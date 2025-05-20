@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin 404 - LUME</title>
+  <link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Jost&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --dark-brown: #291d0e;
+      --olive-green: #314216;
+      --light-bg: #f8f5f2;
+      --border-color: #d3c9be;
+      --accent-brown: #8b7355;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--light-bg);
+      font-family: 'Jost', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+      color: var(--dark-brown);
+    }
+
+    .error-container {
+      padding: 2rem;
+      max-width: 600px;
+      width: 100%;
+    }
+
+    .brand-heading {
+      font-family: 'Aboreto', cursive;
+      font-size: 2.5rem;
+      color: var(--dark-brown);
+      margin-bottom: 1rem;
+      letter-spacing: 1.5px;
+    }
+
+    .error-code {
+      font-size: 150px;
+      color: var(--dark-brown);
+      position: relative;
+      letter-spacing: 15px;
+      font-weight: 700;
+      margin: 1rem 0;
+      line-height: 1;
+    }
+
+    .ghost {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      animation: float 3s ease-in-out infinite;
+      filter: drop-shadow(0 5px 3px rgba(0,0,0,0.1));
+    }
+
+    .ghost svg {
+      width: 100px;
+      height: 120px;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+      50% { transform: translate(-50%, -50%) translateY(-15px); }
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      color: var(--dark-brown);
+      font-weight: 500;
+    }
+
+    p {
+      font-size: 1.1rem;
+      color: var(--dark-brown);
+      margin-bottom: 2rem;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+      opacity: 0.8;
+    }
+
+    /* Your Original Button Style */
+    .home-btn {
+      margin-top: 20px;
+      padding: 12px 30px;
+      border: 2px solid var(--dark-brown);
+      background: none;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: var(--dark-brown);
+      transition: all 0.3s ease;
+      font-family: 'Jost', sans-serif;
+    }
+
+    .home-btn:hover {
+      background: var(--dark-brown);
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    .footer {
+      margin-top: 3rem;
+      font-size: 0.9rem;
+      color: var(--dark-brown);
+      opacity: 0.6;
+    }
+
+    @media (max-width: 600px) {
+      .error-code {
+        font-size: 100px;
+        letter-spacing: 10px;
+      }
+      
+      .ghost svg {
+        width: 70px;
+        height: 84px;
+      }
+      
+      .brand-heading {
+        font-size: 2rem;
+      }
+      
+      h1 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="error-container">
+    <h1 class="brand-heading">LUME</h1>
+    
+    <div class="error-code">
+      4
+      <div class="ghost">
+        <!-- Admin-themed Ghost SVG -->
+        <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M32 12C20 12 10 22 10 34V50C10 56 16 60 22 58L32 54L42 58C48 60 54 56 54 50V34C54 22 44 12 32 12Z" 
+                fill="var(--light-bg)" stroke="var(--dark-brown)" stroke-width="2"/>
+          <circle cx="24" cy="34" r="4" fill="var(--dark-brown)"/>
+          <circle cx="40" cy="34" r="4" fill="var(--dark-brown)"/>
+          <path d="M24 44C24 44 28 48 32 48C36 48 40 44 40 44" 
+                stroke="var(--dark-brown)" stroke-width="2" stroke-linecap="round"/>
+          <!-- Tie for admin ghost -->
+          <rect x="30" y="50" width="4" height="6" rx="2" fill="var(--accent-brown)"/>
+          <rect x="26" y="52" width="12" height="2" rx="1" fill="var(--accent-brown)"/>
+        </svg>
+      </div>
+      4
+    </div>
+
+    <h1>Page Not Found</h1>
+    <p>Looks like you've wandered off the path. Let's get you back home.</p>
+
+    <a href="/admin" class="home-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M9 22H15C20 22 22 20 22 15V9C22 4 20 2 15 2H9C4 2 2 4 2 9V15C2 20 4 22 9 22Z" 
+              stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M13.26 15.53L9.73999 12L13.26 8.46997" 
+              stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Return to Home
+    </a>
+
+    <div class="footer">
+      <p> Error 404 • The requested page could not be found</p>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LUME - Admin Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Jost&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --dark-brown: #291d0e;
+      --olive-green: #314216;
+      --light-bg: #f8f5f2;
+      --border-color: #d3c9be;
+    }
+
+    /* Perfect centering */
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--light-bg);
+      font-family: 'Jost', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .auth-wrapper {
+      width: 100%;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+   
+    .auth-container {
+      width: 100%;
+      max-width: 760px; /* Doubled to accommodate split layout */
+      display: flex;
+      background: white;
+      box-shadow: 0 5px 25px rgba(41, 29, 14, 0.08);
+      border-radius: 2px;
+      overflow: hidden; /* Ensure image doesn't overflow */
+    }
+    
+
+    .auth-image-section {
+      flex: 1;
+      min-height: 400px; /* Ensure the image section has a minimum height */
+    }
+
+    .auth-image-section img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* Ensures the image fills the section without distortion */
+    }
+
+    .auth-login-section {
+      flex: 1;
+      padding: 40px 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    /* Aboreto font for heading */
+    .auth-heading {
+      font-family: 'Aboreto', cursive;
+      color: var(--dark-brown);
+      text-align: center;
+      margin-bottom: 35px;
+      letter-spacing: 1.5px;
+      font-weight: 400;
+      text-transform: uppercase;
+    }
+
+    /* Jost font for everything else */
+    .form-control,
+    .form-check-label,
+    .auth-btn,
+    .google-btn,
+    .auth-footer {
+      font-family: 'Jost', sans-serif;
+    }
+
+    .form-control {
+      border: none;
+      border-bottom: 1px solid var(--border-color);
+      border-radius: 0;
+      padding: 10px 0;
+      margin-bottom: 15px;
+      background-color: transparent;
+      text-align: center;
+      width: 100%;
+    }
+
+    .form-control:focus {
+      box-shadow: none;
+      border-bottom-color: var(--dark-brown);
+      outline: none;
+    }
+
+    .auth-btn {
+      background-color: var(--dark-brown);
+      color: white;
+      width: 100%;
+      border: none;
+      padding: 12px;
+      font-weight: 500;
+      letter-spacing: 0.8px;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+
+    .auth-btn:hover {
+      background-color: var(--olive-green);
+      transform: translateY(-2px);
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 30px 0;
+      color: var(--dark-brown);
+      font-weight: 400;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: "";
+      flex: 1;
+      border-bottom: 1px solid var(--border-color);
+      margin: 0 12px;
+    }
+
+    .google-btn {
+      width: 100%;
+      padding: 10px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border-color);
+      color: var(--dark-brown);
+      transition: all 0.3s ease;
+      text-decoration: none;
+      background: white;
+      cursor: pointer;
+    }
+
+    .google-btn:hover {
+      border-color: var(--dark-brown);
+    }
+
+    .google-btn img {
+      width: 18px;
+      margin-right: 10px;
+    }
+
+    .auth-footer {
+      margin-top: 25px;
+      font-size: 14px;
+      text-align: center;
+      color: var(--dark-brown);
+    }
+
+    .auth-footer a {
+      color: var(--dark-brown);
+      font-weight: 500;
+      text-decoration: underline;
+    }
+
+    .welcome-text {
+      display: block;
+      text-align: center;
+      color: var(--dark-brown);
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+      letter-spacing: 1px;
+    }
+
+    .auth-error {
+      background: #FFEBEE;
+      color: #C62828;
+      padding: 12px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      text-align: center;
+      border: 1px solid #EF9A9A;
+    }
+
+    .error-message {
+      color: #C62828;
+      font-size: 12px;
+      margin-bottom: 15px;
+      text-align: center;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <main class="auth-wrapper">
+    <div class="auth-container">
+      <div class="auth-image-section">
+        <img src="/images/b50eeb23b5eabc48e7d1db341b6e4738.jpg" alt="Admin Login Image">
+      </div>
+      <div class="auth-login-section">
+        <h1 class="auth-heading">LUME</h1>
+        <span class="welcome-text">Welcome back, Admin!</span>
+        <div id="loginError" class="auth-error" style="display: none;"></div>
+
+        <form id="formid" class="auth-form" action="/admin/login" method="post">
+          <input 
+            type="email" 
+            name="email"
+            class="form-control" 
+            id="email"
+            placeholder="Email" 
+            required
+            aria-label="Email address"
+          >
+        
+
+          <input 
+            type="password" 
+            name="password"
+            class="form-control" 
+            id="password"
+            placeholder="Password" 
+            required
+            aria-label="Password"
+          >
+      
+
+          <button type="submit" class="auth-btn">LOGIN</button>
+
+         
+
+     
+         
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <script>
+     const serverMessage = '<%= typeof message !== "undefined" ? message : "" %>';
+  
+  if (serverMessage) {
+    const errorEl = document.getElementById('loginError');
+    errorEl.textContent = serverMessage;
+    errorEl.style.display = 'block';
+    
+    
+    setTimeout(() => {
+      errorEl.style.display = 'none';
+    }, 5000);
+  }
+  </script>
+</body>
+</html>

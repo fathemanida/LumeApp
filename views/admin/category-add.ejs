@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Category | LUME Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
+  <link rel="stylesheet" href="/styles/adminStyles.css">
+</head>
+<body class="dashboard">
+  <aside class="sidebar">
+    <div class="brand">LUME</div>
+    <ul class="nav-menu">
+      <li class="nav-item">
+        <a href="/admin/dashboard" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/product" class="nav-link"><i class="fas fa-box"></i> Product</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/orders" class="nav-link"><i class="fas fa-shopping-cart"></i> Orders</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/users" class="nav-link"><i class="fas fa-users"></i> Users</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/Category" class="nav-link active"><i class="fas fa-tags"></i> Category</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/offers" class="nav-link"><i class="fas fa-ticket-alt"></i> Offers</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/settings" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/banner" class="nav-link"><i class="fas fa-image"></i> Banner</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/Coupons" class="nav-link"><i class="fas fa-ticket-alt"></i> Coupons</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/logout" class="nav-link logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </li>
+    </ul>
+  </aside>
+
+  <div class="main-content">
+    <header class="main-header">
+      <div class="header-left">
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+          <i class="fas fa-bars"></i>
+        </button>
+        <h2 class="page-title">ADD CATEGORY</h2>
+      </div>
+      <div class="header-right">
+        <button class="notification-btn">
+          <i class="fas fa-bell"></i>
+          <span class="notification-badge">3</span>
+        </button>
+        <div class="profile-dropdown">
+          <img src="https://i.pravatar.cc/80" alt="Profile" class="profile-img">
+          <span class="profile-name">Admin</span>
+          <div class="profile-dropdown-menu">
+            <a href="#" class="dropdown-item"><i class="fas fa-user"></i> Profile</a>
+            <a href="#" class="dropdown-item"><i class="fas fa-cog"></i> Settings</a>
+            <a href="/admin/logout" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Logout</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <form id="categoryForm" class="form-container" enctype="multipart/form-data">
+        <div class="form-group">
+          <label for="name">Category Name</label>
+          <input type="text" id="name" name="name" placeholder="Enter category name">
+          <span class="error-message" id="name-error"></span>
+        </div>
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea id="description" name="description" placeholder="Enter description"></textarea>
+          <span class="error-message" id="des-error"></span>
+        </div>
+        <div class="form-group image-upload-group">
+          <label for="image">Category Image</label>
+          <label class="upload-btn">
+            <input type="file" id="image" name="image" accept="image/*" required>
+            <i class="fas fa-upload"></i> Upload Image
+          </label>
+          <span class="error-message" id="image-error"></span>
+          <div class="image-preview-container">
+            <img id="image-preview" class="image-preview" alt="Image Preview">
+            <button type="button" class="remove-image-btn" onclick="removeImage()">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div id="cropper-container" class="cropper-container">
+            <img id="cropper-image" alt="Cropper Image">
+            <div class="cropper-actions">
+              <button type="button" id="crop-btn" class="crop-btn">Crop Image</button>
+              <button type="button" id="reset-crop-btn" class="reset-crop-btn">Cancel</button>
+            </div>
+          </div>
+        </div>
+        <button type="submit" class="submit-btn">ADD CATEGORY</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+  <script>
+    let cropper = null;
+    let croppedImageBlob = null;
+
+    document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+      document.querySelector('.sidebar').classList.toggle('active');
+    });
+
+    function validateForm() {
+      clearErrorMsg();
+      const name = document.getElementById("name").value.trim();
+      const description = document.getElementById("description").value.trim();
+      const image = document.getElementById("image").files[0];
+      let isValid = true;
+
+      if (name === "") {
+        displayErrorMsg("name-error", "Please enter a category name");
+        isValid = false;
+      } else if (!/^[a-zA-Z\s]+$/.test(name)) {
+        displayErrorMsg("name-error", "Category name should only contain letters and spaces");
+        isValid = false;
+      }
+
+      if (description === "") {
+        displayErrorMsg("des-error", "Please enter a description");
+        isValid = false;
+      }
+
+      if (!image && !croppedImageBlob) {
+        displayErrorMsg("image-error", "Please upload an image");
+        isValid = false;
+      }
+
+      return isValid;
+    }
+
+    function displayErrorMsg(elementId, message) {
+      const errorElement = document.getElementById(elementId);
+      errorElement.textContent = message;
+      errorElement.style.display = "block";
+    }
+
+    function clearErrorMsg() {
+      const errorElements = document.querySelectorAll('.error-message');
+      errorElements.forEach(element => {
+        element.textContent = "";
+        element.style.display = "none";
+      });
+    }
+
+    function removeImage() {
+      document.getElementById('image').value = '';
+      document.querySelector('.image-preview-container').style.display = 'none';
+      document.getElementById('cropper-container').style.display = 'none';
+      document.getElementById('image-preview').src = '';
+      croppedImageBlob = null;
+      if (cropper) {
+        cropper.destroy();
+        cropper = null;
+      }
+    }
+
+    function initializeCropper(file) {
+      const previewContainer = document.querySelector('.image-preview-container');
+      const preview = document.getElementById('image-preview');
+      const cropperContainer = document.getElementById('cropper-container');
+      const cropperImage = document.getElementById('cropper-image');
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        preview.src = e.target.result;
+        previewContainer.style.display = 'block';
+        cropperImage.src = e.target.result;
+        cropperContainer.style.display = 'block';
+
+        if (cropper) {
+          cropper.destroy();
+        }
+
+        cropper = new Cropper(cropperImage, {
+          aspectRatio: 1,
+          viewMode: 1,
+          autoCropArea: 0.8,
+          responsive: true,
+          background: true,
+          modal: true,
+          ready: function() {
+            const canvas = this.cropper.getCroppedCanvas();
+            preview.src = canvas.toDataURL();
+          },
+          crop: function(e) {
+            const canvas = this.cropper.getCroppedCanvas();
+            preview.src = canvas.toDataURL();
+          }
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+
+    document.getElementById('image').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        if (file.size > 5 * 1024 * 1024) { 
+          displayErrorMsg("image-error", "Image size should be less than 5MB");
+          this.value = '';
+          return;
+        }
+        if (!file.type.startsWith('image/')) {
+          displayErrorMsg("image-error", "Please upload an image file");
+          this.value = '';
+          return;
+        }
+        initializeCropper(file);
+      }
+    });
+
+    document.getElementById('crop-btn').addEventListener('click', function() {
+      if (cropper) {
+        cropper.getCroppedCanvas({
+          width: 400,
+          height: 400,
+        }).toBlob((blob) => {
+          croppedImageBlob = blob;
+          const preview = document.getElementById('image-preview');
+          preview.src = URL.createObjectURL(blob);
+          document.querySelector('.image-preview-container').style.display = 'block';
+          document.getElementById('cropper-container').style.display = 'none';
+          cropper.destroy();
+          cropper = null;
+        }, 'image/jpeg', 0.8);
+      }
+    });
+
+    document.getElementById('reset-crop-btn').addEventListener('click', removeImage);
+
+    async function handleFormSubmit(event) {
+      event.preventDefault();
+      
+      if (!validateForm()) return;
+
+      const submitBtn = event.target.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Processing...";
+
+      try {
+        const formData = new FormData();
+        formData.append('name', document.getElementById("name").value.trim());
+        formData.append('description', document.getElementById("description").value.trim());
+
+        if (croppedImageBlob) {
+          formData.append('image', croppedImageBlob, 'category.jpg');
+        } else {
+          formData.append('image', document.getElementById('image').files[0]);
+        }
+
+        const response = await fetch("/admin/add-category", {
+          method: "POST",
+          body: formData,
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          const contentType = response.headers.get("content-type");
+          if (contentType && contentType.indexOf("application/json") !== -1) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "Failed to add category");
+          } else {
+            throw new Error("Server error occurred");
+          }
+        }
+
+        const result = await response.json();
+
+        await Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: result.message || "Category added successfully",
+          timer: 2000,
+          showConfirmButton: false
+        });
+
+        window.location.href = "/admin/category";
+        
+      } catch (error) {
+        console.error('Error:', error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: error.message || "Failed to add category"
+        });
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "ADD CATEGORY";
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('categoryForm');
+      if (form) {
+        form.addEventListener('submit', handleFormSubmit);
+      }
+    });
+  </script>
+</body>
+</html>

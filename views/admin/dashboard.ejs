@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LEMO Admin Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Jost&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+ <link rel="stylesheet" href="/styles/adminStyles.css">
+</head>
+<style>
+ /* Dashboard Cards with Elegant Hover Effects */
+.dashboard-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  order: -1; /* This will move the cards above the table */
+}
+
+.content-area {
+  display: flex;
+  flex-direction: column;
+}
+
+.card {
+  background: var(--dark-brown); /* Dark background by default */
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--light-bg);
+  position: relative;
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: translateY(-8px) scale(1.02);
+  background: #f5ede4; /* Very light brown */
+  box-shadow: 0 12px 20px rgba(41, 29, 14, 0.15);
+  color: var(--dark-brown);
+  border-color: var(--border-color);
+}
+
+.card:hover .card-icon {
+  background-color: rgba(49, 66, 22, 0.1);
+  color: var(--olive-green);
+}
+
+.card:hover .card-title {
+  opacity: 0.8;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: var(--olive-green);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s ease;
+}
+
+.card:hover::before {
+  transform: scaleX(1);
+}
+
+.card-title {
+  font-size: 0.9rem;
+  opacity: 0.7;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  transition: opacity 0.3s ease;
+}
+
+.card-value {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.5px;
+}
+
+.card-change {
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.positive {
+  color: #51623e; /* Light olive green */
+}
+
+.card:hover .positive {
+  color: var(--olive-green);
+}
+
+.negative {
+  color: #d4a5a5; /* Light red */
+}
+
+.card:hover .negative {
+  color: #a83a3a;
+}
+
+.card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--light-bg);
+  font-size: 1.2rem;
+  transition: all 0.4s ease;
+}
+</style>
+<body class="dashboard">
+  <!-- Sidebar -->
+
+  <aside class="sidebar">
+    <div class="brand">LEMO</div>
+    <ul class="nav-menu">
+      <li class="nav-item">
+        <a href="/dashboard" class="nav-link active"><i class="fas fa-home"></i> Dashboard</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/product" class="nav-link"><i class="fas fa-box"></i> Product</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/order" class="nav-link"><i class="fas fa-shopping-cart"></i> Orders</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/users" class="nav-link"><i class="fas fa-users"></i> Users</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/category" class="nav-link "><i class="fas fa-tags"></i> Category</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/offer" class="nav-link"><i class="fas fa-ticket-alt"></i> Offers</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/setting" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/banner" class="nav-link"><i class="fas fa-image"></i> Banner</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/Coupons" class="nav-link"><i class="fas fa-ticket-alt"></i> Coupons</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/logout" class="nav-link logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </li>
+    </ul>
+  </aside>
+
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Header -->
+   <header class="main-header">
+    <div class="header-left">
+      <button class="mobile-menu-btn" id="mobileMenuBtn">
+        <i class="fas fa-bars"></i>
+      </button>
+      <h2 class="page-title">DASHBOARD</h2>
+    </div>
+    <div class="header-right">
+      <button class="notification-btn">
+        <i class="fas fa-bell"></i>
+        <span class="notification-badge">3</span>
+      </button>
+      <div class="profile-dropdown">
+        <img src="https://i.pravatar.cc/80" alt="Profile" class="profile-img">
+        <span class="profile-name">Admin</span>
+        <div class="profile-dropdown-menu">
+          <a href="#" class="dropdown-item"><i class="fas fa-user"></i> Profile</a>
+          <a href="#" class="dropdown-item"><i class="fas fa-cog"></i> Settings</a>
+          <a href="/logout" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+      </div>
+    </div>
+  </header>
+<!--   
+      <div class="header-left">
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+          <i class="fas fa-bars"></i>
+        </button>
+        <h2 class="page-title">DASHBOARD</h2>
+      </div>
+      <div class="header-right">
+        <button class="notification-btn">
+          <i class="fas fa-bell"></i>
+          <span class="notification-badge">3</span>
+        </button>
+        <div class="profile-dropdown">
+          <img src="https://i.pravatar.cc/80" alt="Profile" class="profile-img">
+          <span class="profile-name">Admin</span>
+          <div class="profile-dropdown-menu">
+            <a href="#" class="dropdown-item"><i class="fas fa-user"></i> Profile</a>
+            <a href="#" class="dropdown-item"><i class="fas fa-cog"></i> Settings</a>
+            <a href="/admin/logout" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Logout</a>
+          </div>
+        </div>
+      </div> -->
+    </header>
+    
+    <div class="content-area">
+  <div class="dashboard-cards">
+  <div class="card">
+    <div class="card-icon">
+      <i class="fas fa-users"></i>
+    </div>
+    <div class="card-title">Total Users</div>
+    <div class="card-value">1,248</div>
+    <div class="card-change positive">
+      <i class="fas fa-arrow-up"></i> 12% from last month
+    </div>
+  </div>
+  
+  <div class="card">
+    <div class="card-icon">
+      <i class="fas fa-box-open"></i>
+    </div>
+    <div class="card-title">Products</div>
+    <div class="card-value">356</div>
+    <div class="card-change positive">
+      <i class="fas fa-arrow-up"></i> 5% from last month
+    </div>
+  </div>
+  
+  <div class="card">
+    <div class="card-icon">
+      <i class="fas fa-shopping-cart"></i>
+    </div>
+    <div class="card-title">Items Sold</div>
+    <div class="card-value">2,491</div>
+    <div class="card-change positive">
+      <i class="fas fa-arrow-up"></i> 8% from last month
+    </div>
+  </div>
+  
+  <div class="card">
+    <div class="card-icon">
+      <i class="fas fa-dollar-sign"></i>
+    </div>
+    <div class="card-title">Total Revenue</div>
+    <div class="card-value">$24,873</div>
+    <div class="card-change negative">
+      <i class="fas fa-arrow-down"></i> 3% from last month
+    </div>
+  </div>
+</div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Product</th>
+              <th>Product Name</th>
+              <th>Category</th>
+              <th>Amount</th>
+              <th>Revenue</th>
+              <th>Quantity Sold</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>#RB6525</td>
+              <td><img src="/images/necklace.jpg" class="product-img" alt="Pendant Necklace"></td>
+              <td>Pendant Necklace</td>
+              <td>Necklace</td>
+              <td>₹5,450</td>
+              <td>₹5,900</td>
+              <td>2</td>
+            </tr>
+        
+          </tbody>
+        </table>
+
+        
+        <div class="pagination">
+          <button class="page-btn">&lt;</button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <button class="page-btn">&gt;</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+   
+    document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+      document.querySelector('.sidebar').classList.toggle('active');
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <!-- Comment out external stylesheet to isolate conflicts -->
+  <link rel="stylesheet" href="/styles/userStyles.css">
+
+</head>
+<body>
+  <div class="auth-wrapper">
+    <div class="auth-container">
+      <div class="auth-image-section">
+        <img src="/images/e543e77e342361b6f38d3bf73c585146.jpg" alt="App Image" />
+
+      </div>
+      <div class="auth-form-section">
+        <h2 class="auth-heading">CREATE ACCOUNT</h2>
+        <form id="formid" action="/signup" method="POST">
+          <input type="text" class="form-control" name="name" id="name" placeholder="User name">
+          <div id="error1" class="error-message"></div>
+
+          <input type="email" class="form-control" name="email" id="email" placeholder="Email">
+          <div id="error2" class="error-message"></div>
+
+          <input type="text" class="form-control" name="phone" id="phone" placeholder="Phone Number">
+          <div id="error3" class="error-message"></div>
+
+          <input type="password" class="form-control" name="password" id="password" placeholder="Password">
+          <div id="error4" class="error-message"></div>
+
+          <input type="password" class="form-control" name="cPassword" id="cPassword" placeholder="Confirm Password">
+          <div id="error5" class="error-message"></div>
+
+          <% if (locals.message && message.length > 0) { %>
+            <div class="alert alert-danger text-message">
+              <%= message %>
+            </div>
+          <% } %>
+          
+          <button type="submit" class="btn auth-btn">CREATE</button>
+          
+          <div class="divider">OR</div>
+          
+          <a href="/auth/google" class="btn google-btn">
+            <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google">
+            Continue with Google
+          </a>
+          
+          <div class="auth-footer">
+            Have an account? <a href="/login">Log In</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      
+      const form = document.getElementById('formid');
+      const nameInput = document.getElementById('name');
+      const emailInput = document.getElementById('email');
+      const phoneInput = document.getElementById('phone');
+      const passwordInput = document.getElementById('password');
+      const cPasswordInput = document.getElementById('cPassword');
+      const error1 = document.getElementById('error1');
+      const error2 = document.getElementById('error2');
+      const error3 = document.getElementById('error3');
+      const error4 = document.getElementById('error4');
+      const error5 = document.getElementById('error5');
+
+      
+      function validateName() {
+        const value = nameInput.value.trim();
+        const pattern = /^[A-Za-z\s'-]+$/;
+        
+        if (value === "") {
+          showError(error1, "Please enter a valid User Name");
+          return false;
+        } 
+        if (!pattern.test(value)) {
+          showError(error1, "Name should only contain alphabets, spaces, hyphens, and apostrophes");
+          return false;
+        }
+        hideError(error1);
+        return true;
+      }
+
+      function validateEmail() {
+        const value = emailInput.value.trim();
+        const pattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        
+        if (!pattern.test(value)) {
+          showError(error2, "Please enter a valid email address");
+          return false;
+        }
+        hideError(error2);
+        return true;
+      }
+
+      function validatePhone() {
+        const value = phoneInput.value.trim();
+        
+        if (value === "") {
+          showError(error3, "Please enter a phone number");
+          return false;
+        } 
+        if (value.length !== 10 || isNaN(value)) {
+          showError(error3, "Please enter a valid 10-digit phone number");
+          return false;
+        }
+        hideError(error3);
+        return true;
+      }
+
+      function validatePassword() {
+        const value = passwordInput.value;
+        const pattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+        let isValid = true;
+        
+        if (value.length < 8) {
+          showError(error4, "Password should contain at least 8 characters");
+          isValid = false;
+        } 
+        else if (!pattern.test(value)) {
+          showError(error4, "Must contain at least one number, one uppercase, and one lowercase letter");
+          isValid = false;
+        } 
+        else {
+          hideError(error4);
+        }
+        
+        if (value !== cPasswordInput.value) {
+          showError(error5, "Passwords do not match");
+          isValid = false;
+        } 
+        else {
+          hideError(error5);
+        }
+        
+        return isValid;
+      }
+
+      
+      function showError(element, message) {
+        element.textContent = message;
+        element.style.display = "block";
+      }
+
+      function hideError(element) {
+        element.textContent = "";
+        element.style.display = "none";
+      }
+
+      
+      form.addEventListener("submit", function(e) {
+        e.preventDefault();
+        
+        const isNameValid = validateName();
+        const isEmailValid = validateEmail();
+        const isPhoneValid = validatePhone();
+        const isPasswordValid = validatePassword();
+        
+        if (isNameValid && isEmailValid && isPhoneValid && isPasswordValid) {
+          form.submit();
+        }
+      });
+
+     
+      if (!nameInput || !emailInput || !phoneInput || !passwordInput || !cPasswordInput ||
+          !error1 || !error2 || !error3 || !error4 || !error5 || !form) {
+        console.error("One or more elements not found");
+      }
+    });
+  </script>
+</body>
+</html>
