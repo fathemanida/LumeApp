@@ -44,7 +44,7 @@ const categoryInfo = async (req, res) => {
         }
         
         const page = parseInt(req.query.page) || 1;
-        const limit = 6;
+        const limit = 2;
         const skip = (page - 1) * limit;
 
         const categoryName = await Category.find({
@@ -89,7 +89,7 @@ const categoryInfo = async (req, res) => {
 
 const loadAddCategory=async (req,res)=>{
   try {
-      
+      console.log(req.session.admin);
       if(req.session.admin){
           return res.render("category-add")
       }else{
@@ -106,6 +106,7 @@ const loadAddCategory=async (req,res)=>{
 
 const addCategory = async (req, res) => {
     try {
+        console.log('request here for add category');
         const { name, description } = req.body;
         
         if (!name || !description || !req.file) {
@@ -257,6 +258,8 @@ const getEditCategory = async (req, res) => {
     res.render('error', { message: 'Server error, please try again later' });
   }
 };
+
+
 
 const editCategory = async (req, res) => {
     try {

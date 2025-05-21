@@ -665,56 +665,56 @@
               <th>Action</th>
             </tr>
           </thead>
-          <tbody>
-            <% for (let i=data.length - 1; i>= 0; i--) { %>
-              <tr>
-                <td>
-                  <%=i+1%>
-                </td>
-                <td>
-                  <img src="/uploads/product/<%= data[i].productImage[0] %>" alt="Product Image"
-                    style="height: 54px;" />
-                </td>
+            <tbody>
+              <% for (let i=data.length - 1; i>= 0; i--) { %>
+                <tr>
+                  <td>
+                    <%= offset + (data.length - i) %>
+                  </td>
+                  <td>
+                    <img src="/uploads/product/<%= data[i].productImage[0] %>" alt="Product Image"
+                      style="height: 54px;" />
+                  </td>
 
-                <td>
-                  <%= data[i].productName %>
-                </td>
-                <td>
-                  <%= data[i].category ? data[i].category.name : 'No Category' %>
-                </td>
-                <td>
-                  <%= data[i].sizes %>
-                </td>
-                <td></td>
-                <td></td>
-                <td>
-                  <%= data[i].salePrice %>
-                </td>
-                <td>
-                  <%= data[i].quantity %>
-                </td>
+                  <td>
+                    <%= data[i].productName %>
+                  </td>
+                  <td>
+                    <%= data[i].category ? data[i].category.name : 'No Category' %>
+                  </td>
+                  <td>
+                    <%= data[i].sizes %>
+                  </td>
+                  <td></td>
+                  <td></td>
+                  <td>
+                    <%= data[i].salePrice %>
+                  </td>
+                  <td>
+                    <%= data[i].quantity %>
+                  </td>
 
-                <td class="list-unlist-cell" data-id="<%= data[i]._id %>">
-                  <% if(data[i].isListed) { %>
-                    <a href="#" class="unlist-btn" data-id="<%= data[i]._id %>"
-                      onclick="toggleListing('<%= data[i]._id %>', false)">Unlist</a>
-                    <% } else { %>
-                      <a href="#" class="list-btn" data-id="<%= data[i]._id %>"
-                        onclick="toggleListing('<%= data[i]._id %>', true)">List</a>
-                      <% } %>
-                </td>
-                <td>
-                  <a href="/admin/edit-product/<%= data[i]._id %>" class="action-btn edit-btn" title="Edit Product">
-                    <i class="fas fa-edit"></i>
-                  </a>
-                  <a href="/admin/delete-product/<%= data[i]._id %>" class="action-btn delete-btn"
-                    title="Delete Product">
-                    <i class="fas fa-trash"></i>
-                  </a>
-                </td>
-              </tr>
-              <% } %>
-          </tbody>
+                  <td class="list-unlist-cell" data-id="<%= data[i]._id %>">
+                    <% if(data[i].isListed) { %>
+                      <a href="#" class="unlist-btn" data-id="<%= data[i]._id %>"
+                        onclick="toggleListing('<%= data[i]._id %>', false)">Unlist</a>
+                      <% } else { %>
+                        <a href="#" class="list-btn" data-id="<%= data[i]._id %>"
+                          onclick="toggleListing('<%= data[i]._id %>', true)">List</a>
+                        <% } %>
+                  </td>
+                  <td>
+                    <a href="/admin/edit-product/<%= data[i]._id %>" class="action-btn edit-btn" title="Edit Product">
+                      <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="/admin/delete-product/<%= data[i]._id %>" class="action-btn delete-btn"
+                      title="Delete Product">
+                      <i class="fas fa-trash"></i>
+                    </a>
+                  </td>
+                </tr>
+                <% } %>
+            </tbody>
         </table>
 
         <div class="pagination">
@@ -752,6 +752,36 @@
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
+
+ const searchForm = document.getElementById('searchForm');
+      const searchInput = document.querySelector('.search-bar');
+      const clearSearch = document.querySelector('.clear-search');
+
+      searchForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const searchTerm = searchInput.value.trim();
+        const url = new URL(window.location.href);
+        
+        if(searchTerm) {
+          url.searchParams.set('search', searchTerm);
+          url.searchParams.set('page', '1');
+        } else {
+          url.searchParams.delete('search');
+        }
+        
+        window.location.href = url.toString();
+      });
+
+      
+      if(clearSearch) {
+        clearSearch.addEventListener('click', function() {
+          searchInput.value = '';
+          const url = new URL(window.location.href);
+          url.searchParams.delete('search');
+          window.location.href = url.toString();
+        });
+      }
+
     async function toggleListing(productId, shouldList) {
       try {
         const action = shouldList ? 'list-product' : 'unlist-product';

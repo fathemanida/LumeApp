@@ -9,7 +9,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600&family=Aboreto&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
-</head>
   <style>
     :root {
       --dark-brown: #291d0e;
@@ -113,7 +112,89 @@
     @media (max-width: 768px) {
       .md\\:col-span-1, .md\\:col-span-2 { grid-column: span 1; }
     }
+
+    #cropModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(41, 29, 14, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      overflow-y: auto; /* Enable vertical scrolling for the modal */
+      padding: 20px;
+    }
+
+    #cropModal .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 500px;
+      max-height: 90vh; /* Limit modal height to 90% of viewport height */
+      display: flex;
+      flex-direction: column; /* Stack content vertically */
+      overflow: hidden; /* Prevent internal overflow issues */
+    }
+
+    #cropModal .cropper-container {
+      max-height: 50vh; /* Restrict cropper container height */
+      width: 100% !important;
+      overflow: hidden; /* Prevent cropper from overflowing */
+    }
+
+    #cropModal .cropper-wrap-box {
+      max-height: 50vh; /* Ensure wrap box respects height limit */
+      overflow: hidden;
+    }
+
+    #cropModal .cropper-view-box {
+      max-height: 50vh; /* Restrict view box height */
+    }
+
+    #cropModal .cropper-canvas {
+      max-height: 50vh; /* Restrict canvas height */
+    }
+
+    #cropModal .crop-image-container {
+      max-height: 50vh; /* Limit the image container height */
+      overflow: hidden; /* Hide overflow to prevent stretching */
+    }
+
+    #cropModal img#cropImage {
+      max-height: 50vh; /* Ensure the image itself is constrained */
+      width: 100%; /* Maintain aspect ratio */
+      object-fit: contain; /* Prevent image distortion */
+    }
+
+    #cropModal .modal-footer {
+      margin-top: 20px; /* Space above buttons */
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-shrink: 0; /* Prevent buttons from shrinking */
+      padding-top: 10px; /* Add padding for better spacing */
+    }
+
+    @media (max-width: 768px) {
+      #cropModal .modal-content {
+        width: 95%; /* Slightly wider on smaller screens */
+        max-height: 95vh; /* Allow more height on mobile */
+      }
+
+      #cropModal .cropper-container,
+      #cropModal .cropper-wrap-box,
+      #cropModal .cropper-view-box,
+      #cropModal .cropper-canvas,
+      #cropModal .crop-image-container {
+        max-height: 45vh; /* Slightly smaller cropper area on mobile */
+      }
+    }
   </style>
+</head>
 
 <body>
   <div class="bg-light-bg p-6 min-h-screen">
@@ -121,54 +202,54 @@
       <h1 class="text-2xl font-aboreto text-dark-brown mb-6 text-center uppercase letter-spacing-1-5">Edit Product</h1>
 
       <form id="editProductForm" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-       <div class="md:col-span-1">
-  <label class="block mb-2 font-jost text-dark-brown font-medium text-sm">Product Images:</label>
-  <div class="flex gap-4">
-    <% for(let i=0; i < 3; i++) { %>
-      <div class="relative w-24 h-24 border-2 border-dashed border-border-color rounded-lg bg-light-bg flex items-center justify-center group overflow-hidden">
-        <!-- Existing Image Display -->
-        <% if (product.productImage[i]) { %>
-          <img src="/uploads/product/<%= product.productImage[i] %>"
-               class="w-full h-full object-cover rounded-lg"
-               alt="Product Image <%= i + 1 %>"
-               id="image<%= i %>">
-          <div class="absolute inset-0 bg-dark-brown bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-            <label class="cursor-pointer p-2 bg-white bg-opacity-80 rounded-full hover:bg-opacity-100 transition-all">
-              <input type="file" name="newImage<%= i %>" 
-                     class="hidden single-image-input" 
-                     accept="image/*"
-                     data-index="<%= i %>" 
-                     onchange="handleSingleImageUpload(event, <%= i %>)">
-              <i class="fas fa-camera text-dark-brown"></i>
-            </label>
+        <div class="md:col-span-1">
+          <label class="block mb-2 font-jost text-dark-brown font-medium text-sm">Product Images:</label>
+          <div class="flex gap-4">
+            <% for(let i=0; i < 3; i++) { %>
+              <div class="relative w-24 h-24 border-2 border-dashed border-border-color rounded-lg bg-light-bg flex items-center justify-center group overflow-hidden">
+                <!-- Existing Image Display -->
+                <% if (product.productImage[i]) { %>
+                  <img src="/Uploads/product/<%= product.productImage[i] %>"
+                       class="w-full h-full object-cover rounded-lg"
+                       alt="Product Image <%= i + 1 %>"
+                       id="image<%= i %>">
+                  <div class="absolute inset-0 bg-dark-brown bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <label class="cursor-pointer p-2 bg-white bg-opacity-80 rounded-full hover:bg-opacity-100 transition-all">
+                      <input type="file" name="newImage<%= i %>" 
+                             class="hidden single-image-input" 
+                             accept="image/*"
+                             data-index="<%= i %>" 
+                             onchange="handleSingleImageUpload(event, <%= i %>)">
+                      <i class="fas fa-camera text-dark-brown"></i>
+                    </label>
+                  </div>
+                <% } else { %>
+                 
+                  <label class="cursor-pointer w-full h-full flex items-center justify-center">
+                    <input type="file" name="newImage<%= i %>" 
+                           class="hidden single-image-input" 
+                           accept="image/*"
+                           data-index="<%= i %>" 
+                           onchange="handleSingleImageUpload(event, <%= i %>)">
+                    <i class="fas fa-plus text-dark-brown text-2xl"></i>
+                  </label>
+                <% } %>
+              </div>
+            <% } %>
           </div>
-        <% } else { %>
-          <!-- Placeholder for new image -->
-          <label class="cursor-pointer w-full h-full flex items-center justify-center">
-            <input type="file" name="newImage<%= i %>" 
-                   class="hidden single-image-input" 
-                   accept="image/*"
-                   data-index="<%= i %>" 
-                   onchange="handleSingleImageUpload(event, <%= i %>)">
-            <i class="fas fa-plus text-dark-brown text-2xl"></i>
-          </label>
-        <% } %>
-      </div>
-    <% } %>
-  </div>
-  <p class="form-hint mt-2 text-xs text-gray-500">Click on each image to change it. Recommended: 800×800px, JPG/PNG</p>
-  <div id="image-error" class="error-message text-red-500 text-sm mt-1"></div>
-</div>
+          <p class="form-hint mt-2 text-xs text-gray-500">Click on each image to change it. Recommended: 800×800px, JPG/PNG</p>
+          <div id="image-error" class="error-message text-red-500 text-sm mt-1"></div>
+        </div>
 
-        <div id="cropModal" class="fixed inset-0 bg-dark-brown bg-opacity-50 flex justify-center items-center z-50 hidden">
-          <div class="bg-white p-4 rounded-lg w-[450px] max-w-full shadow-lg">
+        <div id="cropModal" class="fixed inset-0 bg-dark-brown bg-opacity-50 flex justify-center items-center z-50 hidden overflow-y-auto">
+          <div class="modal-content">
             <h3 class="text-dark-brown text-xl mb-4 font-jost">Crop Image</h3>
-            <div>
-              <img id="cropImage" class="max-h-[500px] w-auto">
+            <div class="crop-image-container">
+              <img id="cropImage" class="max-w-full">
             </div>
-            <div class="mt-4 flex justify-end gap-2">
-              <button id="cropButton" class="bg-dark-brown text-white px-4 py-2 rounded font-jost hover:bg-olive-green transition-all">Save</button>
-              <button id="cancelCrop" class="bg-border-color text-dark-brown px-4 py-2 rounded font-jost hover:bg-dark-brown hover:text-white transition-all">Cancel</button>
+            <div class="modal-footer">
+              <button type="button" id="cropButton" class="bg-dark-brown text-white px-4 py-2 rounded font-jost hover:bg-olive-green transition-all">Save</button>
+              <button type="button" id="cancelCrop" class="bg-border-color text-dark-brown px-4 py-2 rounded font-jost hover:bg-dark-brown hover:text-white transition-all">Cancel</button>
             </div>
           </div>
         </div>
@@ -272,10 +353,6 @@
     </div>
   </div>
 
-  <style>
-    /* ... (CSS remains unchanged) */
-  </style>
-
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
   <script>
     let cropper = null;
@@ -290,122 +367,192 @@
     const form = document.getElementById("editProductForm");
     let isSubmitting = false;
 
-    
-  
-  function handleSingleImageUpload(event, index) {
-    const file = event.target.files[0];
-    if (!file) return;
+    function handleSingleImageUpload(event, index) {
+      const file = event.target.files[0];
+      if (!file) return;
 
-    if (!file.type.match('image.*')) {
-      displayErrorMessage('image-error', 'Only image files are allowed');
-      return;
-    }
-
-    
-    if (file.size > 5 * 1024 * 1024) {
-      displayErrorMessage('image-error', 'Image size must be less than 5MB');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const imgElement = document.getElementById(`image${index}`);
-      const container = event.target.closest('.relative');
-      
-      if (!imgElement) {
-       
-        const newImg = document.createElement('img');
-        newImg.id = `image${index}`;
-        newImg.className = 'w-full h-full object-cover rounded-lg';
-        newImg.alt = `Product Image ${index + 1}`;
-        newImg.src = e.target.result;
-        
-        
-        const plusContainer = container.querySelector('label[class*="cursor-pointer"]');
-        if (plusContainer) {
-          plusContainer.remove();
-        }
-        
-       
-        container.insertBefore(newImg, container.firstChild);
-      } else {
-        
-        imgElement.src = e.target.result;
+      if (!file.type.match('image.*')) {
+        displayErrorMessage('image-error', 'Only image files are allowed');
+        return;
       }
-      
-     
-      document.getElementById('image-error').textContent = '';
-    };
-    reader.readAsDataURL(file);
-  }
 
-  function displayErrorMessage(elementId, message) {
-    const errorElement = document.getElementById(elementId);
-    errorElement.textContent = message;
-    errorElement.style.display = 'block';
-  }
+      if (file.size > 5 * 1024 * 1024) {
+        displayErrorMessage('image-error', 'Image size must be less than 5MB');
+        return;
+      }
 
+      currentImageIndex = index;
+      selectedFiles[index] = file;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const cropImage = document.getElementById('cropImage');
+        cropImage.src = e.target.result;
+        const cropModal = document.getElementById('cropModal');
+        cropModal.style.display = "flex";
 
         if (cropper) {
           cropper.destroy();
         }
 
-        cropper = new Cropper(cropImage, {
-          aspectRatio: 1,
-          viewMode: 1,
-          autoCropArea: 0.8,
-          background: false,
-          zoomable: true,
-          ready: function () {
-            console.log("Cropper ready for image", currentImageIndex + 1);
-          }
-        });
+       
+        cropImage.onload = function() {
+          cropper = new Cropper(cropImage, {
+            aspectRatio: 1,
+            viewMode: 1,
+            autoCropArea: 0.8,
+            background: false,
+            zoomable: true,
+            minCropBoxWidth: 160,
+            minCropBoxHeight: 160,
+            responsive: true,
+            restore: false,
+            checkCrossOrigin: false,
+            modal: true,
+            guides: true,
+            highlight: true,
+            cropBoxMovable: true,
+            cropBoxResizable: true,
+            toggleDragModeOnDblclick: false,
+            ready: function() {
+             
+              const maxHeight = window.innerHeight * 0.5; 
+              const maxWidth = window.innerWidth * 0.9; 
+              const imageData = this.cropper.getImageData();
+              const scale = Math.min(
+                maxWidth / imageData.naturalWidth,
+                maxHeight / imageData.naturalHeight,
+                
+              );
+              this.cropper.setCanvasData({
+                width: imageData.naturalWidth * scale,
+                height: imageData.naturalHeight * scale
+              });
+            }
+          });
+        };
       };
       reader.readAsDataURL(file);
     }
 
-    cropButton.addEventListener("click", function () {
-      if (!cropper) return;
+    function displayErrorMessage(elementId, message) {
+      const errorElement = document.getElementById(elementId);
+      errorElement.textContent = message;
+      errorElement.style.display = 'block';
+    }
 
-      const canvas = cropper.getCroppedCanvas({
-        width: 500,
-        height: 500,
-        minWidth: 160,
-        minHeight: 160,
-        maxWidth: 4096,
-        maxHeight: 4096,
-        imageSmoothingEnabled: true,
-        imageSmoothingQuality: "high",
-      });
+    document.addEventListener('DOMContentLoaded', function() {
+      if (cropButton) {
+        cropButton.addEventListener("click", function() {
+          if (!cropper) return;
 
-      canvas.toBlob((blob) => {
-        const file = new File([blob], `cropped_${Date.now()}.png`, { type: "image/png" });
-        selectedFiles[currentImageIndex] = file;
+          const canvas = cropper.getCroppedCanvas({
+            width: 800,
+            height: 800,
+            minWidth: 160,
+            minHeight: 160,
+            maxWidth: 4096,
+            maxHeight: 4096,
+            imageSmoothingEnabled: true,
+            imageSmoothingQuality: "high",
+          });
 
-        const existingImg = document.getElementById(`image${currentImageIndex}`);
-        if (existingImg) {
-          existingImg.src = URL.createObjectURL(blob);
-          existingImg.classList.remove("hidden");
+          canvas.toBlob((blob) => {
+            const file = new File([blob], `cropped_image_${currentImageIndex}.png`, { type: "image/png" });
+            selectedFiles[currentImageIndex] = file;
+
+            const container = document.querySelector(`input[name="newImage${currentImageIndex}"]`).closest('.relative');
+            const existingImg = container.querySelector('img');
+            
+            if (existingImg) {
+              existingImg.src = URL.createObjectURL(blob);
+            } else {
+              const newImg = document.createElement('img');
+              newImg.id = `image${currentImageIndex}`;
+              newImg.className = 'w-full h-full object-cover rounded-lg';
+              newImg.alt = `Product Image ${currentImageIndex + 1}`;
+              newImg.src = URL.createObjectURL(blob);
+
+              const plusContainer = container.querySelector('label[class*="cursor-pointer"]');
+              if (plusContainer) {
+                plusContainer.remove();
+              }
+
+              container.insertBefore(newImg, container.firstChild);
+            }
+
+           
+            let hoverDiv = container.querySelector('.absolute.inset-0');
+            if (!hoverDiv) {
+              hoverDiv = document.createElement('div');
+              hoverDiv.className = 'absolute inset-0 bg-dark-brown bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center';
+              container.appendChild(hoverDiv);
+            }
+            
+            hoverDiv.innerHTML = `
+              <label class="cursor-pointer p-2 bg-white bg-opacity-80 rounded-full hover:bg-opacity-100 transition-all">
+                <input type="file" name="newImage${currentImageIndex}" 
+                       class="hidden single-image-input" 
+                       accept="image/*"
+                       data-index="${currentImageIndex}" 
+                       onchange="handleSingleImageUpload(event, ${currentImageIndex})">
+                <i class="fas fa-camera text-dark-brown"></i>
+              </label>
+            `;
+
+            cropModal.style.display = "none";
+            cropper.destroy();
+            cropper = null;
+            document.getElementById('image-error').textContent = '';
+          }, "image/png", 0.9);
+        });
+      }
+
+      if (cancelCrop) {
+        cancelCrop.addEventListener("click", function () {
+          cropModal.style.display = "none";
+          if (cropper) {
+            cropper.destroy();
+            cropper = null;
+          }
+          const input = document.querySelector(`input[data-index="${currentImageIndex}"]`);
+          if (input) {
+            input.value = "";
+          }
+          selectedFiles[currentImageIndex] = null;
+
+          if (existingImages[currentImageIndex]) {
+            const imgElement = document.getElementById(`image${currentImageIndex}`);
+            if (imgElement) {
+              imgElement.src = `/Uploads/product/${existingImages[currentImageIndex]}`;
+            }
+          }
+        });
+      }
+    });
+
+    
+    function initializeImageContainers() {
+      const containers = document.querySelectorAll('.relative.w-24.h-24');
+      containers.forEach((container, index) => {
+        if (!container.querySelector('img')) {
+          const label = document.createElement('label');
+          label.className = 'cursor-pointer w-full h-full flex items-center justify-center';
+          label.innerHTML = `
+            <input type="file" name="newImage${index}" 
+                   class="hidden single-image-input" 
+                   accept="image/*"
+                   data-index="${index}" 
+                   onchange="handleSingleImageUpload(event, ${index})">
+            <i class="fas fa-plus text-dark-brown text-2xl"></i>
+          `;
+          container.appendChild(label);
         }
+      });
+    }
 
-        cropModal.style.display = "none";
-        cropper.destroy();
-        cropper = null;
-      }, "image/png", 0.9);
-    });
-
-    cancelCrop.addEventListener("click", function () {
-      cropModal.style.display = "none";
-      if (cropper) {
-        cropper.destroy();
-        cropper = null;
-      }
-      const input = document.querySelector(`input[data-index="${currentImageIndex}"]`);
-      if (input) {
-        input.value = "";
-      }
-      selectedFiles[currentImageIndex] = null;
-    });
+   
+    window.addEventListener('load', initializeImageContainers);
 
     const categorySelect = document.getElementById("product-category");
     const dynamicSizesSection = document.getElementById("dynamic-sizes");
@@ -509,29 +656,37 @@
         formData.append("new", document.querySelector('input[name="new"]:checked').value);
         formData.append("sizes", document.getElementById("sizes-input").value);
 
-        // Append existing images
+        
         existingImages.forEach((img, index) => {
           if (img) {
             formData.append(`existingImages[${index}]`, img);
           }
         });
 
-        // Append new images
+        
         selectedFiles.forEach((file, index) => {
           if (file) {
-            formData.append(`newImage${index}`, file);
+            formData.append("images", file);
           }
         });
 
         const response = await fetch(`/admin/edit-product/<%= product._id %>`, {
           method: "POST",
           body: formData,
+          headers: {
+            'Accept': 'application/json'
+          }
         });
 
-        const data = await response.json();
+        let data;
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          data = await response.json();
+        } else {
+          throw new Error("Server returned non-JSON response. Please try again.");
+        }
 
         if (!response.ok) {
-          // Handle specific validation errors
           if (data.errors) {
             Object.entries(data.errors).forEach(([field, message]) => {
               displayErrorMessage(`${field}-error`, message);
@@ -555,7 +710,7 @@
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: error.message,
+          text: error.message || "An error occurred while updating the product. Please try again.",
         });
       } finally {
         isSubmitting = false;

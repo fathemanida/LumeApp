@@ -45,7 +45,7 @@ const productInfo = async (req, res) => {
   try {
     const search = req.query.search || "";
     const page = parseInt(req.query.page) || 1;
-    const limit = 8; 
+    const limit = 6; 
 
     const searchQuery = {
       $or: [
@@ -76,6 +76,7 @@ const productInfo = async (req, res) => {
 
     const totalProducts = await Product.countDocuments(searchQuery);
     const totalPages = Math.ceil(totalProducts / limit);
+    const offset = (page - 1) * limit;
 
     const categories = await Category.find({ isListed: true });
 
@@ -87,6 +88,7 @@ const productInfo = async (req, res) => {
       totalPages: totalPages,
       totalProducts: totalProducts, 
       startingNumber: (page - 1) * limit + 1, 
+      offset:offset,
     });
   } catch (error) {
     console.error("Error in getAllProducts:", error);
@@ -333,7 +335,6 @@ const editProduct = async (req, res) => {
       existingImages = [],
     } = req.body;
 
-   
     if (!productName || !category || !regularPrice) {
       return res.status(400).json({
         success: false,
@@ -341,7 +342,6 @@ const editProduct = async (req, res) => {
       });
     }
 
-    
     if (!/^[A-Z][a-zA-Z0-9\s]*$/.test(productName)) {
       return res.status(400).json({
         success: false,
@@ -349,7 +349,6 @@ const editProduct = async (req, res) => {
       });
     }
 
-   
     if (description.length < 10) {
       return res.status(400).json({
         success: false,
@@ -357,9 +356,6 @@ const editProduct = async (req, res) => {
       });
     }
 
-  
-
-   
     const categoryExists = await Category.findById(category);
     if (!categoryExists) {
       return res.status(400).json({
@@ -368,7 +364,6 @@ const editProduct = async (req, res) => {
       });
     }
 
-    
     const regularPriceNum = parseFloat(regularPrice);
     if (isNaN(regularPriceNum) || regularPriceNum <= 0) {
       return res.status(400).json({
@@ -394,7 +389,6 @@ const editProduct = async (req, res) => {
       }
     }
 
-    
     const quantityNum = parseInt(quantity);
     if (isNaN(quantityNum) || quantityNum < 0) {
       return res.status(400).json({
@@ -403,7 +397,6 @@ const editProduct = async (req, res) => {
       });
     }
 
-    
     let parsedSizes = [];
     if (sizes) {
       try {
@@ -416,33 +409,45 @@ const editProduct = async (req, res) => {
       }
     }
 
-    
     const finalImages = [...existingImages];
     if (req.files && req.files.length > 0) {
-      newImageFilenames = req.files.map((file) => path.basename(file.path));
-
-      
-      req.files.forEach((file, index) => {
-        const imageIndex = parseInt(file.fieldname.replace("newImage", ""), 10);
-        if (!isNaN(imageIndex) && imageIndex >= 0 && imageIndex < 3) {
-         
-          if (finalImages[imageIndex]) {
-            const oldImagePath = path.join("public", "uploads", "product", finalImages[imageIndex]);
-            fs.unlink(oldImagePath).catch((err) => console.error("Error deleting old image:", err));
+      try {
+        newImageFilenames = req.files.map((file) => path.basename(file.path));
+        
+        for (let i = 0; i < Math.min(req.files.length, 3); i++) {
+          if (finalImages[i]) {
+            const oldImagePath = path.join("public", "uploads", "product", finalImages[i]);
+            if (fs.existsSync(oldImagePath)) {
+              fs.unlinkSync(oldImagePath);
+            }
           }
-          finalImages[imageIndex] = path.basename(file.path);
+          finalImages[i] = newImageFilenames[i];
         }
-      });
+      } catch (error) {
+        console.error("Error handling images:", error);
+        await Promise.all(
+          newImageFilenames.map(async (filename) => {
+            const filePath = path.join("public", "uploads", "product", filename);
+            if (fs.existsSync(filePath)) {
+              await fs.unlink(filePath);
+            }
+          })
+        );
+        return res.status(500).json({
+          success: false,
+          message: "Error processing images. Please try again.",
+        });
+      }
     }
 
-    
     const cleanedImages = finalImages.filter((img) => img);
     if (cleanedImages.length !== 3) {
-      
       await Promise.all(
         newImageFilenames.map(async (filename) => {
-          const filePath = path.join("public", "Uploads", "product", filename);
-          await fs.unlink(filePath).catch((err) => console.error("Error cleaning up image:", err));
+          const filePath = path.join("public", "uploads", "product", filename);
+          if (fs.existsSync(filePath)) {
+            await fs.unlink(filePath);
+          }
         })
       );
       return res.status(400).json({
@@ -451,7 +456,7 @@ const editProduct = async (req, res) => {
       });
     }
 
-        const updateData = {
+    const updateData = {
       productName: productName.trim(),
       description: description.trim(),
       category: new mongoose.Types.ObjectId(category),
@@ -465,12 +470,19 @@ const editProduct = async (req, res) => {
       productImage: cleanedImages,
     };
 
-   
-    const updatedProduct = await Product.findByIdAndUpdate(id, updateData, {
-      new: true,
-      runValidators: true,
-      context: "query",
-    }).populate("category");
+    const updatedProduct = await Product.findByIdAndUpdate(
+      id,
+      updateData,
+      {
+        new: true,
+        runValidators: true,
+        context: "query",
+      }
+    ).populate("category");
+
+    if (!updatedProduct) {
+      throw new Error("Failed to update product");
+    }
 
     return res.status(200).json({
       success: true,
@@ -481,11 +493,12 @@ const editProduct = async (req, res) => {
   } catch (error) {
     console.error("Error in editProduct:", error);
 
-    
     await Promise.all(
       newImageFilenames.map(async (filename) => {
-        const filePath = path.join("public", "Uploads", "product", filename);
-        await fs.unlink(filePath).catch((err) => console.error("Error cleaning up image:", err));
+        const filePath = path.join("public", "uploads", "product", filename);
+        if (fs.existsSync(filePath)) {
+          await fs.unlink(filePath);
+        }
       })
     );
 

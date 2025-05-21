@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 const nodemailer = require("nodemailer");
 const env = require("dotenv").config();
 const session = require("express-session");
-// const passport = require("passport");
+const passport = require("passport");
 
 
 
@@ -98,7 +98,15 @@ const securePassword = async (passsword) => {
   return passwordHash;
 };
 
-
+const logout = async (req, res) => {
+  try {
+    req.session.user = null;
+    console.log('User session cleared');
+    res.render("login");
+  } catch (error) {
+    console.log("Error in logout", error);
+  }
+};
 
 const verifyOtp = async (req, res) => {
   try {
@@ -217,6 +225,8 @@ const loadHome = async (req, res) => {
   try {
 
     const user = req.session.user;
+    console.log(req.session.user)
+
     const userData = await User.findById(user._id);
 
     const categories=await Category.find({isListed:true})
@@ -558,5 +568,6 @@ module.exports={
     loadHome,
     loadShopAll,
     filterProduct,
-    productDetails
+    productDetails,
+    logout
 }

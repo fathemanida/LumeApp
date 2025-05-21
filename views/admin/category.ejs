@@ -588,7 +588,7 @@
             <div class="header-right">
                 <div class="search-container">
                     <form id="searchForm" action="/admin/category" method="GET">
-                        <input type="text" class="search-bar" placeholder="Search users..." name="search"
+                        <input type="text" class="search-bar" placeholder="Search category..." name="search"
                             value="<%= typeof search !== 'undefined' ? search : '' %>">
                         <button type="button" class="clear-search">
                             <i class="fas fa-times"></i>
@@ -756,7 +756,7 @@ async function handleListUnlist(categoryId, action) {
     }
 }
 
-// Add click event listeners for list/unlist buttons
+
 document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.list-btn, .unlist-btn').forEach(button => {
         button.addEventListener('click', function() {
@@ -788,12 +788,34 @@ document.querySelectorAll('.delete-btn').forEach(btn=>{
     })
 })
 
-        document.querySelector('.search-btn')?.addEventListener('click', function () {
-            const searchTerm = document.querySelector('.search-bar').value;
-            if (searchTerm.trim()) {
-                console.log('Searching for:', searchTerm);
-            }
+         const searchForm = document.getElementById('searchForm');
+      const searchInput = document.querySelector('.search-bar');
+      const clearSearch = document.querySelector('.clear-search');
+
+      searchForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const searchTerm = searchInput.value.trim();
+        const url = new URL(window.location.href);
+        
+        if(searchTerm) {
+          url.searchParams.set('search', searchTerm);
+          url.searchParams.set('page', '1');
+        } else {
+          url.searchParams.delete('search');
+        }
+        
+        window.location.href = url.toString();
+      });
+
+      
+      if(clearSearch) {
+        clearSearch.addEventListener('click', function() {
+          searchInput.value = '';
+          const url = new URL(window.location.href);
+          url.searchParams.delete('search');
+          window.location.href = url.toString();
         });
+      }
     </script>
 </body>
 

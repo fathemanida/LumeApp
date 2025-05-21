@@ -534,10 +534,7 @@
     <div class="content-area">
       <div class="action-bar">
         <h2 class="section-title">Users</h2>
-        <button class="add-user-btn" onclick="window.location.href='/admin/add-user'">
-          <i class="fas fa-plus"></i>
-          ADD USER
-        </button>
+       
       </div>
 
       <div class="table-container">
@@ -633,7 +630,7 @@
         window.location.href = url.toString();
       });
 
-      // Clear search functionality
+      
       if(clearSearch) {
         clearSearch.addEventListener('click', function() {
           searchInput.value = '';
@@ -643,7 +640,7 @@
         });
       }
 
-      // Block/Unblock user confirmation
+     
       document.querySelectorAll('.block-btn, .unblock-btn').forEach(btn => {
         btn.addEventListener('click', function() {
           const url = this.dataset.url;

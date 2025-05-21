@@ -15,6 +15,7 @@ passport.use(
       try {
         let user = await User.findOne({ googleId: profile.id });
         if (user) {
+          req.session.user=user
           return done(null, user);
         } else {
           user = new User({
@@ -23,6 +24,7 @@ passport.use(
             googleId: profile.id,
           });
           await user.save();
+          req.session.user=user
           return done(null, user);
         }
       } catch (error) {
