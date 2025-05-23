@@ -468,6 +468,8 @@ const editProduct = async (req, res) => {
       new: isNew === "yes" || isNew === true,
       status: quantityNum > 0 ? "Available" : "Out of Stock",
       productImage: cleanedImages,
+      isListed: true
+      
     };
 
     const updatedProduct = await Product.findByIdAndUpdate(

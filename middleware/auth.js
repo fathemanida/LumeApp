@@ -25,6 +25,10 @@ const userAuth=async (req,res,next) => {
 
 
 const adminAuth=async (req,res,next) => {
+  const admin=await User.findOne({isAdmin:true})
+   if (!req.session.admin) {
+      return res.redirect("/admin/login");
+    }
   User.findOne({isAdmin:true})
   .then(data=>{
     if(data){

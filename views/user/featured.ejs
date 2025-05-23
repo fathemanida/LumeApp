@@ -30,6 +30,7 @@
       background: white;
       border-bottom: 1px solid var(--border-color);
       position: relative;
+      padding: 1rem 2rem;
     }
 
     .brand {
@@ -41,42 +42,59 @@
       cursor: pointer;
     }
 
-    .nav-link {
+    .navbar .nav-link {
       color: var(--dark-brown);
       font-family: 'Jost', sans-serif;
       font-size: 0.9rem;
       transition: color 0.3s ease;
+      padding: 0.5rem 1rem;
     }
 
-    .nav-link:hover {
+    .navbar .nav-link:hover {
       color: var(--olive-green);
       font-weight: 500;
     }
 
-    .icon-link {
+    .navbar .icon-link {
       color: var(--dark-brown);
       transition: color 0.3s ease;
       font-size: 1.1rem;
+      padding: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .icon-link:hover {
+    .navbar .icon-link:hover {
       color: var(--olive-green);
+    }
+
+    .navbar .d-flex {
+      gap: 1rem;
+    }
+
+    .navbar .list-unstyled {
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar .list-unstyled li {
+      display: flex;
+      align-items: center;
     }
 
     /* Search Bar */
     .search-container {
       position: relative;
-      display: none;
-    }
-
-    .search-container.active {
-      display: block;
+      display: flex;
+      align-items: center;
     }
 
     .search-input {
       border: 1px solid var(--border-color);
-      border-radius: 4px;
+      border-radius: 20px;
       padding: 0.5rem 1rem;
+      padding-right: 2.5rem;
       font-family: 'Jost', sans-serif;
       width: 200px;
       transition: all 0.3s ease;
@@ -86,6 +104,24 @@
       outline: none;
       border-color: var(--dark-brown);
       width: 250px;
+      box-shadow: 0 0 0 2px rgba(41, 29, 14, 0.1);
+    }
+
+    .search-button {
+      position: absolute;
+      right: 10px;
+      background: none;
+      border: none;
+      color: var(--dark-brown);
+      cursor: pointer;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .search-button:hover {
+      color: var(--olive-green);
     }
 
     /* Sidebar */
@@ -462,7 +498,6 @@
     margin-right: auto;
   }
 }
-/* Search Bar Styles */
 .search-container {
   position: relative;
   display: flex;
@@ -557,7 +592,6 @@
           </div>
         </form>
       </div>
-
       <div class="sidebar-category">
         <div class="sidebar-title" onclick="toggleCategory(this)">
           Categories <i class="fas fa-chevron-down"></i>
@@ -626,12 +660,11 @@
   </div>
 
   <!-- Navbar -->
- <!-- Navbar -->
-<nav class="navbar d-flex justify-content-between align-items-center px-4 py-3">
-  <!-- Left side - Brand -->
+  <nav class="navbar d-flex justify-content-between align-items-center px-4 py-3">
+  
   <div class="brand" id="sidebarToggle">LUME</div>
 
-  <!-- Center - Main Navigation -->
+  
   <ul class="d-flex align-items-center list-unstyled mb-0" style="position: absolute; left: 50%; transform: translateX(-50%);">
     <li class="mx-2"><a href="/" class="nav-link">Home</a></li>
     <li class="mx-2"><a href="/shopAll" class="nav-link">Shop All</a></li>
@@ -639,34 +672,36 @@
     <li class="mx-2"><a href="/new-arrivals" class="nav-link">New Arrivals</a></li>
   </ul>
 
-  <!-- Right side - Icons -->
+ 
   <ul class="d-flex align-items-center list-unstyled mb-0">
-    <!-- Search Bar -->
+   
     <li class="mx-2">
       <form action="/shopAll" method="GET" class="d-flex align-items-center">
-        <div class="search-container">
+        <div class="search-container" id="searchContainer">
           <input type="text" 
                  name="search" 
                  placeholder="Search products..." 
-                 class="search-input form-control">
+                 class="search-input form-control" 
+                 id="headerSearch">
           <button type="submit" class="search-button">
             <i class="fas fa-search"></i>
           </button>
         </div>
       </form>
     </li>
+    <li class="mx-2"><a href="#" class="icon-link" id="searchToggle"><i class="fas fa-search"></i></a></li>
     
     <% const currentUser = locals.user || (locals.session && locals.session.user); %>
    
     <li class="mx-2"><a href="/wishlist" class="icon-link"><i class="fas fa-heart"></i></a></li>
     <li class="mx-2"><a href="/cart" class="icon-link"><i class="fas fa-shopping-cart"></i></a></li>
     
-    <!-- User Profile Dropdown -->
+    
     <li class="mx-2">
       <div class="profile-dropdown">
       <a href="#" class="icon-link"><i class="far fa-user"></i></a>
         <div class="profile-dropdown-content">
-        <% if (locals.user) { %>
+        <% if (currentUser) { %>
             <a href="/userProfile"><i class="fas fa-user"></i> My Profile</a>
             <a href="/orders"><i class="fas fa-box"></i> My Orders</a>
             <a href="/wishlist"><i class="fas fa-heart"></i> Wishlist</a>
@@ -680,7 +715,6 @@
     </li>
   </ul>
 </nav>
-
   <!-- Main Content -->
   <div class="container-fluid py-4">
     <div class="row">
@@ -823,20 +857,18 @@
     </div>
   </footer>
 
- 
+  <!-- Bootstrap JS and dependencies -->
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script>
-    // Sidebar functionality
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('overlay');
-    const sidebarToggle = document.getElementById('sidebarToggle');
-    const searchToggle = document.getElementById('searchToggle');
-    const searchContainer = document.getElementById('searchContainer');
+  
+  <!-- Add hidden input for blocked status -->
+  <input type="hidden" id="userBlockedStatus" value="<%= locals.user && locals.user.isBlocked ? 'true' : 'false' %>">
 
+  <script>
     // Check if user is blocked
-    <% if (locals.user && locals.user.isBlocked) { %>
+    const isBlocked = document.getElementById('userBlockedStatus').value === 'true';
+    if (isBlocked) {
       Swal.fire({
         title: 'Account Blocked',
         text: 'Your account has been blocked by the administrator. Please contact support for assistance.',
@@ -853,7 +885,14 @@
       }).then(() => {
         window.location.href = '/logout';
       });
-    <% } %>
+    }
+
+    // Sidebar functionality
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const searchToggle = document.getElementById('searchToggle');
+    const searchContainer = document.getElementById('searchContainer');
 
     sidebarToggle.addEventListener('click', () => {
       sidebar.classList.toggle('open');
@@ -865,7 +904,7 @@
       overlay.classList.remove('active');
     });
 
-    
+    // Search toggle functionality
     searchToggle.addEventListener('click', (e) => {
       e.preventDefault();
       searchContainer.classList.toggle('active');
@@ -874,14 +913,14 @@
       }
     });
 
-    
+    // Close search when clicking outside
     document.addEventListener('click', (e) => {
       if (!searchContainer.contains(e.target) && e.target !== searchToggle) {
         searchContainer.classList.remove('active');
       }
     });
 
-   
+    // Category toggle functionality
     function toggleCategory(element) {
       const items = element.nextElementSibling;
       const icon = element.querySelector('i');
@@ -897,7 +936,7 @@
       }
     }
 
-   
+    // Make sidebar items clickable
     document.querySelectorAll('.sidebar-item').forEach(item => {
       item.addEventListener('click', function() {
         console.log('Navigating to:', this.textContent);
@@ -906,14 +945,14 @@
       });
     });
 
-    
+    // Wishlist functionality
     function toggleWishlist(icon) {
       icon.classList.toggle('far');
       icon.classList.toggle('fas');
       icon.classList.toggle('text-danger');
     }
 
-    
+    // Search functionality
     document.addEventListener('DOMContentLoaded', function() {
       const sidebarSearch = document.getElementById('sidebarSearch');
       const productItems = document.querySelectorAll('.product-item');
@@ -934,7 +973,7 @@
           }
         });
 
-       
+        // Update product count
         const visibleProducts = document.querySelectorAll('.product-item[style=""]').length;
         const totalProducts = productItems.length;
         const countElement = document.querySelector('.d-flex.align-items-center span');
@@ -943,16 +982,16 @@
         }
       }
 
-      
+      // Search on input
       sidebarSearch.addEventListener('input', performSearch);
 
-      
+      // Search on form submit
       document.getElementById('sidebarSearchForm').addEventListener('submit', function(e) {
         e.preventDefault();
         performSearch();
       });
 
-      
+      // Search on button click
       document.getElementById('sidebarSearchBtn').addEventListener('click', function(e) {
         e.preventDefault();
         performSearch();

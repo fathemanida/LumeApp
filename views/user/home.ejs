@@ -367,6 +367,153 @@
       width: 20px;
       text-align: center;
     }
+    .search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input {
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 0.5rem 1rem;
+  padding-right: 2.5rem;
+  font-family: 'Jost', sans-serif;
+  width: 200px;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--dark-brown);
+  width: 250px;
+  box-shadow: 0 0 0 2px rgba(41, 29, 14, 0.1);
+}
+
+.search-button {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  color: var(--dark-brown);
+  cursor: pointer;
+}
+
+.search-button:hover {
+  color: var(--olive-green);
+}/* Search Bar Styles */
+.search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input {
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 0.5rem 1rem;
+  padding-right: 2.5rem;
+  font-family: 'Jost', sans-serif;
+  width: 200px;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--dark-brown);
+  width: 250px;
+  box-shadow: 0 0 0 2px rgba(41, 29, 14, 0.1);
+}
+
+.search-button {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  color: var(--dark-brown);
+  cursor: pointer;
+}
+
+.search-button:hover {
+  color: var(--olive-green);
+}
+
+.banner-section {
+  margin-bottom: 3rem;
+}
+
+.carousel-caption {
+  background: rgba(0, 0, 0, 0.5);
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.carousel-caption h2 {
+  font-family: 'Aboreto', cursive;
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+.carousel-caption p {
+  font-family: 'Jost', sans-serif;
+  font-size: 1.2rem;
+  color: white;
+}
+
+.carousel-indicators button {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin: 0 5px;
+  background-color: var(--dark-brown);
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+  width: 5%;
+  opacity: 0.8;
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  background-color: var(--dark-brown);
+  padding: 1.5rem;
+  border-radius: 50%;
+}
+
+.overlay-dark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 1;
+}
+
+.carousel-caption {
+  z-index: 2;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.banner-title {
+  font-family: 'Aboreto', cursive;
+  font-size: 4rem;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  margin-bottom: 1rem;
+}
+
+.quote-text {
+  font-family: 'Jost', sans-serif;
+  font-size: 1.5rem;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
   </style>
 </head>
 <body>
@@ -420,78 +567,31 @@
   </div>
 
   <!-- Navbar -->
-  <nav class="navbar d-flex justify-content-between align-items-center px-4 py-3">
-    <!-- Left side - Brand -->
-    <div class="brand" id="sidebarToggle">LUME</div>
-  
-    <!-- Center - Main Navigation -->
-    <ul class="d-flex align-items-center list-unstyled mb-0" style="position: absolute; left: 50%; transform: translateX(-50%);">
-      <li class="mx-2"><a href="/" class="nav-link">Home</a></li>
-      <li class="mx-2"><a href="/shopAll" class="nav-link">Shop All</a></li>
-      <li class="mx-2"><a href="/featured" class="nav-link">Featured</a></li>
-      <li class="mx-2"><a href="/new-arrivals" class="nav-link">New Arrivals</a></li>
-    </ul>
-  
-    <!-- Right side - Icons -->
-    <ul class="d-flex align-items-center list-unstyled mb-0">
-      <!-- Search -->
-      <li class="mx-2">
-        <div class="search-container" id="searchContainer">
-          <input type="text" placeholder="Search..." class="search-input form-control">
-        </div>
-      </li>
-      <li class="mx-2"><a href="#" class="icon-link" id="searchToggle"><i class="fas fa-search"></i></a></li>
-      
-      <% const currentUser = locals.user || (locals.session && locals.session.user); %>
-      
-      <li class="mx-2"><a href="/wishlist" class="icon-link"><i class="fas fa-heart"></i></a></li>
-      <li class="mx-2"><a href="/cart" class="icon-link"><i class="fas fa-shopping-cart"></i></a></li>
-      
-      
-      <li class="mx-2">
-        <div class="profile-dropdown">
-          <a href="#" class="icon-link"><i class="far fa-user"></i></a>
-          <div class="profile-dropdown-content">
-            <% if (currentUser) { %>
-              <a href="/userProfile"><i class="fas fa-user"></i> My Profile</a>
-              <a href="/orders"><i class="fas fa-box"></i> My Orders</a>
-              <a href="/wishlist"><i class="fas fa-heart"></i> Wishlist</a>
-              <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
-            <% } else { %>
-              <a href="/login"><i class="fas fa-sign-in-alt"></i> Login</a>
-              <a href="/signup"><i class="fas fa-user-plus"></i> Sign Up</a>
-            <% } %>
-          </div>
-        </div>
-      </li>
-    </ul>
-  </nav>
+<%- include("../../views/partials/header") %>
 
-  <% if (featured.length === 0) { %>
-  <div class="text-center col-12">
-    <p class="fs-5 text-muted">No products found.</p>
-  </div>
-<% } else { %>
-  <% featured.forEach(product => { %>
-    <div class="col">
-      <!-- Product card as before -->
+<!-- Banner Section -->
+<div class="banner-section">
+  <div class="position-relative">
+    <div class="overlay-dark"></div>
+    <img src="\uploads\images\e435b9eed42f4f96a2084c2f83afa193.jpg" class="d-block w-100" alt="LUME" style="height: 600px; object-fit: cover;">
+    <div class="carousel-caption">
+      <h1 class="banner-title">LUME</h1>
+      <p class="quote-text">"Where elegance meets timeless beauty"</p>
     </div>
-  <% }) %>
-<% } %>
+  </div>
+</div>
 
+<section class="text-center py-5" style="background-color: #f9f7f5;">
+  <h2 class="section-heading display-6">FEATURED</h2>
+  <p class="section-subtext mt-2">Explore our newest arrivals with timeless charm and elegance</p>
+</section>
 
-
-  
-  <section class="text-center py-5" style="background-color: #f9f7f5;">
-    <h2 class="section-heading display-6">FEATURED</h2>
-    <p class="section-subtext mt-2">Explore our newest arrivals with timeless charm and elegance</p>
-  </section>
-
-  <section class="row row-cols-1 row-cols-sm-3 g-4 px-4 py-5">
-    <% if (featured && featured.length > 0) { %>
-      <% featured.forEach(product => { %>
-        <div class="col">
-          <div class="product-card card text-center h-100">
+<section class="row row-cols-1 row-cols-sm-3 g-4 px-4 py-5">
+  <% if (featured && featured.length > 0) { %>
+    <% featured.forEach(product => { %>
+      <div class="col">
+        <div class="product-card card text-center h-100">
+          <a href="/product-details?id=<%= product._id %>" class="text-decoration-none">
             <i class="far fa-heart wishlist-icon" onclick="toggleWishlist(this)"></i>
             <img 
               src="/uploads/product/<%= product.productImage[0] %>" 
@@ -504,27 +604,29 @@
               <div class="h-2"></div>
               <p class="product-price card-text">$<%= product.regularPrice %></p>
             </div>
-          </div>
+          </a>
         </div>
-      <% }) %>
-    <% } else { %>
-      <div class="col-12 text-center">
-        <p class="text-muted">No featured products available</p>
       </div>
-    <% } %>
-  </section>
+    <% }) %>
+  <% } else { %>
+    <div class="col-12 text-center">
+      <p class="text-muted">No featured products available</p>
+    </div>
+  <% } %>
+</section>
 
-  <!-- New Collection Banner -->
-  <section class="text-center py-5" style="background-color: #f9f7f5;">
-    <h2 class="section-heading display-6">NEW COLLECTION</h2>
-    <p class="section-subtext mt-2">Discover our curated selection of iconic pieces</p>
-  </section>
+<!-- New Collection Banner -->
+<section class="text-center py-5" style="background-color: #f9f7f5;">
+  <h2 class="section-heading display-6">NEW COLLECTION</h2>
+  <p class="section-subtext mt-2">Discover our curated selection of iconic pieces</p>
+</section>
 
-  <section class="row row-cols-1 row-cols-sm-3 g-4 px-4 py-5">
-    <% if (newCollections && newCollections.length > 0) { %>
-      <% newCollections.forEach(product => { %>
-        <div class="col">
-          <div class="product-card card text-center h-100">
+<section class="row row-cols-1 row-cols-sm-3 g-4 px-4 py-5">
+  <% if (newCollections && newCollections.length > 0) { %>
+    <% newCollections.forEach(product => { %>
+      <div class="col">
+        <div class="product-card card text-center h-100">
+          <a href="/product-details?id=<%= product._id %>" class="text-decoration-none">
             <i class="far fa-heart wishlist-icon" onclick="toggleWishlist(this)"></i>
             <img 
               src="/uploads/product/<%= product.productImage[0] %>" 
@@ -538,108 +640,110 @@
               <p class="product-title card-title"><%= product.productName %></p>
               <p class="product-price card-text">$<%= product.regularPrice %></p>
             </div>
-          </div>
-        </div>
-      <% }) %>
-    <% } else { %>
-      <div class="col-12 text-center">
-        <p class="text-muted">No new products available</p>
-      </div>
-    <% } %>
-  </section>
-
-  <!-- SELECT YOUR SPARKLE Banner -->
-  <div class="sparkle-banner text-center py-3 fs-4">SELECT YOUR SPARKLE</div>
-
-  <!-- Product Categories -->
-   <section class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4 px-4 py-5">
-    <% if (category && category.length > 0) { %>
-      <% category.forEach(category => { %>
-        <div class="col">
-          <a href="/filter?category=<%= category._id %>" class="text-decoration-none">
-            <div class="product-card card text-center h-100">
-              <img 
-                src="<%= category.image %>" 
-                alt="<%= category.name %>" 
-                class="product-img card-img-top bg-secondary object-fit-cover"
-                style="height: 300px;"
-              >
-              <div class="card-body">
-                <p class="product-title card-title text-dark"><%= category.name %></p>
-              </div>
-            </div>
           </a>
         </div>
-      <% }) %>
-    <% } else { %>
-      <div class="col-12 text-center">
-        <p class="text-muted">No categories available</p>
       </div>
-    <% } %>
-  </section>
+    <% }) %>
+  <% } else { %>
+    <div class="col-12 text-center">
+      <p class="text-muted">No new products available</p>
+    </div>
+  <% } %>
+</section>
 
-  <!-- Footer -->
-  <footer class="footer py-5 mt-5" style="background-color: var(--dark-brown);">
-    <div class="container">
-      <div class="row row-cols-1 row-cols-sm-3 g-4">
-        <div class="col">
-          <h4 class="footer-heading mb-3">Company</h4>
-          <ul class="list-unstyled">
-            <li class="mb-2"><a href="#" class="footer-link">About Us</a></li>
-            <li class="mb-2"><a href="#" class="footer-link">Careers</a></li>
-            <li class="mb-2"><a href="#" class="footer-link">Contact</a></li>
-            <li class="mb-2"><a href="#" class="footer-link">Privacy Policy</a></li>
-          </ul>
-        </div>
-        <div class="col">
-          <h4 class="footer-heading mb-3">Shop</h4>
-          <ul class="list-unstyled">
-            <li class="mb-2"><a href="#" class="footer-link">Rings</a></li>
-            <li class="mb-2"><a href="#" class="footer-link">Necklaces</a></li>
-            <li class="mb-2"><a href="#" class="footer-link">Earrings</a></li>
-            <li class="mb-2"><a href="#" class="footer-link">Bracelets</a></li>
-          </ul>
-        </div>
-        <div class="col">
-          <h4 class="footer-heading mb-3">Connect With Us</h4>
-          <ul class="list-unstyled">
-            <li class="mb-2">
-              <a href="#" class="footer-link d-flex align-items-center">
-                <i class="fab fa-instagram me-2"></i> Instagram
-              </a>
-            </li>
-            <li class="mb-2">
-              <a href="#" class="footer-link d-flex align-items-center">
-                <i class="fab fa-facebook me-2"></i> Facebook
-              </a>
-            </li>
-            <li class="mb-2">
-              <a href="#" class="footer-link d-flex align-items-center">
-                <i class="fab fa-pinterest me-2"></i> Pinterest
-              </a>
-            </li>
-            <li class="mb-2">
-              <a href="#" class="footer-link d-flex align-items-center">
-                <i class="fab fa-twitter me-2"></i> Twitter
-              </a>
-            </li>
-          </ul>
-        </div>
+<!-- SELECT YOUR SPARKLE Banner -->
+<div class="sparkle-banner text-center py-3 fs-4">SELECT YOUR SPARKLE</div>
+
+<!-- Product Categories -->
+ <section class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4 px-4 py-5">
+  <% if (category && category.length > 0) { %>
+    <% category.forEach(category => { %>
+      <div class="col">
+        <a href="/filter?category=<%= category._id %>" class="text-decoration-none">
+          <div class="product-card card text-center h-100">
+            
+            <img 
+              src="<%= category.image %>" 
+              alt="<%= category.name %>" 
+              class="product-img card-img-top bg-secondary object-fit-cover"
+              style="height: 300px;"
+            >
+            <div class="card-body">
+              <p class="product-title card-title text-dark"><%= category.name %></p>
+            </div>
+          </div>
+        </a>
       </div>
-      <div class="row mt-4 pt-4 border-top border-secondary">
-        <div class="col-12 text-center">
-          <p class="text-light mb-0">&copy; 2024 LUME Jewelry. All rights reserved.</p>
-        </div>
+    <% }) %>
+  <% } else { %>
+    <div class="col-12 text-center">
+      <p class="text-muted">No categories available</p>
+    </div>
+  <% } %>
+</section>
+
+<!-- Footer -->
+<footer class="footer py-5 mt-5" style="background-color: var(--dark-brown);">
+  <div class="container">
+    <div class="row row-cols-1 row-cols-sm-3 g-4">
+      <div class="col">
+        <h4 class="footer-heading mb-3">Company</h4>
+        <ul class="list-unstyled">
+          <li class="mb-2"><a href="#" class="footer-link">About Us</a></li>
+          <li class="mb-2"><a href="#" class="footer-link">Careers</a></li>
+          <li class="mb-2"><a href="#" class="footer-link">Contact</a></li>
+          <li class="mb-2"><a href="#" class="footer-link">Privacy Policy</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4 class="footer-heading mb-3">Shop</h4>
+        <ul class="list-unstyled">
+          <li class="mb-2"><a href="#" class="footer-link">Rings</a></li>
+          <li class="mb-2"><a href="#" class="footer-link">Necklaces</a></li>
+          <li class="mb-2"><a href="#" class="footer-link">Earrings</a></li>
+          <li class="mb-2"><a href="#" class="footer-link">Bracelets</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4 class="footer-heading mb-3">Connect With Us</h4>
+        <ul class="list-unstyled">
+          <li class="mb-2">
+            <a href="#" class="footer-link d-flex align-items-center">
+              <i class="fab fa-instagram me-2"></i> Instagram
+            </a>
+          </li>
+          <li class="mb-2">
+            <a href="#" class="footer-link d-flex align-items-center">
+              <i class="fab fa-facebook me-2"></i> Facebook
+            </a>
+          </li>
+          <li class="mb-2">
+            <a href="#" class="footer-link d-flex align-items-center">
+              <i class="fab fa-pinterest me-2"></i> Pinterest
+            </a>
+          </li>
+          <li class="mb-2">
+            <a href="#" class="footer-link d-flex align-items-center">
+              <i class="fab fa-twitter me-2"></i> Twitter
+            </a>
+          </li>
+        </ul>
       </div>
     </div>
-  </footer>
+    <div class="row mt-4 pt-4 border-top border-secondary">
+      <div class="col-12 text-center">
+        <p class="text-light mb-0">&copy; 2024 LUME Jewelry. All rights reserved.</p>
+      </div>
+    </div>
+  </div>
+</footer>
 
-  <!-- Bootstrap JS and dependencies -->
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
-  <script>
-    // Sidebar functionality
-    const sidebar = document.getElementById('sidebar');
+<!-- Bootstrap JS and dependencies -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('overlay');
     const sidebarToggle = document.getElementById('sidebarToggle');
     const searchToggle = document.getElementById('searchToggle');
@@ -655,7 +759,7 @@
       overlay.classList.remove('active');
     });
 
-    // Search toggle functionality
+    
     searchToggle.addEventListener('click', (e) => {
       e.preventDefault();
       searchContainer.classList.toggle('active');
@@ -664,14 +768,14 @@
       }
     });
 
-    // Close search when clicking outside
+    
     document.addEventListener('click', (e) => {
       if (!searchContainer.contains(e.target) && e.target !== searchToggle) {
         searchContainer.classList.remove('active');
       }
     });
 
-    // Category toggle functionality
+   
     function toggleCategory(element) {
       const items = element.nextElementSibling;
       const icon = element.querySelector('i');
@@ -687,7 +791,7 @@
       }
     }
 
-    // Make sidebar items clickable
+   
     document.querySelectorAll('.sidebar-item').forEach(item => {
       item.addEventListener('click', function() {
         console.log('Navigating to:', this.textContent);
@@ -696,12 +800,114 @@
       });
     });
 
-    // Wishlist functionality
+    
     function toggleWishlist(icon) {
       icon.classList.toggle('far');
       icon.classList.toggle('fas');
       icon.classList.toggle('text-danger');
     }
+
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      const headerSearch = document.getElementById('headerSearch');
+      const sidebarSearch = document.getElementById('sidebarSearch');
+      const productItems = document.querySelectorAll('.product-item');
+      
+      function performSearch(searchTerm) {
+        searchTerm = searchTerm.trim().toLowerCase();
+        
+        productItems.forEach(item => {
+          const productName = item.dataset.name;
+          const productCategory = item.dataset.category;
+          
+          if (searchTerm === '' || 
+              productName.includes(searchTerm) || 
+              productCategory.includes(searchTerm)) {
+            item.style.display = '';
+          } else {
+            item.style.display = 'none';
+          }
+        });
+
+        // Update product count
+        const visibleProducts = document.querySelectorAll('.product-item[style=""]').length;
+        const totalProducts = productItems.length;
+        const countElement = document.querySelector('.d-flex.align-items-center span');
+        if (countElement) {
+          countElement.textContent = `Showing ${visibleProducts} of ${totalProducts} products`;
+        }
+      }
+
+      // Header search functionality
+      if (headerSearch) {
+        headerSearch.addEventListener('input', function() {
+          performSearch(this.value);
+        });
+      }
+
+      // Sidebar search functionality
+      if (sidebarSearch) {
+        sidebarSearch.addEventListener('input', function() {
+          performSearch(this.value);
+        });
+
+        document.getElementById('sidebarSearchForm').addEventListener('submit', function(e) {
+          e.preventDefault();
+          performSearch(sidebarSearch.value);
+        });
+
+        document.getElementById('sidebarSearchBtn').addEventListener('click', function(e) {
+          e.preventDefault();
+          performSearch(sidebarSearch.value);
+        });
+      }
+
+      // Search toggle functionality
+      if (searchToggle && searchContainer) {
+        searchToggle.addEventListener('click', (e) => {
+          e.preventDefault();
+          searchContainer.classList.toggle('active');
+          if (searchContainer.classList.contains('active')) {
+            headerSearch.focus();
+          } else {
+            headerSearch.value = '';
+            performSearch(''); // Reset search when closing
+          }
+        });
+
+        // Close search when clicking outside
+        document.addEventListener('click', (e) => {
+          if (!searchContainer.contains(e.target) && e.target !== searchToggle) {
+            searchContainer.classList.remove('active');
+            headerSearch.value = '';
+            performSearch(''); // Reset search when closing
+          }
+        });
+      }
+    });
+
+    // Check if user is blocked
+    <% if (locals.blocked) { %>
+      Swal.fire({
+        title: 'Account Blocked',
+        text: 'Your account has been blocked by the administrator. Please contact support for assistance.',
+        icon: 'error',
+        confirmButtonColor: '#291d0e',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        allowEnterKey: false,
+        showCloseButton: false,
+        showCancelButton: false,
+        showDenyButton: false,
+        showConfirmButton: true,
+        confirmButtonText: 'Ok',
+        willClose: () => {
+          window.location.href = '/logout';
+        }
+      });
+    <% } %>
+
+   
   </script>
 </body>
 </html>

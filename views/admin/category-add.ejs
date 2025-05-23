@@ -8,6 +8,125 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
   <link rel="stylesheet" href="/styles/adminStyles.css">
+  <style>
+    .image-upload-group {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .upload-btn {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #3a2914;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+
+    .upload-btn input[type="file"] {
+      display: none;
+    }
+
+    .image-preview-container {
+      position: relative;
+      width: 200px;
+      height: 200px;
+      margin-top: 10px;
+      border: 2px dashed #d3c9be;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .image-preview {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .remove-image-btn {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: rgba(231, 76, 60, 0.8);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+   #cropper-container {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 1000;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+#cropper-container img {
+  max-height: calc(100vh - 100px);
+  max-width: calc(100vw - 40px);
+  margin: 20px auto;
+  display: block;
+}
+
+.cropper-actions {
+  position: fixed;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  z-index: 1001;
+}
+
+.crop-btn,
+.reset-crop-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  margin: 0 10px;
+}
+
+.crop-btn {
+  background-color: #291d0e;
+  color: white;
+}
+
+.reset-crop-btn {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.cropper-view-box,
+.cropper-face {
+  border-radius: 0;
+}
+
+.cropper-container {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.cropper-modal {
+  background: transparent;
+}
+  </style>
 </head>
 <body class="dashboard">
   <aside class="sidebar">
@@ -86,8 +205,8 @@
         <div class="form-group image-upload-group">
           <label for="image">Category Image</label>
           <label class="upload-btn">
-            <input type="file" id="image" name="image" accept="image/*" required>
-            <i class="fas fa-upload"></i> Upload Image
+            <input type="file" id="image" name="image" accept="image/*">
+            <i class="fas fa-upload" style="color: aliceblue;"></i> Upload Image
           </label>
           <span class="error-message" id="image-error"></span>
           <div class="image-preview-container">
@@ -111,54 +230,93 @@
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
-  <script>
+<script>
     let cropper = null;
     let croppedImageBlob = null;
+    let hasExistingImage = false;
 
     document.getElementById('mobileMenuBtn').addEventListener('click', function() {
       document.querySelector('.sidebar').classList.toggle('active');
     });
 
+    function displayErrorMsg(elementId, message) {
+      const errorElement = document.getElementById(elementId);
+      if (errorElement) {
+        errorElement.textContent = message;
+        errorElement.style.display = "block";
+      }
+    }
+
+    function clearErrorMsg(elementId = null) {
+      if (elementId) {
+        const errorElement = document.getElementById(elementId);
+        if (errorElement) {
+          errorElement.textContent = "";
+          errorElement.style.display = "none";
+        }
+      } else {
+        const errorElements = document.querySelectorAll('.error-message');
+        errorElements.forEach(element => {
+          element.textContent = "";
+          element.style.display = "none";
+        });
+      }
+    }
+
+    function validateField(fieldId) {
+      const field = document.getElementById(fieldId);
+      if (!field) return false;
+      
+      const value = field.value.trim();
+      
+      if (fieldId === 'name') {
+        if (value === "") {
+          displayErrorMsg("name-error", "Please enter a category name");
+          return false;
+        } else if (!/^[a-zA-Z\s]+$/.test(value)) {
+          displayErrorMsg("name-error", "Category name should only contain letters and spaces");
+          return false;
+        } else {
+          clearErrorMsg("name-error");
+          return true;
+        }
+      } else if (fieldId === 'description') {
+        if (value === "") {
+          displayErrorMsg("des-error", "Please enter a description");
+          return false;
+        } else {
+          clearErrorMsg("des-error");
+          return true;
+        }
+      }
+      return true;
+    }
+
     function validateForm() {
       clearErrorMsg();
-      const name = document.getElementById("name").value.trim();
-      const description = document.getElementById("description").value.trim();
-      const image = document.getElementById("image").files[0];
+      
+      const name = document.getElementById("name")?.value.trim() || "";
+      const description = document.getElementById("description")?.value.trim() || "";
+      const image = document.getElementById("image")?.files[0];
+      
       let isValid = true;
 
-      if (name === "") {
-        displayErrorMsg("name-error", "Please enter a category name");
-        isValid = false;
-      } else if (!/^[a-zA-Z\s]+$/.test(name)) {
-        displayErrorMsg("name-error", "Category name should only contain letters and spaces");
+      if (!validateField('name')) {
         isValid = false;
       }
 
-      if (description === "") {
-        displayErrorMsg("des-error", "Please enter a description");
+      if (!validateField('description')) {
         isValid = false;
       }
 
       if (!image && !croppedImageBlob) {
         displayErrorMsg("image-error", "Please upload an image");
         isValid = false;
+      } else {
+        clearErrorMsg("image-error");
       }
 
       return isValid;
-    }
-
-    function displayErrorMsg(elementId, message) {
-      const errorElement = document.getElementById(elementId);
-      errorElement.textContent = message;
-      errorElement.style.display = "block";
-    }
-
-    function clearErrorMsg() {
-      const errorElements = document.querySelectorAll('.error-message');
-      errorElements.forEach(element => {
-        element.textContent = "";
-        element.style.display = "none";
-      });
     }
 
     function removeImage() {
@@ -171,18 +329,15 @@
         cropper.destroy();
         cropper = null;
       }
+      clearErrorMsg("image-error");
     }
 
     function initializeCropper(file) {
-      const previewContainer = document.querySelector('.image-preview-container');
-      const preview = document.getElementById('image-preview');
       const cropperContainer = document.getElementById('cropper-container');
       const cropperImage = document.getElementById('cropper-image');
 
       const reader = new FileReader();
-      reader.onload = function(e) {
-        preview.src = e.target.result;
-        previewContainer.style.display = 'block';
+      reader.onload = function (e) {
         cropperImage.src = e.target.result;
         cropperContainer.style.display = 'block';
 
@@ -197,23 +352,18 @@
           responsive: true,
           background: true,
           modal: true,
-          ready: function() {
-            const canvas = this.cropper.getCroppedCanvas();
-            preview.src = canvas.toDataURL();
-          },
-          crop: function(e) {
-            const canvas = this.cropper.getCroppedCanvas();
-            preview.src = canvas.toDataURL();
-          }
+          zoomable: true,
+          minCropBoxWidth: 200,
+          minCropBoxHeight: 200
         });
       };
       reader.readAsDataURL(file);
     }
 
-    document.getElementById('image').addEventListener('change', function(e) {
+    document.getElementById('image').addEventListener('change', function (e) {
       const file = e.target.files[0];
       if (file) {
-        if (file.size > 5 * 1024 * 1024) { 
+        if (file.size > 5 * 1024 * 1024) {
           displayErrorMsg("image-error", "Image size should be less than 5MB");
           this.value = '';
           return;
@@ -227,12 +377,20 @@
       }
     });
 
-    document.getElementById('crop-btn').addEventListener('click', function() {
+    document.getElementById('crop-btn').addEventListener('click', function () {
       if (cropper) {
-        cropper.getCroppedCanvas({
+        const canvas = cropper.getCroppedCanvas({
           width: 400,
           height: 400,
-        }).toBlob((blob) => {
+          minWidth: 200,
+          minHeight: 200,
+          maxWidth: 800,
+          maxHeight: 800,
+          imageSmoothingEnabled: true,
+          imageSmoothingQuality: 'high'
+        });
+
+        canvas.toBlob((blob) => {
           croppedImageBlob = blob;
           const preview = document.getElementById('image-preview');
           preview.src = URL.createObjectURL(blob);
@@ -240,18 +398,31 @@
           document.getElementById('cropper-container').style.display = 'none';
           cropper.destroy();
           cropper = null;
-        }, 'image/jpeg', 0.8);
+        }, 'image/jpeg', 0.9);
       }
     });
 
-    document.getElementById('reset-crop-btn').addEventListener('click', removeImage);
+    document.getElementById('reset-crop-btn').addEventListener('click', function () {
+      document.getElementById('cropper-container').style.display = 'none';
+      if (cropper) {
+        cropper.destroy();
+        cropper = null;
+      }
+      document.getElementById('image').value = '';
+      if (!hasExistingImage) {
+        document.querySelector('.image-preview-container').style.display = 'none';
+      }
+    });
 
-    async function handleFormSubmit(event) {
+    // Form submission handler
+    document.getElementById('categoryForm').addEventListener('submit', async function(event) {
       event.preventDefault();
       
-      if (!validateForm()) return;
+      if (!validateForm()) {
+        return;
+      }
 
-      const submitBtn = event.target.querySelector('button[type="submit"]');
+      const submitBtn = this.querySelector('button[type="submit"]');
       submitBtn.disabled = true;
       submitBtn.textContent = "Processing...";
 
@@ -263,33 +434,27 @@
         if (croppedImageBlob) {
           formData.append('image', croppedImageBlob, 'category.jpg');
         } else {
-          formData.append('image', document.getElementById('image').files[0]);
+          const imageFile = document.getElementById('image').files[0];
+          if (imageFile) {
+            formData.append('image', imageFile);
+          }
         }
 
         const response = await fetch("/admin/add-category", {
           method: "POST",
-          body: formData,
-          headers: {
-            'Accept': 'application/json'
-          }
+          body: formData
         });
 
-        if (!response.ok) {
-          const contentType = response.headers.get("content-type");
-          if (contentType && contentType.indexOf("application/json") !== -1) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || "Failed to add category");
-          } else {
-            throw new Error("Server error occurred");
-          }
-        }
-
         const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.message || "Failed to add category");
+        }
 
         await Swal.fire({
           icon: "success",
           title: "Success!",
-          text: result.message || "Category added successfully",
+          text: "Category added successfully",
           timer: 2000,
           showConfirmButton: false
         });
@@ -298,23 +463,38 @@
         
       } catch (error) {
         console.error('Error:', error);
+        
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: error.message || "Failed to add category"
+          text: error.message || "Failed to add category",
+          confirmButtonColor: "#291d0e"
         });
+
+        if (error.message) {
+          if (error.message.includes("name")) {
+            displayErrorMsg("name-error", error.message);
+          } else if (error.message.includes("description")) {
+            displayErrorMsg("des-error", error.message);
+          } else if (error.message.includes("image")) {
+            displayErrorMsg("image-error", error.message);
+          }
+        }
       } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = "ADD CATEGORY";
       }
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-      const form = document.getElementById('categoryForm');
-      if (form) {
-        form.addEventListener('submit', handleFormSubmit);
-      }
     });
-  </script>
+
+    // Add input validation on blur
+    document.getElementById('name')?.addEventListener('blur', function() {
+      validateField('name');
+    });
+    
+    document.getElementById('description')?.addEventListener('blur', function() {
+      validateField('description');
+    });
+</script>
+
 </body>
 </html>

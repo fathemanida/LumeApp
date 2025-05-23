@@ -43,7 +43,7 @@ const login = async (req, res) => {
 
     const passwordMatch = await bcrypt.compare(password, admin.password);
     if (!passwordMatch) {
-      return res.redirect("/admin/login", {
+      return res.render("admin-login", {
         message: "Invalid Credentials",
       });
     }
@@ -55,7 +55,9 @@ const login = async (req, res) => {
     };
 
     res.redirect("/admin/dashboard");
-  } catch (error) {}
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const logout = async (req, res) => {

@@ -292,12 +292,13 @@
             <div class="flex gap-2 mb-2">
               <input type="text" id="size-input"
                 class="w-full p-2 border-b border-border-color bg-transparent text-dark-brown font-jost focus:border-dark-brown outline-none"
-                placeholder="Enter size (e.g., 6, 16in)">
+                placeholder="Enter size (e.g., 6, 16in)"
+               >
               <button type="button" id="add-size-btn"
                 class="bg-dark-brown text-white px-4 py-2 rounded font-jost hover:bg-olive-green transition-all">Add</button>
             </div>
-            <div id="sizes-list" class="flex flex-wrap gap-2"></div>
-            <input type="hidden" name="sizes" id="sizes-input">
+            <div id="sizes-list" class="flex flex-wrap gap-2"> <%= product.sizes %></div>
+            <input type="hidden" name="sizes" id="sizes-input"  >
             <div id="sizes-error" class="error-message text-dark-brown text-sm mt-1"></div>
           </div>
           <div>
@@ -597,6 +598,7 @@
         displayErrorMessage("sizes-error", "Invalid size format. Use numbers optionally followed by 'in' (e.g., 6, 16in, 1.5in)");
         return;
       }
+      
 
       if (!selectedSizes.includes(size)) {
         selectedSizes.push(size);

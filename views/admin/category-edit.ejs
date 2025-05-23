@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Add Category | LUME Admin</title>
-  <link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Jost:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
   <link rel="stylesheet" href="/styles/adminStyles.css">
@@ -17,7 +19,7 @@
     .upload-btn {
       display: inline-block;
       padding: 10px 20px;
-      background-color: #291d0e;
+      background-color: #3a2914;
       color: white;
       border-radius: 4px;
       cursor: pointer;
@@ -60,59 +62,75 @@
       justify-content: center;
     }
 
-    #cropper-container {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.8);
-      z-index: 1000;
-      padding: 20px;
-    }
+   #cropper-container {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 1000;
+  padding: 20px;
+  box-sizing: border-box;
+}
 
-    #cropper-container img {
-      max-width: 100%;
-      max-height: 80vh;
-      margin: 0 auto;
-      display: block;
-    }
+#cropper-container img {
+  max-height: calc(100vh - 100px);
+  max-width: calc(100vw - 40px);
+  margin: 20px auto;
+  display: block;
+}
 
-    .cropper-actions {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 10px;
-      z-index: 1001;
-    }
+.cropper-actions {
+  position: fixed;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  z-index: 1001;
+}
 
-    .crop-btn, .reset-crop-btn {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: 500;
-    }
+.crop-btn,
+.reset-crop-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  margin: 0 10px;
+}
 
-    .crop-btn {
-      background-color: #291d0e;
-      color: white;
-    }
+.crop-btn {
+  background-color: #291d0e;
+  color: white;
+}
 
-    .reset-crop-btn {
-      background-color: #e74c3c;
-      color: white;
-    }
+.reset-crop-btn {
+  background-color: #e74c3c;
+  color: white;
+}
 
-    .cropper-view-box,
-    .cropper-face {
-      border-radius: 0;
-    }
+.cropper-view-box,
+.cropper-face {
+  border-radius: 0;
+}
+
+.cropper-container {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.cropper-modal {
+  background: transparent;
+}
   </style>
 </head>
+
 <body class="dashboard">
   <aside class="sidebar">
     <div class="brand">LUME</div>
@@ -185,7 +203,8 @@
         </div>
         <div class="form-group">
           <label for="description">Description</label>
-          <textarea id="description" name="description" placeholder="Enter description"><%= category.description %></textarea>
+          <textarea id="description" name="description" place
+            holder="Enter description"><%= category.description %></textarea>
           <span class="error-message" id="des-error"></span>
         </div>
         <div class="form-group image-upload-group">
@@ -195,19 +214,22 @@
             <i class="fas fa-upload"></i> Change Image
           </label>
           <span class="error-message" id="image-error"></span>
-          <div class="image-preview-container" style="display: block;">
-            <img id="image-preview" class="image-preview" src="/uploads/category/<%= category.image.split('/').pop() %>" alt="Category Image">
-            <button type="button" class="remove-image-btn" onclick="removeImage()">
-              <i class="fas fa-times"></i>
-            </button>
-          </div>
-          <div id="cropper-container" class="cropper-container">
-            <img id="cropper-image" alt="Cropper Image">
-            <div class="cropper-actions">
-              <button type="button" id="crop-btn" class="crop-btn">Crop Image</button>
-              <button type="button" id="reset-crop-btn" class="reset-crop-btn">Cancel</button>
+          <% if (category.image) { %>
+            <div class="image-preview-container" style="display: block;">
+              <img id="image-preview" class="image-preview" src="<%= category.image %>" alt="Category Image">
+              <button type="button" class="remove-image-btn" onclick="removeImage()">
+                <i class="fas fa-times"></i>
+              </button>
             </div>
-          </div>
+            <% } %>
+
+              <div id="cropper-container" class="cropper-container">
+                <img id="cropper-image" alt="Cropper Image">
+                <div class="cropper-actions">
+                  <button type="button" id="crop-btn" class="crop-btn">Crop Image</button>
+                  <button type="button" id="reset-crop-btn" class="reset-crop-btn">Cancel</button>
+                </div>
+              </div>
         </div>
         <button type="submit" class="submit-btn">UPDATE CATEGORY</button>
       </form>
@@ -221,10 +243,10 @@
     let croppedImageBlob = null;
     let hasExistingImage = true;
 
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       const previewContainer = document.querySelector('.image-preview-container');
       const preview = document.getElementById('image-preview');
-      
+
       if (preview.src && preview.src !== window.location.href) {
         previewContainer.style.display = 'block';
         hasExistingImage = true;
@@ -239,7 +261,7 @@
       }
     });
 
-    document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+    document.getElementById('mobileMenuBtn').addEventListener('click', function () {
       document.querySelector('.sidebar').classList.toggle('active');
     });
 
@@ -304,7 +326,7 @@
       const cropperImage = document.getElementById('cropper-image');
 
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = function (e) {
         cropperImage.src = e.target.result;
         cropperContainer.style.display = 'block';
 
@@ -322,7 +344,7 @@
           zoomable: true,
           minCropBoxWidth: 200,
           minCropBoxHeight: 200,
-          ready: function() {
+          ready: function () {
             // Ensure the cropper is properly initialized
             this.cropper.setCanvasData({
               width: Math.min(window.innerWidth * 0.8, 800),
@@ -334,7 +356,7 @@
       reader.readAsDataURL(file);
     }
 
-    document.getElementById('image').addEventListener('change', function(e) {
+    document.getElementById('image').addEventListener('change', function (e) {
       const file = e.target.files[0];
       if (file) {
         if (file.size > 5 * 1024 * 1024) {
@@ -351,7 +373,7 @@
       }
     });
 
-    document.getElementById('crop-btn').addEventListener('click', function() {
+    document.getElementById('crop-btn').addEventListener('click', function () {
       if (cropper) {
         const canvas = cropper.getCroppedCanvas({
           width: 400,
@@ -376,7 +398,7 @@
       }
     });
 
-    document.getElementById('reset-crop-btn').addEventListener('click', function() {
+    document.getElementById('reset-crop-btn').addEventListener('click', function () {
       document.getElementById('cropper-container').style.display = 'none';
       if (cropper) {
         cropper.destroy();
@@ -390,7 +412,7 @@
 
     async function handleFormSubmit(event) {
       event.preventDefault();
-      
+
       if (!validateForm()) return;
 
       const submitBtn = event.target.querySelector('button[type="submit"]');
@@ -438,7 +460,7 @@
         });
 
         window.location.href = "/admin/category";
-        
+
       } catch (error) {
         console.error('Error:', error);
         Swal.fire({
@@ -453,4 +475,5 @@
     }
   </script>
 </body>
+
 </html>

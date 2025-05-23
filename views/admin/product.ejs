@@ -666,10 +666,10 @@
             </tr>
           </thead>
             <tbody>
-              <% for (let i=data.length - 1; i>= 0; i--) { %>
+              <% for (let i = 0; i < data.length; i++) { %>
                 <tr>
                   <td>
-                    <%= offset + (data.length - i) %>
+                    <%= offset + i + 1 %>
                   </td>
                   <td>
                     <img src="/uploads/product/<%= data[i].productImage[0] %>" alt="Product Image"
