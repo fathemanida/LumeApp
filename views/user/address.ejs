@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Address Form</title>
+    <link href="https://fonts.googleapis.com/css2?family=Jost&family=Aboreto&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --dark-brown: #5c4b3b;
+            --olive-green: #314216;
+            --light-bg: #ffffff;
+            --border-color: #d3c9be;
+        }
+
+        body {
+            font-family: 'Jost', sans-serif;
+            background-color: white;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            min-height: 100vh;
+            color: var(--dark-brown);
+        }
+
+        .container {
+            background-color: #fff;
+            border-radius: 0;
+            box-shadow: none;
+            overflow: hidden;
+            width: 100%;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Aboreto', cursive;
+        }
+
+        .sidebar {
+            background-color: white;
+            padding: 1.5rem;
+            width: 280px;
+            height: 100vh;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .sidebar-title {
+            font-family: 'Aboreto', cursive;
+            font-size: 1.25rem;
+            color: var(--dark-brown);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--dark-brown);
+            padding: 0.75rem 1rem;
+            transition: all 0.3s;
+            border-radius: 6px;
+            font-family: 'Jost', sans-serif;
+            position: relative;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--olive-green);
+            background-color: rgba(49, 66, 22, 0.1);
+        }
+
+        .nav-link.active {
+            font-weight: 500;
+            background-color: var(--light-bg);
+            box-shadow: 3px 0 0 0 var(--olive-green) inset;
+        }
+
+        .sidebar-actions {
+            margin-top: auto;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .logout-btn, .delete-btn {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-family: 'Jost', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+        }
+
+        .logout-btn {
+            background-color: var(--dark-brown);
+            color: white;
+        }
+
+        .logout-btn:hover {
+            background-color: var(--olive-green);
+        }
+
+        .delete-btn {
+            background-color: #f8f8f8;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+
+        .delete-btn:hover {
+            background-color: #fee2e2;
+        }
+
+        .main-content {
+            padding: 50px 40px;
+            width: 70%;
+            background-color: white;
+            overflow-y: auto;
+        }
+
+        .form-content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            background-color: #f9f9f9;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .profile-image {
+            width: 90px;
+            height: 90px;
+            background-color: var(--border-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .overview-grid div {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .overview-grid div:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-field {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 1rem;
+            width: 100%;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            font-family: 'Jost', sans-serif;
+        }
+
+        .input-field:focus {
+            border-color: var(--olive-green);
+            box-shadow: 0 0 8px rgba(49, 66, 22, 0.2);
+            outline: none;
+        }
+
+        label {
+            font-size: 0.95rem;
+            color: var(--dark-brown);
+            margin-bottom: 10px;
+            display: block;
+            font-family: 'Jost', sans-serif;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .edit-btn {
+            background-color: rgb(64, 45, 30);
+            color: white;
+            padding: 14px 35px; /* Match padding with submit-btn for consistency */
+            border-radius: 8px; /* Match border-radius with submit-btn */
+            font-size: 1.1rem;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            border: none;
+            cursor: pointer;
+            font-family: 'Jost', sans-serif;
+        }
+
+        .edit-btn:hover {
+            background-color: var(--olive-green);
+            transform: translateY(-2px);
+        }
+
+        .submit-btn {
+            background-color: var(--dark-brown);
+            color: white;
+            padding: 14px 35px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            border: none;
+            cursor: pointer;
+            font-family: 'Jost', sans-serif;
+        }
+
+        .submit-btn:hover {
+            background-color: var(--olive-green);
+            transform: translateY(-2px);
+        }
+
+        .add-address-btn {
+            background-color: rgb(58, 35, 5);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            border: none;
+            cursor: pointer;
+            font-family: 'Jost', sans-serif;
+            margin-bottom: 20px;
+        }
+
+        .add-address-btn:hover {
+            background-color: var(--olive-green);
+            transform: translateY(-2px);
+        }
+
+        .logout-btn {
+            background-color: rgb(64, 45, 30);
+            color: white;
+            padding: 14px 0;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            font-family: 'Jost', sans-serif;
+        }
+
+        .logout-btn:hover {
+            background-color: var(--olive-green);
+            transform: translateY(-2px);
+        }
+
+        .delete-btn {
+            background-color: rgb(78, 19, 19);
+            color: white;
+            padding: 14px 0;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            font-family: 'Jost', sans-serif;
+        }
+
+        .delete-btn:hover {
+            background-color: #8B0000;
+            transform: translateY(-2px);
+        }
+
+        .error-message {
+            color: #dc2626;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .input-field.error {
+            border-color: #dc2626;
+        }
+
+        .submit-btn.loading {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        #imagePreviewContainer {
+            max-width: 100%;
+            margin-top: 1rem;
+        }
+
+        .cropper-modal {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .cropper-crop-box {
+            border-radius: 50%;
+        }
+
+        .cropper-view-box {
+            border-radius: 50%;
+            outline: 1px solid #39f;
+            outline-color: rgba(51, 153, 255, 0.75);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .address-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px; /* Increased gap for more space between Pincode and State */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div>
+                <div class="sidebar-title">User Dashboard</div>
+               <div class="sidebar-nav">
+                    <a href="/profile" class="nav-link ">Profile</a>
+                    <a href="/address" class="nav-link active">Address</a>
+                    <a href="/orders" class="nav-link">Orders</a>
+                    <a href="/wishlist" class="nav-link">Wishlist</a>
+                    <a href="/settings" class="nav-link">Settings</a>
+
+                </div>
+            </div>
+            <div class="sidebar-actions">
+                <button class="logout-btn">Logout</button>
+                <button class="delete-btn">Delete Account</button>
+            </div>
+        </div>
+        <div class="main-content">
+            <h2>Address Details</h2>
+            <a href="/add-address"><button class="add-address-btn">Add Address</button></a>
+            <div class="form-content">
+                <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" class="input-field" placeholder="Full Name" >
+                </div>
+                <div class="form-group">
+                    <label for="phoneNumber">Phone Number</label>
+                    <input type="text" id="phoneNumber" class="input-field" placeholder="Phone Number">
+                </div>
+                <div class="form-group">
+                    <label for="alternatePhoneNumber">Alternate Phone Number</label>
+                    <input type="text" id="alternatePhoneNumber" class="input-field" placeholder="Alternate Phone Number">
+                </div>
+                <div class="address-grid">
+                    <div class="form-group">
+                        <label for="pincode">Pincode</label>
+                        <input type="text" id="pincode" class="input-field" placeholder="Pincode">
+                    </div>
+                    <div class="form-group">
+                        <label for="state">State</label>
+                        <input type="text" id="state" class="input-field" placeholder="State">
+                    </div>
+                    <div class="form-group">
+                        <label for="city">City</label>
+                        <input type="text" id="city" class="input-field" placeholder="City">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="houseNo">House No., Building Name</label>
+                    <input type="text" id="houseNo" class="input-field" placeholder="House No., Building Name">
+                </div>
+                <div class="form-group">
+                    <label for="roadName">Road Name, Area</label>
+                    <input type="text" id="roadName" class="input-field" placeholder="Road Name, Area">
+                </div>
+                <div class="button-group">
+
+                    <a href="/address/update"><button class="edit-btn">Edit Address</button></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

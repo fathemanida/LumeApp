@@ -11,11 +11,11 @@ const productSchema = new Schema(
       type: String,
       required: true,
     },
-  category: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Category',
-    required: true
-  },
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Category',
+      required: true
+    },
     regularPrice: {
       type: Number,
       required: true,
@@ -24,11 +24,17 @@ const productSchema = new Schema(
       type: Number,
       required: true,
     },
-    sizes: { 
-      type: [String],
-      required: false,
-      default: [],
-    },
+    sizes: [{ 
+      size: {
+        type: String,
+        required: true
+      },
+      quantity: {
+        type: Number,
+        required: true,
+        min: 0
+      }
+    }],
     productCode: {
       type: String,
       required: true,

@@ -655,7 +655,7 @@
               <td>Image</td>
               <th>Product Name</th>
               <th>Category</th>
-              <th>Size (in)</th>
+              <th>Size</th>
               <th>Offer</th>
               <th>Offer Price</th>
               <th>Sale Price</th>
@@ -683,7 +683,11 @@
                     <%= data[i].category ? data[i].category.name : 'No Category' %>
                   </td>
                   <td>
-                    <%= data[i].sizes %>
+                    <% if(data[i].sizes && data[i].sizes.length > 0) { %>
+                      <%= data[i].sizes.map(size => size.size).join(', ') %>
+                    <% } else { %>
+                      -
+                    <% } %>
                   </td>
                   <td></td>
                   <td></td>

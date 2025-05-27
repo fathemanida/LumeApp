@@ -477,7 +477,7 @@
             gap: 0.5rem;
             margin-top: 1.5rem;
             align-items: center;
-           
+
         }
 
         .page-btn {
@@ -643,7 +643,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <% for (let i = 0; i < cat.length; i++) { %>
+                        <% for (let i=0; i < cat.length; i++) { %>
                             <tr>
                                 <td>
                                     <%= offset + i + 1 %>
@@ -656,7 +656,9 @@
                                     <img src="<%= cat[i].image %>" alt="Category Image" style="height: 100px;" />
                                 </td>
                                 <td class="description-column" style="height: 390px;">
-                                    <%= cat[i].description %>
+                                    <% const description=cat[i].description || '' ; const words=description.split(' ');
+                                    const shortDesc = words.length > 10 ? words.slice(0, 10).join(' ') + ' ...' : description; %>
+                                        <%= shortDesc %>
                                 </td>
                                 <td class="offer-price">
                                     <%= cat[i].offerPrice || '-' %>

@@ -1,0 +1,51 @@
+  <nav class="navbar d-flex justify-content-between align-items-center px-4 py-3">
+    <!-- Left side - Brand -->
+    <div class="brand" id="sidebarToggle">LUME</div>
+
+    <!-- Center - Main Navigation -->
+    <ul class="d-flex align-items-center list-unstyled mb-0"
+      style="position: absolute; left: 50%; transform: translateX(-50%);">
+      <li class="mx-2"><a href="/" class="nav-link">Home</a></li>
+      <li class="mx-2"><a href="/shopAll" class="nav-link">Shop All</a></li>
+      <li class="mx-2"><a href="/featured" class="nav-link">Featured</a></li>
+      <li class="mx-2"><a href="/new-arrivals" class="nav-link">New Arrivals</a></li>
+    </ul>
+
+    <!-- Right side - Icons -->
+    <ul class="d-flex align-items-center list-unstyled mb-0">
+      <!-- Search Bar -->
+      <li class="mx-2">
+        <form action="/shopAll" method="GET" class="d-flex align-items-center">
+          <div class="search-container">
+            <input type="text" name="search" placeholder="Search products..." class="search-input form-control">
+            <button type="submit" class="search-button">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
+        </form>
+      </li>
+
+      <% const currentUser=locals.user || (locals.session && locals.session.user); %>
+
+        <li class="mx-2"><a href="/wishlist" class="icon-link"><i class="fas fa-heart"></i></a></li>
+        <li class="mx-2"><a href="/cart" class="icon-link"><i class="fas fa-shopping-cart"></i></a></li>
+
+        <!-- User Profile Dropdown -->
+        <li class="mx-2">
+          <div class="profile-dropdown">
+            <a href="#" class="icon-link"><i class="far fa-user"></i></a>
+            <div class="profile-dropdown-content">
+              <% if (locals.user) { %>
+                <a href="/profile"><i class="fas fa-user"></i> My Profile</a>
+                <a href="/orders"><i class="fas fa-box"></i> My Orders</a>
+                <a href="/wishlist"><i class="fas fa-heart"></i> Wishlist</a>
+                <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                <% } else { %>
+                  <a href="/login"><i class="fas fa-sign-in-alt"></i> Login</a>
+                  <a href="/signup"><i class="fas fa-user-plus"></i> Sign Up</a>
+                  <% } %>
+            </div>
+          </div>
+        </li>
+    </ul>
+  </nav>

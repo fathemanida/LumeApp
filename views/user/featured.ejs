@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LUME - Jewelry</title>
   <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
   <link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Jost&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
@@ -16,7 +18,8 @@
       --border-color: #d3c9be;
     }
 
-    html, body {
+    html,
+    body {
       height: 100%;
       margin: 0;
       padding: 0;
@@ -134,7 +137,7 @@
       background: white;
       z-index: 1000;
       transition: left 0.3s ease;
-      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
       overflow-y: auto;
     }
 
@@ -212,7 +215,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0,0,0,0.5);
+      background: rgba(0, 0, 0, 0.5);
       z-index: 999;
       display: none;
     }
@@ -310,7 +313,7 @@
       font-size: 1.2rem;
       cursor: pointer;
       transition: all 0.3s ease;
-      
+
     }
 
     .wishlist-icon:hover {
@@ -395,7 +398,7 @@
       right: 0;
       background-color: white;
       min-width: 160px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
       z-index: 1000;
       border-radius: 4px;
       padding: 0.5rem 0;
@@ -424,152 +427,226 @@
       width: 20px;
       text-align: center;
     }
-    
-        .pagination {
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.5rem;
-            margin-top: 1.5rem;
-            align-items: center;
-        }
 
-        .page-btn {
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 4px;
-            border: none;
-            background-color: #e0e0e0;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: var(--dark-brown);
-            text-decoration: none;
-        }
+    .pagination {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+      align-items: center;
+    }
 
-        .page-btn:hover:not(.active):not(:disabled) {
-            background-color: var(--olive-green);
-            color: white;
-        }
+    .page-btn {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      border: none;
+      background-color: #e0e0e0;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: var(--dark-brown);
+      text-decoration: none;
+    }
 
-        .page-btn.active {
-            background-color: var(--dark-brown);
-            color: white;
-        }
+    .page-btn:hover:not(.active):not(:disabled) {
+      background-color: var(--olive-green);
+      color: white;
+    }
 
-        .page-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-         .page-btn:hover:not(.active) {
+    .page-btn.active {
+      background-color: var(--dark-brown);
+      color: white;
+    }
+
+    .page-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .page-btn:hover:not(.active) {
       background-color: #d0d0d0;
     }
 
     .product-info {
-        padding: 1rem;
+      padding: 1rem;
     }
 
     .product-category {
-        color: var(--olive-green);
-        font-size: 0.9rem;
-        margin-bottom: 0.5rem;
+      color: var(--olive-green);
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
     }
+
     /* Add this to your existing CSS */
-.main-content-container {
-    padding-left: 5.5rem;
-    padding-right: 5.5rem;
-}
+    .main-content-container {
+      padding-left: 5.5rem;
+      padding-right: 5.5rem;
+    }
 
-/* For larger screens */
-@media (min-width: 768px) {
-  .main-content-container {
-    padding-left: 4rem;
-    padding-right: 4rem;
-  }
-}
+    /* For larger screens */
+    @media (min-width: 768px) {
+      .main-content-container {
+        padding-left: 4rem;
+        padding-right: 4rem;
+      }
+    }
 
-@media (min-width: 1200px) {
-  .main-content-container {
-    padding-left: 6rem;
-    padding-right: 6rem;
-    max-width: 1400px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-}
-.search-container {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
+    @media (min-width: 1200px) {
+      .main-content-container {
+        padding-left: 6rem;
+        padding-right: 6rem;
+        max-width: 1400px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+    }
 
-.search-input {
-  border: 1px solid var(--border-color);
-  border-radius: 20px;
-  padding: 0.5rem 1rem;
-  padding-right: 2.5rem;
-  font-family: 'Jost', sans-serif;
-  width: 200px;
-  transition: all 0.3s ease;
-}
+    .search-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
 
-.search-input:focus {
-  outline: none;
-  border-color: var(--dark-brown);
-  width: 250px;
-  box-shadow: 0 0 0 2px rgba(41, 29, 14, 0.1);
-}
+    .search-input {
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 0.5rem 1rem;
+      padding-right: 2.5rem;
+      font-family: 'Jost', sans-serif;
+      width: 200px;
+      transition: all 0.3s ease;
+    }
 
-.search-button {
-  position: absolute;
-  right: 10px;
-  background: none;
-  border: none;
-  color: var(--dark-brown);
-  cursor: pointer;
-}
+    .search-input:focus {
+      outline: none;
+      border-color: var(--dark-brown);
+      width: 250px;
+      box-shadow: 0 0 0 2px rgba(41, 29, 14, 0.1);
+    }
 
-.search-button:hover {
-  color: var(--olive-green);
-}/* Search Bar Styles */
-.search-container {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
+    .search-button {
+      position: absolute;
+      right: 10px;
+      background: none;
+      border: none;
+      color: var(--dark-brown);
+      cursor: pointer;
+    }
 
-.search-input {
-  border: 1px solid var(--border-color);
-  border-radius: 20px;
-  padding: 0.5rem 1rem;
-  padding-right: 2.5rem;
-  font-family: 'Jost', sans-serif;
-  width: 200px;
-  transition: all 0.3s ease;
-}
+    .search-button:hover {
+      color: var(--olive-green);
+    }
 
-.search-input:focus {
-  outline: none;
-  border-color: var(--dark-brown);
-  width: 250px;
-  box-shadow: 0 0 0 2px rgba(41, 29, 14, 0.1);
-}
+    /* Search Bar Styles */
+    .search-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
 
-.search-button {
-  position: absolute;
-  right: 10px;
-  background: none;
-  border: none;
-  color: var(--dark-brown);
-  cursor: pointer;
-}
+    .search-input {
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 0.5rem 1rem;
+      padding-right: 2.5rem;
+      font-family: 'Jost', sans-serif;
+      width: 200px;
+      transition: all 0.3s ease;
+    }
 
-.search-button:hover {
-  color: var(--olive-green);
-}
+    .search-input:focus {
+      outline: none;
+      border-color: var(--dark-brown);
+      width: 250px;
+      box-shadow: 0 0 0 2px rgba(41, 29, 14, 0.1);
+    }
+
+    .search-button {
+      position: absolute;
+      right: 10px;
+      background: none;
+      border: none;
+      color: var(--dark-brown);
+      cursor: pointer;
+    }
+
+    .search-button:hover {
+      color: var(--olive-green);
+    }
+     /* Unlisted product styling */
+    .unlisted-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.7);
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .unlisted-badge {
+      background: #6c757d;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+
+    .unlisted-img {
+      opacity: 0.7;
+    }
+
+
+    .unlisted-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgb(255 255 255 / 0%);
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .unlisted-badge {
+      background: #5b0a0a;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-weight: lighter;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.9rem;
+    }
+
+    .unlisted-img {
+      opacity: 0.7;
+    }
+
+
+    .out-of-stock-overlay {
+
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background-color: #dc3545;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 3px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      z-index: 10;
+    }
   </style>
 </head>
+
 <body>
 
   <!-- Overlay -->
@@ -585,7 +662,8 @@
       <div class="sidebar-category mb-4">
         <form id="sidebarSearchForm" onsubmit="return false;">
           <div class="input-group">
-            <input type="text" class="form-control search-input" placeholder="Search products..." id="sidebarSearch" name="search">
+            <input type="text" class="form-control search-input" placeholder="Search products..." id="sidebarSearch"
+              name="search">
             <button class="btn btn-outline-dark" type="submit" id="sidebarSearchBtn">
               <i class="fas fa-search"></i>
             </button>
@@ -597,55 +675,55 @@
           Categories <i class="fas fa-chevron-down"></i>
         </div>
         <div class="sidebar-items">
-        <%for(let i=0;i<category.length;i++){%>
-          <div class="sidebar-item">
-            <a href="/filter?category=<%=category[i]._id%><%= selectedSort ? '&sort=' + selectedSort : '' %>" 
-               class="<%= selectedCategory === category[i]._id.toString() ? 'active' : '' %>">
-              <%=category[i].name%>
-            </a>
-          </div>
-         <% } %>
+          <%for(let i=0;i<category.length;i++){%>
+            <div class="sidebar-item">
+              <a href="/filter?category=<%=category[i]._id%><%= selectedSort ? '&sort=' + selectedSort : '' %>"
+                class="<%= selectedCategory === category[i]._id.toString() ? 'active' : '' %>">
+                <%=category[i].name%>
+              </a>
+            </div>
+            <% } %>
         </div>
       </div>
-      
+
       <div class="sidebar-category">
         <div class="sidebar-title" onclick="toggleCategory(this)">
           Sort By <i class="fas fa-chevron-down"></i>
         </div>
         <div class="sidebar-items">
           <div class="sidebar-item">
-            <a href="?sort=price-low<%= selectedCategory ? '&category=' + selectedCategory : '' %>" 
-               class="<%= selectedSort === 'price-low' ? 'active' : '' %>">
+            <a href="?sort=price-low<%= selectedCategory ? '&category=' + selectedCategory : '' %>"
+              class="<%= selectedSort === 'price-low' ? 'active' : '' %>">
               Price: Low to High
             </a>
           </div>
           <div class="sidebar-item">
             <a href="?sort=price-high<%= selectedCategory ? '&category=' + selectedCategory : '' %>"
-               class="<%= selectedSort === 'price-high' ? 'active' : '' %>">
+              class="<%= selectedSort === 'price-high' ? 'active' : '' %>">
               Price: High to Low
             </a>
           </div>
           <div class="sidebar-item">
             <a href="?sort=name-asc<%= selectedCategory ? '&category=' + selectedCategory : '' %>"
-               class="<%= selectedSort === 'name-asc' ? 'active' : '' %>">
+              class="<%= selectedSort === 'name-asc' ? 'active' : '' %>">
               A-Z
             </a>
           </div>
           <div class="sidebar-item">
             <a href="?sort=name-desc<%= selectedCategory ? '&category=' + selectedCategory : '' %>"
-               class="<%= selectedSort === 'name-desc' ? 'active' : '' %>">
+              class="<%= selectedSort === 'name-desc' ? 'active' : '' %>">
               Z-A
             </a>
           </div>
           <div class="sidebar-item">
             <a href="?sort=newest<%= selectedCategory ? '&category=' + selectedCategory : '' %>"
-               class="<%= selectedSort === 'newest' ? 'active' : '' %>">
+              class="<%= selectedSort === 'newest' ? 'active' : '' %>">
               Newest First
             </a>
           </div>
         </div>
       </div>
-      
+
       <div class="sidebar-category">
         <div class="sidebar-title" onclick="toggleCategory(this)">
           Collections <i class="fas fa-chevron-down"></i>
@@ -661,60 +739,58 @@
 
   <!-- Navbar -->
   <nav class="navbar d-flex justify-content-between align-items-center px-4 py-3">
-  
-  <div class="brand" id="sidebarToggle">LUME</div>
 
-  
-  <ul class="d-flex align-items-center list-unstyled mb-0" style="position: absolute; left: 50%; transform: translateX(-50%);">
-    <li class="mx-2"><a href="/" class="nav-link">Home</a></li>
-    <li class="mx-2"><a href="/shopAll" class="nav-link">Shop All</a></li>
-    <li class="mx-2"><a href="/featured" class="nav-link">Featured</a></li>
-    <li class="mx-2"><a href="/new-arrivals" class="nav-link">New Arrivals</a></li>
-  </ul>
+    <div class="brand" id="sidebarToggle">LUME</div>
 
- 
-  <ul class="d-flex align-items-center list-unstyled mb-0">
-   
-    <li class="mx-2">
-      <form action="/shopAll" method="GET" class="d-flex align-items-center">
-        <div class="search-container" id="searchContainer">
-          <input type="text" 
-                 name="search" 
-                 placeholder="Search products..." 
-                 class="search-input form-control" 
-                 id="headerSearch">
-          <button type="submit" class="search-button">
-            <i class="fas fa-search"></i>
-          </button>
-        </div>
-      </form>
-    </li>
-    <li class="mx-2"><a href="#" class="icon-link" id="searchToggle"><i class="fas fa-search"></i></a></li>
-    
-    <% const currentUser = locals.user || (locals.session && locals.session.user); %>
-   
-    <li class="mx-2"><a href="/wishlist" class="icon-link"><i class="fas fa-heart"></i></a></li>
-    <li class="mx-2"><a href="/cart" class="icon-link"><i class="fas fa-shopping-cart"></i></a></li>
-    
-    
-    <li class="mx-2">
-      <div class="profile-dropdown">
-      <a href="#" class="icon-link"><i class="far fa-user"></i></a>
-        <div class="profile-dropdown-content">
-        <% if (currentUser) { %>
-            <a href="/userProfile"><i class="fas fa-user"></i> My Profile</a>
-            <a href="/orders"><i class="fas fa-box"></i> My Orders</a>
-            <a href="/wishlist"><i class="fas fa-heart"></i> Wishlist</a>
-            <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
-        <% } else { %>
-            <a href="/login"><i class="fas fa-sign-in-alt"></i> Login</a>
-            <a href="/signup"><i class="fas fa-user-plus"></i> Sign Up</a>
-        <% } %>
-        </div>
-      </div>
-    </li>
-  </ul>
-</nav>
+
+    <ul class="d-flex align-items-center list-unstyled mb-0"
+      style="position: absolute; left: 50%; transform: translateX(-50%);">
+      <li class="mx-2"><a href="/" class="nav-link">Home</a></li>
+      <li class="mx-2"><a href="/shopAll" class="nav-link">Shop All</a></li>
+      <li class="mx-2"><a href="/featured" class="nav-link">Featured</a></li>
+      <li class="mx-2"><a href="/new-arrivals" class="nav-link">New Arrivals</a></li>
+    </ul>
+
+
+    <ul class="d-flex align-items-center list-unstyled mb-0">
+
+      <li class="mx-2">
+        <form action="/shopAll" method="GET" class="d-flex align-items-center">
+          <div class="search-container" id="searchContainer">
+            <input type="text" name="search" placeholder="Search products..." class="search-input form-control"
+              id="headerSearch">
+            <button type="submit" class="search-button">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
+        </form>
+      </li>
+      <li class="mx-2"><a href="#" class="icon-link" id="searchToggle"><i class="fas fa-search"></i></a></li>
+
+      <% const currentUser=locals.user || (locals.session && locals.session.user); %>
+
+        <li class="mx-2"><a href="/wishlist" class="icon-link"><i class="fas fa-heart"></i></a></li>
+        <li class="mx-2"><a href="/cart" class="icon-link"><i class="fas fa-shopping-cart"></i></a></li>
+
+
+        <li class="mx-2">
+          <div class="profile-dropdown">
+            <a href="#" class="icon-link"><i class="far fa-user"></i></a>
+            <div class="profile-dropdown-content">
+              <% if (currentUser) { %>
+                <a href="/profile"><i class="fas fa-user"></i> My Profile</a>
+                <a href="/orders"><i class="fas fa-box"></i> My Orders</a>
+                <a href="/wishlist"><i class="fas fa-heart"></i> Wishlist</a>
+                <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                <% } else { %>
+                  <a href="/login"><i class="fas fa-sign-in-alt"></i> Login</a>
+                  <a href="/signup"><i class="fas fa-user-plus"></i> Sign Up</a>
+                  <% } %>
+            </div>
+          </div>
+        </li>
+    </ul>
+  </nav>
   <!-- Main Content -->
   <div class="container-fluid py-4">
     <div class="row">
@@ -730,46 +806,72 @@
 
         <!-- Products Grid -->
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4" id="productsGrid">
-          <% if (products && products.length > 0) { %>
-            <% products.forEach(product => { %>
-      <div class="col product-item" 
-           data-name="<%= product.productName.toLowerCase() %>"
-           data-category="<%= product.category ? product.category.name.toLowerCase() : '' %>">
-        <div class="product-card card text-center h-100">
-          <a href="/product-details?id=<%= product._id %>" class="text-decoration-none">
-            <i class="far fa-heart wishlist-icon" onclick="toggleWishlist(this)"></i>
-            <% if (product.new) { %>
-              <span class="new-badge">New</span>
-            <% } %>
-            <img 
-              src="/uploads/product/<%= product.productImage[0] %>" 
-              alt="<%= product.productName %>" 
-              class="product-img card-img-top bg-secondary"
-            >
-            <div class="product-info">
-              <p class="product-title card-title"><%= product.productName %></p>
-              <% if (product.category && product.category.name) { %>
-                <p class="product-category"><%= product.category.name %></p>
-              <% } %>
-              <p class="product-price">
-                <% if (product.salePrice) { %>
-                  <strike class="text-muted">$<%= (product.regularPrice || 0).toLocaleString('en-IN') %></strike>
-                  <span class="text-danger ms-2">$<%= product.salePrice.toLocaleString('en-IN') %></span>
+          <% if (products && products.length> 0) { %>
+            <% products.forEach(product=> { %>
+              <div class="col product-item">
+                <div class="product-card card text-center h-100" data-product-id="<%= product._id %>">
+                  <a href="/product-details?id=<%= product._id %>" class="text-decoration-none">
+                  <% if (!product.isListed) { %>
+                    <div class="unlisted-overlay">
+                      <span class="unlisted-badge">Not Available</span>
+                    </div>
+                    <% } else if (product.quantity <=0) { %>
+                      <div class="out-of-stock-overlay">
+                        <span class="out-of-stock-badge">Out of Stock</span>
+                      </div>
+                      <% } %>
+
+                        <a href="/product-details?id=<%= product._id %>" class="text-decoration-none">
+                          <i class="far fa-heart wishlist-icon"></i>
+                          <% if (product.new) { %>
+                            <span class="new-badge">New</span>
+                            <% } %>
+                              <img src="/uploads/product/<%= product.productImage[0] %>"
+                                class="product-img card-img-top <%= !product.isListed ? 'unlisted-img' : (product.quantity <= 0 ? 'out-of-stock-img' : '') %>">
+                              <div class="product-info">
+                                <p class="product-title card-title <%= !product.isListed ? 'text-muted' : '' %>">
+                                  <%= product.productName %>
+                                </p>
+                                <% if (product.category?.name) { %>
+                                  <p class="product-category">
+                                    <%= product.category.name %>
+                                  </p>
+                                  <% } %>
+                                    <p class="product-price">
+                                      <% if (product.salePrice) { %>
+                                        <strike class="text-muted">$<%= product.regularPrice.toLocaleString() %>
+                                            </strike>
+                                        <span class="text-danger">$<%= product.salePrice.toLocaleString() %></span>
+                                        <% } else { %>
+                                          $<%= product.regularPrice.toLocaleString() %>
+                                            <% } %>
+                                    </p>
+                                    <% if (product.sizes && product.sizes.length > 0) { %>
+                                      <div class="size-options d-flex gap-2 mb-2">
+                                        <% product.sizes.forEach(size => { %>
+                                          <button class="btn btn-sm btn-outline-dark size-btn" 
+                                                  onclick="selectSize(this, '<%= size.size %>', '<%= product._id %>')"
+                                                  data-size="<%= size.size %>">
+                                            <%= size.size %>
+                                          </button>
+                                        <% }); %>
+                                      </div>
+                                    <% } %>
+                                    <button class="btn btn-dark w-100" onclick="addToCartWithSize('<%= product._id %>')" <%=!product.isListed || product.quantity
+                                      <=0 ? 'disabled' : '' %>>
+                                      <%= !product.isListed ? 'Not Available' : (product.quantity <=0 ? 'Out of Stock'
+                                        : 'Add to Cart' ) %>
+                                    </button>
+                              </div>
+                        </a>
+                </div>
+              </div>
+              <% }) %>
                 <% } else { %>
-                  $<%= (product.regularPrice || 0).toLocaleString('en-IN') %>
-                <% } %>
-              </p>
-              <button class="btn btn-outline-dark w-100">Add to Cart</button>
-            </div>
-          </a>
-        </div>
-      </div>
-    <% }) %>
-          <% } else { %>
-            <div class="col-12 text-center">
-              <p class="text-muted">No products available</p>
-            </div>
-          <% } %>
+                  <div class="col-12 text-center">
+                    <p class="text-muted">No products available</p>
+                  </div>
+                  <% } %>
         </div>
 
         <!-- Pagination -->
@@ -778,54 +880,58 @@
             Page <%= currentPage %> of <%= totalPages %>
           </span>
 
-          <% if (currentPage > 1) { %>
+          <% if (currentPage> 1) { %>
             <a href="?page=<%= currentPage - 1 %>" class="page-btn">&lt;</a>
-          <% } else { %>
-            <span class="page-btn" style="opacity: 0.5; pointer-events: none;">&lt;</span>
-          <% } %>
-
-          <% for (let i = 1; i <= totalPages; i++) { %>
-            <% if (i === currentPage) { %>
-              <span class="page-btn active"><%= i %></span>
             <% } else { %>
-              <a href="?page=<%= i %>" class="page-btn"><%= i %></a>
-            <% } %>
-          <% } %>
+              <span class="page-btn" style="opacity: 0.5; pointer-events: none;">&lt;</span>
+              <% } %>
 
-          <% if (currentPage < totalPages) { %>
-            <a href="?page=<%= currentPage + 1 %>" class="page-btn">&gt;</a>
-          <% } else { %>
-            <span class="page-btn" style="opacity: 0.5; pointer-events: none;">&gt;</span>
-          <% } %>
+                <% for (let i=1; i <=totalPages; i++) { %>
+                  <% if (i===currentPage) { %>
+                    <span class="page-btn active">
+                      <%= i %>
+                    </span>
+                    <% } else { %>
+                      <a href="?page=<%= i %>" class="page-btn">
+                        <%= i %>
+                      </a>
+                      <% } %>
+                        <% } %>
+
+                          <% if (currentPage < totalPages) { %>
+                            <a href="?page=<%= currentPage + 1 %>" class="page-btn">&gt;</a>
+                            <% } else { %>
+                              <span class="page-btn" style="opacity: 0.5; pointer-events: none;">&gt;</span>
+                              <% } %>
         </div>
       </div>
     </div>
   </div>
 
-   <footer class="footer py-5 mt-5" style="background-color: var(--dark-brown);">
+  <footer class="footer py-5 mt-5" style="background-color: var(--dark-brown);">
     <div class="container">
       <div class="row row-cols-1 row-cols-sm-3 g-4">
-    <div class="col">
+        <div class="col">
           <h4 class="footer-heading mb-3">Company</h4>
-      <ul class="list-unstyled">
+          <ul class="list-unstyled">
             <li class="mb-2"><a href="#" class="footer-link">About Us</a></li>
             <li class="mb-2"><a href="#" class="footer-link">Careers</a></li>
             <li class="mb-2"><a href="#" class="footer-link">Contact</a></li>
             <li class="mb-2"><a href="#" class="footer-link">Privacy Policy</a></li>
-      </ul>
-    </div>
-    <div class="col">
+          </ul>
+        </div>
+        <div class="col">
           <h4 class="footer-heading mb-3">Shop</h4>
-      <ul class="list-unstyled">
+          <ul class="list-unstyled">
             <li class="mb-2"><a href="#" class="footer-link">Rings</a></li>
             <li class="mb-2"><a href="#" class="footer-link">Necklaces</a></li>
             <li class="mb-2"><a href="#" class="footer-link">Earrings</a></li>
             <li class="mb-2"><a href="#" class="footer-link">Bracelets</a></li>
-      </ul>
-    </div>
+          </ul>
+        </div>
         <div class="col">
           <h4 class="footer-heading mb-3">Connect With Us</h4>
-      <ul class="list-unstyled">
+          <ul class="list-unstyled">
             <li class="mb-2">
               <a href="#" class="footer-link d-flex align-items-center">
                 <i class="fab fa-instagram me-2"></i> Instagram
@@ -846,7 +952,7 @@
                 <i class="fab fa-twitter me-2"></i> Twitter
               </a>
             </li>
-      </ul>
+          </ul>
         </div>
       </div>
       <div class="row mt-4 pt-4 border-top border-secondary">
@@ -858,10 +964,14 @@
   </footer>
 
   <!-- Bootstrap JS and dependencies -->
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+    integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+    crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  
+
   <!-- Add hidden input for blocked status -->
   <input type="hidden" id="userBlockedStatus" value="<%= locals.user && locals.user.isBlocked ? 'true' : 'false' %>">
 
@@ -924,9 +1034,9 @@
     function toggleCategory(element) {
       const items = element.nextElementSibling;
       const icon = element.querySelector('i');
-      
+
       items.classList.toggle('open');
-      
+
       if (items.classList.contains('open')) {
         icon.classList.remove('fa-chevron-down');
         icon.classList.add('fa-chevron-up');
@@ -938,7 +1048,7 @@
 
     // Make sidebar items clickable
     document.querySelectorAll('.sidebar-item').forEach(item => {
-      item.addEventListener('click', function() {
+      item.addEventListener('click', function () {
         console.log('Navigating to:', this.textContent);
         sidebar.classList.remove('open');
         overlay.classList.remove('active');
@@ -953,20 +1063,20 @@
     }
 
     // Search functionality
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       const sidebarSearch = document.getElementById('sidebarSearch');
       const productItems = document.querySelectorAll('.product-item');
-      
+
       function performSearch() {
         const searchTerm = sidebarSearch.value.trim().toLowerCase();
-        
+
         productItems.forEach(item => {
           const productName = item.dataset.name;
           const productCategory = item.dataset.category;
-          
-          if (searchTerm === '' || 
-              productName.includes(searchTerm) || 
-              productCategory.includes(searchTerm)) {
+
+          if (searchTerm === '' ||
+            productName.includes(searchTerm) ||
+            productCategory.includes(searchTerm)) {
             item.style.display = '';
           } else {
             item.style.display = 'none';
@@ -986,17 +1096,91 @@
       sidebarSearch.addEventListener('input', performSearch);
 
       // Search on form submit
-      document.getElementById('sidebarSearchForm').addEventListener('submit', function(e) {
+      document.getElementById('sidebarSearchForm').addEventListener('submit', function (e) {
         e.preventDefault();
         performSearch();
       });
 
       // Search on button click
-      document.getElementById('sidebarSearchBtn').addEventListener('click', function(e) {
+      document.getElementById('sidebarSearchBtn').addEventListener('click', function (e) {
         e.preventDefault();
         performSearch();
       });
     });
+
+    function addToCart(productId, size = null) {
+      fetch('/cart/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          productId: productId,
+          quantity: 1,
+          size: size
+        })
+      })
+      .then(response => {
+        if (!response.ok) {
+          return response.json().then(err => Promise.reject(err));
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.success) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Added to Cart',
+            text: data.message,
+            showConfirmButton: false,
+            timer: 1500
+          });
+        } else {
+          throw new Error(data.message || 'Failed to add to cart');
+        }
+      })
+      .catch(error => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: error.message || 'Failed to add item to cart',
+          confirmButtonColor: '#291d0e'
+        });
+      });
+    }
+
+    function selectSize(button, size, productId) {
+      // Remove active class from all size buttons in the same product card
+      const productCard = button.closest('.product-card');
+      productCard.querySelectorAll('.size-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      
+      // Add active class to clicked button
+      button.classList.add('active');
+      
+      // Store selected size in data attribute
+      productCard.dataset.selectedSize = size;
+    }
+
+    function addToCartWithSize(productId) {
+      const productCard = document.querySelector(`[data-product-id="${productId}"]`);
+      const selectedSize = productCard.dataset.selectedSize;
+      
+      if (productCard.querySelector('.size-btn') && !selectedSize) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Size Required',
+          text: 'Please select a size before adding to cart',
+          confirmButtonColor: '#291d0e'
+        });
+        return;
+      }
+      
+      addToCart(productId, selectedSize);
+    }
   </script>
 </body>
+
 </html>

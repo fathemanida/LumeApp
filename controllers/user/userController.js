@@ -116,9 +116,38 @@ const logout = async (req, res) => {
 const verifyOtp = async (req, res) => {
   try {
     const { otp } = req.body;
+    const OTP_EXPIRY_SECONDS = 30;
+
+  req.session.otpGeneratedAt = new Date();
     console.log("Entered OTP:", otp);
     console.log("Stored OTP:", req.session.otp);
+    console.log("OTP Generated At:", req.session.otpGeneratedAt);
 
+   
+    if (!req.session.otp || !req.session.otpGeneratedAt) {
+      return res.status(400).json({
+        success: false,
+        message: "No active OTP found. Please request a new one.",
+      });
+    }
+
+   
+    const currentTime = Date.now();
+    const otpExpiryTime =
+      new Date(req.session.otpGeneratedAt).getTime() + OTP_EXPIRY_SECONDS * 1000;
+
+    if (currentTime > otpExpiryTime) {
+      
+      req.session.otp = null;
+      req.session.otpGeneratedAt = null;
+
+      return res.status(400).json({
+        success: false,
+        message: "OTP has expired. Please request a new one.",
+      });
+    }
+
+   
     if (otp === req.session.otp) {
       const user = req.session.userData;
       const passwordHash = await securePassword(user.password);
@@ -129,13 +158,13 @@ const verifyOtp = async (req, res) => {
         phone: user.phone,
         password: passwordHash,
       });
-      console.log("Did we reach here?");
 
       await saveUserData.save();
-      req.session.user = saveUserData._id;
 
+      req.session.user = saveUserData._id;
       req.session.otp = null;
-      console.log("Did we reach here?");
+      req.session.otpGeneratedAt = null;
+      req.session.userData = null;
 
       return res.json({
         success: true,
@@ -145,17 +174,18 @@ const verifyOtp = async (req, res) => {
     } else {
       return res.status(400).json({
         success: false,
-        message: "Invalid OTP, please try again!",
+        message: "Invalid OTP. Please try again.",
       });
     }
   } catch (error) {
-    console.log("Error in OTP verification:", error);
+    console.error("Error in OTP verification:", error);
     return res.status(500).json({
       success: false,
       message: "Internal server error",
     });
   }
 };
+
 
 const resendOtp = async (req, res) => {
   try {
@@ -334,7 +364,7 @@ const newCollections = await Product.find({
 
 const loadShopAll = async (req, res) => {
   try {
-    const user=req.session.user
+    const user = req.session.user;
     let userData = null;
     if (req.session.user?._id) {
       userData = await User.findById(req.session.user._id);
@@ -342,7 +372,7 @@ const loadShopAll = async (req, res) => {
     const searchQuery = req.query.search || "";
     const categories = await Category.find({ isListed: true });
     const listedCategoryIds = categories.map(c => c._id);
-      let isBlocked = false;
+    let isBlocked = false;
     if (user) {
       const dbUser = await User.findById(user.id);
       if (dbUser && dbUser.isBlocked) {
@@ -356,27 +386,23 @@ const loadShopAll = async (req, res) => {
     const sortBy = req.query.sort;
 
     let query = {
-      isListed: true,
-
       isBlocked: false,
       quantity: { $gt: 0 },
     };
 
-      query.category = { $in: listedCategoryIds };
-  if (searchQuery) {
-  query.$or = [
-    { productName: { $regex: searchQuery, $options: 'i' } },
-    { description: { $regex: searchQuery, $options: 'i' } }
-  ];
-}
-
+    query.category = { $in: listedCategoryIds };
+    if (searchQuery) {
+      query.$or = [
+        { productName: { $regex: searchQuery, $options: 'i' } },
+        { description: { $regex: searchQuery, $options: 'i' } }
+      ];
+    }
 
     if (categoryId && listedCategoryIds.includes(categoryId)) {
-  query.category = categoryId;
-} else {
-  query.category = { $in: listedCategoryIds };
-}
-
+      query.category = categoryId;
+    } else {
+      query.category = { $in: listedCategoryIds };
+    }
 
     const totalProducts = await Product.countDocuments(query);
     console.log("\nTotal products:", totalProducts);
@@ -423,7 +449,6 @@ const loadShopAll = async (req, res) => {
 
     const Searchedproduct = await Product.find(query);
 
-
     res.render("shopAll", {
       user: user,
       products,
@@ -433,8 +458,8 @@ const loadShopAll = async (req, res) => {
       category: categoryData,
       selectedCategory: categoryId || null,
       selectedSort: sortBy || null,
-      searchQuery:Searchedproduct,
-      blocked:isBlocked
+      searchQuery: Searchedproduct,
+      blocked: isBlocked
     });
   } catch (error) {
     console.error("Error in loadShopAll:", error);
@@ -594,7 +619,7 @@ const productDetails = async (req, res) => {
     const relatedProducts = await Product.find({
       category: product.category._id,
       _id: { $ne: product._id },
-      isListed: true,
+     
       quantity: { $gt: 0 },
     })
       .limit(4)
@@ -634,8 +659,7 @@ const newArrivals = async (req, res) => {
       }
     }
     const query = {
-      isListed: true,
-      status: "Available",
+      
       isBlocked: false,
       quantity: { $gt: 0 },
       new: true,
@@ -701,8 +725,7 @@ const featured = async (req, res) => {
       }
     }
 const query = {
-  isListed: true,
-  status: "Available",
+ 
   isBlocked: false,
   quantity: { $gt: 0 },
   featured: true,

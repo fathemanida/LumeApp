@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Address Form</title>
+    <link href="https://fonts.googleapis.com/css2?family=Jost&family=Aboreto&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        :root {
+            --dark-brown: #5c4b3b;
+            --olive-green: #314216;
+            --light-bg: #ffffff;
+            --border-color: #d3c9be;
+        }
+
+        body {
+            font-family: 'Jost', sans-serif;
+            background-color: white;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            min-height: 100vh;
+            color: var(--dark-brown);
+        }
+
+        .container {
+            background-color: #fff;
+            border-radius: 0;
+            box-shadow: none;
+            overflow: hidden;
+            width: 100%;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Aboreto', cursive;
+        }
+
+        .sidebar {
+            background-color: white;
+            padding: 1.5rem;
+            width: 280px;
+            height: 100vh;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .sidebar-title {
+            font-family: 'Aboreto', cursive;
+            font-size: 1.25rem;
+            color: var(--dark-brown);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--dark-brown);
+            padding: 0.75rem 1rem;
+            transition: all 0.3s;
+            border-radius: 6px;
+            font-family: 'Jost', sans-serif;
+            position: relative;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--olive-green);
+            background-color: rgba(49, 66, 22, 0.1);
+        }
+
+        .nav-link.active {
+            font-weight: 500;
+            background-color: var(--light-bg);
+            box-shadow: 3px 0 0 0 var(--olive-green) inset;
+        }
+
+        .sidebar-actions {
+            margin-top: auto;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .logout-btn, .delete-btn {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-family: 'Jost', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+        }
+
+        .logout-btn {
+            background-color: var(--dark-brown);
+            color: white;
+        }
+
+        .logout-btn:hover {
+            background-color: var(--olive-green);
+        }
+
+        .delete-btn {
+            background-color: #f8f8f8;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+
+        .delete-btn:hover {
+            background-color: #fee2e2;
+        }
+
+        .main-content {
+            padding: 50px 40px;
+            width: 70%;
+            background-color: white;
+            overflow-y: auto;
+            position: relative; /* Added to position delete button */
+        }
+
+        .form-content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            background-color: #f9f9f9;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .profile-image {
+            width: 90px;
+            height: 90px;
+            background-color: var(--border-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .overview-grid div {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .overview-grid div:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-field {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 1rem;
+            width: 100%;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            font-family: 'Jost', sans-serif;
+        }
+
+        .input-field:focus {
+            border-color: var(--olive-green);
+            box-shadow: 0 0 8px rgba(49, 62, 22, 0.2);
+            outline: none;
+        }
+
+        label {
+            font-size: 0.95rem;
+            color: var(--dark-brown);
+            margin-bottom: 10px;
+            display: block;
+            font-family: 'Jost', sans-serif;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .edit-btn {
+            background-color: rgb(64, 45, 30);
+            color: white;
+            padding: 10px 20px; /* Adjusted padding for smaller button with icon */
+            border-radius: 8px;
+            font-size: 1rem; /* Slightly smaller font size */
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            border: none;
+            cursor: pointer;
+            font-family: 'Jost', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .edit-btn:hover {
+            background-color: var(--olive-green);
+            transform: translateY(-2px);
+        }
+
+        .delete-address-btn {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background-color: rgb(78, 19, 19);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            border: none;
+            cursor: pointer;
+            font-family: 'Jost', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .delete-address-btn:hover {
+            background-color: #8B0000;
+            transform: translateY(-2px);
+        }
+
+        .submit-btn {
+            background-color: var(--dark-brown);
+            color: white;
+            padding: 14px 35px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            border: none;
+            cursor: pointer;
+            font-family: 'Jost', sans-serif;
+        }
+
+        .submit-btn:hover {
+            background-color: var(--olive-green);
+            transform: translateY(-2px);
+        }
+
+        .add-address-btn {
+            background-color: var(--dark-brown);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            border: none;
+            cursor: pointer;
+            font-family: 'Jost', sans-serif;
+            margin-bottom: 20px;
+        }
+
+        .add-address-btn:hover {
+            background-color: var(--olive-green);
+            transform: translateY(-2px);
+        }
+
+        .logout-btn {
+            background-color: rgb(64, 45, 30);
+            color: white;
+            padding: 14px 0;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            font-family: 'Jost', sans-serif;
+        }
+
+        .logout-btn:hover {
+            background-color: var(--olive-green);
+            transform: translateY(-2px);
+        }
+
+        .delete-btn {
+            background-color: rgb(78, 19, 19);
+            color: white;
+            padding: 14px 0;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            font-family: 'Jost', sans-serif;
+        }
+
+        .delete-btn:hover {
+            background-color: #8B0000;
+            transform: translateY(-2px);
+        }
+
+        .error-message {
+            color: #dc2626;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .input-field.error {
+            border-color: #dc2626;
+        }
+
+        .submit-btn.loading {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        #imagePreviewContainer {
+            max-width: 100%;
+            margin-top: 1rem;
+        }
+
+        .cropper-modal {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .cropper-crop-box {
+            border-radius: 50%;
+        }
+
+        .cropper-view-box {
+            border-radius: 50%;
+            outline: 1px solid #39f;
+            outline-color: rgba(51, 153, 255, 0.75);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .address-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .icon {
+            width: 16px;
+            height: 16px;
+            fill: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div>
+                <div class="sidebar-title">User Dashboard</div>
+                <div class="sidebar-nav">
+                    <a href="/profile" class="nav-link">Profile</a>
+                    <a href="/address" class="nav-link active">Address</a>
+                    <a href="/orders" class="nav-link">Orders</a>
+                    <a href="/wishlist" class="nav-link">Wishlist</a>
+                    <a href="/settings" class="nav-link">Settings</a>
+                </div>
+            </div>
+            <div class="sidebar-actions">
+                <button class="logout-btn">Logout</button>
+                <button class="delete-btn">Delete Account</button>
+            </div>
+        </div>
+        <div class="main-content">
+            <div class="header-actions">
+                <h2>Address Details</h2>
+                <a href="/address/update">
+                    <button class="edit-btn">
+                        <svg class="icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                        </svg>
+                        Edit Address
+                    </button>
+                </a>
+            </div>
+            <button class="add-address-btn">Add Address</button>
+            <form id="addressForm" class="form-content">
+                <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" class="input-field" placeholder="Full Name" value="<%= address.name %>">
+                    <span class="error-message" id="fullNameError"></span>
+                </div>
+                <div class="form-group">
+                    <label for="phoneNumber">Phone Number</label>
+                    <input type="tel" id="phoneNumber" class="input-field" placeholder="Phone Number" value="<%= address.phone %>">
+                    <span class="error-message" id="phoneNumberError"></span>
+                </div>
+                <div class="form-group">
+                    <label for="alternatePhoneNumber">Alternate Phone Number</label>
+                    <input type="tel" id="alternatePhoneNumber" class="input-field" placeholder="Alternate Phone Number" value="<%= address.altPhone %>">
+                    <span class="error-message" id="alternatePhoneNumberError"></span>
+                </div>
+                <div class="address-grid">
+                    <div class="form-group">
+                        <label for="pincode">Pincode</label>
+                        <input type="text" id="pincode" class="input-field" placeholder="Pincode" value="<%= address.pincode %>">
+                        <span class="error-message" id="pincodeError"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="state">State</label>
+                        <input type="text" id="state" class="input-field" placeholder="State" value="<%= address.state %>">
+                        <span class="error-message" id="stateError"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="city">City</label>
+                        <input type="text" id="city" class="input-field" placeholder="City" value="<%= address.city %>">
+                        <span class="error-message" id="cityError"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="houseNo">House No., Building Name (Optional)</label>
+                    <input type="text" id="houseNo" class="input-field" placeholder="House No., Building Name" value="<%= address.houseNo %>">
+                </div>
+                <div class="form-group">
+                    <label for="roadName">Road Name, Area (Optional)</label>
+                    <input type="text" id="roadName" class="input-field" placeholder="Road Name, Area" value="<%= address.roadArea %>">
+                </div>
+                <div class="form-group">
+                    <label for="addressType">Address Type</label>
+                    <select id="addressType" class="input-field" required>
+                        <option value="home" <%= address.address && address.address[0] && address.address[0].addressType === 'home' ? 'selected' : '' %>>Home</option>
+                        <option value="work" <%= address.address && address.address[0] && address.address[0].addressType === 'work' ? 'selected' : '' %>>Work</option>
+                        <option value="other" <%= address.address && address.address[0] && address.address[0].addressType === 'other' ? 'selected' : '' %>>Other</option>
+                    </select>
+                </div>
+            </form>
+
+            <button class="delete-address-btn">
+                <svg class="icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                </svg>
+                Delete Address
+            </button>
+        </div>
+        <%- include("../partials/user/fooret.ejs")  %>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.getElementById('addressForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (validateForm()) {
+                submitForm();
+            }
+        });
+
+        function validateForm() {
+            let isValid = true;
+            clearErrors();
+
+            // Full Name validation
+            const fullName = document.getElementById('fullName').value.trim();
+            if (!fullName) {
+                showError('fullName', 'Full Name is required');
+                isValid = false;
+            }
+
+            // Phone Number validation
+            const phoneNumber = document.getElementById('phoneNumber').value.trim();
+            const phoneRegex = /^[0-9]{10}$/;
+            if (!phoneNumber) {
+                showError('phoneNumber', 'Phone Number is required');
+                isValid = false;
+            } else if (!phoneRegex.test(phoneNumber)) {
+                showError('phoneNumber', 'Please enter a valid 10-digit phone number');
+                isValid = false;
+            }
+
+            // Alternate Phone Number validation (conditional)
+            const alternatePhoneNumber = document.getElementById('alternatePhoneNumber').value.trim();
+            if (alternatePhoneNumber && !phoneRegex.test(alternatePhoneNumber)) {
+                showError('alternatePhoneNumber', 'Please enter a valid 10-digit alternate phone number');
+                isValid = false;
+            }
+
+            // Pincode validation
+            const pincode = document.getElementById('pincode').value.trim();
+            const pincodeRegex = /^[0-9]{6}$/;
+            if (!pincode) {
+                showError('pincode', 'Pincode is required');
+                isValid = false;
+            } else if (!pincodeRegex.test(pincode)) {
+                showError('pincode', 'Please enter a valid 6-digit pincode');
+                isValid = false;
+            }
+
+            // State validation
+            const state = document.getElementById('state').value.trim();
+            if (!state) {
+                showError('state', 'State is required');
+                isValid = false;
+            }
+
+            // City validation
+            const city = document.getElementById('city').value.trim();
+            if (!city) {
+                showError('city', 'City is required');
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        function showError(fieldId, message) {
+            const field = document.getElementById(fieldId);
+            const errorElement = document.getElementById(fieldId + 'Error');
+            field.classList.add('error');
+            errorElement.textContent = message;
+        }
+
+        function clearErrors() {
+            const errorFields = document.querySelectorAll('.input-field.error');
+            const errorMessages = document.querySelectorAll('.error-message');
+            
+            errorFields.forEach(field => field.classList.remove('error'));
+            errorMessages.forEach(message => message.textContent = '');
+        }
+
+        async function submitForm() {
+            const submitBtn = document.querySelector('.submit-btn');
+            if (submitBtn) {
+                submitBtn.classList.add('loading');
+                submitBtn.disabled = true;
+            }
+
+            // Collect form data
+            const formData = {
+                fullName: document.getElementById('fullName').value.trim(),
+                phoneNumber: document.getElementById('phoneNumber').value.trim(),
+                alternatePhoneNumber: document.getElementById('alternatePhoneNumber').value.trim() || null,
+                pincode: document.getElementById('pincode').value.trim(),
+                state: document.getElementById('state').value.trim(),
+                city: document.getElementById('city').value.trim(),
+                houseNo: document.getElementById('houseNo').value.trim() || null,
+                roadName: document.getElementById('roadName').value.trim() || null
+            };
+
+            try {
+                const response = await fetch('/add-address', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: result.message || 'Address has been saved successfully',
+                        icon: 'success',
+                        confirmButtonColor: '#314216',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        document.getElementById('addressForm').reset();
+                        if (submitBtn) {
+                            submitBtn.classList.remove('loading');
+                            submitBtn.disabled = false;
+                        }
+                    });
+                } else {
+                    throw new Error(result.message || 'Failed to save address');
+                }
+            } catch (error) {
+                Swal.fire({
+                    title: 'Error!',
+                    text: error.message || 'An error occurred while saving the address',
+                    icon: 'error',
+                    confirmButtonColor: '#314216',
+                    confirmButtonText: 'OK'
+                });
+                if (submitBtn) {
+                    submitBtn.classList.remove('loading');
+                    submitBtn.disabled = false;
+                }
+            }
+        }
+
+        document.querySelector('.edit-btn').addEventListener('click', function() {
+            document.getElementById('addressForm').reset();
+            clearErrors();
+        });
+
+        document.querySelector('.add-address-btn').addEventListener('click', function() {
+            document.getElementById('addressForm').reset();
+            clearErrors();
+        });
+
+        document.querySelector('.delete-address-btn').addEventListener('click', function() {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'Do you want to delete this address?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#314216',
+                cancelButtonColor: '#b91c1c',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Placeholder for delete functionality
+                    Swal.fire({
+                        title: 'Deleted!',
+                        text: 'The address has been deleted.',
+                        icon: 'success',
+                        confirmButtonColor: '#314216',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        document.getElementById('addressForm').reset();
+                        clearErrors();
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

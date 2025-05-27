@@ -567,13 +567,13 @@
   </div>
 
   <!-- Navbar -->
-<%- include("../../views/partials/header") %>
+<%- include("../../views/partials/user/header") %>
 
 <!-- Banner Section -->
 <div class="banner-section">
   <div class="position-relative">
     <div class="overlay-dark"></div>
-    <img src="\uploads\images\e435b9eed42f4f96a2084c2f83afa193.jpg" class="d-block w-100" alt="LUME" style="height: 600px; object-fit: cover;">
+    <img src="/uploads/images/f1a46c99ca2102a14e3bf1112213ca1b.jpg" class="d-block w-100" alt="LUME" style="height: 600px; object-fit: cover;">
     <div class="carousel-caption">
       <h1 class="banner-title">LUME</h1>
       <p class="quote-text">"Where elegance meets timeless beauty"</p>
@@ -590,9 +590,9 @@
   <% if (featured && featured.length > 0) { %>
     <% featured.forEach(product => { %>
       <div class="col">
-        <div class="product-card card text-center h-100">
-          <a href="/product-details?id=<%= product._id %>" class="text-decoration-none">
-            <i class="far fa-heart wishlist-icon" onclick="toggleWishlist(this)"></i>
+        <div class="product-card card text-center h-100" data-product-id="<%= product._id %>">
+          <a href="/product-details?id=<%= product._id %>" class="text-decoration-none" onclick="event.stopPropagation()">
+            <i class="far fa-heart wishlist-icon" onclick="event.stopPropagation(); toggleWishlist(this)"></i>
             <img 
               src="/uploads/product/<%= product.productImage[0] %>" 
               alt="<%= product.productName %>" 
@@ -603,6 +603,20 @@
               <p class="product-title card-title"><%= product.productName %></p>
               <div class="h-2"></div>
               <p class="product-price card-text">$<%= product.regularPrice %></p>
+              <% if (product.sizes && product.sizes.length > 0) { %>
+                <div class="size-options d-flex gap-2 mb-2">
+                  <% product.sizes.forEach(size => { %>
+                    <button class="btn btn-sm btn-outline-dark size-btn" 
+                            onclick="event.stopPropagation(); selectSize(this, '<%= size.size %>', '<%= product._id %>')"
+                            data-size="<%= size.size %>">
+                      <%= size.size %>
+                    </button>
+                  <% }); %>
+                </div>
+              <% } %>
+              <button class="btn btn-dark w-100" onclick="event.stopPropagation(); addToCartWithSize('<%= product._id %>')">
+                Add to Cart
+              </button>
             </div>
           </a>
         </div>
@@ -683,60 +697,7 @@
 </section>
 
 <!-- Footer -->
-<footer class="footer py-5 mt-5" style="background-color: var(--dark-brown);">
-  <div class="container">
-    <div class="row row-cols-1 row-cols-sm-3 g-4">
-      <div class="col">
-        <h4 class="footer-heading mb-3">Company</h4>
-        <ul class="list-unstyled">
-          <li class="mb-2"><a href="#" class="footer-link">About Us</a></li>
-          <li class="mb-2"><a href="#" class="footer-link">Careers</a></li>
-          <li class="mb-2"><a href="#" class="footer-link">Contact</a></li>
-          <li class="mb-2"><a href="#" class="footer-link">Privacy Policy</a></li>
-        </ul>
-      </div>
-      <div class="col">
-        <h4 class="footer-heading mb-3">Shop</h4>
-        <ul class="list-unstyled">
-          <li class="mb-2"><a href="#" class="footer-link">Rings</a></li>
-          <li class="mb-2"><a href="#" class="footer-link">Necklaces</a></li>
-          <li class="mb-2"><a href="#" class="footer-link">Earrings</a></li>
-          <li class="mb-2"><a href="#" class="footer-link">Bracelets</a></li>
-        </ul>
-      </div>
-      <div class="col">
-        <h4 class="footer-heading mb-3">Connect With Us</h4>
-        <ul class="list-unstyled">
-          <li class="mb-2">
-            <a href="#" class="footer-link d-flex align-items-center">
-              <i class="fab fa-instagram me-2"></i> Instagram
-            </a>
-          </li>
-          <li class="mb-2">
-            <a href="#" class="footer-link d-flex align-items-center">
-              <i class="fab fa-facebook me-2"></i> Facebook
-            </a>
-          </li>
-          <li class="mb-2">
-            <a href="#" class="footer-link d-flex align-items-center">
-              <i class="fab fa-pinterest me-2"></i> Pinterest
-            </a>
-          </li>
-          <li class="mb-2">
-            <a href="#" class="footer-link d-flex align-items-center">
-              <i class="fab fa-twitter me-2"></i> Twitter
-            </a>
-          </li>
-        </ul>
-      </div>
-    </div>
-    <div class="row mt-4 pt-4 border-top border-secondary">
-      <div class="col-12 text-center">
-        <p class="text-light mb-0">&copy; 2024 LUME Jewelry. All rights reserved.</p>
-      </div>
-    </div>
-  </div>
-</footer>
+<%-include("../../views/partials/user/fooret.ejs")  %>
 
 <!-- Bootstrap JS and dependencies -->
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
@@ -907,7 +868,113 @@ const sidebar = document.getElementById('sidebar');
       });
     <% } %>
 
-   
+    function addToCart(productId, size = null) {
+      // Check if user is logged in
+      fetch('/check-auth')
+        .then(response => response.json())
+        .then(data => {
+          if (!data.isAuthenticated) {
+            Swal.fire({
+              icon: 'info',
+              title: 'Login Required',
+              text: 'Please login or signup to add items to cart',
+              showCancelButton: true,
+              confirmButtonText: 'Login',
+              cancelButtonText: 'Signup',
+              confirmButtonColor: '#291d0e',
+              cancelButtonColor: '#314216'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                window.location.href = '/login';
+              } else if (result.dismiss === Swal.DismissReason.cancel) {
+                window.location.href = '/signup';
+              }
+            });
+            return;
+          }
+
+          // If user is authenticated, proceed with adding to cart
+          fetch('/cart/add', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+              productId: productId,
+              quantity: 1,
+              size: size
+            })
+          })
+          .then(response => {
+            if (!response.ok) {
+              return response.json().then(err => Promise.reject(err));
+            }
+            return response.json();
+          })
+          .then(data => {
+            if (data.success) {
+              Swal.fire({
+                icon: 'success',
+                title: 'Added to Cart',
+                text: data.message,
+                showConfirmButton: false,
+                timer: 1500
+              });
+            } else {
+              throw new Error(data.message || 'Failed to add to cart');
+            }
+          })
+          .catch(error => {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: error.message || 'Failed to add item to cart',
+              confirmButtonColor: '#291d0e'
+            });
+          });
+        })
+        .catch(error => {
+          console.error('Auth check error:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to check authentication status',
+            confirmButtonColor: '#291d0e'
+          });
+        });
+    }
+
+    function selectSize(button, size, productId) {
+      // Remove active class from all size buttons in the same product card
+      const productCard = button.closest('.product-card');
+      productCard.querySelectorAll('.size-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      
+      // Add active class to clicked button
+      button.classList.add('active');
+      
+      // Store selected size in data attribute
+      productCard.dataset.selectedSize = size;
+    }
+
+    function addToCartWithSize(productId) {
+      const productCard = document.querySelector(`[data-product-id="${productId}"]`);
+      const selectedSize = productCard.dataset.selectedSize;
+      
+      if (productCard.querySelector('.size-btn') && !selectedSize) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Size Required',
+          text: 'Please select a size before adding to cart',
+          confirmButtonColor: '#291d0e'
+        });
+        return;
+      }
+      
+      addToCart(productId, selectedSize);
+    }
   </script>
 </body>
 </html>

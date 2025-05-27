@@ -41,6 +41,10 @@ const userSchema = new mongoose.Schema({
         type:Boolean,
         default:false
     },
+    profileImage:{
+         type: String,
+        required: false
+    },
     cart:[{
       type:Schema.Types.ObjectId,
       ref:"Cart"

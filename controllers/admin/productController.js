@@ -384,7 +384,7 @@ const editProduct = async (req, res) => {
       if (salePriceNum >= regularPriceNum) {
         return res.status(400).json({
           success: false,
-          message: "Sale price must be less than regular price",
+          message: "Sale price must be less than or equal to regular price",
         });
       }
     }
