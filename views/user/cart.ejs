@@ -4,29 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LUME - Cart</title>
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Jost&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <style>
         :root {
-            --dark-brown: #291d0e;
-            --olive-green: #314216;
+            --soft-beige: #D4B996;
+            --muted-green: #A9BA9D;
             --light-bg: #f8f5f2;
-            --border-color: #d3c9be;
+            --border-color: #e0d8cc;
+            --offer-red: #e63946;
+            --dark-text: #2c1810;
+            --darker-text: #1a0f0a;
         }
 
-        body {
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background-color: #f0e9e0;
             font-family: 'Jost', sans-serif;
-            background-color: var(--light-bg);
-            color: var(--dark-brown);
-            min-height: 100vh;
+            color: var(--dark-text);
         }
 
-        .navbar {
+         .navbar {
             background: white;
             border-bottom: 1px solid var(--border-color);
-            padding: 1rem 2rem;
+            position: relative;
         }
 
         .brand {
@@ -34,91 +39,80 @@
             font-size: 1.5rem;
             letter-spacing: 1.5px;
             text-transform: uppercase;
-            color: var(--dark-brown);
+            color: var(--darker-text);
             cursor: pointer;
-            transition: color 0.3s ease;
-        }
-
-        .brand:hover {
-            color: var(--olive-green);
         }
 
         .nav-link {
-            color: var(--dark-brown);
+            color: var(--darker-text);
             font-family: 'Jost', sans-serif;
             font-size: 0.9rem;
-            transition: all 0.3s ease;
-            padding: 0.5rem 1rem;
+            transition: color 0.3s ease;
         }
 
         .nav-link:hover {
-            color: var(--olive-green);
-            transform: translateY(-2px);
+            color: var(--muted-green);
+            font-weight: 500;
         }
 
         .icon-link {
-            color: var(--dark-brown);
-            transition: all 0.3s ease;
+            color: var(--darker-text);
+            transition: color 0.3s ease;
             font-size: 1.1rem;
-            padding: 0.5rem;
         }
 
         .icon-link:hover {
-            color: var(--olive-green);
-            transform: translateY(-2px);
-        }
-
-        .cart-container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 2rem;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(41, 29, 14, 0.05);
+            color: var(--muted-green);
         }
 
         .cart-title {
             font-family: 'Aboreto', cursive;
-            font-size: 2rem;
+            color: var(--darker-text);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-weight: 400;
             margin-bottom: 2rem;
-            color: var(--dark-brown);
-            text-align: center;
         }
 
         .cart-item {
-            display: flex;
-            align-items: center;
+            background: linear-gradient(145deg, #ffffff, #f8f5f2);
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(212, 185, 150, 0.15),
+                        0 8px 30px rgba(212, 185, 150, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-bottom: 1.5rem;
             padding: 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-            margin-bottom: 1rem;
-            transition: all 0.3s ease;
         }
 
         .cart-item:hover {
-            background-color: var(--light-bg);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(212, 185, 150, 0.2);
         }
 
-        .cart-item img {
+        .product-image {
             width: 100px;
             height: 100px;
             object-fit: cover;
-            border-radius: 4px;
-            margin-right: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
 
-        .cart-item-details {
-            flex: 1;
+        .product-details {
+            padding: 0 1.5rem;
         }
 
-        .cart-item-name {
+        .product-name {
             font-family: 'Aboreto', cursive;
-            font-size: 1.2rem;
+            color: var(--darker-text);
+            font-size: 1.1rem;
             margin-bottom: 0.5rem;
+            letter-spacing: 0.5px;
         }
 
-        .cart-item-info {
-            color: #666;
-            font-size: 0.9rem;
+        .product-price {
+            color: var(--dark-text);
+            font-weight: 500;
             margin-bottom: 0.5rem;
         }
 
@@ -126,48 +120,61 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            margin: 1rem 0;
         }
 
         .quantity-btn {
-            background: var(--light-bg);
-            border: 1px solid var(--border-color);
-            width: 30px;
-            height: 30px;
-            border-radius: 4px;
+            background: linear-gradient(145deg, #79896d, #8a9b7d);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
             transition: all 0.3s ease;
+            cursor: pointer;
         }
 
-        .quantity-btn:hover {
-            background: var(--dark-brown);
-            color: white;
+        .quantity-btn:hover:not(:disabled) {
+            background: linear-gradient(145deg, #8a9b7d, #79896d);
+            transform: translateY(-1px);
+        }
+
+        .quantity-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #ccc;
+            transform: none;
+        }
+
+        .quantity-btn:disabled:hover {
+            transform: none;
+            background: #ccc;
         }
 
         .quantity-input {
             width: 50px;
             text-align: center;
             border: 1px solid var(--border-color);
-            border-radius: 4px;
+            border-radius: 8px;
             padding: 0.25rem;
+            font-family: 'Jost', sans-serif;
+            background-color: #fff;
         }
 
-        .cart-item-price {
-            font-size: 1.1rem;
-            font-weight: 500;
-            color: var(--dark-brown);
+        .quantity-input:disabled {
+            background-color: #f8f5f2;
+            cursor: not-allowed;
         }
 
         .remove-btn {
             background: none;
             border: none;
-            color: #dc3545;
+            color: var(--offer-red);
             cursor: pointer;
-            padding: 0.5rem;
             transition: all 0.3s ease;
+            padding: 0.5rem;
         }
 
         .remove-btn:hover {
@@ -175,656 +182,864 @@
         }
 
         .cart-summary {
-            margin-top: 2rem;
-            padding: 1.5rem;
-            background: var(--light-bg);
-            border-radius: 8px;
+            background: linear-gradient(145deg, #ffffff, #f8f5f2);
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(212, 185, 150, 0.15);
+            padding: 2rem;
+            position: sticky;
+            top: 2rem;
+        }
+
+        .summary-title {
+            font-family: 'Aboreto', cursive;
+            color: var(--darker-text);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-weight: 400;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .summary-row {
             display: flex;
             justify-content: space-between;
             margin-bottom: 1rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border-color);
+            color: var(--dark-text);
         }
 
-        .summary-row:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
+        .summary-total {
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: var(--darker-text);
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .checkout-btn {
+            background: linear-gradient(145deg, #79896d, #8a9b7d);
+            border: none;
+            color: white;
+            font-family: 'Jost', sans-serif;
+            font-size: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            width: 100%;
+            margin-top: 1.5rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .checkout-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.2),
+                transparent
+            );
+            transition: 0.5s;
+        }
+
+        .checkout-btn:hover:not(:disabled) {
+            background: linear-gradient(145deg, #8a9b7d, #79896d);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(121, 137, 109, 0.3);
+        }
+
+        .checkout-btn:hover:not(:disabled)::before {
+            left: 100%;
+        }
+
+        .checkout-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #ccc;
         }
 
         .coupon-section {
-            margin: 2rem 0;
-            padding: 1.5rem;
-            background: var(--light-bg);
-            border-radius: 8px;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
         }
 
-        .coupon-input {
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            padding: 0.75rem 1rem;
-            width: 200px;
-            margin-right: 1rem;
+        .coupon-title {
+            font-family: 'Aboreto', cursive;
+            color: var(--darker-text);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-weight: 400;
+            margin-bottom: 1rem;
         }
 
-        .apply-coupon-btn {
-            background-color: var(--dark-brown);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 4px;
+        .coupon-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .coupon-item {
+            background: linear-gradient(145deg, #ffffff, #f8f5f2);
+            border: 2px dashed var(--muted-green);
+            border-radius: 12px;
+            padding: 1rem;
             transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
         }
 
-        .apply-coupon-btn:hover {
-            background-color: var(--olive-green);
+        .coupon-item:hover {
             transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(169, 186, 157, 0.2);
+            border-color: var(--soft-beige);
         }
 
-     .checkout-btn {
-    background-color: var(--light-bg);
-    color:#291d0e;
-    border: none;
-    padding: 1rem 2rem;
-    border-radius: 4px;
-    width: 100%;
-    font-size: 1.1rem;
-    transition: all 0.3s ease;
-    outline: 2px solid #291d0e; /* Add this line */
-}
+        .coupon-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                45deg,
+                transparent 0%,
+                rgba(169, 186, 157, 0.1) 50%,
+                transparent 100%
+            );
+            animation: shimmer 2s infinite;
+        }
 
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
+        }
 
-        .checkout-btn:hover {
-            background-color: #2a3716;
-            color: #d3c9be;
-            transform: translateY(-2px);
+        .coupon-code {
+            font-family: 'Aboreto', cursive;
+            color: var(--darker-text);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .coupon-code i {
+            color: var(--muted-green);
+        }
+
+        .coupon-details {
+            color: var(--dark-text);
+            font-size: 0.9rem;
+        }
+
+        .coupon-discount {
+            color: var(--offer-red);
+            font-weight: 600;
+        }
+
+        .coupon-min-order {
+            color: var(--muted-green);
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+
+        .coupon-expiry {
+            color: #666;
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
         }
 
         .empty-cart {
             text-align: center;
             padding: 3rem;
+            background: linear-gradient(145deg, #ffffff, #f8f5f2);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(212, 185, 150, 0.15);
         }
 
-        .empty-cart i {
+        .empty-cart-icon {
             font-size: 4rem;
-            color: var(--border-color);
+            color: var(--muted-green);
+            margin-bottom: 1.5rem;
+        }
+
+        .empty-cart-text {
+            font-family: 'Aboreto', cursive;
+            color: var(--darker-text);
+            font-size: 1.5rem;
             margin-bottom: 1rem;
         }
 
-        .empty-cart p {
-            font-size: 1.2rem;
-            color: #666;
+        .empty-cart-subtext {
+            color: var(--dark-text);
             margin-bottom: 2rem;
         }
 
-        .continue-shopping {
-            background-color: var(--dark-brown);
+        .continue-shopping-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #4a6741, #6b8c5f);
             color: white;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Jost', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 500;
             text-decoration: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 4px;
             transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(74, 103, 65, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .continue-shopping:hover {
-            background-color: var(--olive-green);
-            color: white;
+        .continue-shopping-btn:hover {
             transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(74, 103, 65, 0.3);
+    color: white;
+    text-decoration: none;
+            background: linear-gradient(135deg, #6b8c5f, #4a6741);
         }
-        .navbar {
-      background: white;
-      border-bottom: 1px solid var(--border-color);
-      position: relative;
-      padding: 1rem 2rem;
-    }
 
-    .brand {
-      font-family: 'Aboreto', cursive;
-      font-size: 1.5rem;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: var(--dark-brown);
-      cursor: pointer;
-    }
+        .continue-shopping-btn i {
+            font-size: 1.4rem;
+            margin-right: 0.25rem;
+        }
 
-    .navbar .nav-link {
-      color: var(--dark-brown);
-      font-family: 'Jost', sans-serif;
-      font-size: 0.9rem;
-      transition: color 0.3s ease;
-      padding: 0.5rem 1rem;
-    }
+        .main-content-container {
+            padding-left: 5.5rem;
+            padding-right: 5.5rem;
+        }
 
-    .navbar .nav-link:hover {
-      color: var(--olive-green);
-      font-weight: 500;
-    }
+        @media (min-width: 768px) {
+            .main-content-container {
+                padding-left: 4rem;
+                padding-right: 4rem;
+            }
+        }
 
-    .navbar .icon-link {
-      color: var(--dark-brown);
-      transition: color 0.3s ease;
-      font-size: 1.1rem;
-      padding: 0.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+        @media (min-width: 1200px) {
+            .main-content-container {
+                padding-left: 6rem;
+                padding-right: 6rem;
+                max-width: 1400px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+        }
 
-    .navbar .icon-link:hover {
-      color: var(--olive-green);
-    }
+        .coupon-input-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
 
-    .navbar .d-flex {
-      gap: 1rem;
-    }
+        .coupon-input {
+            flex: 1;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-family: 'Jost', sans-serif;
+                font-size: 0.9rem;
+            transition: all 0.3s ease;
+            background: linear-gradient(145deg, #ffffff, #f8f5f2);
+        }
 
-    .navbar .list-unstyled {
-      margin: 0;
-      padding: 0;
-    }
+        .coupon-input:focus {
+            outline: none;
+            border-color: var(--muted-green);
+            box-shadow: 0 0 0 2px rgba(169, 186, 157, 0.1);
+        }
 
-    .navbar .list-unstyled li {
-      display: flex;
-      align-items: center;
-    }
+        .apply-coupon-btn {
+            background: linear-gradient(145deg, #79896d, #8a9b7d);
+            border: none;
+            color: white;
+            width: 42px;
+            height: 42px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
 
-    /* Search Bar */
-    .search-container {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
+        .apply-coupon-btn:hover {
+            background: linear-gradient(145deg, #8a9b7d, #79896d);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(121, 137, 109, 0.2);
+        }
 
-    .search-input {
-      border: 1px solid var(--border-color);
-      border-radius: 20px;
-      padding: 0.5rem 1rem;
-      padding-right: 2.5rem;
-      font-family: 'Jost', sans-serif;
-      width: 200px;
-      transition: all 0.3s ease;
-    }
+        .delivery-info {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: linear-gradient(145deg, #ffffff, #f8f5f2);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
 
-    .search-input:focus {
-      outline: none;
-      border-color: var(--dark-brown);
-      width: 250px;
-      box-shadow: 0 0 0 2px rgba(41, 29, 14, 0.1);
-    }
+        .delivery-title {
+            font-family: 'Aboreto', cursive;
+            color: var(--darker-text);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-weight: 400;
+                font-size: 1rem;
+            margin-bottom: 0.75rem;
+        }
 
-    .search-button {
-      position: absolute;
-      right: 10px;
-      background: none;
-      border: none;
-      color: var(--dark-brown);
-      cursor: pointer;
-      padding: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+        .delivery-date {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--dark-text);
+            font-size: 0.9rem;
+        }
 
-    .search-button:hover {
-      color: var(--olive-green);
-    }
+        .delivery-date i {
+            color: var(--muted-green);
+            font-size: 1.1rem;
+        }
 
-    /* Sidebar */
-    .sidebar {
-      position: fixed;
-      top: 0;
-      left: -300px;
-      width: 300px;
-      height: 100%;
-      background: white;
-      z-index: 1000;
-      transition: left 0.3s ease;
-      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-      overflow-y: auto;
-    }
+        .available-coupons {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
 
-    .sidebar.open {
-      left: 0;
-    }
+        .show-coupons-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.2rem;
+            background: white;
+            border: 2px solid var(--muted-green);
+            border-radius: 8px;
+            color: var(--muted-green);
+            font-family: 'Jost', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
 
-    .sidebar-header {
-      padding: 1.5rem;
-      border-bottom: 1px solid var(--border-color);
-    }
+        .show-coupons-btn:hover {
+            background: var(--muted-green);
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
 
-    .sidebar-menu {
-      padding: 1rem;
-    }
+        .show-coupons-btn i {
+            transition: transform 0.3s ease;
+                font-size: 0.9rem;
+        }
 
-    .sidebar-category {
-      margin-bottom: 1.5rem;
-    }
+        .show-coupons-btn.active {
+            background: var(--muted-green);
+            color: white;
+        }
 
-    .sidebar-title {
-      font-family: 'Aboreto', cursive;
-      font-size: 1rem;
-      margin-bottom: 0.5rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: pointer;
-    }
+        .show-coupons-btn.active i {
+            transform: rotate(180deg);
+        }
 
-    .sidebar-items {
-      padding-left: 1rem;
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s ease;
-    }
+        .applied-coupon {
+            background-color: rgba(40, 167, 69, 0.1);
+            border: 1px solid rgba(40, 167, 69, 0.2);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin: 0.5rem 0;
+        }
 
-    .sidebar-items.open {
-      max-height: 500px;
-    }
+        .applied-coupon .coupon-code {
+            background-color: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
 
-    .sidebar-item {
-      padding: 0.5rem 0;
-      cursor: pointer;
-    }
+        .remove-coupon-btn {
+            background: none;
+            border: none;
+            color: #6c757d;
+            padding: 0.25rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
 
-    .sidebar-item:hover {
-      color: var(--olive-green);
-    }
+        .remove-coupon-btn:hover {
+            color: #dc3545;
+            background-color: rgba(220, 53, 69, 0.1);
+            transform: scale(1.1);
+        }
 
-    .sidebar-item a {
-      color: var(--dark-brown);
-      text-decoration: none;
-      display: block;
-      transition: color 0.3s ease;
-    }
+        .discount-amount {
+            color: #2e7d32;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
 
-    .sidebar-item a:hover {
-      color: var(--olive-green);
-    }
+        .coupon-item.applied {
+            background: rgba(74, 103, 65, 0.1);
+            border: 2px solid var(--muted-green);
+            cursor: default;
+        }
 
-    .sidebar-item a.active {
-      color: var(--olive-green);
-      font-weight: 500;
-    }
+        .coupon-item.applied:hover {
+            transform: none;
+            box-shadow: none;
+        }
 
-    .sidebar-item a.active::before {
-      content: "•";
-      margin-right: 5px;
-    }
+        .coupon-input:disabled,
+        .apply-coupon-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
 
-    .overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.5);
-      z-index: 999;
-      display: none;
-    }
+        .stock-info {
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+        }
 
-    .overlay.active {
-      display: block;
-    }
-     .product-card {
-      background: white;
-      border-radius: 4px;
-      box-shadow: 0 2px 10px rgba(41, 29, 14, 0.05);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      position: relative;
-    }
+        .stock-info small {
+            color: var(--muted-green);
+            font-style: italic;
+        }
 
-    .product-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 5px 20px rgba(41, 29, 14, 0.1);
-    }
-
-    .product-img {
-      width: 100%;
-      aspect-ratio: 1;
-      object-fit: cover;
-    }
-
-    .product-title {
-      font-family: 'Jost', sans-serif;
-      font-size: 0.9rem;
-      color: var(--dark-brown);
-      margin-top: 0.5rem;
-    }
-
-    .product-price {
-      font-weight: 500;
-      margin-bottom: 1rem;
-    }
-
-    .new-badge {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background-color: var(--olive-green);
-      color: white;
-      font-family: 'Jost', sans-serif;
-      font-size: 0.7rem;
-      padding: 0.25rem 0.5rem;
-      border-radius: 2px;
-      text-transform: uppercase;
-    }
-
-    /* Wishlist Icon */
-    .wishlist-icon {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      color: rgb(0, 0, 0);
-      font-size: 1.2rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      
-    }
-
-    .wishlist-icon:hover {
-      color: #ff6b6b;
-      transform: scale(1.1);
-    }
-     .footer {
-      background-color: var(--dark-brown);
-    }
-
-    .footer-heading {
-      font-family: 'Aboreto', cursive;
-      color: white;
-      font-size: 1rem;
-      letter-spacing: 1px;
-    }
-
-    .footer-link {
-      color: white;
-      font-family: 'Jost', sans-serif;
-      font-size: 0.9rem;
-      transition: color 0.3s ease;
-    }
-
-    .footer-link:hover {
-      color: var(--light-bg);
-    }
-
-    /* Profile Dropdown */
-    .profile-dropdown {
-      position: relative;
-      display: inline-block;
-    }
-
-    .profile-dropdown-content {
-      display: none;
-      position: absolute;
-      right: 0;
-      background-color: white;
-      min-width: 160px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-      z-index: 1000;
-      border-radius: 4px;
-      padding: 0.5rem 0;
-    }
-
-    .profile-dropdown:hover .profile-dropdown-content {
-      display: block;
-    }
-
-    .profile-dropdown-content a {
-      color: var(--dark-brown);
-      padding: 0.75rem 1rem;
-      text-decoration: none;
-      display: block;
-      font-size: 0.9rem;
-      transition: background-color 0.3s ease;
-    }
-
-    .profile-dropdown-content a:hover {
-      background-color: var(--light-bg);
-      color: var(--olive-green);
-    }
-
-    .profile-dropdown-content a i {
-      margin-right: 0.5rem;
-      width: 20px;
-      text-align: center;
-    }
-    
-.search-container {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.search-input {
-  border: 1px solid var(--border-color);
-  border-radius: 20px;
-  padding: 0.5rem 1rem;
-  padding-right: 2.5rem;
-  font-family: 'Jost', sans-serif;
-  width: 200px;
-  transition: all 0.3s ease;
-}
-
-.search-input:focus {
-  outline: none;
-  border-color: var(--dark-brown);
-  width: 250px;
-  box-shadow: 0 0 0 2px rgba(41, 29, 14, 0.1);
-}
-
-.search-button {
-  position: absolute;
-  right: 10px;
-  background: none;
-  border: none;
-  color: var(--dark-brown);
-  cursor: pointer;
-}
-
-.search-button:hover {
-  color: var(--olive-green);
-}/* Search Bar Styles */
-.search-container {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.search-input {
-  border: 1px solid var(--border-color);
-  border-radius: 20px;
-  padding: 0.5rem 1rem;
-  padding-right: 2.5rem;
-  font-family: 'Jost', sans-serif;
-  width: 200px;
-  transition: all 0.3s ease;
-}
-
-.search-input:focus {
-  outline: none;
-  border-color: var(--dark-brown);
-  width: 250px;
-  box-shadow: 0 0 0 2px rgba(41, 29, 14, 0.1);
-}
-
-.search-button {
-  position: absolute;
-  right: 10px;
-  background: none;
-  border: none;
-  color: var(--dark-brown);
-  cursor: pointer;
-}
-
-.search-button:hover {
-  color: var(--olive-green);
-}
-
-
+        .stock-info small.text-warning {
+            color: #e63946;
+        }
     </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar d-flex justify-content-between align-items-center px-4 py-3">
-        <!-- Left side - Brand -->
-        <div class="brand" id="sidebarToggle">LUME</div>
+    <%- include("../../views/partials/user/header") %>
 
-        <!-- Center - Main Navigation -->
-        <ul class="d-flex align-items-center list-unstyled mb-0" style="position: absolute; left: 50%; transform: translateX(-50%);">
-            <li class="mx-2"><a href="/" class="nav-link">Home</a></li>
-            <li class="mx-2"><a href="/shopAll" class="nav-link">Shop All</a></li>
-            <li class="mx-2"><a href="/featured" class="nav-link">Featured</a></li>
-            <li class="mx-2"><a href="/new-arrivals" class="nav-link">New Arrivals</a></li>
-        </ul>
-
-        <!-- Right side - Icons -->
-        <ul class="d-flex align-items-center list-unstyled mb-0">
-            <li class="mx-2"><a href="/wishlist" class="icon-link"><i class="fas fa-heart"></i></a></li>
-            <li class="mx-2"><a href="/cart" class="icon-link"><i class="fas fa-shopping-cart"></i></a></li>
-            <li class="mx-2">
-                <div class="profile-dropdown">
-                    <a href="#" class="icon-link"><i class="far fa-user"></i></a>
-                    <div class="profile-dropdown-content">
-                        <% const currentUser=locals.user || (locals.session && locals.session.user); %>
-                        <% if (currentUser) { %>
-                            <a href="/profile"><i class="fas fa-user"></i> My Profile</a>
-                            <a href="/orders"><i class="fas fa-box"></i> My Orders</a>
-                            <a href="/wishlist"><i class="fas fa-heart"></i> Wishlist</a>
-                            <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
-                        <% } else { %>
-                            <a href="/login"><i class="fas fa-sign-in-alt"></i> Login</a>
-                            <a href="/signup"><i class="fas fa-user-plus"></i> Sign Up</a>
-                        <% } %>
-                    </div>
-                </div>
-            </li>
-        </ul>
-    </nav>
-
-    <div class="cart-container">
-        <h1 class="cart-title">Shopping Cart</h1>
-
+    <div class="container-fluid py-4 main-content-container">
+        <h2 class="cart-title">Shopping Cart</h2>
+        
+        <div class="row">
+            <div class="col-lg-8">
         <% if (items && items.length > 0) { %>
             <% items.forEach(item => { %>
                 <div class="cart-item" data-id="<%= item._id %>">
-                    <img src="/uploads/product/<%= item.productId.productImage[0] %>" alt="<%= item.productId.productName %>">
-                    <div class="cart-item-details">
-                        <h3 class="cart-item-name"><%= item.productId.productName %></h3>
-                        <p class="cart-item-info">Size: <%= item.size %></p>
-                        <div class="quantity-control">
-                            <button class="quantity-btn" onclick="updateQuantity('<%= item._id %>', 'decrease')">-</button>
-                            <input type="number" class="quantity-input" value="<%= item.quantity %>" min="1" readonly>
-                            <button class="quantity-btn" onclick="updateQuantity('<%= item._id %>', 'increase')">+</button>
+                            <div class="row align-items-center">
+                                <div class="col-auto">
+                            <img src="/uploads/product/<%= item.productId.productImage[0] %>" alt="<%= item.productId.productName %>" class="product-image">
+                                </div>
+                                <div class="col">
+                        <div class="product-details">
+                                        <h5 class="product-name"><%= item.productId.productName %></h5>
+                                        <p class="product-price">₹<%= item.totalPrice.toLocaleString() %></p>
+                                        <div class="quantity-control">
+                                            <button class="quantity-btn" onclick="updateQuantity('<%= item._id %>', 'decrease')" <%= item.quantity <= 1 ? 'disabled' : '' %>>
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                    <input type="number" class="quantity-input" value="<%= item.quantity %>" min="1" max="<%= Math.min(item.productId.stock, 6) %>" readonly>
+                                    <button class="quantity-btn" onclick="updateQuantity('<%= item._id %>', 'increase')" <%= item.quantity >= Math.min(item.productId.stock, 6) ? 'disabled' : '' %>>
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                            </div>
+                                <p class="stock-info">
+                                    <small class="<%= item.productId.stock <= 6 ? 'text-warning' : 'text-muted' %>">
+                                        <% if (item.productId.stock <= 6) { %>
+                                            Only <%= item.productId.stock %> items available
+                                        <% } else { %>
+                                            Maximum 6 items allowed
+                                        <% } %>
+                                    </small>
+                                </p>
                         </div>
-                        <p class="cart-item-price"><%= item.price %></p>
                     </div>
-                    <button class="remove-btn" onclick="removeItem('<%= item._id %>')">
-                        <i class="fas fa-trash"></i>
-                    </button>
+                                <div class="col-auto">
+                                    <button class="remove-btn" onclick="removeItem('<%= item._id %>')">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
                 </div>
             <% }) %>
 
-            <div class="coupon-section">
-                <input type="text" class="coupon-input" id="couponCode" placeholder="Enter coupon code">
-                <button class="apply-coupon-btn" onclick="applyCoupon()">Apply Coupon</button>
+                    <div class="delivery-info mt-4">
+                        <h4 class="delivery-title">Estimated Delivery</h4>
+                        <div class="delivery-date">
+                            <i class="fas fa-truck"></i>
+                            <span><%= new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }) %> - <%= new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }) %></span>
+                        </div>
             </div>
 
-            <div class="cart-summary">
-                <div class="summary-row">
-                    <span>Subtotal</span>
-                    <span><%= totalPrice %></span>
-                </div>
-                <% if (discount) { %>
-                    <div class="summary-row">
-                        <span>Discount</span>
-                        <span><%= discount %></span>
+                    <div class="text-center mt-4 mb-4">
+                        <a href="/shopAll" class="continue-shopping-btn">
+                            <i class="fas fa-shopping-cart"></i> Continue Shopping
+                        </a>
+                    </div>
+                <% } else { %>
+                    <div class="empty-cart">
+                        <i class="fas fa-shopping-cart empty-cart-icon"></i>
+                        <h3 class="empty-cart-text">Your cart is empty</h3>
+                        <p class="empty-cart-subtext">Looks like you haven't added any items to your cart yet.</p>
+                        <a href="/shopAll" class="continue-shopping-btn">Continue Shopping</a>
                     </div>
                 <% } %>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="cart-summary">
+                    <h3 class="summary-title">Order Summary</h3>
+                    
                 <div class="summary-row">
+                    <span>Subtotal</span>
+                        <span id="subtotal">₹<%= totalPrice.toLocaleString() %></span>
+                </div>
+                    
+                    
+                    <div class="summary-row">
+                        <span>Shipping</span>
+                        <span id="shipping"><%= shipping === 0 ? 'Free' : '₹' + shipping.toLocaleString() %></span>
+                    </div>
+                    
+                    <div class="summary-row summary-total">
                     <span>Total</span>
-                    <span><%= totalPrice %></span>
+                        <span id="finalPrice">₹<%= finalPrice.toLocaleString() %></span>
+                    </div>
+
+                    <div class="coupon-section">
+                        <h4 class="coupon-title">Apply Coupon</h4>
+                        <div class="coupon-input-group">
+                            <input type="text" class="coupon-input" id="couponCode" placeholder="Enter coupon code" <%= appliedCoupon ? 'disabled' : '' %>>
+                            <button class="apply-coupon-btn" onclick="applyCoupon()" <%= appliedCoupon ? 'disabled' : '' %>>
+                                <i class="fas fa-check"></i>
+                            </button>
                 </div>
             </div>
+                    
+                    
+                     <% if (appliedCoupon) { %>
+                        <div class="applied-coupon">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="text-success">Coupon Applied:</span>
+                                    <span class="coupon-code"><%= appliedCoupon.code %></span>
+                                    <span class="text-success">(<%= appliedCoupon.discountType === 'percentage' ? 
+                                        `${appliedCoupon.discountValue}% off` : 
+                                        `₹${appliedCoupon.discountValue} off` %>)</span>
+                                </div>
+                                <button class="remove-coupon-btn" onclick="removeCoupon()" title="Remove coupon">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="text-success mt-1">
+                                You saved: ₹<%= discount.toLocaleString() %>
+                            </div>
+                        </div>
+                    <% } %>
+                    
 
-            <button class="checkout-btn" onclick="checkout()">Proceed to Checkout</button>
-        <% } else { %>
-            <div class="empty-cart">
-                <i class="fas fa-shopping-cart"></i>
-                <p>Your cart is empty</p>
-                <a href="/shopAll" class="continue-shopping">Continue Shopping</a>
+
+                    <div class="available-coupons">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4 class="coupon-title mb-0">Available Coupons</h4>
+                            <button class="show-coupons-btn" onclick="toggleCoupons()">
+                                <span class="show-text">Show All</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
             </div>
-        <% } %>
+                        <div class="coupon-list" id="couponList" style="display: none;">
+                            <% if (coupons && coupons.length > 0) { %>
+                                <% coupons.forEach(coupon => { %>
+                                    <div class="coupon-item <%= appliedCoupon && appliedCoupon.code === coupon.code ? 'applied' : '' %>" 
+                                         onclick="<%= !appliedCoupon ? `applyCoupon('${coupon.code}')` : '' %>">
+                                        <div class="coupon-code">
+                                            <i class="fas fa-tag"></i>
+                                            <%= coupon.code %>
+                                        </div>
+                                        <div class="coupon-details">
+                                            <span class="coupon-discount">
+                                                <%= coupon.discountType === 'percentage' ? 
+                                                    `${coupon.discountValue}% OFF` : 
+                                                    `₹${coupon.discountValue} OFF` %>
+                                            </span>
+                                            <% if (coupon.maxDiscount) { %>
+                                                <span class="coupon-min-order">
+                                                    (Max discount: ₹<%= coupon.maxDiscount %>)
+                                                </span>
+                                            <% } %>
+                                        </div>
+                                        <% if (coupon.minOrderAmount) { %>
+                                            <div class="coupon-min-order">
+                                                Min. order: ₹<%= coupon.minOrderAmount %>
+                                            </div>
+                                        <% } %>
+                                        <% if (coupon.expiryDate) { %>
+                                            <div class="coupon-expiry">
+                                                Expires: <%= new Date(coupon.expiryDate).toLocaleDateString() %>
+                                            </div>
+                                        <% } %>
+                                    </div>
+                                <% }) %>
+                            <% } else { %>
+                                <p class="text-muted">No coupons available at the moment</p>
+                            <% } %>
+                        </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+                    <button class="checkout-btn" onclick="proceedToCheckout()" <%= items.length === 0 ? 'disabled' : '' %>>
+                        Proceed to Checkout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include("../../views/partials/user/fooret.ejs") %>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script>
         async function updateQuantity(itemId, action) {
             try {
-                const response = await fetch(`/cart/update/${itemId}`, {
-                    method: 'PUT',
+                const response = await fetch('/cart/update-quantity', {
+                    method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json'
                     },
-                    body: JSON.stringify({ action })
+                    body: JSON.stringify({ itemId, action })
                 });
 
-                const result = await response.json();
+                const data = await response.json();
+                console.log('Update quantity response:', data);
+                
+                if (!data.success) {
+                    showNotification(data.message || 'Failed to update quantity', 'error');
+                    return;
+                }
 
-                if (response.ok) {
-                    // Update the quantity input
-                    const itemElement = document.querySelector(`.cart-item[data-id="${itemId}"]`);
-                    const quantityInput = itemElement.querySelector('.quantity-input');
-                    const priceElement = itemElement.querySelector('.cart-item-price');
-                    
-                    // Update quantity
-                    quantityInput.value = result.quantity;
-                    
-                    // Update item price
-                    priceElement.textContent = `$${result.price}`;
+                // Find the cart item container
+                const cartItem = document.querySelector(`.cart-item[data-id="${itemId}"]`);
+                if (!cartItem) {
+                    console.error('Cart item element not found');
+                    return;
+                }
 
-                    // Update cart summary
-                    document.querySelector('.summary-row:nth-child(1) span:last-child').textContent = `$${result.totalPrice}`;
+                // Update quantity input
+                const quantityInput = cartItem.querySelector('.quantity-input');
+                if (quantityInput) {
+                    quantityInput.value = data.quantity;
+                    quantityInput.max = Math.min(data.stock, 6);
+                }
+
+                // Update total price
+                const totalElement = cartItem.querySelector('.product-price');
+                    if (totalElement) {
+                    totalElement.textContent = `₹${data.totalPrice.toLocaleString()}`;
+                }
+
+                // Update stock info
+                const stockInfo = cartItem.querySelector('.stock-info small');
+                if (stockInfo) {
+                    if (data.stock <= 6) {
+                        stockInfo.textContent = `Only ${data.stock} items available`;
+                        stockInfo.className = 'text-warning';
+                    } else {
+                        stockInfo.textContent = 'Maximum 6 items allowed';
+                        stockInfo.className = 'text-muted';
+                    }
+                }
+
+                // Update cart summary
+                document.getElementById('subtotal').textContent = `₹${data.cartTotal.toLocaleString()}`;
+                document.getElementById('shipping').textContent = data.shipping === 0 ? 'Free' : `₹${data.shipping.toLocaleString()}`;
+                document.getElementById('finalPrice').textContent = `₹${data.finalPrice.toLocaleString()}`;
+
+                // Update button states
+                const increaseBtn = cartItem.querySelector('.quantity-btn[onclick*="increase"]');
+                const decreaseBtn = cartItem.querySelector('.quantity-btn[onclick*="decrease"]');
+                
+                if (increaseBtn) {
+                    const maxAllowed = Math.min(data.stock, 6);
+                    const shouldDisableIncrease = data.quantity >= maxAllowed;
+                    increaseBtn.disabled = shouldDisableIncrease;
+                    increaseBtn.style.opacity = shouldDisableIncrease ? '0.5' : '1';
+                    increaseBtn.style.cursor = shouldDisableIncrease ? 'not-allowed' : 'pointer';
+                }
+                if (decreaseBtn) {
+                    const shouldDisableDecrease = data.quantity <= 1;
+                    decreaseBtn.disabled = shouldDisableDecrease;
+                    decreaseBtn.style.opacity = shouldDisableDecrease ? '0.5' : '1';
+                    decreaseBtn.style.cursor = shouldDisableDecrease ? 'not-allowed' : 'pointer';
+                }
+
+                showNotification('Quantity updated successfully', 'success');
+            } catch (error) {
+                console.error('Error updating quantity:', error);
+                showNotification('An error occurred while updating quantity', 'error');
+            }
+        }
+
+        function confirmRemove(event) {
+            event.preventDefault();
+            const form = event.target;
+            
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3e4c22',
+                cancelButtonColor: '#c82333',
+                confirmButtonText: 'Yes, remove it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+            
+            return false;
+        }
+
+        async function applyCoupon() {
+            const code = document.getElementById('couponCode').value.trim();
+            if (!code) {
+                showNotification('Please enter a coupon code', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/apply-coupon', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ code })
+                });
+
+                const data = await response.json();
+                console.log('Coupon response:', data);
+
+                if (data.success) {
+                    showNotification(data.message, 'success');
                     
-                    if (parseFloat(result.discount) > 0) {
-                        const discountRow = document.querySelector('.summary-row:nth-child(2)');
-                        if (!discountRow) {
-                            // Create discount row if it doesn't exist
-                            const summaryDiv = document.querySelector('.cart-summary');
-                            const newRow = document.createElement('div');
-                            newRow.className = 'summary-row';
-                            newRow.innerHTML = `
-                                <span>Discount</span>
-                                <span>-$${result.discount}</span>
-                            `;
-                            summaryDiv.insertBefore(newRow, summaryDiv.querySelector('.summary-row:last-child'));
-                        } else {
-                            discountRow.querySelector('span:last-child').textContent = `-$${result.discount}`;
-                        }
+                    document.getElementById('subtotal').textContent = `₹${data.totals.subtotal.toFixed(2)}`;
+                    document.getElementById('shipping').textContent = `₹${data.totals.shipping.toFixed(2)}`;
+                    document.getElementById('finalPrice').textContent = `₹${data.totals.finalPrice.toFixed(2)}`;
+
+                    let couponSection = document.querySelector('.applied-coupon');
+                    if (!couponSection) {
+                        couponSection = document.createElement('div');
+                        couponSection.className = 'applied-coupon';
+                        const subtotalRow = document.querySelector('.cart-summary-row:first-child');
+                        subtotalRow.parentNode.insertBefore(couponSection, subtotalRow.nextSibling);
                     }
 
-                    // Update total
-                    document.querySelector('.summary-row:last-child span:last-child').textContent = `$${result.finalPrice}`;
+                    const discountAmount = data.totals.discount;
+                    const discountText = data.coupon.discountType === 'percentage' 
+                        ? `${data.coupon.discountValue}% off` 
+                        : `₹${data.coupon.discountValue} off`;
 
-                    // Update cart count in navbar if exists
-                    const cartCount = document.querySelector('.cart-count');
-                    if (cartCount) {
-                        cartCount.textContent = result.cartCount;
-                    }
+                    couponSection.innerHTML = `
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center gap-2">
+                                <span class="text-green-600 font-medium">Coupon Applied:</span>
+                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">${data.coupon.code}</span>
+                                <span class="text-green-600">(${discountText})</span>
+                            </div>
+                            <button onclick="removeCoupon()" class="text-gray-500 hover:text-red-500 transition-colors">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="text-green-600 text-sm mt-1">
+                            You saved: ₹${discountAmount.toFixed(2)}
+                        </div>
+                    `;
+
+                    document.getElementById('couponCode').value = '';
+                    document.getElementById('couponCode').disabled = true;
+                    document.querySelector('button[onclick="applyCoupon()"]').disabled = true;
                 } else {
-                    throw new Error(result.message || 'Failed to update quantity');
+                    showNotification(data.message, 'error');
                 }
             } catch (error) {
-                Swal.fire({
-                    title: 'Error!',
-                    text: error.message || 'An error occurred while updating quantity',
-                    icon: 'error',
-                    confirmButtonColor: '#314216'
+                console.error('Error applying coupon:', error);
+                showNotification('Error applying coupon', 'error');
+            }
+        }
+
+        async function removeCoupon() {
+            try {
+                const result = await Swal.fire({
+                    title: 'Remove Coupon',
+                    text: 'Are you sure you want to remove this coupon?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3e4c22',
+                    cancelButtonColor: '#c82333',
+                    confirmButtonText: 'Yes, remove it!'
                 });
+
+                if (!result.isConfirmed) {
+                    return;
+                }
+
+                const response = await fetch('/remove-coupon', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+                console.log('Remove coupon response:', data);
+
+                if (data.success) {
+                    // Remove coupon section
+                    const couponSection = document.querySelector('.applied-coupon');
+                    if (couponSection) {
+                        couponSection.remove();
+                    }
+
+                    // Update cart summary
+                    document.getElementById('subtotal').textContent = `₹${data.totals.subtotal.toLocaleString()}`;
+                    document.getElementById('shipping').textContent = data.totals.shipping === 0 ? 'Free' : `₹${data.totals.shipping.toLocaleString()}`;
+                    document.getElementById('finalPrice').textContent = `₹${data.totals.finalPrice.toLocaleString()}`;
+
+                    // Enable coupon input and apply button
+                    document.getElementById('couponCode').disabled = false;
+                    document.querySelector('button[onclick="applyCoupon()"]').disabled = false;
+
+                    showNotification(data.message, 'success');
+                } else {
+                    showNotification(data.message || 'Failed to remove coupon', 'error');
+                }
+            } catch (error) {
+                console.error('Error removing coupon:', error);
+                showNotification('An error occurred while removing the coupon', 'error');
             }
         }
 
@@ -835,92 +1050,95 @@
                     text: 'Are you sure you want to remove this item from your cart?',
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#314216',
-                    cancelButtonColor: '#dc3545',
-                    confirmButtonText: 'Yes, remove it'
+                    confirmButtonColor: '#3e4c22',
+                    cancelButtonColor: '#c82333',
+                    confirmButtonText: 'Yes, remove it!'
                 });
 
-                if (result.isConfirmed) {
-                    const response = await fetch(`/cart/remove/${itemId}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
-                        }
-                    });
-
-                    const data = await response.json();
-
-                    if (response.ok) {
-                        Swal.fire({
-                            title: 'Removed!',
-                            text: 'Item has been removed from your cart.',
-                            icon: 'success',
-                            confirmButtonColor: '#314216'
-                        }).then(() => {
-                            location.reload();
-                        });
-                    } else {
-                        throw new Error(data.message || 'Failed to remove item');
-                    }
+                if (!result.isConfirmed) {
+                    return;
                 }
-            } catch (error) {
-                Swal.fire({
-                    title: 'Error!',
-                    text: error.message || 'An error occurred while removing the item',
-                    icon: 'error',
-                    confirmButtonColor: '#314216'
-                });
-            }
-        }
 
-        async function applyCoupon() {
-            const couponCode = document.getElementById('couponCode').value.trim();
-            if (!couponCode) {
-                Swal.fire({
-                    title: 'Error!',
-                    text: 'Please enter a coupon code',
-                    icon: 'error',
-                    confirmButtonColor: '#314216'
-                });
-                return;
-            }
-
-            try {
-                const response = await fetch('/cart/apply-coupon', {
+                const response = await fetch('/cart/remove/${itemId}', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ couponCode })
+                    body: JSON.stringify({ itemId })
                 });
 
-                const result = await response.json();
+                const data = await response.json();
+                console.log('Remove item response:', data);
+                
+                if (data.success) {
+                    const cartItem = document.querySelector(`.cart-item[data-id="${itemId}"]`);
+                    if (cartItem) {
+                        cartItem.remove();
+                    }
 
-                if (response.ok) {
-                    Swal.fire({
-                        title: 'Success!',
-                        text: result.message || 'Coupon applied successfully',
-                        icon: 'success',
-                        confirmButtonColor: '#314216'
-                    }).then(() => {
-                        location.reload();
-                    });
+                    document.getElementById('subtotal').textContent = `₹${data.totals.subtotal.toLocaleString()}`;
+                    document.getElementById('shipping').textContent = data.totals.shipping === 0 ? 'Free' : `₹${data.totals.shipping.toLocaleString()}`;
+                    document.getElementById('finalPrice').textContent = `₹${data.totals.finalPrice.toLocaleString()}`;
+
+                    const remainingItems = document.querySelectorAll('.cart-item');
+                    if (remainingItems.length === 0) {
+                        const cartContainer = document.querySelector('.col-lg-8');
+                        cartContainer.innerHTML = `
+                            <div class="empty-cart">
+                                <i class="fas fa-shopping-cart empty-cart-icon"></i>
+                                <h3 class="empty-cart-text">Your cart is empty</h3>
+                                <p class="empty-cart-subtext">Looks like you haven't added any items to your cart yet.</p>
+                                <a href="/shopAll" class="continue-shopping-btn">Continue Shopping</a>
+                            </div>
+                        `;
+                    }
+
+                    showNotification(data.message, 'success');
                 } else {
-                    throw new Error(result.message || 'Failed to apply coupon');
+                    showNotification(data.message || 'Failed to remove item', 'error');
                 }
             } catch (error) {
-                Swal.fire({
-                    title: 'Error!',
-                    text: error.message || 'An error occurred while applying the coupon',
-                    icon: 'error',
-                    confirmButtonColor: '#314216'
-                });
+                console.error('Error removing item:', error);
+                showNotification('An error occurred while removing the item', 'error');
             }
         }
 
-        function checkout() {
+        function proceedToCheckout() {
             window.location.href = '/checkout';
+        }
+
+        function showNotification(message, type) {
+            Toastify({
+                text: message,
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: type === 'success' ? '#4a6741' : '#e63946',
+                stopOnFocus: true,
+                style: {
+                    fontFamily: "'Jost', sans-serif",
+                    fontSize: "14px",
+                    padding: "12px 20px",
+                    borderRadius: "8px",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
+                }
+            }).showToast();
+        }
+
+        function toggleCoupons() {
+            const couponList = document.getElementById('couponList');
+            const showBtn = document.querySelector('.show-coupons-btn');
+            const showText = showBtn.querySelector('.show-text');
+            
+            if (couponList.style.display === 'none') {
+                couponList.style.display = 'block';
+                showText.textContent = 'Hide';
+                showBtn.classList.add('active');
+            } else {
+                couponList.style.display = 'none';
+                showText.textContent = 'Show All';
+                showBtn.classList.remove('active');
+            }
         }
     </script>
 </body>

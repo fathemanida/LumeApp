@@ -8,103 +8,150 @@
   <link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Jost&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
+    /* Dark Theme Variables */
     :root {
-      --dark-brown: #291d0e;
-      --olive-green: #314216;
-      --light-bg: #f8f5f2;
-      --border-color: #d3c9be;
+      --bg-primary: #1a1a1a;
+      --bg-secondary: #2d2d2d;
+      --text-primary: #ffffff;
+      --text-secondary: #b3b3b3;
+      --accent-color: #dac6a4;
+      --border-color: #404040;
+      --input-bg: #333333;
+      --hover-bg: #404040;
+      --shadow-color: rgba(0, 0, 0, 0.3);
+      --status-active: #4caf50;
+      --status-inactive: #f44336;
     }
 
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-    }
-
-    html,
-    body {
-      height: 100%;
       font-family: 'Jost', sans-serif;
-      background-color: var(--light-bg);
-      color: var(--dark-brown);
     }
 
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Dashboard Layout */
     .dashboard {
       display: flex;
       min-height: 100vh;
+      position: relative;
     }
 
+    /* Sidebar Styles */
     .sidebar {
-      width: 240px;
-      background: white;
-      border-right: 1px solid var(--border-color);
+      width: 280px;
+      background-color: var(--bg-secondary);
       padding: 2rem 1.5rem;
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+      z-index: 1000;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      display: none;
     }
 
     .brand {
       font-family: 'Aboreto', cursive;
-      font-size: 1.8rem;
-      margin-bottom: 2.5rem;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: var(--dark-brown);
+      font-size: 1.5rem;
+      color: var(--accent-color);
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-color);
+      letter-spacing: 1px;
     }
 
     .nav-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
       list-style: none;
+      flex: 1;
     }
 
-    .nav-menu {
-            list-style: none;
-        }
+    .nav-item {
+      margin-bottom: 0.5rem;
+    }
 
-        .nav-item {
-            margin-bottom: 1rem;
-        }
+    .nav-link {
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 0.75rem 1rem;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.95rem;
+    }
 
-        .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            text-decoration: none;
-            color: var(--dark-brown);
-            padding: 0.5rem 0.75rem;
-            transition: all 0.3s;
-            border-radius: 4px;
-        }
+    .nav-link i {
+      width: 20px;
+      text-align: center;
+      color: var(--text-secondary);
+    }
 
-        .nav-link:hover,
-        .nav-link.active {
-            color: var(--olive-green);
-            font-weight: 500;
-            background-color: rgba(49, 66, 22, 0.1);
-        }
+    .nav-link:hover {
+      background-color: var(--hover-bg);
+      color: var(--accent-color);
+      transform: translateX(4px);
+    }
 
-        .nav-link.active {
-            font-weight: 600;
-            background-color: var(--light-bg);
-            box-shadow: 3px 0 0 0 var(--olive-green) inset;
-        }
+    .nav-link.active {
+      background-color: var(--hover-bg);
+      color: var(--accent-color);
+      font-weight: 500;
+      border-left: 3px solid var(--accent-color);
+    }
 
-        .nav-link.logout {
-            color: #c33;
-            margin-top: 1.5rem;
-        }
+    .nav-link.logout {
+      color: #ff6b6b;
+      margin-top: auto;
+      margin-bottom: 1rem;
+    }
 
+    .nav-link.logout:hover {
+      background-color: rgba(255, 107, 107, 0.1);
+    }
 
+    /* Main Content Styles */
     .main-content {
       flex: 1;
       display: flex;
       flex-direction: column;
+      margin-left: 280px;
+      transition: margin-left 0.3s ease;
     }
 
     .main-header {
-      background: white;
-      padding: 1rem 2rem;
+      background-color: var(--bg-secondary);
+      padding: 1.5rem 2rem;
       border-bottom: 1px solid var(--border-color);
       display: flex;
       justify-content: space-between;
       align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
 
     .header-left {
@@ -117,72 +164,60 @@
       display: none;
       background: none;
       border: none;
+      color: var(--text-primary);
       font-size: 1.25rem;
       cursor: pointer;
-      color: var(--dark-brown);
     }
 
     .page-title {
+      font-family: 'Aboreto', cursive;
       font-size: 1.5rem;
-      font-weight: 500;
-      letter-spacing: 0.5px;
+      color: var(--text-primary);
+      margin: 0;
     }
 
     .header-right {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 1.5rem;
     }
 
-    .search-container {
-      display: flex;
-      margin-right: 15px;
-    }
-
-    .search-bar {
-      padding: 8px 15px;
-      border: 1px solid #ddd;
-      border-radius: 4px 0 0 4px;
-      width: 200px;
-      font-family: 'Jost', sans-serif;
-    }
-
+    /* Search Bar */
     .search-container {
       position: relative;
       display: flex;
-      margin-right: 15px;
+      box-shadow: 0 2px 6px rgb(129 83 50 / 49%);
     }
 
     .search-bar {
-      padding: 10px 40px 10px 15px;
-      border: 1px solid #ddd;
-      border-radius: 20px;
       width: 220px;
+      padding: 0.75rem 1rem 0.75rem 2.5rem;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      background-color: var(--input-bg);
+      color: var(--text-primary);
+      font-size: 0.9rem;
       transition: all 0.3s ease;
-      font-family: 'Jost', sans-serif;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .search-bar:focus {
       outline: none;
-      border-color: var(--olive-green);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-      transform: scale(1.02);
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 2px rgba(218, 198, 164, 0.2);
     }
 
     .search-btn {
-      padding: 10px 15px;
-      background: var(--dark-brown);
+      padding: 0 1rem;
+      background-color: var(--accent-color);
+      color: var(--bg-primary);
       border: none;
-      border-radius: 0 20px 20px 0;
+      border-radius: 0 4px 4px 0;
       cursor: pointer;
       transition: all 0.3s ease;
-      color: white;
     }
 
     .search-btn:hover {
-      background: var(--dark-brown);
-      transform: translateY(-1px);
+      background-color: #c5b393;
     }
 
     .clear-search {
@@ -190,12 +225,12 @@
       right: 50px;
       top: 50%;
       transform: translateY(-50%) scale(0.8);
-      background: #fff;
-      border: 1px solid #ddd;
+      background: var(--input-bg);
+      border: 1px solid var(--border-color);
       border-radius: 50%;
       width: 24px;
       height: 24px;
-      color: var(--dark-brown);
+      color: var(--text-secondary);
       cursor: pointer;
       display: none;
       transition: all 0.3s ease;
@@ -205,7 +240,7 @@
     }
 
     .clear-search:hover {
-      background: #f5f5f5;
+      background: var(--hover-bg);
       transform: translateY(-50%) scale(0.9);
     }
 
@@ -213,12 +248,13 @@
       display: flex;
     }
 
+    /* Notification and Profile */
     .notification-btn {
       background: none;
       border: none;
       position: relative;
       cursor: pointer;
-      color: #555;
+      color: var(--text-primary);
       font-size: 1.1rem;
     }
 
@@ -260,12 +296,12 @@
       position: absolute;
       top: 100%;
       right: 0;
-      background: white;
+      background: var(--bg-secondary);
       border: 1px solid var(--border-color);
       border-radius: 4px;
       padding: 0.5rem 0;
       min-width: 180px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 10px var(--shadow-color);
       display: none;
       z-index: 100;
     }
@@ -277,15 +313,17 @@
     .dropdown-item {
       padding: 0.5rem 1rem;
       display: block;
-      color: var(--dark-brown);
+      color: var(--text-secondary);
       text-decoration: none;
-      transition: background-color 0.2s;
+      transition: all 0.3s ease;
     }
 
     .dropdown-item:hover {
-      background-color: var(--light-bg);
+      background-color: var(--hover-bg);
+      color: var(--accent-color);
     }
 
+    /* Content Area */
     .content-area {
       padding: 2rem;
       flex: 1;
@@ -302,11 +340,12 @@
     .section-title {
       font-size: 1.25rem;
       font-weight: 500;
+      color: var(--accent-color);
     }
 
     .add-product-btn {
-      background-color: var(--olive-green);
-      color: white;
+      background-color: var(--accent-color);
+      color: var(--bg-primary);
       padding: 0.75rem 1.25rem;
       border: none;
       border-radius: 4px;
@@ -315,19 +354,22 @@
       gap: 0.5rem;
       font-weight: 500;
       cursor: pointer;
-      transition: all 0.3s;
+      transition: all 0.3s ease;
     }
 
     .add-product-btn:hover {
-      background-color: var(--dark-brown);
+      background-color: #c5b393;
       transform: translateY(-2px);
     }
 
+    /* Table Styles */
     .table-container {
-      background: white;
-      padding: 1.5rem;
+      background-color: var(--bg-secondary);
       border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(41, 29, 14, 0.05);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      overflow-x: auto;
+      box-shadow: 0 2px 6px rgb(129 83 50 / 49%);
     }
 
     table {
@@ -338,14 +380,20 @@
     th {
       text-align: left;
       padding: 1rem;
-      background-color: var(--light-bg);
-      color: var(--dark-brown);
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
       font-weight: 500;
+      border-bottom: 1px solid var(--border-color);
     }
 
     td {
       padding: 1rem;
       border-bottom: 1px solid var(--border-color);
+      color: var(--text-secondary);
+    }
+
+    tr:hover {
+      background-color: var(--hover-bg);
     }
 
     .product-image {
@@ -355,28 +403,9 @@
       object-fit: cover;
     }
 
-    .action-btn {
-      padding: 0.5rem 0.75rem;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: all 0.2s;
-      margin-right: 0.5rem;
-      background: none;
-    }
-
-    .status-active {
-      background-color: rgba(46, 204, 113, 0.1);
-      color: var(--status-active);
-    }
-
-    .status-blocked {
-      background-color: rgba(231, 76, 60, 0.1);
-      color: var(--status-blocked);
-    }
-
+    /* Status Badges */
     .status-listed {
-      background-color: rgba(46, 204, 113, 0.1);
+      background-color: rgba(76, 175, 80, 0.2);
       color: var(--status-active);
       padding: 0.4rem 0.8rem;
       border-radius: 12px;
@@ -386,8 +415,8 @@
     }
 
     .status-unlisted {
-      background-color: rgba(231, 76, 60, 0.1);
-      color: var(--status-blocked);
+      background-color: rgba(244, 67, 54, 0.2);
+      color: var(--status-inactive);
       padding: 0.4rem 0.8rem;
       border-radius: 12px;
       font-size: 0.85rem;
@@ -395,58 +424,11 @@
       display: inline-block;
     }
 
-    .list-btn {
-      background-color: rgb(43, 96, 43);
-      color: white;
-      padding: 0.5rem 0.75rem;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: all 0.2s;
-      text-decoration: none;
-      display: inline-block;
-    }
-
-    .list-btn:hover {
-      background-color: #27ae60;
-      transform: translateY(-1px);
-    }
-
-    .unlist-btn {
-      background-color: rgba(137, 2, 2, 0.789);
-      color: white;
-      padding: 0.5rem 0.75rem;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: all 0.2s;
-      text-decoration: none;
-      display: inline-block;
-    }
-
-    .unlist-btn:hover {
-      background-color: #c0392b;
-      transform: translateY(-1px);
-    }
-
-    .offer-price {
-      font-weight: 500;
-      color: var(--olive-green);
-    }
-
-    .offer-btn {
-      background-color: var(--olive-green);
-      color: white;
-      padding: 0.5rem 0.75rem;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .offer-btn:hover {
-      background-color: var(--dark-brown);
-      transform: translateY(-1px);
+    /* Action Buttons */
+    .action-buttons {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
     }
 
     .action-btn {
@@ -454,39 +436,83 @@
       border: none;
       border-radius: 4px;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.3s ease;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       width: 32px;
       height: 32px;
+      background: transparent;
+      color: var(--text-secondary);
     }
 
     .edit-btn {
-      background-color: rgba(32, 103, 151, 0.46);
-      color: #291d0e;
+      background-color: rgba(218, 198, 164, 0.2);
+      color: var(--accent-color);
     }
 
     .edit-btn:hover {
-      background-color: rgba(41, 128, 185, 0.2);
+      background-color: rgba(218, 198, 164, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .list-btn {
+      background-color: rgba(76, 175, 80, 0.2);
+      color: var(--status-active);
+    }
+
+    .list-btn:hover {
+      background-color: rgba(76, 175, 80, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .unlist-btn {
+      background-color: rgba(244, 67, 54, 0.2);
+      color: var(--status-inactive);
+    }
+
+    .unlist-btn:hover {
+      background-color: rgba(244, 67, 54, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .offer-price {
+      font-weight: 500;
+      color: var(--accent-color);
+    }
+
+    .offer-btn {
+      background-color: var(--accent-color);
+      color: var(--bg-primary);
+      padding: 0.5rem 0.75rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .offer-btn:hover {
+      background-color: #c5b393;
       transform: translateY(-1px);
     }
 
     .delete-btn {
-      background-color: rgba(150, 28, 28, 0.303);
-      color: #291d0e;
+      background-color: rgba(244, 67, 54, 0.2);
+      color: #f44336;
     }
 
     .delete-btn:hover {
-      background-color: rgba(231, 76, 60, 0.2);
+      background-color: rgba(244, 67, 54, 0.3);
       transform: translateY(-1px);
     }
 
+    /* Pagination */
     .pagination {
       display: flex;
       justify-content: flex-end;
       gap: 0.5rem;
       margin-top: 1.5rem;
+      align-items: center;
     }
 
     .page-btn {
@@ -496,76 +522,70 @@
       align-items: center;
       justify-content: center;
       border-radius: 4px;
-      border: none;
-      background-color: #e0e0e0;
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-secondary);
+      color: var(--text-secondary);
       cursor: pointer;
-      transition: background-color 0.3s;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+
+    .page-btn:hover:not(.active):not(:disabled) {
+      background-color: var(--accent-color);
+      color: var(--bg-primary);
+      border-color: var(--accent-color);
       text-decoration: none;
     }
 
     .page-btn.active {
-      background-color: var(--dark-brown);
-      color: white;
+      background-color: var(--accent-color);
+      color: var(--bg-primary);
+      border-color: var(--accent-color);
     }
 
-    .page-btn:hover:not(.active) {
-      background-color: #d0d0d0;
+    .page-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      text-decoration: none;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+      .sidebar {
+        width: 240px;
+      }
+      .main-content {
+        margin-left: 240px;
+      }
     }
 
     @media (max-width: 768px) {
       .sidebar {
+        transform: translateX(-100%);
         position: fixed;
-        left: -240px;
-        top: 0;
-        bottom: 0;
         z-index: 1000;
-        transition: left 0.3s;
       }
-
       .sidebar.active {
-        left: 0;
+        transform: translateX(0);
       }
-
+      .main-content {
+        margin-left: 0;
+      }
       .mobile-menu-btn {
         display: block;
       }
-
-      .main-header {
-        padding: 1rem;
-      }
-
       .search-bar {
-        min-width: 180px;
+        min-width: 150px;
       }
-    }
-
-    .list-btn {
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
-      color: white;
-      font-weight: 500;
-      background-color: var(--olive-green);
-    }
-
-    .list-btn:hover {
-      background-color: #1b2f0a;
-    }
-
-    .unlist-btn {
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
-      color: white;
-      font-weight: 500;
-      background-color: rgb(144, 30, 30);
-    }
-
-    .unlist-btn:hover {
-      background-color: #b71c1c;
+      .profile-name {
+        display: none;
+      }
     }
   </style>
 </head>
 
 <body class="dashboard">
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
   <aside class="sidebar">
     <div class="brand">LUME</div>
     <ul class="nav-menu">
@@ -582,7 +602,7 @@
         <a href="/admin/users" class="nav-link"><i class="fas fa-users"></i> Users</a>
       </li>
       <li class="nav-item">
-        <a href="/admin/Category" class="nav-link "><i class="fas fa-tags"></i> Category</a>
+        <a href="/admin/Category" class="nav-link"><i class="fas fa-tags"></i> Category</a>
       </li>
       <li class="nav-item">
         <a href="/admin/offers" class="nav-link"><i class="fas fa-ticket-alt"></i> Offers</a>
@@ -651,74 +671,87 @@
         <table>
           <thead>
             <tr>
-              <td>No</td>
-              <td>Image</td>
-              <th>Product Name</th>
+              <th>Image</th>
+              <th>Name</th>
               <th>Category</th>
-              <th>Size</th>
+              <th>Price</th>
               <th>Offer</th>
-              <th>Offer Price</th>
-              <th>Sale Price</th>
-              <th>Quantity</th>
-
-              <th>List/Unlist</th>
-              <th>Action</th>
+              <th>Discount</th>
+              <th>Valid Until</th>
+              <th>Stock</th>
+              <th>Status</th>
+              <th>Actions</th>
             </tr>
           </thead>
-            <tbody>
-              <% for (let i = 0; i < data.length; i++) { %>
-                <tr>
-                  <td>
-                    <%= offset + i + 1 %>
-                  </td>
-                  <td>
-                    <img src="/uploads/product/<%= data[i].productImage[0] %>" alt="Product Image"
-                      style="height: 54px;" />
-                  </td>
-
-                  <td>
-                    <%= data[i].productName %>
-                  </td>
-                  <td>
-                    <%= data[i].category ? data[i].category.name : 'No Category' %>
-                  </td>
-                  <td>
-                    <% if(data[i].sizes && data[i].sizes.length > 0) { %>
-                      <%= data[i].sizes.map(size => size.size).join(', ') %>
+          <tbody>
+            <% for (let i = 0; i < data.length; i++) { %>
+              <tr data-product-id="<%= data[i]._id %>">
+                <td>
+                  <img src="/uploads/product/<%= data[i].productImage[0] %>" alt="Product Image" style="height: 54px;" />
+                </td>
+                <td>
+                  <%= data[i].productName %>
+                </td>
+                <td>
+                  <%= data[i].category ? data[i].category.name : 'No Category' %>
+                </td>
+                <td>
+                  $<%= data[i] && data[i].price ? data[i].price.toFixed(2) : '0.00' %>
+                </td>
+                <td>
+                  <% if (data[i] && data[i].productOffer && data[i].productOffer.active) { %>
+                    <span class="badge badge-success">Active</span>
+                  <% } else { %>
+                    <span class="badge badge-secondary">Inactive</span>
+                  <% } %>
+                </td>
+                <td>
+                  <% if (data[i] && data[i].productOffer && data[i].productOffer.active) { %>
+                    <% if (data[i].productOffer.discountType === 'percentage') { %>
+                      <%= data[i].productOffer.discountValue %>%
                     <% } else { %>
-                      -
+                      $<%= data[i].productOffer.discountValue.toFixed(2) %>
                     <% } %>
-                  </td>
-                  <td></td>
-                  <td></td>
-                  <td>
-                    <%= data[i].salePrice %>
-                  </td>
-                  <td>
-                    <%= data[i].quantity %>
-                  </td>
-
-                  <td class="list-unlist-cell" data-id="<%= data[i]._id %>">
-                    <% if(data[i].isListed) { %>
-                      <a href="#" class="unlist-btn" data-id="<%= data[i]._id %>"
-                        onclick="toggleListing('<%= data[i]._id %>', false)">Unlist</a>
-                      <% } else { %>
-                        <a href="#" class="list-btn" data-id="<%= data[i]._id %>"
-                          onclick="toggleListing('<%= data[i]._id %>', true)">List</a>
-                        <% } %>
-                  </td>
-                  <td>
-                    <a href="/admin/edit-product/<%= data[i]._id %>" class="action-btn edit-btn" title="Edit Product">
+                  <% } else { %>
+                    -
+                  <% } %>
+                </td>
+                <td>
+                  <% if (data[i] && data[i].productOffer && data[i].productOffer.active) { %>
+                    <%= new Date(data[i].productOffer.endDate).toLocaleDateString() %>
+                  <% } else { %>
+                    -
+                  <% } %>
+                </td>
+                <td>
+                  <%= data[i].quantity %>
+                </td>
+                <td>
+                  <% if (data[i].isListed) { %>
+                    <span class="status-listed">Listed</span>
+                  <% } else { %>
+                    <span class="status-unlisted">Unlisted</span>
+                  <% } %>
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <a href="/admin/edit-product/<%= data[i]._id %>" class="action-btn edit-btn">
                       <i class="fas fa-edit"></i>
                     </a>
-                    <a href="/admin/delete-product/<%= data[i]._id %>" class="action-btn delete-btn"
-                      title="Delete Product">
-                      <i class="fas fa-trash"></i>
-                    </a>
-                  </td>
-                </tr>
-                <% } %>
-            </tbody>
+                    <% if (data[i].isListed) { %>
+                      <button onclick="toggleListing('<%= data[i]._id %>', false)" class="action-btn unlist-btn">
+                        <i class="fas fa-eye-slash"></i>
+                      </button>
+                    <% } else { %>
+                      <button onclick="toggleListing('<%= data[i]._id %>', true)" class="action-btn list-btn">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                    <% } %>
+                  </div>
+                </td>
+              </tr>
+            <% } %>
+          </tbody>
         </table>
 
         <div class="pagination">
@@ -728,27 +761,27 @@
 
           <% if (currentPage> 1) { %>
             <a href="?page=<%= currentPage - 1 %>" class="page-btn">&lt;</a>
+          <% } else { %>
+            <span class="page-btn" style="opacity: 0.5; pointer-events: none;">&lt;</span>
+          <% } %>
+
+          <% for (let i=1; i <=totalPages; i++) { %>
+            <% if (i===currentPage) { %>
+              <span class="page-btn active">
+                <%= i %>
+              </span>
             <% } else { %>
-              <span class="page-btn" style="opacity: 0.5; pointer-events: none;">&lt;</span>
-              <% } %>
+              <a href="?page=<%= i %>" class="page-btn">
+                <%= i %>
+              </a>
+            <% } %>
+          <% } %>
 
-                <% for (let i=1; i <=totalPages; i++) { %>
-                  <% if (i===currentPage) { %>
-                    <span class="page-btn active">
-                      <%= i %>
-                    </span>
-                    <% } else { %>
-                      <a href="?page=<%= i %>" class="page-btn">
-                        <%= i %>
-                      </a>
-                      <% } %>
-                        <% } %>
-
-                          <% if (currentPage < totalPages) { %>
-                            <a href="?page=<%= currentPage + 1 %>" class="page-btn">&gt;</a>
-                            <% } else { %>
-                              <span class="page-btn" style="opacity: 0.5; pointer-events: none;">&gt;</span>
-                              <% } %>
+          <% if (currentPage < totalPages) { %>
+            <a href="?page=<%= currentPage + 1 %>" class="page-btn">&gt;</a>
+          <% } else { %>
+            <span class="page-btn" style="opacity: 0.5; pointer-events: none;">&gt;</span>
+          <% } %>
         </div>
       </div>
     </div>
@@ -756,41 +789,62 @@
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
+    // Sidebar toggle functionality
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const sidebar = document.querySelector('.sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
 
- const searchForm = document.getElementById('searchForm');
-      const searchInput = document.querySelector('.search-bar');
-      const clearSearch = document.querySelector('.clear-search');
+    function toggleSidebar() {
+      sidebar.classList.toggle('active');
+      sidebarOverlay.style.display = sidebar.classList.contains('active') ? 'block' : 'none';
+    }
 
-      searchForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const searchTerm = searchInput.value.trim();
-        const url = new URL(window.location.href);
-        
-        if(searchTerm) {
-          url.searchParams.set('search', searchTerm);
-          url.searchParams.set('page', '1');
-        } else {
-          url.searchParams.delete('search');
+    mobileMenuBtn.addEventListener('click', toggleSidebar);
+
+    // Close sidebar when clicking outside
+    sidebarOverlay.addEventListener('click', toggleSidebar);
+
+    // Close sidebar when clicking on a nav link (for mobile)
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth <= 768) {
+          toggleSidebar();
         }
-        
+      });
+    });
+
+    const searchForm = document.getElementById('searchForm');
+    const searchInput = document.querySelector('.search-bar');
+    const clearSearch = document.querySelector('.clear-search');
+
+    searchForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const searchTerm = searchInput.value.trim();
+      const url = new URL(window.location.href);
+      
+      if(searchTerm) {
+        url.searchParams.set('search', searchTerm);
+        url.searchParams.set('page', '1');
+      } else {
+        url.searchParams.delete('search');
+      }
+      
+      window.location.href = url.toString();
+    });
+
+    if(clearSearch) {
+      clearSearch.addEventListener('click', function() {
+        searchInput.value = '';
+        const url = new URL(window.location.href);
+        url.searchParams.delete('search');
         window.location.href = url.toString();
       });
-
-      
-      if(clearSearch) {
-        clearSearch.addEventListener('click', function() {
-          searchInput.value = '';
-          const url = new URL(window.location.href);
-          url.searchParams.delete('search');
-          window.location.href = url.toString();
-        });
-      }
+    }
 
     async function toggleListing(productId, shouldList) {
       try {
         const action = shouldList ? 'list-product' : 'unlist-product';
         const url = `/admin/${action}/${productId}`;
-        console.log(`Fetching: ${url}, shouldList: ${shouldList}`);
 
         const response = await fetch(url, {
           method: 'GET',
@@ -800,18 +854,39 @@
         });
 
         const data = await response.json();
-        console.log('Response:', data);
 
         if (!response.ok) {
           throw new Error(data.message || 'Failed to update product listing status');
         }
 
-        const cell = document.querySelector(`.list-unlist-cell[data-id="${productId}"]`);
-        if (cell) {
-          if (shouldList) {
-            cell.innerHTML = `<a href="#" class="unlist-btn" data-id="${productId}" onclick="toggleListing('${productId}', false)">Unlist</a>`;
-          } else {
-            cell.innerHTML = `<a href="#" class="list-btn" data-id="${productId}" onclick="toggleListing('${productId}', true)">List</a>`;
+        // Find the row containing the product
+        const row = document.querySelector(`tr[data-product-id="${productId}"]`);
+        if (!row) {
+          throw new Error('Product row not found in the table');
+        }
+
+        // Update the status badge
+        const statusCell = row.querySelector('td:nth-last-child(2)');
+        if (statusCell) {
+          const newStatus = document.createElement('span');
+          newStatus.className = shouldList ? 'status-listed' : 'status-unlisted';
+          newStatus.textContent = shouldList ? 'Listed' : 'Unlisted';
+          statusCell.innerHTML = '';
+          statusCell.appendChild(newStatus);
+        }
+
+        // Update the action buttons
+        const actionButtons = row.querySelector('.action-buttons');
+        if (actionButtons) {
+          const newButton = document.createElement('button');
+          newButton.onclick = () => toggleListing(productId, !shouldList);
+          newButton.className = `action-btn ${shouldList ? 'unlist-btn' : 'list-btn'}`;
+          newButton.innerHTML = `<i class="fas fa-${shouldList ? 'eye-slash' : 'eye'}"></i>`;
+          
+          // Replace the old button
+          const oldButton = actionButtons.querySelector(`button[onclick*="toggleListing('${productId}'"]`);
+          if (oldButton) {
+            oldButton.replaceWith(newButton);
           }
         }
 
@@ -832,10 +907,6 @@
       }
     }
 
-    document.getElementById('mobileMenuBtn').addEventListener('click', () => {
-      document.querySelector('.sidebar').classList.toggle('active');
-    });
-
     document.querySelectorAll('.delete-btn').forEach(btn => {
       btn.addEventListener('click', function (e) {
         e.preventDefault();
@@ -853,6 +924,14 @@
           }
         });
       });
+    });
+
+    // Close sidebar when window is resized to desktop size
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 768) {
+        sidebar.classList.remove('active');
+        sidebarOverlay.style.display = 'none';
+      }
     });
   </script>
 </body>

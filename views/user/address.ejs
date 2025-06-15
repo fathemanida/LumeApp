@@ -3,90 +3,206 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Address Form</title>
-    <link href="https://fonts.googleapis.com/css2?family=Jost&family=Aboreto&display=swap" rel="stylesheet">
+    <title>My Addresses - Lume</title>
+    <link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --dark-brown: #5c4b3b;
-            --olive-green: #314216;
-            --light-bg: #ffffff;
-            --border-color: #d3c9be;
+            --dark-bg: #1a1a1a;
+            --darker-bg: #121212;
+            --card-bg: #242424;
+            --text-primary: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --accent-color: #c5a267;
+            --border-color: #333333;
+            --success-color: #4caf50;
+            --error-color: #f44336;
         }
 
         body {
             font-family: 'Jost', sans-serif;
-            background-color: white;
+            background-color: var(--dark-bg);
             margin: 0;
             padding: 0;
-            display: flex;
-            justify-content: flex-start;
-            align-items: flex-start;
             min-height: 100vh;
-            color: var(--dark-brown);
-        }
-
-        .container {
-            background-color: #fff;
-            border-radius: 0;
-            box-shadow: none;
-            overflow: hidden;
-            width: 100%;
-            margin: 0;
+            color: var(--text-primary);
             display: flex;
-            height: 100vh;
+            flex-direction: column;
         }
 
-        h1, h2, h3 {
+        /* Navbar styles */
+        .navbar {
+            background: var(--darker-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: nowrap;
+        }
+
+        .brand {
             font-family: 'Aboreto', cursive;
+            font-size: 1.5rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: color 0.3s ease;
         }
 
+        .brand:hover {
+            color: var(--accent-color);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .nav-link {
+            color: var(--text-primary);
+            font-family: 'Jost', sans-serif;
+            font-size: 0.9rem;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        .icon-links {
+            display: flex;
+            align-items: center;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .icon-link {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            padding: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .icon-link:hover {
+            color: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        /* Profile Dropdown */
+        .profile-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .profile-dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: var(--card-bg);
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            z-index: 1000;
+            border-radius: 4px;
+            padding: 0.5rem 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .profile-dropdown:hover .profile-dropdown-content {
+            display: block;
+        }
+
+        .profile-dropdown-content a {
+            color: var(--text-primary);
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            display: block;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .profile-dropdown-content a:hover {
+            background-color: var(--darker-bg);
+            color: var(--accent-color);
+        }
+
+        .profile-dropdown-content a i {
+            margin-right: 0.5rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Container */
+        .main-container {
+            display: flex;
+            flex: 1;
+        }
+
+        /* Elegant Dark Sidebar */
         .sidebar {
-            background-color: white;
-            padding: 1.5rem;
             width: 280px;
-            height: 100vh;
+            background-color: var(--darker-bg);
+            padding: 2rem 1.5rem;
             border-right: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
         }
 
         .sidebar-title {
             font-family: 'Aboreto', cursive;
-            font-size: 1.25rem;
-            color: var(--dark-brown);
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.75rem;
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
             border-bottom: 1px solid var(--border-color);
+            letter-spacing: 1px;
         }
 
         .sidebar-nav {
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
+            flex: 1;
         }
 
-        .nav-link {
+        .sidebar-nav a {
+            color: var(--text-primary);
+            text-decoration: none;
+            padding: 0.75rem 1rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            text-decoration: none;
-            color: var(--dark-brown);
-            padding: 0.75rem 1rem;
-            transition: all 0.3s;
-            border-radius: 6px;
-            font-family: 'Jost', sans-serif;
-            position: relative;
+            gap: 0.75rem;
+            font-size: 0.95rem;
         }
 
-        .nav-link:hover, .nav-link.active {
-            color: var(--olive-green);
-            background-color: rgba(49, 66, 22, 0.1);
+        .sidebar-nav a i {
+            width: 20px;
+            text-align: center;
+            color: var(--accent-color);
         }
 
-        .nav-link.active {
+        .sidebar-nav a:hover {
+            background-color: rgba(197, 162, 103, 0.1);
+            color: var(--accent-color);
+            transform: translateX(4px);
+        }
+
+        .sidebar-nav a.active {
+            background-color: rgba(197, 162, 103, 0.2);
+            color: var(--accent-color);
             font-weight: 500;
-            background-color: var(--light-bg);
-            box-shadow: 3px 0 0 0 var(--olive-green) inset;
+            border-left: 3px solid var(--accent-color);
         }
 
         .sidebar-actions {
@@ -98,322 +214,444 @@
             gap: 0.75rem;
         }
 
-        .logout-btn, .delete-btn {
-            width: 100%;
+        .sidebar-actions button {
             padding: 0.75rem;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Jost', sans-serif;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .logout-btn {
+            background-color: rgba(197, 162, 103, 0.1);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .logout-btn:hover {
+            background-color: rgba(197, 162, 103, 0.2);
+            border-color: var(--accent-color);
+        }
+
+        .delete-btn {
+            background-color: transparent;
+            color: #ff6b6b;
+            border: 1px solid #ff6b6b;
+        }
+
+        .delete-btn:hover {
+            background-color: rgba(255, 107, 107, 0.1);
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            padding: 2rem 3rem;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-family: 'Aboreto', cursive;
+            font-size: 2rem;
+            color: var(--accent-color);
+            margin: 0;
+        }
+
+        /* Address Card Styles */
+        .address-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .address-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .address-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+
+        .address-type {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background-color: var(--accent-color);
+            color: var(--dark-bg);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        .address-name {
+            font-family: 'Aboreto', cursive;
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .address-details {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .address-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .address-btn {
+            flex: 1;
+            padding: 0.5rem;
+            border: none;
+            border-radius: 4px;
+            font-family: 'Jost', sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .edit-btn {
+            background-color: var(--accent-color);
+            color: var(--dark-bg);
+        }
+
+        .edit-btn:hover {
+            background-color: #d4b47c;
+        }
+
+        .delete-btn {
+            background-color: transparent;
+            color: var(--error-color);
+            border: 1px solid var(--error-color);
+        }
+
+        .delete-btn:hover {
+            background-color: rgba(244, 67, 54, 0.1);
+        }
+
+        .add-address-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--accent-color);
+            color: var(--dark-bg);
+            border: none;
             border-radius: 6px;
             font-family: 'Jost', sans-serif;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s;
-            border: none;
-        }
-
-        .logout-btn {
-            background-color: var(--dark-brown);
-            color: white;
-        }
-
-        .logout-btn:hover {
-            background-color: var(--olive-green);
-        }
-
-        .delete-btn {
-            background-color: #f8f8f8;
-            color: #b91c1c;
-            border: 1px solid #fecaca;
-        }
-
-        .delete-btn:hover {
-            background-color: #fee2e2;
-        }
-
-        .main-content {
-            padding: 50px 40px;
-            width: 70%;
-            background-color: white;
-            overflow-y: auto;
-        }
-
-        .form-content {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .profile-header {
-            display: flex;
-            align-items: center;
-            background-color: #f9f9f9;
-            padding: 25px;
-            border-radius: 8px;
-            margin-bottom: 40px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            border: 1px solid var(--border-color);
-        }
-
-        .profile-image {
-            width: 90px;
-            height: 90px;
-            background-color: var(--border-color);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 25px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .overview-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-        }
-
-        .overview-grid div {
-            background-color: #f9f9f9;
-            padding: 20px;
-            border-radius: 8px;
-            transition: transform 0.2s ease, box-shadow 0.3s ease;
-            border: 1px solid var(--border-color);
-        }
-
-        .overview-grid div:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .input-field {
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 14px;
-            font-size: 1rem;
-            width: 100%;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-            font-family: 'Jost', sans-serif;
-        }
-
-        .input-field:focus {
-            border-color: var(--olive-green);
-            box-shadow: 0 0 8px rgba(49, 66, 22, 0.2);
-            outline: none;
-        }
-
-        label {
-            font-size: 0.95rem;
-            color: var(--dark-brown);
-            margin-bottom: 10px;
-            display: block;
-            font-family: 'Jost', sans-serif;
-        }
-
-        .form-group {
-            margin-bottom: 25px;
-        }
-
-        .edit-btn {
-            background-color: rgb(64, 45, 30);
-            color: white;
-            padding: 14px 35px; /* Match padding with submit-btn for consistency */
-            border-radius: 8px; /* Match border-radius with submit-btn */
-            font-size: 1.1rem;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            border: none;
-            cursor: pointer;
-            font-family: 'Jost', sans-serif;
-        }
-
-        .edit-btn:hover {
-            background-color: var(--olive-green);
-            transform: translateY(-2px);
-        }
-
-        .submit-btn {
-            background-color: var(--dark-brown);
-            color: white;
-            padding: 14px 35px;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            border: none;
-            cursor: pointer;
-            font-family: 'Jost', sans-serif;
-        }
-
-        .submit-btn:hover {
-            background-color: var(--olive-green);
-            transform: translateY(-2px);
-        }
-
-        .add-address-btn {
-            background-color: rgb(58, 35, 5);
-            color: white;
-            padding: 12px 30px;
-            border-radius: 5px;
-            font-size: 1.1rem;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            border: none;
-            cursor: pointer;
-            font-family: 'Jost', sans-serif;
-            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            text-decoration: none;
         }
 
         .add-address-btn:hover {
-            background-color: var(--olive-green);
+            background-color: #d4b47c;
             transform: translateY(-2px);
         }
 
-        .logout-btn {
-            background-color: rgb(64, 45, 30);
-            color: white;
-            padding: 14px 0;
-            border-radius: 5px;
-            font-size: 1.1rem;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            border: none;
-            cursor: pointer;
-            width: 100%;
-            font-family: 'Jost', sans-serif;
+        .no-addresses {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+            font-style: italic;
+            background: var(--card-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
         }
 
-        .logout-btn:hover {
-            background-color: var(--olive-green);
-            transform: translateY(-2px);
-        }
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
 
-        .delete-btn {
-            background-color: rgb(78, 19, 19);
-            color: white;
-            padding: 14px 0;
-            border-radius: 5px;
-            font-size: 1.1rem;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            border: none;
-            cursor: pointer;
-            width: 100%;
-            font-family: 'Jost', sans-serif;
-        }
+            .sidebar {
+                width: 100%;
+                padding: 1rem;
+            }
 
-        .delete-btn:hover {
-            background-color: #8B0000;
-            transform: translateY(-2px);
-        }
+            .content-area {
+                padding: 1.5rem;
+            }
 
-        .error-message {
-            color: #dc2626;
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
-        }
-
-        .input-field.error {
-            border-color: #dc2626;
-        }
-
-        .submit-btn.loading {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-
-        #imagePreviewContainer {
-            max-width: 100%;
-            margin-top: 1rem;
-        }
-
-        .cropper-modal {
-            background-color: rgba(0, 0, 0, 0.5);
-        }
-
-        .cropper-crop-box {
-            border-radius: 50%;
-        }
-
-        .cropper-view-box {
-            border-radius: 50%;
-            outline: 1px solid #39f;
-            outline-color: rgba(51, 153, 255, 0.75);
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 1rem;
-        }
-
-        .address-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px; /* Increased gap for more space between Pincode and State */
+            .address-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="sidebar">
-            <div>
-                <div class="sidebar-title">User Dashboard</div>
-               <div class="sidebar-nav">
-                    <a href="/profile" class="nav-link ">Profile</a>
-                    <a href="/address" class="nav-link active">Address</a>
-                    <a href="/orders" class="nav-link">Orders</a>
-                    <a href="/wishlist" class="nav-link">Wishlist</a>
-                    <a href="/settings" class="nav-link">Settings</a>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <!-- Left side - Brand -->
+        <div class="brand">LUME</div>
 
+        <!-- Center - Navigation Links -->
+        <ul class="nav-links">
+            <li><a href="/" class="nav-link">Home</a></li>
+            <li><a href="/shopAll" class="nav-link">Shop All</a></li>
+            <li><a href="/featured" class="nav-link">Featured</a></li>
+            <li><a href="/new-arrivals" class="nav-link">New Arrivals</a></li>
+        </ul>
+
+        <!-- Right side - Icons -->
+        <ul class="icon-links">
+            <li>
+                <a href="/search" class="icon-link">
+                    <i class="fas fa-search"></i>
+                </a>
+            </li>
+            <li>
+                <a href="/cart" class="icon-link">
+                    <i class="fas fa-shopping-cart"></i>
+                </a>
+            </li>
+            <li>
+                <div class="profile-dropdown">
+                    <a href="#" class="icon-link"><i class="far fa-user"></i></a>
+                    <div class="profile-dropdown-content">
+                        <% if (locals.user) { %>
+                            <a href="/profile"><i class="fas fa-user"></i> My Profile</a>
+                            <a href="/orders"><i class="fas fa-box"></i> My Orders</a>
+                            <a href="/wishlist"><i class="fas fa-heart"></i> Wishlist</a>
+                            <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        <% } else { %>
+                            <a href="/login"><i class="fas fa-sign-in-alt"></i> Login</a>
+                            <a href="/signup"><i class="fas fa-user-plus"></i> Sign Up</a>
+                        <% } %>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </nav>
+
+    <% if (locals.user) { %>
+        <div class="main-container">
+            <!-- Elegant Dark Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar-title">My Account</div>
+                <div class="sidebar-nav">
+                    <a href="/profile" class="nav-link">
+                        <i class="fas fa-user"></i>
+                        Profile
+                    </a>
+                    <a href="/wallet" class="nav-link">
+                        <i class="fas fa-wallet"></i>
+                        Wallet
+                    </a>
+                    <a href="/address" class="nav-link active">
+                        <i class="fas fa-map-marker-alt"></i>
+                        Address
+                    </a>
+                    <a href="/orders" class="nav-link">
+                        <i class="fas fa-box-open"></i>
+                        Orders
+                    </a>
+                    <a href="/wishlist" class="nav-link">
+                        <i class="fas fa-heart"></i>
+                        Wishlist
+                    </a>
+                    <a href="/settings" class="nav-link">
+                        <i class="fas fa-cog"></i>
+                        Settings
+                    </a>
+                </div>
+                <div class="sidebar-actions">
+                    <button class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Logout
+                    </button>
+                    <button class="delete-btn">
+                        <i class="fas fa-trash-alt"></i>
+                        Delete Account
+                    </button>
                 </div>
             </div>
-            <div class="sidebar-actions">
-                <button class="logout-btn">Logout</button>
-                <button class="delete-btn">Delete Account</button>
-            </div>
-        </div>
-        <div class="main-content">
-            <h2>Address Details</h2>
-            <a href="/add-address"><button class="add-address-btn">Add Address</button></a>
-            <div class="form-content">
-                <div class="form-group">
-                    <label for="fullName">Full Name</label>
-                    <input type="text" id="fullName" class="input-field" placeholder="Full Name" >
+
+            <!-- Address Content Area -->
+            <div class="content-area">
+                <div class="page-header">
+                    <h1 class="page-title">My Addresses</h1>
+                    <a href="/add-address" class="add-address-btn">
+                        <i class="fas fa-plus"></i>
+                        Add New Address
+                    </a>
                 </div>
-                <div class="form-group">
-                    <label for="phoneNumber">Phone Number</label>
-                    <input type="text" id="phoneNumber" class="input-field" placeholder="Phone Number">
-                </div>
-                <div class="form-group">
-                    <label for="alternatePhoneNumber">Alternate Phone Number</label>
-                    <input type="text" id="alternatePhoneNumber" class="input-field" placeholder="Alternate Phone Number">
-                </div>
+
                 <div class="address-grid">
-                    <div class="form-group">
-                        <label for="pincode">Pincode</label>
-                        <input type="text" id="pincode" class="input-field" placeholder="Pincode">
-                    </div>
-                    <div class="form-group">
-                        <label for="state">State</label>
-                        <input type="text" id="state" class="input-field" placeholder="State">
-                    </div>
-                    <div class="form-group">
-                        <label for="city">City</label>
-                        <input type="text" id="city" class="input-field" placeholder="City">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="houseNo">House No., Building Name</label>
-                    <input type="text" id="houseNo" class="input-field" placeholder="House No., Building Name">
-                </div>
-                <div class="form-group">
-                    <label for="roadName">Road Name, Area</label>
-                    <input type="text" id="roadName" class="input-field" placeholder="Road Name, Area">
-                </div>
-                <div class="button-group">
-
-                    <a href="/address/update"><button class="edit-btn">Edit Address</button></a>
+                    <% if (addresses && addresses.length > 0) { %>
+                        <% addresses.forEach(address => { %>
+                            <div class="address-card">
+                                <span class="address-type">
+                                    <%= address.type %>
+                                </span>
+                                <h3 class="address-name">
+                                    <%= address.name %>
+                                </h3>
+                                <div class="address-details">
+                                    <p><%= address.street %></p>
+                                    <p><%= address.city %>, <%= address.state %> <%= address.zipCode %></p>
+                                    <p><%= address.country %></p>
+                                    <p>Phone: <%= address.phone %></p>
+                                </div>
+                                <div class="address-actions">
+                                    <a href="/update/address/<%= address._id %>" class="address-btn edit-btn">
+                                        <i class="fas fa-edit"></i>
+                                        Edit
+                                    </a>
+                                    <button class="address-btn delete-btn" data-address-id="<%= address._id %>">
+                                        <i class="fas fa-trash"></i>
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <div class="no-addresses">
+                            <p>No addresses found. Add your first address to get started.</p>
+                        </div>
+                    <% } %>
                 </div>
             </div>
         </div>
-    </div>
+    <% } else { %>
+        <div class="content-area">
+            <div class="page-header">
+                <h1 class="page-title">My Addresses</h1>
+            </div>
+            <div class="no-addresses">
+                <p>Please log in to view or manage your addresses.</p>
+                <a href="/login" class="add-address-btn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Login Now
+                </a>
+            </div>
+        </div>
+    <% } %>
+
+    <!-- Footer -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <footer style="background-color: #121212; color: #b0b0b0; padding: 40px 0; font-family: 'Cinzel', serif; line-height: 1.6; border-top: 1px solid #333;">
+        <div style="display: flex; justify-content: center; gap: 120px; padding: 0 20px; max-width: 1200px; margin: 0 auto;">
+            <div>
+                <h3 style="font-size: 18px; margin-bottom: 15px; letter-spacing: 1px; text-transform: uppercase; color: #c5a267;">Company</h3>
+                <ul style="list-style: none; padding: 0; font-size: 14px;">
+                    <li style="margin-bottom: 8px;"><a href="/about-us" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">About Us</a></li>
+                    <li style="margin-bottom: 8px;"><a href="/careers" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Careers</a></li>
+                    <li style="margin-bottom: 8px;"><a href="/contact" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Contact</a></li>
+                    <li style="margin-bottom: 8px;"><a href="/privacy-policy" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Privacy Policy</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 style="font-size: 18px; margin-bottom: 15px; letter-spacing: 1px; text-transform: uppercase; color: #c5a267;">Shop</h3>
+                <ul style="list-style: none; padding: 0; font-size: 14px;">
+                    <li style="margin-bottom: 8px;"><a href="/rings" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Rings</a></li>
+                    <li style="margin-bottom: 8px;"><a href="/necklaces" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Necklaces</a></li>
+                    <li style="margin-bottom: 8px;"><a href="/earrings" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Earrings</a></li>
+                    <li style="margin-bottom: 8px;"><a href="/bracelets" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Bracelets</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 style="font-size: 18px; margin-bottom: 15px; letter-spacing: 1px; text-transform: uppercase; color: #c5a267;">Connect With Us</h3>
+                <ul style="list-style: none; padding: 0; font-size: 14px;">
+                    <li style="margin-bottom: 8px;"><a href="https://instagram.com" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Instagram</a></li>
+                    <li style="margin-bottom: 8px;"><a href="https://facebook.com" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Facebook</a></li>
+                    <li style="margin-bottom: 8px;"><a href="https://pinterest.com" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Pinterest</a></li>
+                    <li style="margin-bottom: 8px;"><a href="https://twitter.com" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Twitter</a></li>
+                </ul>
+            </div>
+        </div>
+        <div style="text-align: center; font-size: 12px; padding-top: 30px; margin-top: 30px; border-top: 1px solid #333; color: #666;">
+            © 2024 Lume Jewelry. All Rights Reserved.
+        </div>
+    </footer>
+    <style>
+        footer a:hover {
+            color: #c5a267;
+        }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Sidebar button functionality
+        document.querySelector('.logout-btn').addEventListener('click', function() {
+            window.location.href = '/logout';
+        });
+
+        document.querySelector('.delete-btn').addEventListener('click', function() {
+            if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+                window.location.href = '/profile/delete';
+            }
+        });
+
+        // Address delete functionality
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const addressId = this.dataset.addressId;
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "This address will be permanently deleted!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch('/remove-address', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ addressId })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire('Deleted!', data.message, 'success')
+                                    .then(() => location.reload());
+                            } else {
+                                Swal.fire('Oops!', data.message, 'warning');
+                            }
+                        })
+                        .catch(() => {
+                            Swal.fire('Error', 'Something went wrong. Try again.', 'error');
+                        });
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

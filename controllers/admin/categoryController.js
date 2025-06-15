@@ -109,60 +109,93 @@ const loadAddCategory = async (req, res) => {
 
 const addCategory = async (req, res) => {
   try {
-    if (!req.session.admin) {
-      return res.redirect("/admin/login");
-    }
-  
-
- 
-    const { name, description } = req.body;
+    const { name, description, categoryOffer } = req.body;
 
     if (!name || !description || !req.file) {
       return res.status(400).json({
         success: false,
-        message: "Name, description, and image are required",
+        message: "All required fields must be provided"
       });
     }
 
-    const existingCategory = await Category.findOne({
-      name: { $regex: `^${name}$`, $options: "i" },
-    });
-
+    const existingCategory = await Category.findOne({ name });
     if (existingCategory) {
       if (req.file) {
         fs.unlinkSync(req.file.path);
       }
       return res.status(400).json({
         success: false,
-        message: "Category name already exists",
+        message: "A category with this name already exists"
       });
     }
 
-    const imagePath = req.file.path.replace("public", "");
+    let parsedOffer = { active: false };
+    if (categoryOffer) {
+      try {
+        parsedOffer = JSON.parse(categoryOffer);
+        
+        if (parsedOffer.discountType) {
+          parsedOffer.discountType = parsedOffer.discountType.toLowerCase();
+        }
+        
+        // Set active status based on the offer data
+        parsedOffer.active = parsedOffer.isActive;
+        
+        if (parsedOffer.active) {
+          if (!parsedOffer.discountType || !parsedOffer.discountValue || !parsedOffer.startDate || !parsedOffer.endDate) {
+            return res.status(400).json({
+              success: false,
+              message: "All offer fields are required when offer is active"
+            });
+          }
 
-    const newCategory = new Category({
+          if (parsedOffer.discountType === 'percentage' && (parsedOffer.discountValue < 0 || parsedOffer.discountValue > 100)) {
+            return res.status(400).json({
+              success: false,
+              message: "Percentage discount must be between 0 and 100"
+            });
+          }
+
+          if (new Date(parsedOffer.startDate) >= new Date(parsedOffer.endDate)) {
+            return res.status(400).json({
+              success: false,
+              message: "End date must be after start date"
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Error parsing offer data:", error);
+        return res.status(400).json({
+          success: false,
+          message: "Invalid offer data format"
+        });
+      }
+    }
+
+    const category = new Category({
       name,
       description,
-      image: imagePath,
+image: `uploads/category/${req.file.filename}`,
+      categoryOffer: parsedOffer
     });
 
-    await newCategory.save();
+    await category.save();
+    console.log(category);
 
-    res.status(200).json({
+    res.status(201).json({
       success: true,
       message: "Category added successfully",
+      category
     });
   } catch (error) {
-    if (req.file) {
-      fs.unlinkSync(req.file.path);
-    }
     console.error("Error adding category:", error);
     res.status(500).json({
       success: false,
-      message: "Internal server error",
+      message: "Error adding category"
     });
   }
 };
+
 const getListcategory = async (req, res) => {
   try {
     if (!req.session.admin) {
@@ -278,74 +311,112 @@ const getEditCategory = async (req, res) => {
 
 const editCategory = async (req, res) => {
   try {
-    if (!req.session.admin) {
-      return res.redirect("/admin/login");
-    }
+    const { name, description, categoryOffer } = req.body;
+    const categoryId = req.params.id;
 
-    const id = req.params.id;
-    const { categoryName, description } = req.body;
-
-    if (!categoryName || !description) {
+    if (!name || !description) {
       return res.status(400).json({
         success: false,
-        message: "Name and description are required",
+        message: "All required fields must be provided"
       });
     }
 
-    const existingCategory = await Category.findOne({
-      name: { $regex: `^${categoryName}$`, $options: "i" },
-      _id: { $ne: id },
-    });
-
-    if (existingCategory) {
-      if (req.file) {
-        fs.unlinkSync(req.file.path);
-      }
-      return res.status(400).json({
-        success: false,
-        message: "Category name already exists",
-      });
-    }
-
-    const updateData = {
-      name: categoryName.trim(),
-      description: description.trim(),
-    };
-
-    if (req.file) {
-      const oldCategory = await Category.findById(id);
-      if (oldCategory && oldCategory.imagePath) {
-        const oldImagePath = path.join("public", oldCategory.imagePath);
-        if (fs.existsSync(oldImagePath)) {
-          fs.unlinkSync(oldImagePath);
-        }
-      }
-      updateData.imagePath = req.file.path.replace("public", "");
-    }
-
-    const updatedCategory = await Category.findByIdAndUpdate(id, updateData, {
-      new: true,
-    });
-
-    if (!updatedCategory) {
+    const category = await Category.findById(categoryId);
+    if (!category) {
       return res.status(404).json({
         success: false,
-        message: "Category not found",
+        message: "Category not found"
       });
     }
 
-    res.status(200).json({
+    // Check if another category with same name exists
+    const existingCategory = await Category.findOne({
+      name,
+      _id: { $ne: categoryId }
+    });
+    if (existingCategory) {
+      return res.status(400).json({
+        success: false,
+        message: "A category with this name already exists"
+      });
+    }
+
+    let parsedOffer = { active: false };
+    if (categoryOffer) {
+      try {
+        parsedOffer = JSON.parse(categoryOffer);
+        
+        if (parsedOffer.discountType) {
+          parsedOffer.discountType = parsedOffer.discountType.toLowerCase();
+        }
+        
+        // Set active status based on the offer data
+        parsedOffer.active = parsedOffer.isActive;
+        
+        if (parsedOffer.active) {
+          if (!parsedOffer.discountType || !parsedOffer.discountValue || !parsedOffer.startDate || !parsedOffer.endDate) {
+            return res.status(400).json({
+              success: false,
+              message: "All offer fields are required when offer is active"
+            });
+          }
+
+          if (parsedOffer.discountType === 'percentage' && (parsedOffer.discountValue < 0 || parsedOffer.discountValue > 100)) {
+            return res.status(400).json({
+              success: false,
+              message: "Percentage discount must be between 0 and 100"
+            });
+          }
+
+          if (new Date(parsedOffer.startDate) >= new Date(parsedOffer.endDate)) {
+            return res.status(400).json({
+              success: false,
+              message: "End date must be after start date"
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Error parsing offer data:", error);
+        return res.status(400).json({
+          success: false,
+          message: "Invalid offer data format"
+        });
+      }
+    }
+
+    // Update category data
+    const updateData = {
+      name,
+      description,
+      categoryOffer: parsedOffer
+    };
+
+    // Handle image upload if provided
+    if (req.file) {
+      // Delete old image
+      const oldImagePath = path.join( category.image);
+      if (fs.existsSync(oldImagePath)) {
+        fs.unlinkSync(oldImagePath);
+      }
+      updateData.image = `${req.file.filename}`;
+    }
+
+    const updatedCategory = await Category.findByIdAndUpdate(
+      categoryId,
+      updateData,
+      { new: true }
+    );
+
+    res.json({
       success: true,
       message: "Category updated successfully",
+      category: updatedCategory
     });
   } catch (error) {
-    if (req.file) {
-      fs.unlinkSync(req.file.path);
-    }
-    console.error("Error in editCategory:", error);
+    console.error("Error updating category:", error);
     res.status(500).json({
       success: false,
-      message: "Server error",
+      message: "Error updating category"
     });
   }
 };

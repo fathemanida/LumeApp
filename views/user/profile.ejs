@@ -3,363 +3,535 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile - E-commerce</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>My Profile</title>
     <link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-          --dark-brown: #5c4b3b; /* Updated brown color */
-          --olive-green: #314216;
-          --light-bg: #ffffff; /* Changed to white */
-          --border-color: #d3c9be;
+            --dark-bg: #1a1a1a;
+            --darker-bg: #121212;
+            --card-bg: #242424;
+            --text-primary: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --accent-color: #c5a267;
+            --border-color: #333333;
+            --success-color: #4caf50;
+            --error-color: #f44336;
         }
 
         body {
             font-family: 'Jost', sans-serif;
-            background-color: white; /* Changed to white */
+            background-color: var(--dark-bg);
             margin: 0;
             padding: 0;
-            display: flex;
-            justify-content: flex-start;
-            align-items: flex-start;
             min-height: 100vh;
-            color: var(--dark-brown);
-        }
-
-        .container {
-            background-color: #fff;
-            border-radius: 0;
-            box-shadow: none;
-            overflow: hidden;
-            width: 100%;
-            margin: 0;
+            color: var(--text-primary);
             display: flex;
-            height: 100vh;
+            flex-direction: column;
         }
-        
-        h1, h2, h3 {
-            font-family: 'Aboreto', cursive;
-        }
-       
-       .sidebar {
-    background-color: white;
-    padding: 1.5rem;
-    width: 280px;
-    height: 100vh;
-    border-right: 1px solid var(--border-color);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
 
-.sidebar-title {
-    font-family: 'Aboreto', cursive;
-    font-size: 1.25rem;
-    color: var(--dark-brown);
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.sidebar-nav {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.nav-link {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-    color: var(--dark-brown);
-    padding: 0.75rem 1rem;
-    transition: all 0.3s;
-    border-radius: 6px;
-    font-family: 'Jost', sans-serif;
-    position: relative;
-}
-
-.nav-link:hover,
-.nav-link.active {
-    color: var(--olive-green);
-    background-color: rgba(49, 66, 22, 0.1);
-}
-
-.nav-link.active {
-    font-weight: 500;
-    background-color: var(--light-bg);
-    box-shadow: 3px 0 0 0 var(--olive-green) inset;
-}
-
-.sidebar-actions {
-    margin-top: auto;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--border-color);
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-.logout-btn, 
-.delete-btn {
-    width: 100%;
-    padding: 0.75rem;
-    border-radius: 6px;
-    font-family: 'Jost', sans-serif;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s;
-    border: none;
-}
-
-.logout-btn {
-    background-color: var(--dark-brown);
-    color: white;
-}
-
-.logout-btn:hover {
-    background-color: var(--olive-green);
-}
-
-.delete-btn {
-    background-color: #f8f8f8;
-    color: #b91c1c;
-    border: 1px solid #fecaca;
-}
-
-.delete-btn:hover {
-    background-color: #fee2e2;
-}
-        .main-content {
-            padding: 50px 40px;
-            width: 70%;
-            height: 100%;
-            overflow-y: auto;
-            background-color: white; /* Ensure white background */
-        }
-        
-        .profile-header {
+        /* Navbar styles */
+        .navbar {
+            background: var(--darker-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
             display: flex;
             align-items: center;
-            background-color: #f9f9f9; /* Light gray background */
-            padding: 25px;
-            border-radius: 8px;
-            margin-bottom: 40px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            justify-content: space-between;
+            flex-wrap: nowrap;
+        }
+
+        .brand {
+            font-family: 'Aboreto', cursive;
+            font-size: 1.5rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .brand:hover {
+            color: var(--accent-color);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .nav-link {
+            color: var(--text-primary);
+            font-family: 'Jost', sans-serif;
+            font-size: 0.9rem;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        .icon-links {
+            display: flex;
+            align-items: center;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .icon-link {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            padding: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .icon-link:hover {
+            color: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        /* Profile Dropdown */
+        .profile-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .profile-dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: var(--card-bg);
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            z-index: 1000;
+            border-radius: 4px;
+            padding: 0.5rem 0;
             border: 1px solid var(--border-color);
         }
-        
-        .profile-image {
-            width: 90px;
-            height: 90px;
-            background-color: var(--border-color);
-            border-radius: 50%;
+
+        .profile-dropdown:hover .profile-dropdown-content {
+            display: block;
+        }
+
+        .profile-dropdown-content a {
+            color: var(--text-primary);
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            display: block;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .profile-dropdown-content a:hover {
+            background-color: var(--darker-bg);
+            color: var(--accent-color);
+        }
+
+        .profile-dropdown-content a i {
+            margin-right: 0.5rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Container */
+        .main-container {
+            display: flex;
+            flex: 1;
+        }
+
+        /* Elegant Dark Sidebar */
+        .sidebar {
+            width: 280px;
+            background-color: var(--darker-bg);
+            padding: 2rem 1.5rem;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-title {
+            font-family: 'Aboreto', cursive;
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            letter-spacing: 1px;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .sidebar-nav a {
+            color: var(--text-primary);
+            text-decoration: none;
+            padding: 0.75rem 1rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .sidebar-nav a i {
+            width: 20px;
+            text-align: center;
+            color: var(--accent-color);
+        }
+
+        .sidebar-nav a:hover {
+            background-color: rgba(197, 162, 103, 0.1);
+            color: var(--accent-color);
+            transform: translateX(4px);
+        }
+
+        .sidebar-nav a.active {
+            background-color: rgba(197, 162, 103, 0.2);
+            color: var(--accent-color);
+            font-weight: 500;
+            border-left: 3px solid var(--accent-color);
+        }
+
+        .sidebar-actions {
+            margin-top: auto;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .sidebar-actions button {
+            padding: 0.75rem;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Jost', sans-serif;
+            font-size: 0.9rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 25px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            gap: 0.5rem;
         }
-        
-        .overview-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-        }
-        
-        .overview-grid div {
-            background-color: #f9f9f9; /* Light gray background */
-            padding: 20px;
-            border-radius: 8px;
-            transition: transform 0.2s ease, box-shadow 0.3s ease;
-            border: 1px solid var(--border-color);
-        }
-        
-        .overview-grid div:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        .input-field {
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 14px;
-            font-size: 1rem;
-            width: 100%;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-            font-family: 'Jost', sans-serif;
-        }
-        
-        .input-field:focus {
-            border-color: var(--olive-green);
-            box-shadow: 0 0 8px rgba(49, 66, 22, 0.2);
-            outline: none;
-        }
-        
-        label {
-            font-size: 0.95rem;
-            color: var(--dark-brown);
-            margin-bottom: 10px;
-            display: block;
-            font-family: 'Jost', sans-serif;
-        }
-        
-        .form-group {
-            margin-bottom: 25px;
-        }
-        
-        .edit-btn {
-            background-color: rgb(64, 45, 30);; /* Brown button */
-            color: white;
-            padding: 12px 30px;
-            border-radius: 5px;
-            font-size: 1.1rem;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            border: none;
-            cursor: pointer;
-            font-family: 'Jost', sans-serif;
-        }
-        
-        .edit-btn:hover {
-            background-color: var(--olive-green); /* Green hover */
-            transform: translateY(-2px);
-        }
-        
-        .submit-btn {
-            background-color: var(--dark-brown); /* Brown button */
-            color: white;
-            padding: 14px 35px;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            border: none;
-            cursor: pointer;
-            font-family: 'Jost', sans-serif;
-        }
-        
-        .submit-btn:hover {
-            background-color: var(--olive-green); /* Green hover */
-            transform: translateY(-2px);
-        }
-        
+
         .logout-btn {
-            background-color:rgb(64, 45, 30); /* Brown button */
-            color: white;
-            padding: 14px 0;
-            border-radius: 5px;
-            font-size: 1.1rem;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            border: none;
-            cursor: pointer;
-            width: 100%;
-            font-family: 'Jost', sans-serif;
+            background-color: rgba(197, 162, 103, 0.1);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
         }
-        
+
         .logout-btn:hover {
-            background-color: var(--olive-green); /* Green hover */
-            transform: translateY(-2px);
+            background-color: rgba(197, 162, 103, 0.2);
+            border-color: var(--accent-color);
         }
-        
+
         .delete-btn {
-            background-color: rgb(78, 19, 19); /* Brown button */
-            color: white;
-            padding: 14px 0;
-            border-radius: 5px;
-            font-size: 1.1rem;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            border: none;
-            cursor: pointer;
-            width: 100%;
-            font-family: 'Jost', sans-serif;
+            background-color: transparent;
+            color: #ff6b6b;
+            border: 1px solid #ff6b6b;
         }
-        
+
         .delete-btn:hover {
-            background-color: #8B0000; /* Dark red hover */
+            background-color: rgba(255, 107, 107, 0.1);
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            padding: 2rem 3rem;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-family: 'Aboreto', cursive;
+            font-size: 2rem;
+            color: var(--accent-color);
+            margin: 0;
+        }
+
+        .edit-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            background-color: var(--accent-color);
+            color: #121212;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .edit-btn:hover {
+            background-color: #d4b47c;
             transform: translateY(-2px);
+        }
+
+        /* Profile Content Styles */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .profile-image {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            overflow: hidden;
+            background-color: var(--card-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .profile-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-info h2 {
+            font-family: 'Aboreto', cursive;
+            font-size: 1.75rem;
+            margin: 0 0 0.5rem 0;
+            color: var(--text-primary);
+        }
+
+        .profile-info p {
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                padding: 1rem;
+            }
+            
+            .content-area {
+                padding: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Sidebar -->
-    <div class="sidebar">
-            <div>
-                <div class="sidebar-nav">
-                    <a href="/profile" class="nav-link active">Profile</a>
-                    <a href="/address" class="nav-link ">Address</a>
-                    <a href="/orders" class="nav-link">Orders</a>
-                    <a href="/wishlist" class="nav-link">Wishlist</a>
-                    <a href="/settings" class="nav-link">Settings</a>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <!-- Left side - Brand -->
+        <div class="brand">LUME</div>
 
+        <!-- Center - Navigation Links -->
+        <ul class="nav-links">
+            <li><a href="/" class="nav-link">Home</a></li>
+            <li><a href="/shopAll" class="nav-link">Shop All</a></li>
+            <li><a href="/featured" class="nav-link">Featured</a></li>
+            <li><a href="/new-arrivals" class="nav-link">New Arrivals</a></li>
+        </ul>
+
+        <!-- Right side - Icons -->
+        <ul class="icon-links">
+            <li>
+                <a href="/search" class="icon-link">
+                    <i class="fas fa-search"></i>
+                </a>
+            </li>
+            <li>
+                <a href="/cart" class="icon-link">
+                    <i class="fas fa-shopping-cart"></i>
+                </a>
+            </li>
+            <li>
+                <div class="profile-dropdown">
+                    <a href="#" class="icon-link"><i class="far fa-user"></i></a>
+                    <div class="profile-dropdown-content">
+                        <% if (locals.user) { %>
+                            <a href="/profile"><i class="fas fa-user"></i> My Profile</a>
+                            <a href="/orders"><i class="fas fa-box"></i> My Orders</a>
+                            <a href="/wishlist"><i class="fas fa-heart"></i> Wishlist</a>
+                            <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        <% } else { %>
+                            <a href="/login"><i class="fas fa-sign-in-alt"></i> Login</a>
+                            <a href="/signup"><i class="fas fa-user-plus"></i> Sign Up</a>
+                        <% } %>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </nav>
+
+    <% if (locals.user) { %>
+        <div class="main-container">
+            <!-- Elegant Dark Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar-title">My Account</div>
+                <div class="sidebar-nav">
+                    <a href="/profile" class="nav-link active">
+                        <i class="fas fa-user"></i>
+                        Profile
+                    </a>
+                    <a href="/wallet" class="nav-link">
+                        <i class="fas fa-wallet"></i>
+                        Wallet
+                    </a>
+                    <a href="/address" class="nav-link">
+                        <i class="fas fa-map-marker-alt"></i>
+                        Address
+                    </a>
+                    <a href="/orders" class="nav-link">
+                        <i class="fas fa-box-open"></i>
+                        Orders
+                    </a>
+                    <a href="/wishlist" class="nav-link">
+                        <i class="fas fa-heart"></i>
+                        Wishlist
+                    </a>
+                    <a href="/settings" class="nav-link">
+                        <i class="fas fa-cog"></i>
+                        Settings
+                    </a>
+                </div>
+                <div class="sidebar-actions">
+                    <button class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Logout
+                    </button>
+                    <button class="delete-btn">
+                        <i class="fas fa-trash-alt"></i>
+                        Delete Account
+                    </button>
                 </div>
             </div>
-            <div class="sidebar-actions">
-                <button class="logout-btn">Logout</button>
-                <button class="delete-btn">Delete Account</button>
+
+            <!-- Profile Content Area -->
+            <div class="content-area">
+                <div class="page-header">
+                    <h1 class="page-title">My Profile</h1>
+                    <a href="/profile/update" class="edit-btn">
+                        <i class="fas fa-edit"></i>
+                        Edit Profile
+                    </a>
+                </div>
+
+                <div class="profile-header">
+                    <div class="profile-image">
+                        <% if(users && users.profileImage) { %>
+                            <img src="/Uploads/user/<%= users.profileImage %>" alt="Profile">
+                        <% } else { %>
+                            <i class="fas fa-user fa-2x" style="color: var(--text-secondary);"></i>
+                        <% } %>
+                    </div>
+                    <div class="profile-info">
+                        <h2><%= users ? users.name : 'User' %></h2>
+                        <p><%= users ? users.email : 'No email available' %></p>
+                        <% if(users && users.phone) { %>
+                            <p><%= users.phone %></p>
+                        <% } %>
+                        <% if(users && users.createdAt) { %>
+                            <p>Member since: <%= new Date(users.createdAt).toLocaleDateString() %></p>
+                        <% } %>
+                    </div>
+                </div>
             </div>
         </div>
-        <!-- Main Content -->
-<div class="main-content">
-    <div class="flex justify-between items-center mb-10">
-        <h1 class="text-3xl font-semibold">My Account</h1>
-        <button class="edit-btn"><a href="/profile/update">Edit</a></button>
-    </div>
-    <!-- Profile Header -->
-    <div class="profile-header">
-        <div class="profile-image">
-            <% if(users.profileImage) { %>
-                <img src="<%= users.profileImage %>" alt="Profile" class="w-full h-full rounded-full object-cover">
-            <% } else { %>
-                <svg class="w-12 h-12 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                </svg>
-            <% } %>
+    <% } else { %>
+        <div class="content-area">
+            <div class="no-profile">
+                <h2 style="font-family: 'Aboreto', cursive; color: var(--accent-color);">Welcome to LUME</h2>
+                <p style="color: var(--text-secondary);">Please log in to view your profile.</p>
+                <a href="/login" class="edit-btn">Login Now</a>
+            </div>
         </div>
-     
+    <% } %>
+
+    <!-- Footer -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <footer style="background-color: var(--darker-bg); color: var(--text-secondary); padding: 40px 0; font-family: 'Cinzel', serif; line-height: 1.6; border-top: 1px solid var(--border-color);">
+      <div style="display: flex; justify-content: center; gap: 120px; padding: 0 20px; max-width: 1200px; margin: 0 auto;">
+        <!-- Company Section -->
         <div>
-            <h2 class="text-2xl font-semibold"><%= users.name %></h2>
-            <p class="text-sm"><%= users.email %></p>
+          <h3 style="font-size: 18px; margin-bottom: 15px; letter-spacing: 1px; text-transform: uppercase; color: var(--accent-color);">Company</h3>
+          <ul style="list-style: none; padding: 0; font-size: 14px;">
+            <li style="margin-bottom: 8px;"><a href="/about-us" style="color: var(--text-secondary); text-decoration: none; transition: color 0.3s ease;">About Us</a></li>
+            <li style="margin-bottom: 8px;"><a href="/careers" style="color: var(--text-secondary); text-decoration: none; transition: color 0.3s ease;">Careers</a></li>
+            <li style="margin-bottom: 8px;"><a href="/contact" style="color: var(--text-secondary); text-decoration: none; transition: color 0.3s ease;">Contact</a></li>
+            <li style="margin-bottom: 8px;"><a href="/privacy-policy" style="color: var(--text-secondary); text-decoration: none; transition: color 0.3s ease;">Privacy Policy</a></li>
+          </ul>
         </div>
-    </div>
-    <!-- Account Overview -->
-    <div class="mb-12">
-        <h3 class="text-2xl font-semibold mb-6">Account Overview</h3>
-        <div class="overview-grid">
-            <div>
-                <p class="text-sm">Total Orders</p>
-                <p class="font-semibold"><%= users.orderCount || 0 %></p>
-            </div>
-            <div>
-                <p class="text-sm">Wishlist Items</p>
-                <p class="font-semibold"><%= users.wishlist || 0 %></p>
-            </div>
-            <div>
-                <p class="text-sm">Account Status</p>
-                <p class="font-semibold"><%= users.isActive ? 'Active' : 'Inactive' %></p>
-            </div>
-            <div>
-                <p class="text-sm">Member Since</p>
-                <p class="font-semibold"><%= new Date(users.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) %></p>
-            </div>
+
+        <!-- Shop Section -->
+        <div>
+          <h3 style="font-size: 18px; margin-bottom: 15px; letter-spacing: 1px; text-transform: uppercase; color: var(--accent-color);">Shop</h3>
+          <ul style="list-style: none; padding: 0; font-size: 14px;">
+            <li style="margin-bottom: 8px;"><a href="/rings" style="color: var(--text-secondary); text-decoration: none; transition: color 0.3s ease;">Rings</a></li>
+            <li style="margin-bottom: 8px;"><a href="/necklaces" style="color: var(--text-secondary); text-decoration: none; transition: color 0.3s ease;">Necklaces</a></li>
+            <li style="margin-bottom: 8px;"><a href="/earrings" style="color: var(--text-secondary); text-decoration: none; transition: color 0.3s ease;">Earrings</a></li>
+            <li style="margin-bottom: 8px;"><a href="/bracelets" style="color: var(--text-secondary); text-decoration: none; transition: color 0.3s ease;">Bracelets</a></li>
+          </ul>
         </div>
-    </div>
-    <!-- Profile Form -->
-  
-        <div class="form-group">
-            <label>Username</label>
-            <input type="text" name="name" class="input-field" value="<%= users.name %>" readonly>
+
+        <!-- Connect With Us Section -->
+        <div>
+          <h3 style="font-size: 18px; margin-bottom: 15px; letter-spacing: 1px; text-transform: uppercase; color: var(--accent-color);">Connect With Us</h3>
+          <ul style="list-style: none; padding: 0; font-size: 14px;">
+            <li style="margin-bottom: 8px;"><a href="https://instagram.com" style="color: var(--text-secondary); text-decoration: none; transition: color 0.3s ease;">Instagram</a></li>
+            <li style="margin-bottom: 8px;"><a href="https://facebook.com" style="color: var(--text-secondary); text-decoration: none; transition: color 0.3s ease;">Facebook</a></li>
+            <li style="margin-bottom: 8px;"><a href="https://pinterest.com" style="color: var(--text-secondary); text-decoration: none; transition: color 0.3s ease;">Pinterest</a></li>
+            <li style="margin-bottom: 8px;"><a href="https://twitter.com" style="color: var(--text-secondary); text-decoration: none; transition: color 0.3s ease;">Twitter</a></li>
+          </ul>
         </div>
-        <div class="form-group">
-            <label>Phone</label>
-            <input type="text" name="phone" value="<%= users.phone %>" class="input-field" readonly>
-        </div>
-        <div class="form-group">
-            <label>Email</label>
-            <input type="email" name="email" value="<%= users.email %>" class="input-field" readonly>
-        </div>
-    </form>
-</div>
-    </div>
+      </div>
+
+      <!-- Copyright Section -->
+      <div style="text-align: center; font-size: 12px; padding-top: 30px; margin-top: 30px; border-top: 1px solid var(--border-color); color: var(--text-secondary);">
+        © 2024 Lume Jewelry. All Rights Reserved.
+      </div>
+    </footer>
+    <style>
+      footer a:hover {
+        color: var(--accent-color);
+      }
+    </style>
+
+    <script>
+        document.querySelector('.logout-btn').addEventListener('click', function() {
+            window.location.href = '/logout';
+        });
+
+        document.querySelector('.delete-btn').addEventListener('click', function() {
+            if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+                window.location.href = '/profile/delete';
+            }
+        });
+    </script>
 </body>
 </html>

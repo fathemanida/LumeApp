@@ -99,7 +99,7 @@ const productInfo = async (req, res) => {
 const loadAddProduct = async (req, res) => {
   try {
     const categories = await Category.find({ isListed: true });
-    res.render("admin/product-add", { categories });
+    res.render("admin/product-add", { categories, selectedSizes: []  });
   } catch (error) {
     console.error("Error fetching categories:", error);
     res.status(500).json({
@@ -111,6 +111,9 @@ const loadAddProduct = async (req, res) => {
 
 const addProduct = async (req, res) => {
   try {
+    console.log('Request body:', req.body);
+    console.log('Request files:', req.files);
+
     const {
       productName,
       description,
@@ -118,162 +121,128 @@ const addProduct = async (req, res) => {
       regularPrice,
       salePrice,
       quantity,
-      sizes,
       featured,
       new: isNew,
+      sizes,
+      productOffer
     } = req.body;
 
-    if (
-      !productName ||
-      !description ||
-      !category ||
-      !regularPrice ||
-      !quantity
-    ) {
-      return res.status(400).json({
-        success: false,
-        message: "All required fields must be provided",
-      });
+    if (!productName || !description || !category || !regularPrice || !quantity) {
+      return res.status(400).json({ message: 'Please fill all required fields' });
     }
 
-   
-    if (!/^[A-Z][a-zA-Z0-9\s]*$/.test(productName)) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "Product name must start with a capital letter and contain only alphabets and numbers",
-      });
+    if (!req.files || req.files.length === 0 || req.files.length > 3) {
+      return res.status(400).json({ message: 'Please upload 1 to 3 images' });
     }
 
-    
-    if (description.length < 10) {
-      return res.status(400).json({
-        success: false,
-        message: "Description must be at least 10 characters long",
-      });
-    }
-
-    
     let parsedSizes = [];
     if (sizes) {
       try {
         parsedSizes = JSON.parse(sizes);
-      } catch (err) {
-        return res.status(400).json({
-          success: false,
-          message: "Invalid sizes format",
-        });
+        if (!Array.isArray(parsedSizes)) {
+          return res.status(400).json({ message: 'Sizes must be an array' });
+        }
+        for (const size of parsedSizes) {
+          if (!size.size || typeof size.quantity !== 'number' || size.quantity < 0) {
+            return res.status(400).json({ message: 'Invalid size or quantity value' });
+          }
+        }
+      } catch (error) {
+        return res.status(400).json({ message: 'Invalid sizes format' });
       }
     }
 
-    
-    if (isNaN(regularPrice) || regularPrice <= 0) {
-      return res.status(400).json({
-        success: false,
-        message: "Regular price must be a positive number",
-      });
-    }
+    let parsedProductOffer = { active: false };
+    if (productOffer) {
+      try {
+        parsedProductOffer = JSON.parse(productOffer);
+        if (typeof parsedProductOffer !== 'object') {
+          return res.status(400).json({ message: 'Invalid product offer format' });
+        }
 
-    if (salePrice && (isNaN(salePrice) || salePrice >= regularPrice)) {
-      return res.status(400).json({
-        success: false,
-        message: "Sale price must be less than regular price",
-      });
-    }
+        if (parsedProductOffer.active) {
+          const { discountType, discountValue, startDate, endDate } = parsedProductOffer;
 
-   
-    if (!Number.isInteger(Number(quantity)) || quantity < 0) {
-      return res.status(400).json({
-        success: false,
-        message: "Quantity must be a non-negative integer",
-      });
-    }
-
-    
-    const productExists = await Product.findOne({ productName });
-    if (productExists) {
-      return res.status(400).json({
-        success: false,
-        message: "Product already exists",
-      });
-    }
-
-   
-    const productImage = [];
-    if (req.files && req.files.length > 0) {
-      if (req.files.length !== 3) {
-        return res.status(400).json({
-          success: false,
-          message: "Exactly three images are required",
-        });
+          if (!discountType || !['percentage', 'flat'].includes(discountType)) {
+            return res.status(400).json({ message: 'Invalid or missing discount type' });
+          }
+          if (typeof discountValue !== 'number' || discountValue < 0) {
+            return res.status(400).json({ message: 'Discount value must be a non-negative number' });
+          }
+          if (discountType === 'percentage' && discountValue > 100) {
+            return res.status(400).json({ message: 'Percentage discount must be between 0 and 100' });
+          }
+          if (!startDate || isNaN(new Date(startDate).getTime())) {
+            return res.status(400).json({ message: 'Invalid or missing start date' });
+          }
+          if (!endDate || isNaN(new Date(endDate).getTime())) {
+            return res.status(400).json({ message: 'Invalid or missing end date' });
+          }
+          if (new Date(startDate) >= new Date(endDate)) {
+            return res.status(400).json({ message: 'End date must be after start date' });
+          }
+        }
+      } catch (error) {
+        return res.status(400).json({ message: 'Invalid product offer format' });
       }
-
-      for (const file of req.files) {
-        
-        const filename = path.basename(file.path);
-        productImage.push(filename);
-      }
-    } else {
-      return res.status(400).json({
-        success: false,
-        message: "Exactly three images are required",
-      });
     }
 
-   
-    const categoryDoc = await Category.findById(category);
-    if (!categoryDoc) {
-      return res.status(400).json({
-        success: false,
-        message: "Category not found",
-      });
+    const categoryExists = await Category.findById(category);
+    if (!categoryExists) {
+      return res.status(400).json({ message: 'Invalid category' });
     }
 
-    
-    const timestamp = Date.now();
-    const randomNum = Math.floor(1000 + Math.random() * 9000);
-    const productCode = `${categoryDoc.name
-      .slice(0, 3)
-      .toUpperCase()}${timestamp}${randomNum}`;
+    const parsedRegularPrice = parseFloat(regularPrice);
+    const parsedSalePrice = salePrice ? parseFloat(salePrice) : parsedRegularPrice;
+    if (isNaN(parsedRegularPrice) || parsedRegularPrice <= 0) {
+      return res.status(400).json({ message: 'Regular price must be a positive number' });
+    }
+    if (isNaN(parsedSalePrice) || parsedSalePrice <= 0) {
+      return res.status(400).json({ message: 'Sale price must be a positive number' });
+    }
+    if (parsedSalePrice > parsedRegularPrice) {
+      return res.status(400).json({ message: 'Sale price must be less than or equal to regular price' });
+    }
 
-    
-    const newProduct = new Product({
+    const parsedQuantity = parseInt(quantity);
+    if (isNaN(parsedQuantity) || parsedQuantity < 0) {
+      return res.status(400).json({ message: 'Quantity must be a non-negative integer' });
+    }
+
+    const parsedFeatured = featured === 'yes';
+    const parsedNew = isNew === 'yes';
+
+    const imagePaths = req.files.map(file => file.filename);
+
+
+    const timestamp = Date.now().toString().slice(-6);
+    const randomNum = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+    const productCode = `LUME${timestamp}${randomNum}`;
+
+    const product = new Product({
       productName,
       description,
-      category: categoryDoc._id,
-      regularPrice,
-      salePrice: salePrice || regularPrice,
+      productImage: imagePaths,
+      category,
+      regularPrice: parsedRegularPrice,
+      salePrice: parsedSalePrice,
+      quantity: parsedQuantity,
       sizes: parsedSizes,
-      productCode,
-      quantity,
-      productImage,
-      status: quantity > 0 ? "Available" : "Out of Stock",
-      featured: featured === "yes",
-      new: isNew === "yes",
-      createdOn: new Date(),
+      featured: parsedFeatured,
+      new: parsedNew,
+      productOffer: parsedProductOffer,
+      productCode
     });
 
-    await newProduct.save();
+    await product.save();
 
-    return res.status(200).json({
-      success: true,
-      message: "Product added successfully",
-      redirect: "/admin/product",
-    });
+    return res.status(201).json({ message: 'Product added successfully', redirect: '/admin/product' });
   } catch (error) {
-    console.error("Error in addProduct:", error);
-    
-    if (req.files) {
-      req.files.forEach((file) => {
-        if (fs.existsSync(file.path)) {
-          fs.unlinkSync(file.path);
-        }
-      });
+    console.error('Error adding product:', error);
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ message: Object.values(error.errors).map(err => err.message).join(', ') });
     }
-    return res.status(500).json({
-      success: false,
-      message: "Server error, please try again later",
-    });
+    return res.status(500).json({ message: 'Internal server error' });
   }
 };
 
@@ -310,18 +279,7 @@ const getEditProduct = async (req, res) => {
 };
 
 const editProduct = async (req, res) => {
-  let newImageFilenames = []; 
   try {
-    const { id } = req.params;
-    const product = await Product.findById(id);
-
-    if (!product) {
-      return res.status(404).json({
-        success: false,
-        message: "Product not found",
-      });
-    }
-
     const {
       productName,
       description,
@@ -332,20 +290,23 @@ const editProduct = async (req, res) => {
       sizes,
       featured,
       new: isNew,
-      existingImages = [],
+      productOffer
     } = req.body;
 
-    if (!productName || !category || !regularPrice) {
+    const productId = req.params.id;
+
+    if (!productName || !description || !category || !regularPrice || !quantity) {
       return res.status(400).json({
         success: false,
-        message: "Product name, category, and regular price are required",
+        message: "All required fields must be provided",
       });
     }
 
     if (!/^[A-Z][a-zA-Z0-9\s]*$/.test(productName)) {
       return res.status(400).json({
         success: false,
-        message: "Product name must start with a capital letter and contain only alphabets and numbers",
+        message:
+          "Product name must start with a capital letter and contain only alphabets and numbers",
       });
     }
 
@@ -356,51 +317,10 @@ const editProduct = async (req, res) => {
       });
     }
 
-    const categoryExists = await Category.findById(category);
-    if (!categoryExists) {
-      return res.status(400).json({
-        success: false,
-        message: "Specified category does not exist",
-      });
-    }
-
-    const regularPriceNum = parseFloat(regularPrice);
-    if (isNaN(regularPriceNum) || regularPriceNum <= 0) {
-      return res.status(400).json({
-        success: false,
-        message: "Regular price must be a positive number",
-      });
-    }
-
-    let salePriceNum = regularPriceNum;
-    if (salePrice) {
-      salePriceNum = parseFloat(salePrice);
-      if (isNaN(salePriceNum) || salePriceNum <= 0) {
-        return res.status(400).json({
-          success: false,
-          message: "Sale price must be a positive number",
-        });
-      }
-      if (salePriceNum >= regularPriceNum) {
-        return res.status(400).json({
-          success: false,
-          message: "Sale price must be less than or equal to regular price",
-        });
-      }
-    }
-
-    const quantityNum = parseInt(quantity);
-    if (isNaN(quantityNum) || quantityNum < 0) {
-      return res.status(400).json({
-        success: false,
-        message: "Quantity must be a non-negative integer",
-      });
-    }
-
     let parsedSizes = [];
     if (sizes) {
       try {
-        parsedSizes = Array.isArray(sizes) ? sizes : JSON.parse(sizes);
+        parsedSizes = JSON.parse(sizes);
       } catch (err) {
         return res.status(400).json({
           success: false,
@@ -409,112 +329,148 @@ const editProduct = async (req, res) => {
       }
     }
 
-    const finalImages = [...existingImages];
-    if (req.files && req.files.length > 0) {
+    if (isNaN(regularPrice) || regularPrice <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Regular price must be a positive number",
+      });
+    }
+
+    if (salePrice && (isNaN(salePrice) || salePrice >= regularPrice)) {
+      return res.status(400).json({
+        success: false,
+        message: "Sale price must be less than regular price",
+      });
+    }
+
+    if (!Number.isInteger(Number(quantity)) || quantity < 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Quantity must be a non-negative integer",
+      });
+    }
+
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    const existingProduct = await Product.findOne({
+      productName,
+      _id: { $ne: productId }
+    });
+    if (existingProduct) {
+      return res.status(400).json({
+        success: false,
+        message: "A product with this name already exists",
+      });
+    }
+
+    let parsedOffer = { active: false };
+    if (productOffer) {
       try {
-        newImageFilenames = req.files.map((file) => path.basename(file.path));
+        parsedOffer = JSON.parse(productOffer);
         
-        for (let i = 0; i < Math.min(req.files.length, 3); i++) {
-          if (finalImages[i]) {
-            const oldImagePath = path.join("public", "uploads", "product", finalImages[i]);
-            if (fs.existsSync(oldImagePath)) {
-              fs.unlinkSync(oldImagePath);
-            }
+        if (parsedOffer.active) {
+          if (!parsedOffer.discountType || !parsedOffer.discountValue || !parsedOffer.startDate || !parsedOffer.endDate) {
+            return res.status(400).json({
+              success: false,
+              message: "All offer fields are required when offer is active"
+            });
           }
-          finalImages[i] = newImageFilenames[i];
+
+          if (parsedOffer.discountType === 'percentage' && (parsedOffer.discountValue < 0 || parsedOffer.discountValue > 100)) {
+            return res.status(400).json({
+              success: false,
+              message: "Percentage discount must be between 0 and 100"
+            });
+          }
+
+          if (new Date(parsedOffer.startDate) >= new Date(parsedOffer.endDate)) {
+            return res.status(400).json({
+              success: false,
+              message: "End date must be after start date"
+            });
+          }
         }
       } catch (error) {
-        console.error("Error handling images:", error);
-        await Promise.all(
-          newImageFilenames.map(async (filename) => {
-            const filePath = path.join("public", "uploads", "product", filename);
-            if (fs.existsSync(filePath)) {
-              await fs.unlink(filePath);
-            }
-          })
-        );
-        return res.status(500).json({
+        return res.status(400).json({
           success: false,
-          message: "Error processing images. Please try again.",
+          message: "Invalid offer data format"
         });
       }
     }
 
-    const cleanedImages = finalImages.filter((img) => img);
-    if (cleanedImages.length !== 3) {
-      await Promise.all(
-        newImageFilenames.map(async (filename) => {
-          const filePath = path.join("public", "uploads", "product", filename);
-          if (fs.existsSync(filePath)) {
-            await fs.unlink(filePath);
-          }
-        })
-      );
-      return res.status(400).json({
-        success: false,
-        message: "Exactly three images are required",
-      });
+    let finalPrice = regularPrice;
+    if (parsedOffer.active) {
+      if (parsedOffer.discountType === 'percentage') {
+        finalPrice = regularPrice - (regularPrice * parsedOffer.discountValue / 100);
+      } else {
+        finalPrice = Math.max(regularPrice - parsedOffer.discountValue, 0);
+      }
     }
 
     const updateData = {
-      productName: productName.trim(),
-      description: description.trim(),
-      category: new mongoose.Types.ObjectId(category),
-      regularPrice: regularPriceNum,
-      salePrice: salePriceNum,
-      quantity: quantityNum,
+      productName,
+      description,
+      category,
+      regularPrice,
+      salePrice: finalPrice,
+      quantity,
       sizes: parsedSizes,
-      featured: featured === "yes" || featured === true,
-      new: isNew === "yes" || isNew === true,
-      status: quantityNum > 0 ? "Available" : "Out of Stock",
-      productImage: cleanedImages,
-      isListed: true
-      
+      featured: featured === 'true',
+      new: isNew === 'true',
+      productOffer: parsedOffer
     };
 
-    const updatedProduct = await Product.findByIdAndUpdate(
-      id,
-      updateData,
-      {
-        new: true,
-        runValidators: true,
-        context: "query",
+    if (req.files && req.files.length > 0) {
+      if (req.files.length !== 3) {
+        return res.status(400).json({
+          success: false,
+          message: "Exactly three images are required",
+        });
       }
-    ).populate("category");
 
-    if (!updatedProduct) {
-      throw new Error("Failed to update product");
+      if (product.productImage && product.productImage.length > 0) {
+        for (const image of product.productImage) {
+          const imagePath = path.join('public/uploads/product', image);
+          if (fs.existsSync(imagePath)) {
+            fs.unlinkSync(imagePath);
+          }
+        }
+      }
+
+      const productImage = req.files.map(file => path.basename(file.path));
+      updateData.productImage = productImage;
     }
 
-    return res.status(200).json({
-      success: true,
-      message: "Product updated successfully",
-      data: updatedProduct,
-      redirect: "/admin/product",
-    });
-  } catch (error) {
-    console.error("Error in editProduct:", error);
-
-    await Promise.all(
-      newImageFilenames.map(async (filename) => {
-        const filePath = path.join("public", "uploads", "product", filename);
-        if (fs.existsSync(filePath)) {
-          await fs.unlink(filePath);
-        }
-      })
+    const updatedProduct = await Product.findByIdAndUpdate(
+      productId,
+      updateData,
+      { new: true }
     );
 
-    return res.status(500).json({
+    res.json({
+      success: true,
+      message: "Product updated successfully",
+      product: updatedProduct
+    });
+  } catch (error) {
+    console.error("Error updating product:", error);
+    res.status(500).json({
       success: false,
-      message: error.message || "Server error, please try again later",
+      message: "Error updating product"
     });
   }
 };
 
 const getListProduct = async (req, res) => {
   try {
-    const { id } = req.params;
-    const product = await Product.findById(id);
+    const productId = req.params.id;
+    const product = await Product.findById(productId);
 
     if (!product) {
       return res.status(404).json({
@@ -523,25 +479,40 @@ const getListProduct = async (req, res) => {
       });
     }
 
-    if (product.isListed) {
-      return res.status(400).json({
-        success: false,
-        message: "Product is already listed",
-      });
+    // Update the product's listing status
+    product.isListed = true;
+    
+    // If there's an active offer, ensure it's properly formatted
+    if (product.productOffer && product.productOffer.active) {
+      product.productOffer = {
+        active: true,
+        discountType: product.productOffer.discountType || 'percentage',
+        discountValue: product.productOffer.discountValue || 0,
+        startDate: product.productOffer.startDate,
+        endDate: product.productOffer.endDate
+      };
+    } else {
+      // If no offer or inactive, set default values
+      product.productOffer = {
+        active: false,
+        discountType: 'percentage',
+        discountValue: 0,
+        startDate: null,
+        endDate: null
+      };
     }
 
-    product.isListed = true;
     await product.save();
 
-    return res.status(200).json({
+    res.status(200).json({
       success: true,
       message: "Product listed successfully",
     });
   } catch (error) {
     console.error("Error listing product:", error);
-    return res.status(500).json({
+    res.status(500).json({
       success: false,
-      message: "Server error, please try again later",
+      message: error.message || "Error listing product",
     });
   }
 };

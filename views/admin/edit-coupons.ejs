@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUME Admin - Edit Coupon</title>
+    <link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/admin/coupons.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="brand">LUME</div>
+        <nav class="nav-menu">
+            <div class="nav-item">
+                <a href="/admin" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
+            </div>
+            <div class="nav-item">
+                <a href="/admin/product" class="nav-link"><i class="fas fa-box"></i> Products</a>
+            </div>
+            <div class="nav-item">
+                <a href="/admin/orders" class="nav-link"><i class="fas fa-shopping-cart"></i> Orders</a>
+            </div>
+            <div class="nav-item">
+                <a href="/admin/users" class="nav-link"><i class="fas fa-users"></i> Users</a>
+            </div>
+            <div class="nav-item">
+                <a href="/admin/category" class="nav-link"><i class="fas fa-tags"></i> Categories</a>
+            </div>
+            <div class="nav-item">
+                <a href="/admin/coupons" class="nav-link active"><i class="fas fa-ticket-alt"></i> Coupons</a>
+            </div>
+            <div class="nav-item">
+                <a href="/admin/settings" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="header">
+            <h1 class="page-title">Edit Coupon</h1>
+            <a href="/admin/coupons" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Coupons
+            </a>
+        </div>
+
+        <div class="form-container">
+            <form id="couponForm" action="/admin/coupons/<%= coupon._id %>" method="PUT">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="code">Coupon Code</label>
+                        <input type="text" class="form-input" id="code" name="code" value="<%= coupon.code %>">
+                        <div class="field-error" id="codeError"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="discountType">Discount Type</label>
+                        <select class="form-input" id="discountType" name="discountType">
+                            <option value="PERCENTAGE" <%= coupon.discountType === 'PERCENTAGE' ? 'selected' : '' %>>Percentage</option>
+                            <option value="FLAT" <%= coupon.discountType === 'FLAT' ? 'selected' : '' %>>Fixed Amount</option>
+                        </select>
+                        <div class="field-error" id="discountTypeError"></div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="discountValue">Discount Value</label>
+                        <input type="number" class="form-input" id="discountValue" name="discountValue" min="1" value="<%= coupon.discountValue %>">
+                        <div class="field-error" id="discountValueError"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="minOrderAmount">Minimum Order Amount</label>
+                        <input type="number" class="form-input" id="minOrderAmount" name="minOrderAmount" min="0" value="<%= coupon.minOrderAmount %>">
+                        <div class="field-error" id="minOrderAmountError"></div>
+            </div>
+        </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="expiryDate">Expiry Date</label>
+                        <input type="date" class="form-input" id="expiryDate" name="expiryDate" value="<%= new Date(coupon.expiryDate).toISOString().split('T')[0] %>">
+                        <div class="field-error" id="expiryDateError"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="fromDate">From Date</label>
+                        <input type="date" class="form-input" id="fromDate" name="fromDate" value="<%= new Date(coupon.createdAt).toISOString().split('T')[0] %>">
+                        <div class="field-error" id="fromDateError"></div>
+                    </div>
+        </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="maxDiscount">Maximum Discount (for percentage only)</label>
+                        <input type="number" class="form-input" id="maxDiscount" name="maxDiscount" min="0" value="<%= coupon.maxDiscount || '' %>">
+                        <div class="field-error" id="maxDiscountError"></div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <label class="form-label" for="description">Description</label>
+                        <textarea class="form-input" id="description" name="description" rows="3"><%= coupon.description %></textarea>
+                        <div class="field-error" id="descriptionError"></div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <input type="checkbox" id="isActive" name="isActive" <%= coupon.isActive ? 'checked' : '' %>>
+                            Active
+                        </label>
+                        <div class="field-error" id="isActiveError"></div>
+                    </div>
+                </div>
+
+                <div class="form-footer">
+                    <button type="button" class="btn btn-secondary" onclick="window.location.href='/admin/coupons'">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Coupon</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        const form = document.getElementById('couponForm');
+        const discountType = document.getElementById('discountType');
+        const maxDiscount = document.getElementById('maxDiscount');
+
+        function showError(fieldId, message) {
+            const errorElement = document.getElementById(`${fieldId}Error`);
+            const inputElement = document.getElementById(fieldId);
+            errorElement.textContent = message;
+            inputElement.classList.add('error');
+        }
+
+        function clearError(fieldId) {
+            const errorElement = document.getElementById(`${fieldId}Error`);
+            const inputElement = document.getElementById(fieldId);
+            errorElement.textContent = '';
+            inputElement.classList.remove('error');
+        }
+
+        function clearAllErrors() {
+            const errorElements = document.querySelectorAll('.field-error');
+            const inputElements = document.querySelectorAll('.form-input');
+            errorElements.forEach(element => element.textContent = '');
+            inputElements.forEach(element => element.classList.remove('error'));
+        }
+
+        function showToast(message, type = 'success') {
+            Toastify({
+                text: message,
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: type === 'success' ? "#2e7d32" : "#c62828",
+            }).showToast();
+        }
+
+        discountType.addEventListener('change', function() {
+            maxDiscount.parentElement.style.display = this.value === 'PERCENTAGE' ? 'block' : 'none';
+            clearAllErrors();
+        });
+
+        maxDiscount.parentElement.style.display = discountType.value === 'PERCENTAGE' ? 'block' : 'none';
+
+        function validateForm(formData) {
+            clearAllErrors();
+            let hasErrors = false;
+
+            // Required fields validation
+            const requiredFields = ['code', 'discountType', 'discountValue', 'expiryDate', 'fromDate', 'minOrderAmount'];
+            requiredFields.forEach(field => {
+                if (!formData.get(field)) {
+                    showError(field, `${field.charAt(0).toUpperCase() + field.slice(1)} is required`);
+                    hasErrors = true;
+                }
+            });
+
+            // Date validation
+            const fromDate = new Date(formData.get('fromDate'));
+            const expiryDate = new Date(formData.get('expiryDate'));
+            const today = new Date();
+
+           
+
+            if (expiryDate <= fromDate) {
+                showError('expiryDate', 'Expiry date must be after from date');
+                hasErrors = true;
+            }
+
+            // Numeric validations
+            const discountValue = Number(formData.get('discountValue'));
+            const minOrderAmount = Number(formData.get('minOrderAmount'));
+            const maxDiscount = Number(formData.get('maxDiscount'));
+
+            if (discountValue <= 0) {
+                showError('discountValue', 'Discount value must be greater than 0');
+                hasErrors = true;
+            }
+
+            if (formData.get('discountType') === 'PERCENTAGE' && discountValue > 100) {
+                showError('discountValue', 'Percentage discount cannot exceed 100%');
+                hasErrors = true;
+            }
+
+            if (minOrderAmount < 0) {
+                showError('minOrderAmount', 'Minimum order amount cannot be negative');
+                hasErrors = true;
+            }
+
+            if (formData.get('discountType') === 'PERCENTAGE' && maxDiscount <= 0) {
+                showError('maxDiscount', 'Maximum discount is required for percentage discount');
+                hasErrors = true;
+            }
+
+            return !hasErrors;
+        }
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!validateForm(new FormData(this))) {
+                return;
+            }
+
+            try {
+                const formData = new FormData(this);
+                const data = {
+                    code: formData.get('code').toUpperCase(),
+                    description: formData.get('description'),
+                    discountType: formData.get('discountType'),
+                    discountValue: Number(formData.get('discountValue')),
+                    expiryDate: formData.get('expiryDate'),
+                    fromDate: formData.get('fromDate'),
+                    minOrderAmount: Number(formData.get('minOrderAmount')),
+                    isActive: formData.get('isActive') === 'on'
+                };
+
+                if (data.discountType === 'PERCENTAGE') {
+                    data.maxDiscount = Number(formData.get('maxDiscount'));
+                }
+
+                // Check if any changes were made
+                const originalValues = {
+                    code: document.getElementById('code').defaultValue,
+                    description: document.getElementById('description').defaultValue,
+                    discountType: document.getElementById('discountType').value,
+                    discountValue: Number(document.getElementById('discountValue').defaultValue),
+                    expiryDate: document.getElementById('expiryDate').defaultValue,
+                    fromDate: document.getElementById('fromDate').defaultValue,
+                    minOrderAmount: Number(document.getElementById('minOrderAmount').defaultValue),
+                    isActive: document.getElementById('isActive').defaultChecked,
+                    maxDiscount: document.getElementById('maxDiscount').defaultValue ? Number(document.getElementById('maxDiscount').defaultValue) : null
+                };
+
+                const hasChanges = 
+                    data.code !== originalValues.code ||
+                    data.description !== originalValues.description ||
+                    data.discountType !== originalValues.discountType ||
+                    data.discountValue !== originalValues.discountValue ||
+                    data.expiryDate !== originalValues.expiryDate ||
+                    data.fromDate !== originalValues.fromDate ||
+                    data.minOrderAmount !== originalValues.minOrderAmount ||
+                    data.isActive !== originalValues.isActive ||
+                    (data.discountType === 'PERCENTAGE' && data.maxDiscount !== originalValues.maxDiscount);
+
+                if (!hasChanges) {
+                    showToast('No changes were made to the coupon');
+                    setTimeout(() => {
+                        window.location.href = '/admin/coupons';
+                    }, 1000);
+                    return;
+                }
+
+                const response = await fetch(this.action, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                        
+                        if (response.ok) {
+                    showToast('Coupon updated successfully');
+                    setTimeout(() => {
+                        window.location.href = '/admin/coupons';
+                    }, 1000);
+                        } else {
+                    showToast(result.message || "Error updating coupon", 'error');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                showToast('Error updating coupon', 'error');
+                }
+        });
+    </script>
+</body>
+</html>

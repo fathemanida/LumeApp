@@ -4,12 +4,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Add Category | LUME Admin</title>
+  <title>Edit Category | LUME Admin</title>
   <link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Jost:wght@300;400;500;600&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
   <link rel="stylesheet" href="/styles/adminStyles.css">
+  <link rel="stylesheet" href="/css/admin/category.css">
+
   <style>
     .image-upload-group {
       position: relative;
@@ -128,6 +130,43 @@
 .cropper-modal {
   background: transparent;
 }
+
+.date-input-container {
+  position: relative;
+  width: 100%;
+}
+
+.date-input {
+  padding-right: 40px !important;
+  width: 100%;
+}
+
+.date-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666;
+  pointer-events: none;
+}
+
+/* Remove the default calendar icon */
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+/* Style the date input */
+input[type="datetime-local"] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
   </style>
 </head>
 
@@ -198,13 +237,12 @@
         <input type="hidden" id="categoryId" value="<%= category._id %>">
         <div class="form-group">
           <label for="name">Category Name</label>
-          <input type="text" id="name" name="name" placeholder="Enter category name" value="<%= category.name %>">
+          <input type="text" id="name" name="name" class="form-input" placeholder="Enter category name" value="<%= category.name %>">
           <span class="error-message" id="name-error"></span>
         </div>
         <div class="form-group">
           <label for="description">Description</label>
-          <textarea id="description" name="description" place
-            holder="Enter description"><%= category.description %></textarea>
+          <textarea id="description" name="description" class="form-input" placeholder="Enter description"><%= category.description %></textarea>
           <span class="error-message" id="des-error"></span>
         </div>
         <div class="form-group image-upload-group">
@@ -216,21 +254,72 @@
           <span class="error-message" id="image-error"></span>
           <% if (category.image) { %>
             <div class="image-preview-container" style="display: block;">
-              <img id="image-preview" class="image-preview" src="<%= category.image %>" alt="Category Image">
+              <img id="image-preview" class="image-preview" src="/uploads/category/<%= category.image %>" alt="Category Image">
               <button type="button" class="remove-image-btn" onclick="removeImage()">
                 <i class="fas fa-times"></i>
               </button>
             </div>
-            <% } %>
+          <% } %>
 
-              <div id="cropper-container" class="cropper-container">
-                <img id="cropper-image" alt="Cropper Image">
-                <div class="cropper-actions">
-                  <button type="button" id="crop-btn" class="crop-btn">Crop Image</button>
-                  <button type="button" id="reset-crop-btn" class="reset-crop-btn">Cancel</button>
-                </div>
-              </div>
+          <div id="cropper-container" class="cropper-container">
+            <img id="cropper-image" alt="Cropper Image">
+            <div class="cropper-actions">
+              <button type="button" id="crop-btn" class="crop-btn">Crop Image</button>
+              <button type="button" id="reset-crop-btn" class="reset-crop-btn">Cancel</button>
+            </div>
+          </div>
         </div>
+
+        <!-- Offer Section -->
+        <div class="form-group">
+          <label>Category Offer</label>
+          <div class="offer-fields">
+            <div class="form-check">
+              <input type="checkbox" id="offerActive" name="offerActive" class="form-check-input"
+                <%= category.categoryOffer && category.categoryOffer.active ? 'checked' : '' %>>
+              <label for="offerActive" class="form-check-label">Enable Offer</label>
+            </div>
+            
+            <div id="offerDetails" style="display: <%= category.categoryOffer && category.categoryOffer.isActive ? 'block' : 'none' %>;">
+              <div class="form-group">
+                <label for="discountType">Discount Type</label>
+                <select id="discountType" name="discountType" class="form-input">
+                  <option value="PERCENTAGE" <%= category.categoryOffer && category.categoryOffer.discountType === 'PERCENTAGE' ? 'selected' : '' %>>PERCENTAGE</option>
+                  <option value="FLAT" <%= category.categoryOffer && category.categoryOffer.discountType === 'FLAT' ? 'selected' : '' %>>Flat Amount</option>
+                </select>
+                <span class="error-message" id="discount-type-error"></span>
+              </div>
+              
+              <div class="form-group">
+                <label for="discountValue">Discount Value</label>
+                <input type="number" id="discountValue" name="discountValue" class="form-input" min="0" step="0.01"
+                  value="<%= category.categoryOffer && category.categoryOffer.discountValue ? category.categoryOffer.discountValue : '' %>">
+                <span class="error-message" id="discount-value-error"></span>
+              </div>
+              
+              <div class="form-group">
+                <label for="startDate">Start Date</label>
+                <div class="date-input-container">
+                  <input type="datetime-local" id="startDate" name="startDate" class="form-input date-input"
+                    value="<%= category.categoryOffer && category.categoryOffer.startDate ? new Date(category.categoryOffer.startDate).toISOString().slice(0, 16) : '' %>">
+                  <i class="fas fa-calendar-alt date-icon"></i>
+                </div>
+                <span class="error-message" id="start-date-error"></span>
+              </div>
+              
+              <div class="form-group">
+                <label for="endDate">End Date</label>
+                <div class="date-input-container">
+                  <input type="datetime-local" id="endDate" name="endDate" class="form-input date-input"
+                    value="<%= category.categoryOffer && category.categoryOffer.endDate ? new Date(category.categoryOffer.endDate).toISOString().slice(0, 16) : '' %>">
+                  <i class="fas fa-calendar-alt date-icon"></i>
+                </div>
+                <span class="error-message" id="end-date-error"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
         <button type="submit" class="submit-btn">UPDATE CATEGORY</button>
       </form>
     </div>
@@ -255,6 +344,13 @@
         hasExistingImage = false;
       }
 
+      // Initialize offer details visibility
+      const offerActive = document.getElementById('offerActive');
+      const offerDetails = document.getElementById('offerDetails');
+      if (offerActive && offerActive.checked) {
+        offerDetails.style.display = 'block';
+      }
+
       const form = document.getElementById('categoryForm');
       if (form) {
         form.addEventListener('submit', handleFormSubmit);
@@ -265,14 +361,77 @@
       document.querySelector('.sidebar').classList.toggle('active');
     });
 
+    // Add offer toggle functionality
+    document.getElementById('offerActive').addEventListener('change', function() {
+      const offerDetails = document.getElementById('offerDetails');
+      offerDetails.style.display = this.checked ? 'block' : 'none';
+      
+      // Clear all offer-related error messages when toggling
+      if (!this.checked) {
+        clearErrorMsg("discount-type-error");
+        clearErrorMsg("discount-value-error");
+        clearErrorMsg("start-date-error");
+        clearErrorMsg("end-date-error");
+      }
+    });
+
+    function validateOfferFields() {
+      let isValid = true;
+      const discountType = document.getElementById("discountType").value;
+      const discountValue = document.getElementById("discountValue").value;
+      const startDate = document.getElementById("startDate").value;
+      const endDate = document.getElementById("endDate").value;
+
+      if (!discountType) {
+        displayErrorMsg("discount-type-error", "Please select a discount type");
+        isValid = false;
+      } else {
+        clearErrorMsg("discount-type-error");
+      }
+
+      if (!discountValue || discountValue <= 0) {
+        displayErrorMsg("discount-value-error", "Please enter a valid discount value");
+        isValid = false;
+      } else if (discountType === 'PERCENTAGE' && discountValue > 100) {
+        displayErrorMsg("discount-value-error", "Percentage discount cannot exceed 100%");
+        isValid = false;
+      } else {
+        clearErrorMsg("discount-value-error");
+      }
+
+      if (!startDate) {
+        displayErrorMsg("start-date-error", "Please select a start date");
+        isValid = false;
+      } else if (new Date(startDate) <= new Date()) {
+        displayErrorMsg("start-date-error", "Start date must be in the future");
+        isValid = false;
+      } else {
+        clearErrorMsg("start-date-error");
+      }
+
+      if (!endDate) {
+        displayErrorMsg("end-date-error", "Please select an end date");
+        isValid = false;
+      } else if (startDate && new Date(startDate) >= new Date(endDate)) {
+        displayErrorMsg("end-date-error", "End date must be after start date");
+        isValid = false;
+      } else {
+        clearErrorMsg("end-date-error");
+      }
+
+      return isValid;
+    }
+
     function validateForm() {
       clearErrorMsg();
       const name = document.getElementById("name").value.trim();
       const description = document.getElementById("description").value.trim();
       const image = document.getElementById("image").files[0];
+      const offerActive = document.getElementById("offerActive").checked;
       let isValid = true;
 
-      if (name === "") {
+      // Validate name
+      if (!name) {
         displayErrorMsg("name-error", "Please enter a category name");
         isValid = false;
       } else if (!/^[a-zA-Z\s]+$/.test(name)) {
@@ -280,15 +439,53 @@
         isValid = false;
       }
 
-      if (description === "") {
+      // Validate description
+      if (!description) {
         displayErrorMsg("des-error", "Please enter a description");
         isValid = false;
       }
 
-      // Don't require image if we have an existing one and no new image is selected
+      // Validate image only if no existing image and no new image selected
       if (!image && !croppedImageBlob && !hasExistingImage) {
         displayErrorMsg("image-error", "Please upload an image");
         isValid = false;
+      }
+
+      // Validate offer fields if offer is active
+      if (offerActive) {
+        const discountType = document.getElementById("discountType").value;
+        const discountValue = document.getElementById("discountValue").value;
+        const startDate = document.getElementById("startDate").value;
+        const endDate = document.getElementById("endDate").value;
+
+        if (!discountType) {
+          displayErrorMsg("discount-type-error", "Please select a discount type");
+          isValid = false;
+        }
+
+        if (!discountValue || isNaN(discountValue) || parseFloat(discountValue) <= 0) {
+          displayErrorMsg("discount-value-error", "Please enter a valid discount value");
+          isValid = false;
+        } else if (discountType === 'PERCENTAGE' && parseFloat(discountValue) > 100) {
+          displayErrorMsg("discount-value-error", "Percentage discount cannot exceed 100%");
+          isValid = false;
+        }
+
+        if (!startDate) {
+          displayErrorMsg("start-date-error", "Please select a start date");
+          isValid = false;
+        } else if (new Date(startDate) <= new Date()) {
+          displayErrorMsg("start-date-error", "Start date must be in the future");
+          isValid = false;
+        }
+
+        if (!endDate) {
+          displayErrorMsg("end-date-error", "Please select an end date");
+          isValid = false;
+        } else if (startDate && new Date(startDate) >= new Date(endDate)) {
+          displayErrorMsg("end-date-error", "End date must be after start date");
+          isValid = false;
+        }
       }
 
       return isValid;
@@ -410,6 +607,64 @@
       }
     });
 
+    // Add input validation for offer fields
+    document.getElementById('discountValue')?.addEventListener('input', function() {
+      if (document.getElementById("offerActive").checked) {
+        const discountType = document.getElementById("discountType").value;
+        const value = this.value;
+        
+        if (!value || isNaN(value) || parseFloat(value) <= 0) {
+          displayErrorMsg("discount-value-error", "Please enter a valid discount value");
+        } else if (discountType === 'PERCENTAGE' && parseFloat(value) > 100) {
+          displayErrorMsg("discount-value-error", "Percentage discount cannot exceed 100%");
+        } else {
+          clearErrorMsg("discount-value-error");
+        }
+      }
+    });
+
+    document.getElementById('discountType')?.addEventListener('change', function() {
+      if (document.getElementById("offerActive").checked) {
+        const discountValue = document.getElementById("discountValue").value;
+        
+        if (this.value === 'PERCENTAGE' && parseFloat(discountValue) > 100) {
+          displayErrorMsg("discount-value-error", "Percentage discount cannot exceed 100%");
+        } else {
+          clearErrorMsg("discount-value-error");
+        }
+      }
+    });
+
+    document.getElementById('startDate')?.addEventListener('change', function() {
+      if (document.getElementById("offerActive").checked) {
+        const endDate = document.getElementById("endDate").value;
+        
+        if (!this.value) {
+          displayErrorMsg("start-date-error", "Please select a start date");
+        } else if (new Date(this.value) <= new Date()) {
+          displayErrorMsg("start-date-error", "Start date must be in the future");
+        } else if (endDate && new Date(this.value) >= new Date(endDate)) {
+          displayErrorMsg("start-date-error", "Start date must be before end date");
+        } else {
+          clearErrorMsg("start-date-error");
+        }
+      }
+    });
+
+    document.getElementById('endDate')?.addEventListener('change', function() {
+      if (document.getElementById("offerActive").checked) {
+        const startDate = document.getElementById("startDate").value;
+        
+        if (!this.value) {
+          displayErrorMsg("end-date-error", "Please select an end date");
+        } else if (startDate && new Date(startDate) >= new Date(this.value)) {
+          displayErrorMsg("end-date-error", "End date must be after start date");
+        } else {
+          clearErrorMsg("end-date-error");
+        }
+      }
+    });
+
     async function handleFormSubmit(event) {
       event.preventDefault();
 
@@ -422,8 +677,29 @@
       try {
         const categoryId = document.getElementById("categoryId").value;
         const formData = new FormData();
-        formData.append('categoryName', document.getElementById("name").value.trim());
+        formData.append('name', document.getElementById("name").value.trim());
         formData.append('description', document.getElementById("description").value.trim());
+
+        // Add offer data
+        const offerActive = document.getElementById("offerActive").checked;
+        if (offerActive) {
+          const offerData = {
+            isActive: true,
+            discountType: document.getElementById("discountType").value,
+            discountValue: parseFloat(document.getElementById("discountValue").value),
+            startDate: document.getElementById("startDate").value,
+            endDate: document.getElementById("endDate").value
+          };
+          formData.append('categoryOffer', JSON.stringify(offerData));
+        } else {
+          formData.append('categoryOffer', JSON.stringify({
+            isActive: false,
+            discountType: null,
+            discountValue: null,
+            startDate: null,
+            endDate: null
+          }));
+        }
 
         if (croppedImageBlob) {
           formData.append('image', croppedImageBlob, 'category.jpg');
@@ -433,23 +709,14 @@
 
         const response = await fetch(`/admin/edit-category/${categoryId}`, {
           method: "POST",
-          body: formData,
-          headers: {
-            'Accept': 'application/json'
-          }
+          body: formData
         });
 
-        if (!response.ok) {
-          const contentType = response.headers.get("content-type");
-          if (contentType && contentType.indexOf("application/json") !== -1) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || "Failed to update category");
-          } else {
-            throw new Error("Server error occurred");
-          }
-        }
-
         const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.message || "Failed to update category");
+        }
 
         await Swal.fire({
           icon: "success",
@@ -468,7 +735,7 @@
           title: "Error",
           text: error.message || "Failed to update category"
         });
-      } finally {
+      
         submitBtn.disabled = false;
         submitBtn.textContent = "UPDATE CATEGORY";
       }

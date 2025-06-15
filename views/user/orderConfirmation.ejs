@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation | LUME</title>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500&family=Aboreto&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --dark-brown: #291d0e;
+            --olive-green: #314216;
+            --light-bg: #f8f5f2;
+            --border-color: #d3c9be;
+        }
+
+        body {
+            font-family: 'Jost', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--dark-brown);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: nowrap;
+        }
+
+        .brand {
+            font-family: 'Aboreto', cursive;
+            font-size: 1.5rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--dark-brown);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .brand:hover {
+            color: var(--olive-green);
+        }
+
+        /* Success Message Container */
+        .success-container {
+            max-width: 800px;
+            margin: 4rem auto;
+            padding: 2rem;
+            text-align: center;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(41, 29, 14, 0.1);
+            flex: 1;
+        }
+
+        .success-icon {
+            font-size: 5rem;
+            color: #28a745;
+            margin-bottom: 1.5rem;
+            animation: bounce 1s ease;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-30px);}
+            60% {transform: translateY(-15px);}
+        }
+
+        .success-title {
+            font-family: 'Aboreto', cursive;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--dark-brown);
+        }
+
+        .success-message {
+            font-size: 1.1rem;
+            color: #555;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .order-details {
+            background: var(--light-bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+            text-align: left;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .detail-label {
+            font-weight: 500;
+            color: var(--dark-brown);
+        }
+
+        .detail-value {
+            color: #555;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 200px;
+        }
+
+        .btn-primary {
+            background-color: var(--dark-brown);
+            color: white;
+            border: 2px solid var(--dark-brown);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--olive-green);
+            border-color: var(--olive-green);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--dark-brown);
+            border: 2px solid var(--dark-brown);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--light-bg);
+            transform: translateY(-2px);
+        }
+
+        .btn i {
+            margin-right: 0.5rem;
+        }
+
+        /* Footer Styles */
+        footer {
+            background-color: var(--dark-brown);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .success-container {
+                margin: 2rem 1rem;
+                padding: 1.5rem;
+            }
+
+            .success-title {
+                font-size: 2rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .navbar {
+                padding: 1rem;
+                flex-wrap: wrap;
+            }
+
+            .success-icon {
+                font-size: 4rem;
+            }
+
+            .success-title {
+                font-size: 1.8rem;
+            }
+
+            .order-details {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="brand">LUME</div>
+    </nav>
+
+    <div class="success-container">
+        <div class="success-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        
+        <h1 class="success-title">Order Confirmed!</h1>
+        
+        <p class="success-message">
+            Thank you for your purchase! Your order has been received and is being processed.<br>
+            We've sent a confirmation email with all the details to your registered email address.
+        </p>
+        
+        <div class="order-details">
+            <div class="detail-row">
+                <span class="detail-label">Order Number:</span>
+                <span class="detail-value">#<%= order.orderNumber || '123456' %></span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Date:</span>
+                <span class="detail-value"><%= new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Estimated Delivery:</span>
+                <span class="detail-value"><%= new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></span>
+            </div>
+            <% 
+                const total = order.totalAmount || 0;
+                const shipping = total < 3000 ? 50 : 0;
+                const taxRate = total < 3000 ? 0.02 : 0.04;
+                const tax = total * taxRate;
+                const subtotal = total - tax - shipping;
+            %>
+            <div class="detail-row">
+                <span class="detail-label">Subtotal:</span>
+                <span class="detail-value">₹<%= subtotal.toFixed(2) %></span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Tax (<%= (taxRate * 100).toFixed(0) %>%):</span>
+                <span class="detail-value">₹<%= tax.toFixed(2) %></span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Shipping:</span>
+                <span class="detail-value">₹<%= shipping.toFixed(2) %></span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Total:</span>
+                <span class="detail-value">₹<%= total.toFixed(2) %></span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Payment Method:</span>
+                <span class="detail-value"><%= order.paymentMethod || 'Credit Card' %></span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Delivery Address:</span>
+                <span class="detail-value">
+                    <% if (order.address) { %>
+                        <%= order.address.name %>, 
+                        <%= order.address.street %>, 
+                        <%= order.address.city %>, 
+                        <%= order.address.state %> - 
+                        <%= order.address.pincode %>
+                    <% } else { %>
+                        Address not available
+                    <% } %>
+                </span>
+            </div>
+        </div>
+        
+        <div class="button-group">
+            <a href="/shopAll" class="btn btn-outline">
+                <i class="fas fa-arrow-left"></i> Continue Shopping
+            </a>
+            <a href="/orders" class="btn btn-primary">
+                <i class="fas fa-box-open"></i> View My Orders
+            </a>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <p>&copy; <%= new Date().getFullYear() %> LUME. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

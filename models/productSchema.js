@@ -6,6 +6,7 @@ const productSchema = new Schema(
     productName: {
       type: String,
       required: true,
+      trim: true
     },
     description: {
       type: String,
@@ -19,10 +20,12 @@ const productSchema = new Schema(
     regularPrice: {
       type: Number,
       required: true,
+      min: 0
     },
     salePrice: {
       type: Number,
       required: true,
+      min: 0
     },
     sizes: [{ 
       size: {
@@ -38,23 +41,42 @@ const productSchema = new Schema(
     productCode: {
       type: String,
       required: true,
+      unique: true
     },
     productStock: {
       type: Number,
       default: 0,
     },
     productOffer: {
-      type: Number,
-      default: 0,
+      active: {
+        type: Boolean,
+        default: false
+      },
+      discountType: {
+        type: String,
+        enum: ['percentage', 'flat'],
+        default: 'percentage'
+      },
+      discountValue: {
+        type: Number,
+        min: 0
+      },
+      startDate: {
+        type: Date
+      },
+      endDate: {
+        type: Date
+      }
     },
     quantity: {
       type: Number,
-      default: 0,
-    },
-    productImage: {
-      type: [String],
       required: true,
+      min: 0
     },
+    productImage: [{
+      type: String,
+      required: true
+    }],
     isListed: {
       type: Boolean,
       default: true,

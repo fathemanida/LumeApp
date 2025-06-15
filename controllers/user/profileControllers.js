@@ -207,53 +207,6 @@ const checkNewPassword = async (req, res) => {
     return res.render("pageError");
   }
 };
-
-///////profile///////
-
-const profile = async (req, res) => {
-  try {
-    if (!req.session.user) {
-      return res.redirect("/login");
-    }
-
-    const userId = req.session.user.id;
-    const userData = await User.findById(userId);
-
-    if (!userData) {
-      return res.redirect("/login");
-    }
-
-    res.render("profile", {
-      users: userData,
-    });
-  } catch (error) {
-    console.log("error in profile getting", error);
-    res.redirect("/page404");
-  }
-};
-
-const editProfile = async (req, res) => {
-  try {
-    if (!req.session.user) {
-      return res.redirect("/login");
-    }
-
-    const userId = req.session.user.id;
-    const userData = await User.findById(userId);
-
-    if (!userData) {
-      return res.redirect("/login");
-    }
-
-    res.render("profile-edit", {
-      user: userData,
-    });
-  } catch (error) {
-    console.error("Error in editProfile:", error);
-    res.redirect("/page404");
-  }
-};
-
 const sendOtp = async (req, res) => {
   try {
     const { email } = req.body;
@@ -327,11 +280,9 @@ const verifyOtp = async (req, res) => {
     }
 
     if (otp === req.session.otp) {
-      // Mark email as verified in session
       req.session.emailVerified = true;
       req.session.verifiedEmail = req.session.pendingEmail;
 
-      // Clear OTP session data
       req.session.otp = null;
       req.session.otpGeneratedAt = null;
       req.session.pendingEmail = null;
@@ -355,8 +306,60 @@ const verifyOtp = async (req, res) => {
   }
 };
 
+///////profile///////
+
+const profile = async (req, res) => {
+  try {
+   
+  if (!req.session.user) {
+  return res.json({message:'login required'})
+}
+
+const userId = req.session.user.id;
+const userData = await User.findById(userId).lean();
+
+console.log('user====',  userData);
+
+if (!userData) {
+  return res.redirect("/login");
+}
+
+    res.render("profile", {
+      users: userData,
+    });
+  } catch (error) {
+    console.log("error in profile getting", error);
+    res.redirect("/page404");
+  }
+};
+
+const editProfile = async (req, res) => {
+  try {
+    if (!req.session.user) {
+      return res.redirect("/login");
+    }
+    const userId = req.session.user.id;
+    const userData = await User.findById(userId);
+
+    if (!userData) {
+      return res.redirect("/login");
+    }
+
+    res.render("profile-edit", {
+      users: userData,
+    });
+  } catch (error) {
+    console.error("Error in editProfile:", error);
+    res.redirect("/page404");
+  }
+};
+
+
+
 const getEditProfile = async (req, res) => {
   try {
+  
+
     if (!req.session.user) {
       return res.redirect("/login");
     }
@@ -365,14 +368,20 @@ const getEditProfile = async (req, res) => {
     const updates = {};
 
     if (req.file) {
-      updates.profileImage = `/uploads/${req.file.filename}`;
+      updates.profileImage = req.file.filename;
     }
 
-    if (req.body.name) updates.name = req.body.name;
-    if (req.body.phone) updates.phone = req.body.phone;
+    if (req.body.name) {
+      updates.name = req.body.name;
+    }
+    if (req.body.phone) {
+      updates.phone = req.body.phone;
+    }
 
     if (req.body.email && req.body.email !== req.session.user.email) {
+      console.log('email change');
       if (!req.session.emailVerified) {
+        console.log('email not verified');
         return res.status(400).json({
           success: false,
           message: "Please verify your new email address first",
@@ -389,12 +398,14 @@ const getEditProfile = async (req, res) => {
       );
 
       if (!updatedUser) {
+        console.log('user not found in db');
         return res.status(404).json({
           success: false,
           message: "User not found",
         });
       }
 
+      console.log('updated user successfully:', updatedUser);
       req.session.user = {
         ...req.session.user,
         name: updatedUser.name,
@@ -410,7 +421,7 @@ const getEditProfile = async (req, res) => {
         message: "Profile updated successfully",
       });
     } catch (error) {
-      console.error("Database update error:", error);
+      console.error("profile update error", error);
       return res.status(500).json({
         success: false,
         message: "Error updating profile",
@@ -430,182 +441,260 @@ const getEditProfile = async (req, res) => {
 const address = async (req, res) => {
   try {
     if (!req.session.user) {
-      res.redirect("/login");
+      return res.redirect("/login");
     }
-    const user = req.session.user;
+    const userId = req.session.user.id;
+    const addresses = await Address.find({ userId }).sort({ isDefault: -1 });
+    
     res.render("address", {
-      user: user,
+      user: req.session.user,
+      addresses: addresses
     });
-  } catch (error) {}
+  } catch (error) {
+    console.log("error in address page", error);
+    res.redirect("/pageError");
+  }
 };
 
 const getAddAdress = async (req, res) => {
   try {
-     const userId = req.session.user.id;
-
-    const addressData = await Address.findOne({ userId });
-
-    if (!addressData) {
-      return res.redirect('address'); 
-    }
-
-    res.render("address-add", { address: addressData });
+    const from = req.query.from;
+    res.render("address-add", { from });
   } catch (error) {
-    console.log("error in get add addrss", error);
-    res.render("page404");
+    console.log("error in get add address", error);
+    res.redirect("/pageError");
   }
 };
 
 const addAddress = async (req, res) => {
   try {
-    const {
-      fullName,
-      phoneNumber,
-      alternatePhoneNumber,
-      pincode,
-      state,
-      city,
-      houseNo,
-      roadName,
+    const userId = req.session.user.id;
+    const { 
+      name, 
+      houseNo, 
+      roadArea, 
+      city, 
+      state, 
+      pincode, 
+      phone,
+      altPhone,
+      addressType = 'home' 
     } = req.body;
+    const from = req.query.from;
 
-    
-    console.log(req.body);
-
-  
-    if (!fullName || !phoneNumber || !pincode || !state || !city) {
-      return res.status(400).json({ message: "All required fields must be filled" });
-    }
-
-   
-    const phoneRegex = /^[0-9]{10}$/;
-    if (!phoneRegex.test(phoneNumber)) {
-      return res.status(400).json({ message: "Phone number must be 10 digits" });
-    }
-    if (alternatePhoneNumber && !phoneRegex.test(alternatePhoneNumber)) {
-      return res.status(400).json({ message: "Alternate phone number must be 10 digits if provided" });
-    }
-
-    
-    const pincodeRegex = /^[0-9]{6}$/;
-    if (!pincodeRegex.test(pincode)) {
-      return res.status(400).json({ message: "Pincode must be 6 digits" });
-    }
-
-    
-    const newAddress = new Address({
-      userId: req.session.user.id,
-      name:fullName,
-      phone:phoneNumber,
-      altPhone: alternatePhoneNumber || null,
-      pincode,
-      state,
+    console.log('new address', {
+      userId,
+      name,
+      houseNo,
+      roadArea,
       city,
-      houseNo: houseNo || null,
-      roadName: roadName || null,
-      
+      state,
+      pincode,
+      phone,
+      altPhone,
+      addressType
+    });
+
+    const newAddress = new Address({
+      userId,
+      name,
+      houseNo,
+      roadArea,
+      city,
+      state,
+      pincode,
+      phone,
+      altPhone,
+      addressType,
+      isDefault: false
     });
 
     await newAddress.save();
-    console.log("Address saved successfully");
-    return res.status(200).json({ message: "Address saved successfully" });
+
+    if (req.xhr || req.headers.accept.includes('application/json')) {
+      return res.status(200).json({
+        success: true,
+        message: 'Address added successfully'
+      });
+    }
+
+    if (from === 'address') {
+      res.redirect('/addresst');
+    } else {
+      res.redirect('/checkout');
+    }
   } catch (error) {
-    console.error("Error in addAddress:", error);
-    return res.status(500).json({ message: "Server error: " + error.message });
+    console.error("error in addAddress", error);
+    if (error.name === 'ValidationError') {
+      const validationErrors = Object.values(error.errors).map(err => err.message);
+      if (req.xhr || req.headers.accept.includes('application/json')) {
+        return res.status(400).json({
+          success: false,
+          message: 'Validation failed',
+          errors: validationErrors
+        });
+      }
+      req.flash('error', validationErrors.join(', '));
+      return res.redirect('/add-address');
+    }
+    if (req.xhr || req.headers.accept.includes('application/json')) {
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to add address'
+      });
+    }
+    req.flash('error', 'Failed to add address');
+    res.redirect("/pageError");
   }
 };
-
-
 
 const getEditAddress = async (req, res) => {
   try {
-    const userId = req.session.user.id;
-
-    const addressData = await Address.findOne({ userId });
-
-    if (!addressData) {
-      return res.redirect('address'); 
+    const addressId = req.params.id;
+    const from = req.query.from;
+    
+    const address = await Address.findById(addressId);
+    
+    if (!address) {
+      return res.redirect('/address');
     }
 
-    res.render("address-edit", { address: addressData });
+    console.log('Address found', address);
+    
+    const formattedAddress = {
+      _id: address._id,
+      name: address.name,
+      phone: address.phone,
+      altPhone: address.altPhone || '',
+      pincode: address.pincode,
+      state: address.state,
+      city: address.city,
+      houseNo: address.houseNo || '',
+      roadArea: address.roadArea || '',
+      addressType: address.addressType || 'home'
+    };
+
+    res.render("address-edit", { 
+      address: formattedAddress, 
+      from,
+      user: req.session.user 
+    });
   } catch (error) {
-    console.error("Error loading edit address:", error);
-    res.status(500).send("Server error");
+    console.log("Error in getEditAddress:", error);
+    res.redirect("/pageError");
   }
 };
-
-
 
 const updateAddress = async (req, res) => {
   try {
-    const userId = req.session.user.id;
-    const {
-      name,
+    const addressId = req.params.id;
+    const from = req.query.from;
+    const { 
+      name, 
+      houseNo, 
+      roadArea, 
+      city, 
+      state, 
+      pincode, 
       phone,
       altPhone,
-      pincode,
-      state,
-      city,
-      houseNo,
-      roadArea,
-      addressType
+      addressType 
     } = req.body;
 
-    
-    if (!name || !phone || !pincode || !state || !city || !addressType) {
-      return res.status(400).json({ message: "All required fields must be filled" });
+    console.log('updating address', {
+      addressId,
+      name,
+      houseNo,
+      roadArea,
+      city,
+      state,
+      pincode,
+      phone,
+      altPhone,
+      addressType
+    });
+
+    const updatedAddress = await Address.findByIdAndUpdate(
+      addressId,
+      {
+        name,
+        houseNo,
+        roadArea,
+        city,
+        state,
+        pincode,
+        phone,
+        altPhone,
+        addressType
+      },
+      { new: true }
+    );
+
+    if (!updatedAddress) {
+      console.log('Address not found ');
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Address not found' 
+      });
     }
 
-    
-    const phoneRegex = /^[0-9]{10}$/;
-    if (!phoneRegex.test(phone)) {
-      return res.status(400).json({ message: "Phone number must be 10 digits" });
-    }
-    if (altPhone && !phoneRegex.test(altPhone)) {
-      return res.status(400).json({ message: "Alternate phone number must be 10 digits if provided" });
-    }
+    console.log('Address updated successfully:', updatedAddress);
 
-   
-    const pincodeRegex = /^[0-9]{6}$/;
-    if (!pincodeRegex.test(pincode)) {
-      return res.status(400).json({ message: "Pincode must be 6 digits" });
-    }
-
-    const existingAddress = await Address.findOne({ userId });
-
-    if (!existingAddress) {
-      return res.status(404).json({ message: 'Address not found' });
-    }
-
-    
-    existingAddress.name = name;
-    existingAddress.phone = phone;
-    existingAddress.altPhone = altPhone || null;
-    existingAddress.pincode = pincode;
-    existingAddress.state = state;
-    existingAddress.city = city;
-    existingAddress.houseNo = houseNo || null;
-    existingAddress.roadArea = roadArea || null;
-    existingAddress.addressType= addressType ||null;
-
-   
-    if (!existingAddress.address || existingAddress.address.length === 0) {
-      existingAddress.address = [{ addressType }];
+    if (from === 'checkout') {
+      res.redirect('/checkout');
     } else {
-      existingAddress.address[0].addressType = addressType;
+      res.redirect('/address');
     }
-
-    
-    await existingAddress.save();
-
-    return res.status(200).json({ message: "Address updated successfully" });
-  } catch (err) {
-    console.error('Error updating address:', err);
-    return res.status(500).json({ message: "Server error: " + err.message });
+  } catch (error) {
+    console.log("Error in updateAddress", error);
+    res.redirect("/pageError");
   }
 };
 
+const setDefaultAddress = async (req, res) => {
+  try {
+    const { addressId } = req.body;
+    const userId = req.session.user.id;
 
+    console.log('Setting default address:', { addressId, userId });
+
+    if (!addressId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Address ID is required'
+      });
+    }
+
+    await Address.updateMany(
+      { userId },
+      { $set: { isDefault: false } }
+    );
+
+    const updatedAddress = await Address.findOneAndUpdate(
+      { _id: addressId, userId },
+      { $set: { isDefault: true } },
+      { new: true }
+    );
+
+    if (!updatedAddress) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Address not found or does not belong to user' 
+      });
+    }
+
+    res.json({ 
+      success: true, 
+      message: 'Default address updated successfully' 
+    });
+  } catch (error) {
+    console.error("Error in setDefaultAddress:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to update default address' 
+    });
+  }
+};
 
 const resendOtp = async (req, res) => {
   try {
@@ -643,6 +732,132 @@ const resendOtp = async (req, res) => {
   }
 };
 
+const removeAddress = async (req, res) => {
+  try {
+    const { addressId } = req.body;
+    const userId = req.session.user.id;
+
+
+    const addressCount = await Address.countDocuments({ userId });
+    if (addressCount <= 1) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Cannot remove the last address. Please add another address first.' 
+      });
+    }
+
+    const address = await Address.findById(addressId);
+    if (!address) {
+      console.log('Address not found');
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Address not found' 
+      });
+    }
+
+    if (address.isDefault) {
+      console.log('Removing default address, finding new default');
+      const anotherAddress = await Address.findOne({ 
+        userId, 
+        _id: { $ne: addressId } 
+      });
+      
+      if (anotherAddress) {
+        anotherAddress.isDefault = true;
+        await anotherAddress.save();
+        console.log('New default address set:', anotherAddress._id);
+      }
+    }
+
+    await Address.findByIdAndDelete(addressId);
+
+    res.json({ 
+      success: true, 
+      message: 'Address removed successfully' 
+    });
+  } catch (error) {
+    console.error("Error in removeAddress:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to remove address' 
+    });
+  }
+};
+
+
+const getChangePassword=async (req,res) => {
+  try {
+    if(!req.session.user){
+     return res.status(400).json({success:false,message:'login required'})
+    }
+
+    res.render('change-password')
+  } catch (error) {
+    console.log('error getting chnage password page',error);
+    res.rnder('page404')
+  }
+}
+
+
+const changePassword = async (req, res) => {
+  try {
+    if (!req.session.user) {
+  return res.status(401).json({ success: false, message: 'please log in' });
+}
+
+    
+    console.log('Req body:', req.body);
+    const userId = req.session.user.id;
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+    
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "All password fields are required" 
+      });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "User not found" 
+      });
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ 
+        success: false, 
+        message: "Current password is incorrect" 
+      });
+    }
+
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "New passwords do not match" 
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await user.save();
+
+    return res.status(200).json({ 
+      success: true, 
+      message: "Password changed successfully" 
+    });
+
+  } catch (error) {
+    console.error("change password error", error);
+    return res.status(500).json({ 
+      success: false, 
+      message: "Internal server error" 
+    });
+  }
+}
+
 module.exports = {
   getForgotPasspage,
   forgotEmailValid,
@@ -661,6 +876,9 @@ module.exports = {
   getAddAdress,
   addAddress,
   getEditAddress,
-  updateAddress
-  
+  updateAddress,
+  setDefaultAddress,
+  removeAddress,
+  getChangePassword,
+  changePassword
 };

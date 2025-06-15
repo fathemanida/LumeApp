@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUME - Secure Payment</title>
+    <link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <style>
+        :root {
+            --primary-dark: #2c1e0f;
+            --primary-accent: #3e4c22;
+            --light-bg: #f9f7f4;
+            --border-color: #e0d8ce;
+            --text-muted: #6b5e4e;
+            --error-color: #c82333;
+            --success-color: #28a745;
+        }
+
+        body {
+            font-family: 'Jost', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--primary-dark);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .navbar {
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .brand {
+            font-family: 'Aboreto', cursive;
+            font-size: 1.8rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--primary-dark);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .brand:hover {
+            color: var(--primary-accent);
+        }
+
+        .nav-link {
+            color: var(--primary-dark);
+            font-size: 1rem;
+            font-weight: 400;
+            padding: 0.5rem 1.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-accent);
+            font-weight: 500;
+        }
+
+        .icon-link {
+            color: var(--primary-dark);
+            font-size: 1.2rem;
+            padding: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .icon-link:hover {
+            color: var(--primary-accent);
+            transform: scale(1.1);
+        }
+
+        .payment-container {
+            max-width: 1100px;
+            margin: 3rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(44, 30, 15, 0.08);
+        }
+
+        .payment-title {
+            font-family: 'Aboreto', cursive;
+            font-size: 2.5rem;
+            margin-bottom: 2.5rem;
+            color: var(--primary-dark);
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        .payment-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .payment-form-section {
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(44, 30, 15, 0.08);
+        }
+
+        .payment-form-title {
+            font-family: 'Aboreto', cursive;
+            font-size: 1.8rem;
+            color: var(--primary-dark);
+            margin-bottom: 1.5rem;
+        }
+
+        .security-notice {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .security-notice i {
+            color: var(--success-color);
+        }
+
+        .payment-methods {
+            margin-bottom: 1.5rem;
+        }
+
+        .payment-methods label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+            color: var(--primary-dark);
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+        }
+
+        .payment-form {
+            display: none;
+        }
+
+        .payment-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--primary-dark);
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-dark);
+            box-shadow: 0 0 0 2px rgba(44, 30, 15, 0.1);
+        }
+
+        .card-details {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .cod-message {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .order-summary {
+            padding: 1.5rem;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(44, 30, 15, 0.08);
+        }
+
+        .order-summary h3 {
+            font-family: 'Aboreto', cursive;
+            font-size: 1.3rem;
+            color: var(--primary-dark);
+            margin-bottom: 1rem;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+            font-weight: 400;
+        }
+
+        .summary-row.expected-delivery {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .summary-row:last-child {
+            border-top: 1px solid var(--border-color);
+            padding-top: 0.75rem;
+            margin-top: 0.75rem;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .address-details {
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(44, 30, 15, 0.05);
+            margin-bottom: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .address-details.default {
+            border: 2px solid var(--primary-accent);
+            background: var(--light-bg);
+        }
+
+        .address-details.default::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            color: var(--success-color);
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.9rem;
+        }
+
+        .pay-now-btn {
+            background: transparent;
+            border: 2px solid var(--primary-dark);
+            color: var(--primary-dark);
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            width: 100%;
+            font-size: 1.1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .pay-now-btn:hover:not(:disabled) {
+            background: var(--primary-accent);
+            color: white;
+            border-color: var(--primary-accent);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(44, 30, 15, 0.2);
+        }
+
+        .pay-now-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .back-btn {
+            background: transparent;
+            border: 2px solid var(--primary-dark);
+            color: var(--primary-dark);
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+            display: block;
+        }
+
+        .back-btn:hover {
+            background: var(--primary-accent);
+            color: white;
+            border-color: var(--primary-accent);
+            transform: translateY(-2px);
+        }
+
+        .profile-dropdown {
+            position: relative;
+        }
+
+        .profile-dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background: white;
+            min-width: 180px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            border-radius: 8px;
+            padding: 0.5rem 0;
+        }
+
+        .profile-dropdown:hover .profile-dropdown-content {
+            display: block;
+        }
+
+        .profile-dropdown-content a {
+            color: var(--primary-dark);
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            display: block;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .profile-dropdown-content a:hover {
+            background-color: var(--light-bg);
+            color: var(--primary-accent);
+        }
+
+        .profile-dropdown-content a i {
+            margin-right: 0.5rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .search-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input {
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            padding-right: 2.5rem;
+            font-family: 'Jost', sans-serif;
+            width: 200px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-dark);
+            width: 250px;
+            box-shadow: 0 0 0 2px rgba(44, 30, 15, 0.1);
+        }
+
+        .search-button {
+            position: absolute;
+            right: 10px;
+            background: none;
+            border: none;
+            color: var(--primary-dark);
+            cursor: pointer;
+        }
+
+        .search-button:hover {
+            color: var(--primary-accent);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .payment-section {
+                grid-template-columns: 1fr;
+            }
+
+            .payment-container {
+                margin: 1.5rem;
+                padding: 1.5rem;
+            }
+
+            .payment-form-section {
+                padding: 1.5rem;
+            }
+
+            .order-summary {
+                padding: 1rem;
+            }
+
+            .address-details {
+                font-size: 0.75rem;
+                padding: 0.75rem;
+            }
+
+            .pay-now-btn {
+                font-size: 1rem;
+                padding: 0.75rem 1.5rem;
+            }
+
+            .back-btn {
+                font-size: 0.9rem;
+                padding: 0.5rem 1.5rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .payment-title {
+                font-size: 2rem;
+            }
+
+            .payment-form-title {
+                font-size: 1.5rem;
+            }
+
+            .card-details {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group input {
+                font-size: 0.85rem;
+            }
+
+            .order-summary h3 {
+                font-size: 1.2rem;
+            }
+
+            .summary-row {
+                font-size: 0.85rem;
+            }
+        }
+
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .loading-spinner {
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--primary-dark);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        .loading-text {
+            font-family: 'Aboreto', cursive;
+            font-size: 1.5rem;
+            color: var(--primary-dark);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .navbar {
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: nowrap;
+        }
+
+        .brand {
+            font-family: 'Aboreto', cursive;
+            font-size: 1.5rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--dark-brown);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .brand:hover {
+            color: var(--olive-green);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .nav-link {
+            color: var(--dark-brown);
+            font-family: 'Jost', sans-serif;
+            font-size: 0.9rem;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--olive-green);
+            transform: translateY(-2px);
+        }
+
+        .icon-links {
+            display: flex;
+            align-items: center;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .icon-link {
+            color: var(--dark-brown);
+            font-size: 1.1rem;
+            padding: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .icon-link:hover {
+            color: var(--olive-green);
+            transform: translateY(-2px);
+        }
+
+        /* Search Bar Styles */
+        .search-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input {
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            padding-right: 2.5rem;
+            font-family: 'Jost', sans-serif;
+            width: 200px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--dark-brown);
+            width: 250px;
+            box-shadow: 0 0 0 2px rgba(41, 29, 14, 0.1);
+        }
+
+        .search-button {
+            position: absolute;
+            right: 10px;
+            background: none;
+            border: none;
+            color: var(--dark-brown);
+            cursor: pointer;
+        }
+
+        .search-button:hover {
+            color: var(--olive-green);
+        }
+
+        /* Profile Dropdown */
+        .profile-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .profile-dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: white;
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            z-index: 1000;
+            border-radius: 4px;
+            padding: 0.5rem 0;
+        }
+
+        .profile-dropdown:hover .profile-dropdown-content {
+            display: block;
+        }
+
+        .profile-dropdown-content a {
+            color: var(--dark-brown);
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            display: block;
+            font-size: 0.9rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .profile-dropdown-content a:hover {
+            background-color: var(--light-bg);
+            color: var(--olive-green);
+        }
+
+        .profile-dropdown-content a i {
+            margin-right: 0.5rem;
+            width: 20px;
+            text-align: center;
+        }
+/* Footer */
+.footer {
+  background-color: var(--dark-brown);
+  color: white;
+  padding: 3rem 0;
+  margin-top: 3rem;
+}
+
+.footer-heading {
+  font-family: 'Aboreto', cursive;
+  font-size: 1rem;
+  letter-spacing: 1px;
+  margin-bottom: 1.25rem;
+  color: white;
+}
+
+.footer-link {
+  color: white;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  display: block;
+  margin-bottom: 0.5rem;
+  text-decoration: none; /* Remove underline */
+}
+
+.footer-link:hover {
+  color: var(--light-bg);
+  transform: translateX(3px);
+  text-decoration: none; /* Ensure no underline on hover */
+}
+
+.footer-link i {
+  margin-right: 0.5rem;
+  width: 20px;
+  text-align: center;
+}
+
+.border-secondary {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.text-light {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.test-card-info {
+    color: #666;
+    font-size: 0.8em;
+    margin-top: 4px;
+}
+
+.test-mode-notice {
+    background-color: #fff3cd;
+    color: #856404;
+    padding: 10px;
+    border-radius: 4px;
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.payment-info {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.payment-info p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 15px;
+}
+    </style>
+</head>
+<body>
+        <nav class="navbar">
+        <!-- Left side - Brand -->
+        <div class="brand" id="sidebarToggle">LUME</div>
+
+        <!-- Center - Navigation Links -->
+        <ul class="nav-links">
+            <li class="mx-2"><a href="/" class="nav-link">Home</a></li>
+            <li class="mx-2"><a href="/shopAll" class="nav-link">Shop All</a></li>
+            <li class="mx-2"><a href="/featured" class="nav-link">Featured</a></li>
+            <li class="mx-2"><a href="/new-arrivals" class="nav-link">New Arrivals</a></li>
+        </ul>
+
+        <!-- Right side - Icons -->
+        <ul class="icon-links">
+            <li class="mx-2">
+                <form action="/shopAll" method="GET" class="d-flex align-items-center">
+                    <div class="search-container">
+                        <input type="text" name="search" placeholder="Search products..." class="search-input form-control">
+                        <button type="submit" class="search-button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </li>
+            <li class="mx-2"><a href="/wishlist" class="icon-link"><i class="fas fa-heart"></i></a></li>
+            <li class="mx-2"><a href="/cart" class="icon-link"><i class="fas fa-shopping-cart"></i></a></li>
+            <li class="mx-2">
+                <div class="profile-dropdown">
+                    <a href="#" class="icon-link"><i class="far fa-user"></i></a>
+                    <div class="profile-dropdown-content">
+                        <% if (locals.user) { %>
+                            <a href="/profile"><i class="fas fa-user"></i> My Profile</a>
+                            <a href="/orders"><i class="fas fa-box"></i> My Orders</a>
+                            <a href="/wishlist"><i class="fas fa-heart"></i> Wishlist</a>
+                            <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        <% } else { %>
+                            <a href="/login"><i class="fas fa-sign-in-alt"></i> Login</a>
+                            <a href="/signup"><i class="fas fa-user-plus"></i> Sign Up</a>
+                        <% } %>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Processing Payment...</div>
+    </div>
+
+    <div class="payment-container" data-total-amount="<%= cart ? cart.totalPrice : 0 %>">
+        <h1 class="payment-title">Secure Payment</h1>
+
+        <div class="payment-section">
+            <!-- Payment Form Section -->
+            <div class="payment-form-section">
+                <h2 class="payment-form-title">Payment Details</h2>
+                <div class="security-notice">
+                    <i class="fas fa-lock"></i>
+                    <span>Payments are secure and encrypted</span>
+                </div>
+
+                <!-- Payment Method Selection -->
+                <div class="payment-methods">
+                    <label>
+                        <input type="radio" name="paymentMethod" value="cod" checked onclick="showPaymentForm('cod')">
+                        Cash on Delivery
+                    </label>
+                    <label>
+                        <input type="radio" name="paymentMethod" value="razorpay" onclick="showPaymentForm('razorpay')">
+                        Razorpay
+                    </label>
+                    <label>
+                        <input type="radio" name="paymentMethod" value="upi" onclick="showPaymentForm('upi')">
+                        UPI
+                    </label>
+                    <label>
+                        <input type="radio" name="paymentMethod" value="wallet" onclick="showPaymentForm('wallet')">
+                        Wallet
+                    </label>
+                </div>
+
+                <!-- Payment Forms -->
+                <div id="paymentForms">
+                    <!-- Cash on Delivery -->
+                    <div class="payment-form active" id="codForm">
+                        <p class="cod-message">You will pay ₹<%= cart ? (cart.subtotal + cart.shipping + cart.tax - (cart.discount || 0)).toFixed(2) : '0.00' %> in cash upon delivery.</p>
+                    </div>
+
+                    <!-- Razorpay Form -->
+                    <div class="payment-form" id="razorpayForm">
+                        <div class="payment-info">
+                            <p>You will be redirected to Razorpay's secure payment gateway to complete your payment.</p>
+                            <div class="test-mode-notice">
+                                <i class="fas fa-info-circle"></i>
+                                <span>Test Mode Enabled - Use test card details in Razorpay modal</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- UPI Form -->
+                    <div class="payment-form" id="upiForm">
+                        <div class="form-group">
+                            <label for="upiId">UPI ID</label>
+                            <input type="text" id="upiId" placeholder="yourname@upi" required>
+                        </div>
+                    </div>
+
+                    <!-- Wallet Form -->
+                    <div class="payment-form" id="walletForm">
+                        <div class="form-group">
+                            <label for="walletId">Wallet ID/Phone Number</label>
+                            <input type="text" id="walletId" placeholder="Enter wallet ID or phone number" required>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" class="pay-now-btn" id="payNowBtn" onclick="processPayment()">Pay Now</button>
+                <a href="/checkout" class="back-btn">Back to Checkout</a>
+            </div>
+
+            <!-- Order Summary Section -->
+            <div class="order-summary">
+                <h3>Order Summary</h3>
+                <% if (cart && cart.items && cart.items.length > 0) { %>
+                    <% 
+                        const total = cart.subtotal;
+                        const shipping = total < 3000 ? 50 : 0;
+                        const taxRate = total < 3000 ? 0.02 : 0.04;
+                        const tax = (total * taxRate) / (1 + taxRate);
+                        const subtotal = total - tax - shipping;
+                    %>
+                    <% cart.items.forEach(item => { %>
+                        <div class="summary-row">
+                            <span><%= item.productId.productName %> (x<%= item.quantity %>)</span>
+                            <span>₹<%= item.totalPrice.toFixed(2) %></span>
+                        </div>
+                    <% }) %>
+                    <div class="summary-row expected-delivery">
+                        <span>Expected Delivery</span>
+                        <span><%= new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span>₹<%= subtotal.toFixed(2) %></span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Tax (<%= (taxRate * 100).toFixed(0) %>%)</span>
+                        <span>₹<%= tax.toFixed(2) %></span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Shipping</span>
+                        <span>₹<%= shipping.toFixed(2) %></span>
+                    </div>
+                    <% if (cart.discount > 0) { %>
+                        <div class="summary-row">
+                            <span>Discount</span>
+                            <span>-₹<%= cart.discount.toFixed(2) %></span>
+                        </div>
+                    <% } %>
+                    <div class="summary-row">
+                        <strong>Total</strong>
+                        <strong>₹<%= (total - (cart.discount || 0)).toFixed(2) %></strong>
+                    </div>
+
+                    <!-- Delivery Address -->
+                    <div class="address-details default">
+                        <h4>Delivery Address</h4>
+                        <p><%= address.name %>, <%= address.houseNo || '' %>, <%= address.roadArea || '' %></p>
+                        <p><%= address.city %>, <%= address.state %> - <%= address.pincode %></p>
+                        <p>Phone: <%= address.phone %></p>
+                    </div>
+                <% } else { %>
+                    <p>No items in cart</p>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+<footer style="background-color: #1F1714; color: #E8E8E8; padding: 40px 0; font-family: 'Cinzel', serif; line-height: 1.6;">
+  <div style="display: flex; justify-content: center; gap: 120px; padding: 0 20px; max-width: 1200px; margin: 0 auto;">
+    <!-- Company Section -->
+    <div>
+      <h3 style="font-size: 18px; margin-bottom: 15px; letter-spacing: 1px; text-transform: uppercase; color: #C0C0C0;">Company</h3>
+      <ul style="list-style: none; padding: 0; font-size: 14px;">
+        <li style="margin-bottom: 8px;"><a href="/about-us" style="color: #E8E8E8; text-decoration: none; transition: color 0.3s ease;">About Us</a></li>
+        <li style="margin-bottom: 8px;"><a href="/careers" style="color: #E8E8E8; text-decoration: none; transition: color 0.3s ease;">Careers</a></li>
+        <li style="margin-bottom: 8px;"><a href="/contact" style="color: #E8E8E8; text-decoration: none; transition: color 0.3s ease;">Contact</a></li>
+        <li style="margin-bottom: 8px;"><a href="/privacy-policy" style="color: #E8E8E8; text-decoration: none; transition: color 0.3s ease;">Privacy Policy</a></li>
+      </ul>
+    </div>
+
+    <!-- Shop Section -->
+    <div>
+      <h3 style="font-size: 18px; margin-bottom: 15px; letter-spacing: 1px; text-transform: uppercase; color: #C0C0C0;">Shop</h3>
+      <ul style="list-style: none; padding: 0; font-size: 14px;">
+        <li style="margin-bottom: 8px;"><a href="/rings" style="color: #E8E8E8; text-decoration: none; transition: color 0.3s ease;">Rings</a></li>
+        <li style="margin-bottom: 8px;"><a href="/necklaces" style="color: #E8E8E8; text-decoration: none; transition: color 0.3s ease;">Necklaces</a></li>
+        <li style="margin-bottom: 8px;"><a href="/earrings" style="color: #E8E8E8; text-decoration: none; transition: color 0.3s ease;">Earrings</a></li>
+        <li style="margin-bottom: 8px;"><a href="/bracelets" style="color: #E8E8E8; text-decoration: none; transition: color 0.3s ease;">Bracelets</a></li>
+      </ul>
+    </div>
+
+    <!-- Connect With Us Section -->
+    <div>
+      <h3 style="font-size: 18px; margin-bottom: 15px; letter-spacing: 1px; text-transform: uppercase; color: #C0C0C0;">Connect With Us</h3>
+      <ul style="list-style: none; padding: 0; font-size: 14px;">
+        <li style="margin-bottom: 8px;"><a href="https://instagram.com" style="color: #E8E8E8; text-decoration: none; transition: color 0.3s ease;">Instagram</a></li>
+        <li style="margin-bottom: 8px;"><a href="https://facebook.com" style="color: #E8E8E8; text-decoration: none; transition: color 0.3s ease;">Facebook</a></li>
+        <li style="margin-bottom: 8px;"><a href="https://pinterest.com" style="color: #E8E8E8; text-decoration: none; transition: color 0.3s ease;">Pinterest</a></li>
+        <li style="margin-bottom: 8px;"><a href="https://twitter.com" style="color: #E8E8E8; text-decoration: none; transition: color 0.3s ease;">Twitter</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Copyright Section -->
+  <div style="text-align: center; font-size: 12px; padding-top: 30px; margin-top: 30px; border-top: 1px solid #4A3C31; color: #A9A9A9;">
+    © 2024 Lume Jewelry. All Rights Reserved.
+  </div>
+</footer>
+<style>
+  footer a:hover {
+    color: #C0C0C0;
+  }
+</style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded');
+            const payNowBtn = document.getElementById('payNowBtn');
+            if (payNowBtn) {
+                console.log('Pay Now button found');
+            } else {
+                console.log('Pay Now button not found');
+            }
+        });
+
+        function showPaymentForm(method) {
+            console.log('Showing payment form for method:', method);
+            document.querySelectorAll('.payment-form').forEach(form => {
+                form.classList.remove('active');
+            });
+            document.getElementById(`${method}Form`).classList.add('active');
+
+            const payNowBtn = document.getElementById('payNowBtn');
+            if (method === 'cod') {
+                payNowBtn.disabled = false;
+            } else {
+                validateForm(method);
+            }
+        }
+
+        function validateForm(method) {
+            console.log('Validating form for method:', method);
+            const payNowBtn = document.getElementById('payNowBtn');
+            if (method === 'razorpay') {
+                payNowBtn.disabled = false;
+            } else if (method === 'upi') {
+                const upiId = document.getElementById('upiId').value;
+                payNowBtn.disabled = !upiId;
+            } else if (method === 'wallet') {
+                const walletId = document.getElementById('walletId').value;
+                payNowBtn.disabled = !walletId;
+            }
+        }
+
+        async function processPayment() {
+            const method = document.querySelector('input[name="paymentMethod"]:checked').value;
+            
+            if (method === 'razorpay') {
+                try {
+                    const loadingOverlay = document.getElementById('loadingOverlay');
+                    loadingOverlay.style.display = 'flex';
+
+                    const totalAmount = parseFloat(document.querySelector('.payment-container').dataset.totalAmount);
+
+                    const res = await fetch('/create-order', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            amount: totalAmount,
+                            addressId: '<%= address._id %>'
+                        })
+                    });
+
+                    if (!res.ok) {
+                        const errorData = await res.json();
+                        throw new Error(errorData.message || `HTTP error! status: ${res.status}`);
+                    }
+
+                    const data = await res.json();
+
+                    if (!data.success) {
+                        throw new Error(data.message || "Order creation failed");
+                    }
+
+                    const options = {
+                        key: "<%= RAZORPAY_KEY_ID %>", 
+                        amount: data.amount,
+                        currency: data.currency,
+                        name: "Lume",
+                        description: "Order Payment",
+                        order_id: data.razorpayOrderId,
+                        handler: async function (response) {
+                            try {
+                                console.log('Payment response:', response);
+                                console.log('Order data:', data);
+
+                                const verifyRes = await fetch('/verify-payment', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        razorpay_payment_id: response.razorpay_payment_id,
+                                        razorpay_order_id: response.razorpay_order_id,
+                                        razorpay_signature: response.razorpay_signature,
+                                        orderId: data.orderId,
+                                        addressId: '<%= address._id %>'
+                                    })
+                                });
+
+                                if (!verifyRes.ok) {
+                                    const errorData = await verifyRes.json();
+                                    throw new Error(errorData.message || `HTTP error! status: ${verifyRes.status}`);
+                                }
+
+                                const verifyData = await verifyRes.json();
+                                console.log('Verification response:', verifyData);
+                                
+                                if (verifyData.success) {
+                                    if (verifyData.redirect) {
+                                        window.location.href = verifyData.redirect;
+                                    } else {
+                                        window.location.href = `/payment-confirmation?orderId=${data.orderId}`;
+                                    }
+                                } else {
+                                    throw new Error(verifyData.message || "Verification failed");
+                                }
+                            } catch (error) {
+                                console.error('Payment verification error:', error);
+                                Swal.fire("Payment Failed", error.message || "Payment verification failed", "error");
+                            } finally {
+                                loadingOverlay.style.display = 'none';
+                            }
+                        },
+                        prefill: {
+                            name: "<%= user.name %>",
+                            email: "<%= user.email %>",
+                            contact: "<%= address.phone %>"
+                        },
+                        theme: {
+                            color: "#F6C90E"
+                        },
+                        modal: {
+                            ondismiss: function() {
+                                loadingOverlay.style.display = 'none';
+                            }
+                        }
+                    };
+
+                    const rzp = new Razorpay(options);
+                    rzp.open();
+                } catch (error) {
+                    loadingOverlay.style.display = 'none';
+                    Swal.fire("Error", error.message, "error");
+                }
+            } else {
+                const otherPaymentData = { method, addressId: '<%= address._id %>' };
+
+                if (method === 'upi') {
+                    otherPaymentData.upiId = document.getElementById('upiId').value;
+                } else if (method === 'wallet') {
+                    otherPaymentData.walletId = document.getElementById('walletId').value;
+                }
+
+                const response = await fetch('/proceed-payment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(otherPaymentData)
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    window.location.href = `/payment-confirmation?orderId=${data.orderId}`;
+                } else {
+                    Swal.fire("Payment Failed", data.message || "Try again", "error");
+                }
+            }
+        }
+
+        document.getElementById('upiId')?.addEventListener('input', () => validateForm('upi'));
+        document.getElementById('walletId')?.addEventListener('input', () => validateForm('wallet'));
+
+        showPaymentForm('cod');
+    </script>
+</body>
+</html>

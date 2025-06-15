@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details - Lume</title>
+    <link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --dark-bg: #1a1a1a;
+            --darker-bg: #121212;
+            --card-bg: #242424;
+            --text-primary: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --accent-color: #c5a267;
+            --border-color: #333333;
+            --success-color: #4caf50;
+            --error-color: #f44336;
+        }
+
+        body {
+            font-family: 'Jost', sans-serif;
+            background-color: var(--dark-bg);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            width: 100vw;
+            overflow-x: hidden;
+            box-sizing: border-box;
+        }
+
+        /* Navbar styles */
+        .navbar {
+            background: var(--darker-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: nowrap;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .brand {
+            font-family: 'Aboreto', cursive;
+            font-size: 1.5rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .brand:hover {
+            color: var(--accent-color);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .nav-link {
+            color: var(--text-primary);
+            font-family: 'Jost', sans-serif;
+            font-size: 0.9rem;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        .icon-links {
+            display: flex;
+            align-items: center;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .icon-link {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            padding: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .icon-link:hover {
+            color: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        .search-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input {
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            padding-right: 2.5rem;
+            width: 200px;
+            background-color: var(--card-bg);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            width: 250px;
+            border-color: var(--accent-color);
+            box-shadow: none;
+            outline: none;
+        }
+
+        .search-button {
+            position: absolute;
+            right: 10px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        /* Profile Dropdown */
+        .profile-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .profile-dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: var(--card-bg);
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            z-index: 1000;
+            border-radius: 4px;
+            padding: 0.5rem 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .profile-dropdown:hover .profile-dropdown-content {
+            display: block;
+        }
+
+        .profile-dropdown-content a {
+            color: var(--text-primary);
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            display: block;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .profile-dropdown-content a:hover {
+            background-color: var(--darker-bg);
+            color: var(--accent-color);
+        }
+
+        .profile-dropdown-content a i {
+            margin-right: 0.5rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Container */
+        .main-container {
+            display: flex;
+            flex: 1;
+            margin-top: 70px;
+        }
+
+        /* Elegant Dark Sidebar */
+        .sidebar {
+            width: 280px;
+            background-color: var(--darker-bg);
+            padding: 2rem 1.5rem;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-title {
+            font-family: 'Aboreto', cursive;
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            letter-spacing: 1px;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .sidebar-nav a {
+            color: var(--text-primary);
+            text-decoration: none;
+            padding: 0.75rem 1rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .sidebar-nav a i {
+            width: 20px;
+            text-align: center;
+            color: var(--accent-color);
+        }
+
+        .sidebar-nav a:hover {
+            background-color: rgba(197, 162, 103, 0.1);
+            color: var(--accent-color);
+            transform: translateX(4px);
+        }
+
+        .sidebar-nav a.active {
+            background-color: rgba(197, 162, 103, 0.2);
+            color: var(--accent-color);
+            font-weight: 500;
+            border-left: 3px solid var(--accent-color);
+        }
+
+        .sidebar-actions {
+            margin-top: auto;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .sidebar-actions button {
+            padding: 0.75rem;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Jost', sans-serif;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .logout-btn {
+            background-color: rgba(197, 162, 103, 0.1);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .logout-btn:hover {
+            background-color: rgba(197, 162, 103, 0.2);
+            border-color: var(--accent-color);
+        }
+
+        .delete-btn {
+            background-color: transparent;
+            color: #ff6b6b;
+            border: 1px solid #ff6b6b;
+        }
+
+        .delete-btn:hover {
+            background-color: rgba(255, 107, 107, 0.1);
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            padding: 2rem 3rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .page-title {
+            font-family: 'Aboreto', cursive;
+            font-size: 2rem;
+            color: var(--accent-color);
+            margin-bottom: 2rem;
+        }
+
+        .order-details-container {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-sizing: border-box;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .order-number {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .order-status {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-delivered {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-processing {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+
+        .status-cancelled {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .order-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-section {
+            background: var(--darker-bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+
+        .info-section h3 {
+            font-family: 'Aboreto', cursive;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--accent-color);
+        }
+
+        .info-item {
+            margin-bottom: 0.75rem;
+        }
+
+        .info-label {
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .info-value {
+            color: var(--text-secondary);
+        }
+
+        .order-items {
+            margin-top: 2rem;
+        }
+
+        .order-items h3 {
+            font-family: 'Aboreto', cursive;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--accent-color);
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+
+        .items-table th {
+            background-color: var(--darker-bg);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .items-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .item-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .order-summary {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .summary-row.total {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .back-btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--accent-color);
+            color: var(--dark-bg);
+            text-decoration: none;
+            border-radius: 6px;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .back-btn:hover {
+            background-color: #d4b47c;
+            transform: translateY(-2px);
+        }
+
+        .order-actions {
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--darker-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .cancel-btn, .return-btn {
+            padding: 0.75rem 1.5rem;
+            color: var(--text-primary);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Jost', sans-serif;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .cancel-btn {
+            background-color: var(--error-color);
+        }
+
+        .cancel-btn:hover {
+            background-color: #d32f2f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .return-btn {
+            background-color: var(--success-color);
+        }
+
+        .return-btn:hover {
+            background-color: #388e3c;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+            overflow-y: auto;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            position: relative;
+            background-color: var(--card-bg);
+            margin: 20px auto;
+            padding: 0;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease-out;
+            display: flex;
+            flex-direction: column;
+            max-height: 90vh;
+            box-sizing: border-box;
+            border: 1px solid var(--border-color);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: 'Jost', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background-color: var(--darker-bg);
+            color: var(--text-primary);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(197, 162, 103, 0.1);
+        }
+
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b0b0b0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1em;
+            padding-right: 2.5rem;
+            cursor: pointer;
+        }
+
+        select.form-control option {
+            padding: 0.5rem;
+            font-size: 1rem;
+            background-color: var(--darker-bg);
+            color: var(--text-primary);
+        }
+
+        select.form-control option:checked {
+            background-color: var(--accent-color);
+            color: var(--dark-bg);
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2.5rem;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--card-bg);
+            border-radius: 12px 12px 0 0;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .modal-header h3 {
+            font-family: 'Aboreto', cursive;
+            font-size: 1.2rem;
+            color: var(--accent-color);
+            margin: 0;
+        }
+
+        .modal-body {
+            padding: 2.5rem;
+            overflow-y: auto;
+            flex: 1;
+            color: var(--text-secondary);
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            padding: 1.5rem 2.5rem;
+            border-top: 1px solid var(--border-color);
+            background: var(--card-bg);
+            border-radius: 0 0 12px 12px;
+            position: sticky;
+            bottom: 0;
+            z-index: 1;
+        }
+
+        .return-items-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            background-color: var(--darker-bg);
+            margin-bottom: 1rem;
+        }
+
+        .return-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .return-item:last-child {
+            border-bottom: none;
+        }
+
+        .return-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: var(--card-bg);
+        }
+
+        .return-item input[type="checkbox"]:checked {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        .return-item label {
+            font-size: 1rem;
+            color: var(--text-primary);
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .cancel-modal-btn, .confirm-return-btn, .confirm-cancel-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Jost', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .cancel-modal-btn {
+            background-color: #6c757d;
+            color: var(--text-primary);
+        }
+
+        .cancel-modal-btn:hover {
+            background-color: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .confirm-return-btn, .confirm-cancel-btn {
+            background-color: var(--accent-color);
+            color: var(--dark-bg);
+        }
+
+        .confirm-return-btn:hover, .confirm-cancel-btn:hover {
+            background-color: #d4b47c;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: 'Jost', sans-serif;
+            font-size: 1rem;
+            resize: vertical;
+            transition: all 0.3s ease;
+            background-color: var(--darker-bg);
+            color: var(--text-primary);
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(197, 162, 103, 0.1);
+        }
+
+        .return-policy {
+            margin-top: 2rem;
+            padding: 2rem;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .return-policy h3 {
+            font-family: 'Aboreto', cursive;
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent-color);
+        }
+
+        .policy-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .policy-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--darker-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .policy-item i {
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            margin-top: 0.25rem;
+        }
+
+        .policy-text h4 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .policy-text p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 10px;
+            z-index: 9999;
+            width: calc(100% - 20px);
+            max-width: 400px;
+        }
+
+        .toast {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 16px 24px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 250px;
+            max-width: 100%;
+            transform: translateX(120%);
+            transition: transform 0.3s ease-in-out;
+            animation: slideIn 0.3s ease-in-out forwards;
+            box-sizing: border-box;
+            border: 1px solid var(--border-color);
+        }
+
+        .toast.success {
+            border-left: 4px solid var(--success-color);
+        }
+
+        .toast.error {
+            border-left: 4px solid var(--error-color);
+        }
+
+        .toast.warning {
+            border-left: 4px solid #ffc107;
+        }
+
+        .toast-icon {
+            font-size: 20px;
+        }
+
+        .toast.success .toast-icon {
+            color: var(--success-color);
+        }
+
+        .toast.error .toast-icon {
+            color: var(--error-color);
+        }
+
+        .toast.warning .toast-icon {
+            color: #ffc107;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--text-primary);
+        }
+
+        .toast-message {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .toast-close {
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 4px;
+            font-size: 18px;
+            transition: color 0.3s ease;
+        }
+
+        .toast-close:hover {
+            color: var(--text-primary);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(120%); }
+            to { transform: translateX(0); }
+        }
+
+        @keyframes slideOut {
+            from { transform: translateX(0); }
+            to { transform: translateX(120%); }
+        }
+
+        .no-order {
+            text-align: center;
+            padding: 3rem;
+            background: var(--card-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .no-order h2 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .no-order p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .login-btn {
+            background-color: var(--accent-color);
+            color: var(--dark-bg);
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Jost', sans-serif;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .login-btn:hover {
+            background-color: #d4b47c;
+            transform: translateY(-2px);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .content-area {
+                padding: 1.5rem;
+            }
+
+            .order-details-container {
+                padding: 1rem;
+                margin: 0 0.5rem 2rem;
+            }
+
+            .order-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .order-info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal {
+                padding: 0;
+            }
+
+            .modal-content {
+                margin: 10px 5px;
+                width: calc(100% - 10px);
+            }
+
+            .modal-header, .modal-body, .modal-actions {
+                padding: 1rem;
+            }
+
+            .order-actions {
+                flex-direction: column;
+            }
+
+            .cancel-btn, .return-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .policy-content {
+                grid-template-columns: 1fr;
+            }
+
+            .main-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                padding: 1rem;
+                height: auto;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="brand">LUME</div>
+        <ul class="nav-links">
+            <li><a href="/" class="nav-link">Home</a></li>
+            <li><a href="/shopAll" class="nav-link">Shop All</a></li>
+            <li><a href="/featured" class="nav-link">Featured</a></li>
+            <li><a href="/new-arrivals" class="nav-link">New Arrivals</a></li>
+        </ul>
+        <ul class="icon-links">
+            <li>
+                <form action="/shopAll" method="GET" class="search-container">
+                    <input type="text" name="search" placeholder="Search products..." class="search-input">
+                    <button type="submit" class="search-button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+            </li>
+            <li><a href="/wishlist" class="icon-link"><i class="fas fa-heart"></i></a></li>
+            <li><a href="/cart" class="icon-link"><i class="fas fa-shopping-cart"></i></a></li>
+            <li>
+                <div class="profile-dropdown">
+                    <a href="#" class="icon-link"><i class="far fa-user"></i></a>
+                    <div class="profile-dropdown-content">
+                        <% if (locals.user) { %>
+                            <a href="/profile"><i class="fas fa-user"></i> My Profile</a>
+                            <a href="/orders"><i class="fas fa-box"></i> My Orders</a>
+                            <a href="/wishlist"><i class="fas fa-heart"></i> Wishlist</a>
+                            <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        <% } else { %>
+                            <a href="/login"><i class="fas fa-sign-in-alt"></i> Login</a>
+                            <a href="/signup"><i class="fas fa-user-plus"></i> Sign Up</a>
+                        <% } %>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </nav>
+
+    <% if (locals.user) { %>
+        <div class="main-container">
+            <!-- Elegant Dark Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar-title">My Account</div>
+                <div class="sidebar-nav">
+                    <a href="/profile" class="nav-link"><i class="fas fa-user"></i> Profile</a>
+                    <a href="/wallet" class="nav-link"><i class="fas fa-wallet"></i> Wallet</a>
+                    <a href="/address" class="nav-link"><i class="fas fa-map-marker-alt"></i> Address</a>
+                    <a href="/orders" class="nav-link active"><i class="fas fa-box-open"></i> Orders</a>
+                    <a href="/wishlist" class="nav-link"><i class="fas fa-heart"></i> Wishlist</a>
+                    <a href="/settings" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
+                </div>
+                <div class="sidebar-actions">
+                    <button class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                    <button class="delete-btn"><i class="fas fa-trash-alt"></i> Delete Account</button>
+                </div>
+            </div>
+
+            <!-- Order Details Content Area -->
+            <div class="content-area">
+                <h1 class="page-title">Order Details</h1>
+                <div class="order-details-container">
+                    <div class="order-header">
+                        <div class="order-number">Order #<%= order.orderNumber %></div>
+                        <div class="order-status status-<%= order.status.toLowerCase() %>">
+                            <%= order.status %>
+                        </div>
+                    </div>
+
+                    <% if (order.status === 'Pending' || order.status === 'Processing') { %>
+                        <div class="order-actions">
+                            <button class="cancel-btn" onclick="openCancelModal()">
+                                <i class="fas fa-times"></i> Cancel Order
+                            </button>
+                        </div>
+                    <% } else if (order.status === 'Delivered' && !order.returnRequest) { %>
+                        <div class="order-actions">
+                            <button class="return-btn" onclick="openReturnModal()">
+                                <i class="fas fa-undo"></i> Request Return
+                            </button>
+                        </div>
+                    <% } %>
+
+                    <div class="order-info-grid">
+                        <div class="info-section">
+                            <h3>Order Information</h3>
+                            <div class="info-item">
+                                <div class="info-label">Order Date</div>
+                                <div class="info-value"><%= order.date %></div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Estimated Delivery</div>
+                                <div class="info-value"><%= new Date(new Date(order.date).getTime() + 5 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Payment Method</div>
+                                <div class="info-value"><%= order.paymentMethod %></div>
+                            </div>
+                        </div>
+                        <div class="info-section">
+                            <h3>Shipping Address</h3>
+                            <% if (order.address) { %>
+                                <div class="info-item">
+                                    <div class="info-label">Address:</div>
+                                    <div class="info-value">
+                                        <p>
+                                            <%= order.address.name %>, <%= order.address.city %>, <%= order.address.state %> - <%= order.address.pincode %>, Phone: <%= order.address.phone %>
+                                            <% if (order.address.houseNo || order.address.roadArea) { %>
+                                                <% if (order.address.houseNo && order.address.roadArea) { %>
+                                                    , <%= order.address.houseNo %>, <%= order.address.roadArea %>
+                                                <% } else if (order.address.houseNo) { %>
+                                                    , <%= order.address.houseNo %>
+                                                <% } else { %>
+                                                    , <%= order.address.roadArea %>
+                                                <% } %>
+                                            <% } %>
+                                        </p>
+                                    </div>
+                                </div>
+                            <% } else { %>
+                                <div class="info-item">Address not available</div>
+                            <% } %>
+                        </div>
+                    </div>
+
+                    <div class="order-items">
+                        <h3>Order Items</h3>
+                        <table class="items-table">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% order.items.forEach(item => { %>
+                                    <tr>
+                                        <td>
+                                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                                <img src="<%= item.image %>" alt="<%= item.name %>" class="item-image">
+                                                <span><%= item.name %></span>
+                                            </div>
+                                        </td>
+                                        <td>₹<%= item.price.toFixed(2) %></td>
+                                        <td><%= item.quantity %></td>
+                                        <td>₹<%= item.total.toFixed(2) %></td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="order-summary">
+                        <% 
+                            const total = order.total;
+                            const shipping = total < 3000 ? 50 : 0;
+                            const taxRate = total < 3000 ? 0.02 : 0.04;
+                            const tax = total * taxRate;
+                            const subtotal = total - tax - shipping;
+                        %>
+                        <div class="summary-row">
+                            <span>Subtotal</span>
+                            <span>₹<%= subtotal.toFixed(2) %></span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Tax (<%= (taxRate * 100).toFixed(0) %>%)</span>
+                            <span>₹<%= tax.toFixed(2) %></span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Shipping</span>
+                            <span>₹<%= shipping.toFixed(2) %></span>
+                        </div>
+                        <% if (order.discount > 0) { %>
+                            <div class="summary-row">
+                                <span>Discount</span>
+                                <span>-₹<%= order.discount.toFixed(2) %></span>
+                            </div>
+                        <% } %>
+                        <div class="summary-row total">
+                            <span>Total</span>
+                            <span>₹<%= total.toFixed(2) %></span>
+                        </div>
+                    </div>
+
+                    <div class="return-policy">
+                        <h3>Return Policy</h3>
+                        <div class="policy-content">
+                            <div class="policy-item">
+                                <i class="fas fa-undo"></i>
+                                <div class="policy-text">
+                                    <h4>Easy Returns</h4>
+                                    <p>You can return your order within 14 days of delivery.</p>
+                                </div>
+                            </div>
+                            <div class="policy-item">
+                                <i class="fas fa-box"></i>
+                                <div class="policy-text">
+                                    <h4>Return Conditions</h4>
+                                    <p>Items must be unused, in original packaging with all tags attached.</p>
+                                </div>
+                            </div>
+                            <div class="policy-item">
+                                <i class="fas fa-truck"></i>
+                                <div class="policy-text">
+                                    <h4>Return Process</h4>
+                                    <p>Contact our support team to initiate a return. We'll arrange pickup from your address.</p>
+                                </div>
+                            </div>
+                            <div class="policy-item">
+                                <i class="fas fa-money-bill-wave"></i>
+                                <div class="policy-text">
+                                    <h4>Refund Policy</h4>
+                                    <p>Refunds will be processed within 5-7 business days after receiving the returned items.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="/orders" class="back-btn">
+                        <i class="fas fa-arrow-left"></i> Back to Orders
+                    </a>
+                </div>
+            </div>
+        </div>
+    <% } else { %>
+        <div class="content-area">
+            <div class="no-order">
+                <h2>Welcome to LUME</h2>
+                <p>Please log in to view your order details.</p>
+                <a href="/login" class="login-btn">Login Now</a>
+            </div>
+        </div>
+    <% } %>
+
+    <!-- Cancel Order Modal -->
+    <div id="cancelModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Cancel Order</h3>
+                <span class="close" onclick="closeCancelModal()">×</span>
+            </div>
+            <div class="modal-body">
+                <p>Please provide a reason for cancelling this order:</p>
+                <form id="cancelOrderForm" onsubmit="submitCancelOrder(event)">
+                    <input type="hidden" id="orderId" value="<%= order._id %>">
+                    <textarea id="cancelReason" required placeholder="Enter your reason for cancellation..." class="form-control"></textarea>
+                    <div class="modal-actions">
+                        <button type="button" class="cancel-modal-btn" onclick="closeCancelModal()">Close</button>
+                        <button type="submit" class="confirm-cancel-btn">Confirm Cancellation</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Return Request Modal -->
+    <div id="returnModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Request Return</h3>
+                <span class="close" onclick="closeReturnModal()">×</span>
+            </div>
+            <div class="modal-body">
+                <p>Please provide details for your return request:</p>
+                <form id="returnRequestForm" onsubmit="submitReturnRequest(event)">
+                    <input type="hidden" id="returnOrderId" value="<%= order._id %>">
+                    <div class="form-group">
+                        <label for="returnReason">Reason for Return:</label>
+                        <select id="returnReason" required class="form-control">
+                            <option value="">Select a reason</option>
+                            <option value="wrong_size">Wrong Size</option>
+                            <option value="defective">Defective Product</option>
+                            <option value="not_as_described">Not as Described</option>
+                            <option value="quality_issues">Quality Issues</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="returnDescription">Additional Details:</label>
+                        <textarea id="returnDescription" name="returnDescription" placeholder="Please provide more details about your return request..." class="form-control"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="returnItems">Select Items to Return:</label>
+                        <div class="return-items-list">
+                            <% order.items.forEach(item => { %>
+                                <div class="return-item">
+                                    <input type="checkbox" id="item_<%= item.productId %>" name="returnItems" value="<%= item.productId %>" class="return-item-checkbox">
+                                    <label for="item_<%= item.productId %>">
+                                        <%= item.name %> (Quantity: <%= item.quantity %>)
+                                    </label>
+                                </div>
+                            <% }) %>
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="cancel-modal-btn" onclick="closeReturnModal()">Close</button>
+                        <button type="submit" class="confirm-return-btn">Submit Return Request</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <footer style="background-color: #121212; color: #b0b0b0; padding: 40px 0; font-family: 'Cinzel', serif; line-height: 1.6; border-top: 1px solid #333;">
+        <div style="display: flex; justify-content: center; gap: 120px; padding: 0 20px; max-width: 1200px; margin: 0 auto;">
+            <div>
+                <h3 style="font-size: 18px; margin-bottom: 15px; letter-spacing: 1px; text-transform: uppercase; color: #c5a267;">Company</h3>
+                <ul style="list-style: none; padding: 0; font-size: 14px;">
+                    <li style="margin-bottom: 8px;"><a href="/about-us" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">About Us</a></li>
+                    <li style="margin-bottom: 8px;"><a href="/careers" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Careers</a></li>
+                    <li style="margin-bottom: 8px;"><a href="/contact" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Contact</a></li>
+                    <li style="margin-bottom: 8px;"><a href="/privacy-policy" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Privacy Policy</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 style="font-size: 18px; margin-bottom: 15px; letter-spacing: 1px; text-transform: uppercase; color: #c5a267;">Shop</h3>
+                <ul style="list-style: none; padding: 0; font-size: 14px;">
+                    <li style="margin-bottom: 8px;"><a href="/rings" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Rings</a></li>
+                    <li style="margin-bottom: 8px;"><a href="/necklaces" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Necklaces</a></li>
+                    <li style="margin-bottom: 8px;"><a href="/earrings" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Earrings</a></li>
+                    <li style="margin-bottom: 8px;"><a href="/bracelets" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Bracelets</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 style="font-size: 18px; margin-bottom: 15px; letter-spacing: 1px; text-transform: uppercase; color: #c5a267;">Connect With Us</h3>
+                <ul style="list-style: none; padding: 0; font-size: 14px;">
+                    <li style="margin-bottom: 8px;"><a href="https://instagram.com" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Instagram</a></li>
+                    <li style="margin-bottom: 8px;"><a href="https://facebook.com" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Facebook</a></li>
+                    <li style="margin-bottom: 8px;"><a href="https://pinterest.com" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Pinterest</a></li>
+                    <li style="margin-bottom: 8px;"><a href="https://twitter.com" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Twitter</a></li>
+                </ul>
+            </div>
+        </div>
+        <div style="text-align: center; font-size: 12px; padding-top: 30px; margin-top: 30px; border-top: 1px solid #333; color: #666;">
+            © 2024 Lume Jewelry. All Rights Reserved.
+        </div>
+    </footer>
+    <style>
+        footer a:hover {
+            color: #c5a267;
+        }
+    </style>
+
+    <script>
+        // Sidebar button functionality
+        document.querySelector('.logout-btn').addEventListener('click', function() {
+            window.location.href = '/logout';
+        });
+
+        document.querySelector('.delete-btn').addEventListener('click', function() {
+            if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+                window.location.href = '/profile/delete';
+            }
+        });
+
+        // Toast Notification Function
+        function showToast(type, title, message) {
+            const toastContainer = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icon = type === 'success' ? 'check-circle' : 
+                        type === 'error' ? 'times-circle' : 'exclamation-circle';
+            
+            toast.innerHTML = `
+                <i class="fas fa-${icon} toast-icon"></i>
+                <div class="toast-content">
+                    <div class="toast-title">${title}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+                <i class="fas fa-times toast-close" onclick="this.parentElement.remove()"></i>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease-in-out forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 5000);
+        }
+
+        function openCancelModal() {
+            const orderId = '<%= order._id %>';
+            if (!orderId) {
+                showToast('error', 'Error', 'Order ID is missing');
+                return;
+            }
+            document.getElementById('orderId').value = orderId;
+            document.getElementById('cancelReason').value = '';
+            document.getElementById('cancelModal').classList.add('show');
+        }
+
+        function closeCancelModal() {
+            document.getElementById('cancelModal').classList.remove('show');
+            document.getElementById('cancelReason').value = '';
+        }
+
+        async function submitCancelOrder(event) {
+            event.preventDefault();
+            
+            const orderId = document.getElementById('orderId').value;
+            const reason = document.getElementById('cancelReason').value;
+
+            if (!orderId) {
+                showToast('error', 'Error', 'Order ID is missing');
+                return;
+            }
+
+            if (!reason.trim()) {
+                showToast('warning', 'Warning', 'Please provide a reason for cancellation');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/orders/${orderId}/cancel`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reason })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    showToast('success', 'Success', 'Order cancelled successfully');
+                    setTimeout(() => window.location.reload(), 1500);
+                } else {
+                    showToast('error', 'Error', data.message || 'Failed to cancel order');
+                }
+            } catch (error) {
+                showToast('error', 'Error', 'An error occurred while cancelling the order');
+            }
+        }
+
+        function openReturnModal() {
+            document.getElementById('returnModal').classList.add('show');
+        }
+
+        function closeReturnModal() {
+            document.getElementById('returnModal').classList.remove('show');
+        }
+
+        async function submitReturnRequest(event) {
+            event.preventDefault();
+            
+            const orderId = document.getElementById('returnOrderId').value;
+            const reason = document.getElementById('returnReason').value;
+            const description = document.getElementById('returnDescription').value.trim();
+            const selectedItems = Array.from(document.querySelectorAll('input[name="returnItems"]:checked'))
+                .map(checkbox => checkbox.value);
+
+            if (!selectedItems.length) {
+                showToast('warning', 'Warning', 'Please select at least one item to return');
+                return;
+            }
+
+            if (!description) {
+                showToast('warning', 'Warning', 'Please provide additional details for your return request');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/orders/${orderId}/return`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reason, description, items: selectedItems })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    showToast('success', 'Success', 'Return request submitted successfully');
+                    setTimeout(() => window.location.reload(), 1500);
+                } else {
+                    showToast('error', 'Error', data.message || 'Failed to submit return request');
+                }
+            } catch (error) {
+                showToast('error', 'Error', 'An error occurred while submitting the return request');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.return-item-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const selectedItems = Array.from(document.querySelectorAll('input[name="returnItems"]:checked'))
+                        .map(checkbox => checkbox.value);
+                    if (!selectedItems.length) {
+                        showToast('warning', 'Warning', 'Please select at least one item to return');
+                    }
+                });
+            });
+        });
+
+        window.onclick = function(event) {
+            const cancelModal = document.getElementById('cancelModal');
+            const returnModal = document.getElementById('returnModal');
+            if (event.target === cancelModal) closeCancelModal();
+            if (event.target === returnModal) closeReturnModal();
+        }
+    </script>
+</body>
+</html>

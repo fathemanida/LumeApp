@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders | Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500&family=Aboreto&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --dark-brown: #291d0e;
+            --olive-green: #314216;
+            --light-bg: #f8f5f2;
+            --border-color: #d3c9be;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: 'Jost', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--dark-brown);
+        }
+
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 240px;
+            background: white;
+            border-right: 1px solid var(--border-color);
+            padding: 2rem 1.5rem;
+        }
+
+        .brand {
+            font-family: 'Aboreto', cursive;
+            font-size: 1.8rem;
+            margin-bottom: 2.5rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--dark-brown);
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 1rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--dark-brown);
+            padding: 0.5rem 0.75rem;
+            transition: all 0.3s;
+            border-radius: 4px;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--olive-green);
+            font-weight: 500;
+            background-color: rgba(49, 66, 22, 0.1);
+        }
+
+        .nav-link.active {
+            font-weight: 600;
+            background-color: var(--light-bg);
+            box-shadow: 3px 0 0 0 var(--olive-green) inset;
+        }
+
+        .nav-link.logout {
+            color: #c33;
+            margin-top: 1.5rem;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-header {
+            background: white;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .search-container {
+            position: relative;
+            display: flex;
+            margin-right: 15px;
+        }
+
+        .search-bar {
+            padding: 10px 40px 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            width: 220px;
+            transition: all 0.3s ease;
+            font-family: 'Jost', sans-serif;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-bar:focus {
+            outline: none;
+            border-color: var(--olive-green);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            transform: scale(1.02);
+        }
+
+        .search-btn {
+            padding: 10px 15px;
+            background: var(--dark-brown);
+            border: none;
+            border-radius: 0 20px 20px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .search-btn:hover {
+            background: var(--dark-brown);
+            transform: translateY(-1px);
+        }
+
+        .clear-search {
+            position: absolute;
+            right: 50px;
+            top: 50%;
+            transform: translateY(-50%) scale(0.8);
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            color: var(--dark-brown);
+            cursor: pointer;
+            display: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .clear-search:hover {
+            background: #f5f5f5;
+            transform: translateY(-50%) scale(0.9);
+        }
+
+        .search-bar:not(:placeholder-shown) + .clear-search {
+            display: flex;
+        }
+
+        .notification-btn {
+            background: none;
+            border: none;
+            position: relative;
+            cursor: pointer;
+            color: #555;
+            font-size: 1.1rem;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4757;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .profile-dropdown {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .profile-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .profile-name {
+            font-weight: 500;
+        }
+
+        .profile-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 0.5rem 0;
+            min-width: 180px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 100;
+        }
+
+        .profile-dropdown:hover .profile-dropdown-menu {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 0.5rem 1rem;
+            display: block;
+            color: var(--dark-brown);
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--light-bg);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            color: var(--dark-brown);
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .content-area {
+            padding: 2rem;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .table-container {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(41, 29, 14, 0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 1rem;
+            background-color: var(--light-bg);
+            color: var(--dark-brown);
+            font-weight: 500;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .status {
+            padding: 0.4rem 0.8rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-delivered {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-processing {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+
+        .status-shipped {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-cancelled {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .view-btn {
+            padding: 0.5rem 1rem;
+            background-color: var(--olive-green);
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .view-btn:hover {
+            background-color: var(--dark-brown);
+            transform: translateY(-2px);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .page-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            border: none;
+            background-color: #e0e0e0;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none;
+        }
+
+        .page-btn.active {
+            background-color: var(--dark-brown);
+            color: white;
+        }
+
+        .page-btn:hover:not(.active) {
+            background-color: #d0d0d0;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -240px;
+                top: 0;
+                bottom: 0;
+                z-index: 1000;
+                transition: left 0.3s;
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .main-header {
+                padding: 1rem;
+            }
+        }
+
+        /* Toast Styles */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+        }
+
+        .toast {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .toast-header {
+            background-color: var(--dark-brown);
+            color: white;
+            border-bottom: none;
+        }
+
+        .toast-header .btn-close {
+            color: white;
+            filter: brightness(0) invert(1);
+        }
+
+        .toast-body {
+            color: var(--dark-brown);
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+<body class="dashboard">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="brand">LUME</div>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="/admin/dashboard" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/product" class="nav-link"><i class="fas fa-box"></i> Product</a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/orders" class="nav-link active"><i class="fas fa-shopping-cart"></i> Orders</a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/users" class="nav-link"><i class="fas fa-users"></i> Users</a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/Category" class="nav-link"><i class="fas fa-tags"></i> Category</a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/offers" class="nav-link"><i class="fas fa-ticket-alt"></i> Offers</a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/settings" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/banner" class="nav-link"><i class="fas fa-image"></i> Banner</a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/Coupons" class="nav-link"><i class="fas fa-ticket-alt"></i> Coupons</a>
+            </li>
+            <li class="nav-item">
+                <a href="/admin/logout" class="nav-link logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <header class="main-header">
+            <div class="header-left">
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h2 class="page-title">ORDERS</h2>
+            </div>
+            <div class="header-right">
+                <div class="search-container">
+                    <form id="searchForm" action="/admin/orders" method="GET">
+                        <input type="text" class="search-bar" placeholder="Search orders..." name="search"
+                            value="<%= typeof search !== 'undefined' ? search : '' %>">
+                        <button type="button" class="clear-search">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        <button type="submit" class="search-btn">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
+                </div>
+                <button class="notification-btn">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </button>
+                <div class="profile-dropdown">
+                    <img src="https://i.pravatar.cc/80" alt="Profile" class="profile-img">
+                    <span class="profile-name">Admin</span>
+                    <div class="profile-dropdown-menu">
+                        <a href="#" class="dropdown-item"><i class="fas fa-user"></i> Profile</a>
+                        <a href="#" class="dropdown-item"><i class="fas fa-cog"></i> Settings</a>
+                        <a href="/admin/logout" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="content-area">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Date</th>
+                            <th>Customer</th>
+                            <th>Products</th>
+                            <th>Amount</th>
+                            <th>Payment Method</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% orders.forEach(order => { %>
+                            <tr>
+                                <td>#<%= order.orderNumber %></td>
+                                <td><%= new Date(order.createdOn).toLocaleDateString('en-US', { 
+                                    year: 'numeric', 
+                                    month: 'short', 
+                                    day: 'numeric'
+                                }) %></td>
+                                <td>
+                                    <% if (order.userId && order.userId.name) { %>
+                                        <%= order.userId.name %>
+                                    <% } else { %>
+                                        User not found
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <% if (order.orderItems && order.orderItems.length > 0) { %>
+                                        <% const firstItem = order.orderItems[0] %>
+                                        <%= firstItem.productId ? firstItem.productId.productName : 'Product not found' %>
+                                        <% if (order.orderItems.length > 1) { %>
+                                            <span style="color: #666;">+<%= order.orderItems.length - 1 %> more</span>
+                                        <% } %>
+                                    <% } else { %>
+                                        No items
+                                    <% } %>
+                                </td>
+                                <td>₹<%= order.totalAmount.toFixed(2) %></td>
+                                <td><%= order.paymentMethod || 'COD' %></td>
+                                <td>
+                                    <span class="status status-<%= order.status.toLowerCase() %>">
+                                        <%= order.status %>
+                                    </span>
+                                    <% if (order.returnRequest) { %>
+                                        <div class="return-status" style="margin-top: 5px; font-size: 0.8rem;">
+                                            <% if (order.returnRequest.status === 'Pending') { %>
+                                                <div style="color: #721c24; background-color: #f8d7da; padding: 4px 8px; border-radius: 4px;">
+                                                    <i class="fas fa-exclamation-circle"></i> Return Requested
+                                                </div>
+                                            <% } else if (order.returnRequest.status === 'Accepted') { %>
+                                                <div style="color: #155724; background-color: #d4edda; padding: 4px 8px; border-radius: 4px;">
+                                                    <i class="fas fa-check-circle"></i> Return Accepted
+                                                </div>
+                                            <% } else if (order.returnRequest.status === 'Rejected') { %>
+                                                <div style="color: #721c24; background-color: #f8d7da; padding: 4px 8px; border-radius: 4px;">
+                                                    <i class="fas fa-times-circle"></i> Return Rejected
+                                                </div>
+                                            <% } %>
+                                        </div>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <a href="/admin/orders/<%= order._id %>" class="view-btn">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+
+                <div class="pagination">
+                    <span style="margin-right: 1rem; align-self: center;">
+                        Showing <%= currentPage %> of <%= totalPages %>
+                    </span>
+
+                    <% if (currentPage > 1) { %>
+                        <a href="?page=<%= currentPage - 1 %>" class="page-btn">&lt;</a>
+                    <% } else { %>
+                        <span class="page-btn" style="opacity: 0.5; pointer-events: none;">&lt;</span>
+                    <% } %>
+
+                    <% for(let i = 1; i <= totalPages; i++) { %>
+                        <% if (i === currentPage) { %>
+                            <span class="page-btn active"><%= i %></span>
+                        <% } else { %>
+                            <a href="?page=<%= i %>" class="page-btn"><%= i %></a>
+                        <% } %>
+                    <% } %>
+
+                    <% if (currentPage < totalPages) { %>
+                        <a href="?page=<%= currentPage + 1 %>" class="page-btn">&gt;</a>
+                    <% } else { %>
+                        <span class="page-btn" style="opacity: 0.5; pointer-events: none;">&gt;</span>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Bootstrap JS and Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+
+    <script>
+        document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+            document.querySelector('.sidebar').classList.toggle('active');
+        });
+
+        const searchForm = document.getElementById('searchForm');
+        const searchInput = document.querySelector('.search-bar');
+        const clearSearch = document.querySelector('.clear-search');
+
+        searchForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const searchTerm = searchInput.value.trim();
+            const url = new URL(window.location.href);
+            
+            if(searchTerm) {
+                url.searchParams.set('search', searchTerm);
+                url.searchParams.set('page', '1');
+            } else {
+                url.searchParams.delete('search');
+            }
+            
+            window.location.href = url.toString();
+        });
+
+        if(clearSearch) {
+            clearSearch.addEventListener('click', function() {
+                searchInput.value = '';
+                const url = new URL(window.location.href);
+                url.searchParams.delete('search');
+                window.location.href = url.toString();
+            });
+        }
+
+        function showToast(message, type = 'success') {
+            const toastContainer = document.querySelector('.toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'assertive');
+            toast.setAttribute('aria-atomic', 'true');
+
+            const icon = type === 'success' ? 'check-circle' : 'exclamation-circle';
+            const bgColor = type === 'success' ? 'success' : 'danger';
+
+            toast.innerHTML = `
+                <div class="toast-header bg-${bgColor} text-white">
+                    <i class="fas fa-${icon} me-2"></i>
+                    <strong class="me-auto">${type === 'success' ? 'Success' : 'Error'}</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    ${message}
+                </div>
+            `;
+
+            toastContainer.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast, {
+                autohide: true,
+                delay: 3000
+            });
+            bsToast.show();
+
+            // Remove toast from DOM after it's hidden
+            toast.addEventListener('hidden.bs.toast', () => {
+                toast.remove();
+            });
+        }
+    </script>
+</body>
+</html> 

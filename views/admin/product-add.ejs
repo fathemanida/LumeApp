@@ -53,8 +53,8 @@
         <div class="md:col-span-1 grid grid-cols-1 gap-4">
           <div>
             <label class="block mb-1 font-jost text-dark-brown font-medium text-sm">Product Name:</label>
-            <input type="text" name="name" id="name" class="w-full p-2 border-b border-border-color bg-transparent text-dark-brown font-jost focus:border-dark-brown outline-none">
-            <div id="name-error" class="error-message text-dark-brown text-sm mt-1"></div>
+            <input type="text" name="productName" id="productName" class="w-full p-2 border-b border-border-color bg-transparent text-dark-brown font-jost focus:border-dark-brown outline-none">
+            <div id="productName-error" class="error-message text-dark-brown text-sm mt-1"></div>
           </div>
           <div>
             <label class="block mb-1 font-jost text-dark-brown font-medium text-sm">Product Description:</label>
@@ -80,8 +80,8 @@
           <div id="dynamic-sizes" class="form-group" style="display: none;">
             <label class="block mb-1 font-jost text-dark-brown font-medium text-sm">Sizes and Quantities:</label>
             <div class="flex gap-2 mb-2">
-              <input type="text" id="size-input" class="w-full p-2 border-b border-border-color bg-transparent text-dark-brown font-jost focus:border-dark-brown outline-none" placeholder="Enter size (e.g., 6, 16in)">
-              <input type="number" id="size-quantity" class="w-full p-2 border-b border-border-color bg-transparent text-dark-brown font-jost focus:border-dark-brown outline-none" placeholder="Quantity" min="0">
+              <input type="text" id="size-input" class="w-1/2 p-2 border-b border-border-color bg-transparent text-dark-brown font-jost focus:border-dark-brown outline-none" placeholder="Enter size (e.g., 6, 16in)">
+              <input type="number" id="size-quantity-input" class="w-1/2 p-2 border-b border-border-color bg-transparent text-dark-brown font-jost focus:border-dark-brown outline-none" placeholder="Quantity" min="0">
               <button type="button" id="add-size-btn" class="bg-dark-brown text-white px-4 py-2 rounded font-jost hover:bg-olive-green transition-all">Add</button>
             </div>
             <div id="sizes-list" class="flex flex-wrap gap-2"></div>
@@ -90,18 +90,18 @@
           </div>
           <div>
             <label class="block mb-1 font-jost text-dark-brown font-medium text-sm">Regular Amount (₹):</label>
-            <input type="number" name="amount" id="amount" class="w-full p-2 border-b border-border-color bg-transparent text-dark-brown font-jost focus:border-dark-brown outline-none" min="0" step="0.01">
-            <div id="amount-error" class="error-message text-dark-brown text-sm mt-1"></div>
+            <input type="number" name="regularPrice" id="regularPrice" class="w-full p-2 border-b border-border-color bg-transparent text-dark-brown font-jost focus:border-dark-brown outline-none" min="0" step="0.01">
+            <div id="regularPrice-error" class="error-message text-dark-brown text-sm mt-1"></div>
           </div>
           <div>
             <label class="block mb-1 font-jost text-dark-brown font-medium text-sm">Sales Amount (₹):</label>
-            <input type="number" name="salesAmount" id="salesAmount" class="w-full p-2 border-b border-border-color bg-transparent text-dark-brown font-jost focus:border-dark-brown outline-none" min="0" step="0.01">
-            <div id="salesAmount-error" class="error-message text-dark-brown text-sm mt-1"></div>
+            <input type="number" name="salePrice" id="salePrice" class="w-full p-2 border-b border-border-color bg-transparent text-dark-brown font-jost focus:border-dark-brown outline-none" min="0" step="0.01">
+            <div id="salePrice-error" class="error-message text-dark-brown text-sm mt-1"></div>
           </div>
           <div>
-            <label class="block mb-1 font-jost text-dark-brown font-medium text-sm">Stock Count:</label>
-            <input type="number" name="stock" id="stock" class="w-full p-2 border-b border-border-color bg-transparent text-dark-brown font-jost focus:border-dark-brown outline-none" min="0">
-            <div id="stock-error" class="error-message text-dark-brown text-sm mt-1"></div>
+            <label class="block mb-1 font-jost text-dark-brown font-medium text-sm">Stock Count (Total):</label>
+            <input type="number" name="quantity" id="quantity" class="w-full p-2 border-b border-border-color bg-transparent text-dark-brown font-jost focus:border-dark-brown outline-none" min="0" readonly>
+            <div id="quantity-error" class="error-message text-dark-brown text-sm mt-1"></div>
           </div>
           <div class="flex flex-col">
             <label class="block mb-1 font-jost text-dark-brown font-medium text-sm">Featured:</label>
@@ -118,6 +118,36 @@
               <label class="font-jost text-dark-brown"><input type="radio" name="new" value="no" class="mr-1 accent-dark-brown"> No</label>
             </div>
             <div id="new-error" class="error-message text-dark-brown text-sm mt-1"></div>
+          </div>
+          <div class="flex flex-col">
+            <label class="block mb-1 font-jost text-dark-brown font-medium text-sm">
+              <input type="checkbox" id="enable-offer" class="mr-1 accent-dark-brown"> Enable Product Offer
+            </label>
+            <div id="offer-form" class="hidden mt-2 grid gap-2">
+              <div>
+                <label class="block mb-1 font-jost text-dark-brown font-medium text-sm">Discount Type:</label>
+                <select id="discount-type" class="w-full p-2 border-b border-border-color bg-white text-dark-brown font-jost focus:border-dark-brown outline-none">
+                  <option value="percentage">Percentage</option>
+                  <option value="flat">Flat</option>
+                </select>
+              </div>
+              <div>
+                <label class="block mb-1 font-jost text-dark-brown font-medium text-sm">Discount Value:</label>
+                <input type="number" id="discount-value" class="w-full p-2 border-b border-border-color bg-transparent text-dark-brown font-jost focus:border-dark-brown outline-none" min="0" step="0.01" placeholder="e.g., 10 for 10% or ₹10">
+                <div id="discount-value-error" class="error-message text-dark-brown text-sm mt-1"></div>
+              </div>
+              <div>
+                <label class="block mb-1 font-jost text-dark-brown font-medium text-sm">Start Date:</label>
+                <input type="date" id="start-date" class="w-full p-2 border-b border-border-color bg-transparent text-dark-brown font-jost focus:border-dark-brown outline-none">
+                <div id="start-date-error" class="error-message text-dark-brown text-sm mt-1"></div>
+              </div>
+              <div>
+                <label class="block mb-1 font-jost text-dark-brown font-medium text-sm">End Date:</label>
+                <input type="date" id="end-date" class="w-full p-2 border-b border-border-color bg-transparent text-dark-brown font-jost focus:border-dark-brown outline-none">
+                <div id="end-date-error" class="error-message text-dark-brown text-sm mt-1"></div>
+              </div>
+            </div>
+            <div id="offer-error" class="error-message text-dark-brown text-sm mt-1"></div>
           </div>
         </div>
 
@@ -216,6 +246,7 @@
     .outline-none { outline: none; }
     .flex-col { flex-direction: column; }
     .mt-1 { margin-top: 0.25rem; }
+    .mt-2 { margin-top: 0.5rem; }
     .error-message { color: var(--error); font-size: 0.8rem; margin-top: 0.25rem; display: none; font-family: 'Jost', sans-serif; }
     .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
     .mt-5 { margin-top: 1.25rem; }
@@ -225,37 +256,10 @@
     .transition-all { transition: all 0.3s ease; }
     .accent-dark-brown { accent-color: var(--dark-brown); }
     .mr-1 { margin-right: 0.25rem; }
-    .size-tag {
-      background-color: var(--dark-brown);
-      color: #ffffff;
-      padding: 0.5rem 0.75rem;
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      font-size: 0.9rem;
-    }
-    .size-tag .size-info {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .size-tag .quantity-badge {
-      background-color: rgba(255, 255, 255, 0.2);
-      padding: 0.25rem 0.5rem;
-      border-radius: 3px;
-      font-size: 0.8rem;
-    }
-    .size-tag .remove-size {
-      cursor: pointer;
-      font-size: 0.8rem;
-      padding: 0.25rem;
-      border-radius: 50%;
-      transition: all 0.3s ease;
-    }
-    .size-tag .remove-size:hover {
-      background-color: rgba(255, 255, 255, 0.2);
-    }
+    .size-tag { background-color: var(--dark-brown); color: #ffffff; padding: 0.25rem 0.5rem; border-radius: 4px; display: flex; align-items: center; gap: 0.5rem; }
+    .size-tag .remove-size { cursor: pointer; font-size: 0.8rem; }
+    .flex-wrap { flex-wrap: wrap; }
+    .w-1\\/2 { width: 50%; }
 
     @media (max-width: 768px) {
       .md\\:col-span-1, .md\\:col-span-2 { grid-column: span 1; }
@@ -268,6 +272,7 @@
     let currentImageIndex = 0;
     let selectedFiles = [];
     let selectedSizes = [];
+    let productOffer = { active: false };
     const imageInput = document.getElementById("imageInput");
     const previewImages = [
       document.getElementById("preview1"),
@@ -279,6 +284,8 @@
     const cropButton = document.getElementById("cropButton");
     const cancelCrop = document.getElementById("cancelCrop");
     const form = document.getElementById("addProductForm");
+    const enableOfferCheckbox = document.getElementById("enable-offer");
+    const offerForm = document.getElementById("offer-form");
     let isSubmitting = false;
 
     function handleImageUpload(event) {
@@ -359,7 +366,7 @@
               });
               console.log("Cropper initialized for image", currentImageIndex + 1);
             } catch (error) {
-             console.error("Error initializing Cropper:", error);
+              console.error("Error initializing Cropper:", error);
               displayErrorMessage("image-error", "Failed to initialize cropper");
               cropModal.style.display = "none";
               currentImageIndex++;
@@ -403,7 +410,7 @@
 
       try {
         const canvas = cropper.getCroppedCanvas({
-          aspectRatio:2/3,
+          aspectRatio: 2/3,
           minWidth: 160,
           minHeight: 160,
           maxWidth: 4096,
@@ -504,11 +511,11 @@
     const categorySelect = document.getElementById("product-category");
     const dynamicSizesSection = document.getElementById("dynamic-sizes");
     const sizeInput = document.getElementById("size-input");
-    const sizeQuantity = document.getElementById("size-quantity");
+    const sizeQuantityInput = document.getElementById("size-quantity-input");
     const addSizeBtn = document.getElementById("add-size-btn");
     const sizesList = document.getElementById("sizes-list");
     const sizesInput = document.getElementById("sizes-input");
-    const stockInput = document.getElementById("stock");
+    const stockInput = document.getElementById("quantity");
 
     categorySelect.addEventListener("change", function () {
       console.log("Category changed to:", categorySelect.value);
@@ -524,16 +531,9 @@
       }
     });
 
-    // Function to calculate total stock from sizes
-    function calculateTotalStock() {
-      const total = selectedSizes.reduce((sum, item) => sum + item.quantity, 0);
-      stockInput.value = total;
-      return total;
-    }
-
     addSizeBtn.addEventListener("click", function () {
       const size = sizeInput.value.trim();
-      const quantity = parseInt(sizeQuantity.value);
+      const quantity = parseInt(sizeQuantityInput.value.trim() || 0);
 
       if (size === "") {
         displayErrorMessage("sizes-error", "Please enter a size");
@@ -541,7 +541,7 @@
       }
 
       if (isNaN(quantity) || quantity < 0) {
-        displayErrorMessage("sizes-error", "Please enter a valid quantity");
+        displayErrorMessage("sizes-error", "Please enter a valid quantity (0 or more)");
         return;
       }
 
@@ -551,59 +551,52 @@
         return;
       }
 
-      // Check if size already exists
-      const existingSizeIndex = selectedSizes.findIndex(item => item.size === size);
-      if (existingSizeIndex !== -1) {
-        displayErrorMessage("sizes-error", "This size has already been added");
-        return;
+      if (!selectedSizes.some(item => item.size === size)) {
+        selectedSizes.push({ size, quantity });
+        updateSizesList();
+        console.log("Size and quantity added:", size, quantity);
+      } else {
+        displayErrorMessage("sizes-error", "This size is already added");
       }
-
-      selectedSizes.push({ size, quantity });
-      updateSizesList();
-      calculateTotalStock(); // Update total stock
-      console.log("Size added:", size, "Quantity:", quantity);
-      
-      // Clear inputs
       sizeInput.value = "";
-      sizeQuantity.value = "";
+      sizeQuantityInput.value = "";
     });
 
     function updateSizesList() {
       sizesList.innerHTML = "";
+      let totalQuantity = 0;
+
       selectedSizes.forEach((item, index) => {
         const sizeTag = document.createElement("div");
         sizeTag.classList.add("size-tag");
         sizeTag.innerHTML = `
-          <div class="size-info">
-            <span>${item.size}</span>
-            <span class="quantity-badge">Qty: ${item.quantity}</span>
-          </div>
+          <span>${item.size} (${item.quantity})</span>
           <span class="remove-size">×</span>
         `;
         sizeTag.querySelector(".remove-size").addEventListener("click", () => {
           selectedSizes.splice(index, 1);
           updateSizesList();
-          calculateTotalStock(); // Update total stock when size is removed
           console.log("Size removed:", item.size);
         });
         sizesList.appendChild(sizeTag);
+        totalQuantity += Number(item.quantity) || 0;
       });
+
+      stockInput.value = totalQuantity > 0 ? totalQuantity : 0;
       sizesInput.value = JSON.stringify(selectedSizes);
+      console.log("Total quantity updated:", totalQuantity);
     }
 
-    // Make stock input read-only since it's calculated automatically
-    stockInput.readOnly = true;
-    stockInput.style.backgroundColor = "#f8f5f2";
-    stockInput.style.cursor = "not-allowed";
-
-    // Add a note about automatic stock calculation
-    const stockLabel = stockInput.previousElementSibling;
-    if (stockLabel) {
-      const note = document.createElement("small");
-      note.className = "text-muted d-block mt-1";
-      note.textContent = "Stock count is automatically calculated from size quantities";
-      stockLabel.parentNode.insertBefore(note, stockInput.nextSibling);
-    }
+    enableOfferCheckbox.addEventListener("change", function () {
+      console.log("Enable offer checkbox changed:", enableOfferCheckbox.checked);
+      if (enableOfferCheckbox.checked) {
+        offerForm.classList.remove("hidden");
+        productOffer.active = true;
+      } else {
+        offerForm.classList.add("hidden");
+        productOffer = { active: false };
+      }
+    });
 
     form.addEventListener("submit", async function (event) {
       event.preventDefault();
@@ -613,7 +606,7 @@
 
       const submitButton = document.getElementById("submitButton");
       submitButton.disabled = true;
-      submitButton.innerHTML = "Processing...";
+      submitButton.innerHTML = "Submitting...";
 
       if (!validateForm()) {
         isSubmitting = false;
@@ -625,15 +618,23 @@
       try {
         const formData = new FormData();
 
-        formData.append("productName", document.getElementById("name").value.trim());
+        formData.append("productName", document.getElementById("productName").value.trim());
         formData.append("description", document.getElementById("description").value.trim());
         formData.append("category", document.getElementById("product-category").value.trim());
-        formData.append("regularPrice", document.getElementById("amount").value);
-        formData.append("salePrice", document.getElementById("salesAmount").value || document.getElementById("amount").value);
-        formData.append("quantity", document.getElementById("stock").value);
+        formData.append("regularPrice", document.getElementById("regularPrice").value);
+        formData.append("salePrice", document.getElementById("salePrice").value || document.getElementById("regularPrice").value);
+        formData.append("quantity", document.getElementById("quantity").value);
         formData.append("featured", document.querySelector('input[name="featured"]:checked').value);
         formData.append("new", document.querySelector('input[name="new"]:checked').value);
-        formData.append("sizes", JSON.stringify(selectedSizes));
+        formData.append("sizes", document.getElementById("sizes-input").value);
+
+        if (enableOfferCheckbox.checked) {
+          productOffer.discountType = document.getElementById("discount-type").value;
+          productOffer.discountValue = parseFloat(document.getElementById("discount-value").value);
+          productOffer.startDate = document.getElementById("start-date").value;
+          productOffer.endDate = document.getElementById("end-date").value;
+        }
+        formData.append("productOffer", JSON.stringify(productOffer));
 
         selectedFiles.forEach((file) => {
           formData.append("images", file);
@@ -677,37 +678,42 @@
         submitButton.innerHTML = "Add Product";
       }
     });
-     
+
     function validateForm() {
       console.log("Validating form");
       clearErrorMessages();
-      
-      const name = document.getElementById("name").value.trim();
+
+      const productName = document.getElementById("productName").value.trim();
       const description = document.getElementById("description").value.trim();
       const category = document.getElementById("product-category").value.trim();
-      const amount = document.getElementById("amount").value.trim();
-      const salesAmount = document.getElementById("salesAmount").value.trim();
-      const totalStock = calculateTotalStock(); // Get the calculated total stock
+      const regularPrice = document.getElementById("regularPrice").value.trim();
+      const salePrice = document.getElementById("salePrice").value.trim();
+      const quantity = document.getElementById("quantity").value.trim();
       const featuredSelected = document.querySelector('input[name="featured"]:checked');
       const newSelected = document.querySelector('input[name="new"]:checked');
+      const enableOffer = enableOfferCheckbox.checked;
+      const discountType = document.getElementById("discount-type")?.value;
+      const discountValue = document.getElementById("discount-value")?.value;
+      const startDate = document.getElementById("start-date")?.value;
+      const endDate = document.getElementById("end-date")?.value;
 
       let isValid = true;
 
-      if (name === "") {
-        displayErrorMessage("name-error", "Please enter a product name");
+      if (productName === "") {
+        displayErrorMessage("productName-error", "Please enter a product name");
         isValid = false;
-        console.log("Validation failed: Empty name");
-      } else if (!/^[A-Z][a-zA-Z0-9\s]*$/.test(name)) {
-        displayErrorMessage("name-error", "Product name should start with a capital letter and contain only alphabets");
+        console.log("Validation failed: Empty product name");
+      } else if (!/^[A-Z][a-zA-Z0-9\s]*$/.test(productName)) {
+        displayErrorMessage("productName-error", "Product name should start with a capital letter and contain only alphabets");
         isValid = false;
-        console.log("Validation failed: Invalid name format");
+        console.log("Validation failed: Invalid product name format");
       }
-      if (category === "") {
-  displayErrorMessage("category-error", "Please select a category");
-  isValid = false;
-  console.log("Validation failed: No category selected");
-}
 
+      if (category === "") {
+        displayErrorMessage("category-error", "Please select a category");
+        isValid = false;
+        console.log("Validation failed: No category selected");
+      }
 
       if (description === "") {
         displayErrorMessage("description-error", "Please enter a description");
@@ -718,8 +724,6 @@
         isValid = false;
         console.log("Validation failed: Description too short");
       }
-
-     
 
       const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
       if (selectedFiles.length !== 3) {
@@ -732,22 +736,32 @@
         console.log("Validation failed: Invalid image types");
       }
 
-      if ( parseFloat(salesAmount) >= parseFloat(amount)) {
-        displayErrorMessage("salesAmount-error", "Sale price must be less than regular price");
+      if (salePrice && parseFloat(salePrice) >= parseFloat(regularPrice)) {
+        displayErrorMessage("salePrice-error", "Sale price must be less than regular price");
         isValid = false;
-        console.log("Validation failed: Invalid sales amount");
+        console.log("Validation failed: Invalid sale price");
       }
 
-      if (amount === "" || isNaN(amount) || amount <= 0) {
-        displayErrorMessage("amount-error", "Enter a valid amount greater than 0");
+      if (regularPrice === "" || isNaN(regularPrice) || parseFloat(regularPrice) <= 0) {
+        displayErrorMessage("regularPrice-error", "Enter a valid amount greater than 0");
         isValid = false;
-        console.log("Validation failed: Invalid amount");
+        console.log("Validation failed: Invalid regular price");
       }
 
-      if (totalStock === 0) {
-        displayErrorMessage("stock-error", "Please add at least one size with quantity");
+      if (quantity === "" || !Number.isInteger(Number(quantity)) || parseInt(quantity) < 0) {
+        displayErrorMessage("quantity-error", "Enter a valid stock quantity (0 or more)");
         isValid = false;
-        console.log("Validation failed: No stock");
+        console.log("Validation failed: Invalid quantity");
+      }
+
+      if (category && selectedSizes.length === 0) {
+        displayErrorMessage("sizes-error", "Please add at least one size with quantity");
+        isValid = false;
+        console.log("Validation failed: No sizes added");
+      } else if (selectedSizes.some(item => item.quantity < 0)) {
+        displayErrorMessage("sizes-error", "All size quantities must be 0 or more");
+        isValid = false;
+        console.log("Validation failed: Invalid size quantities");
       }
 
       if (!featuredSelected) {
@@ -760,6 +774,40 @@
         displayErrorMessage("new-error", "Please select new product status");
         isValid = false;
         console.log("Validation failed: Missing new status");
+      }
+
+      if (enableOffer) {
+        if (!discountType) {
+          displayErrorMessage("offer-error", "Please select a discount type");
+          isValid = false;
+          console.log("Validation failed: Missing discount type");
+        }
+
+        if (!discountValue || isNaN(discountValue) || parseFloat(discountValue) < 0) {
+          displayErrorMessage("discount-value-error", "Enter a valid discount value (0 or more)");
+          isValid = false;
+          console.log("Validation failed: Invalid discount value");
+        } else if (discountType === "percentage" && parseFloat(discountValue) > 100) {
+          displayErrorMessage("discount-value-error", "Percentage discount must be between 0 and 100");
+          isValid = false;
+          console.log("Validation failed: Invalid percentage discount");
+        }
+
+        if (!startDate) {
+          displayErrorMessage("start-date-error", "Please select a start date");
+          isValid = false;
+          console.log("Validation failed: Missing start date");
+        }
+
+        if (!endDate) {
+          displayErrorMessage("end-date-error", "Please select an end date");
+          isValid = false;
+          console.log("Validation failed: Missing end date");
+        } else if (startDate && endDate && new Date(startDate) >= new Date(endDate)) {
+          displayErrorMessage("end-date-error", "End date must be after start date");
+          isValid = false;
+          console.log("Validation failed: Invalid date range");
+        }
       }
 
       console.log("Form validation result:", isValid);

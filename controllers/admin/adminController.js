@@ -3,6 +3,7 @@ const Product = require("../../models/productSchema");
 const Category = require("../../models/categorySchema");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const Order = require('../../models/orderSchema');
 
 const pageError = async (req, res) => {
   try {
@@ -78,60 +79,41 @@ const logout = async (req, res) => {
 
 const loadDashboard = async (req, res) => {
   try {
-    if (!req.session.admin) {
-      return res.redirect("/admin/login");
-    }
+    // Get total customers (excluding admins)
+    const totalCustomers = await User.countDocuments({ isAdmin: false });
 
-    const adminData = await User.findById(req.session.admin.id);
+    // Get total products
+    const totalProducts = await Product.countDocuments();
 
-    const totalUsers = await User.countDocuments({ isAdmin: false });
-    const totalProducts = await Product.countDocuments({
-      isListed: true,
-      status: "Available",
-    });
-    const totalCategories = await Category.countDocuments({ isListed: true });
+    // Get total orders and calculate revenue
+    const orders = await Order.find();
+    const totalOrders = orders.length;
+    const totalRevenue = orders.reduce((sum, order) => sum + (order.finalAmount || 0), 0);
 
-    const recentProducts = await Product.find({ isListed: true })
+    // Get recent orders (last 5)
+    const recentOrders = await Order.find()
       .sort({ createdOn: -1 })
       .limit(5)
-      .populate({
-        path: "category",
-        select: "name",
-        match: { isListed: true },
-      });
+      .select('_id status createdOn')
+      .lean();
 
-    const lowStockProducts = await Product.find({
-      isListed: true,
-      quantity: { $lt: 10 },
-    })
-      .limit(5)
-      .populate({
-        path: "category",
-        select: "name",
-        match: { isListed: true },
-      });
+    // Format recent orders
+    const formattedRecentOrders = recentOrders.map(order => ({
+      orderNumber: order._id.toString().slice(-6).toUpperCase(),
+      status: order.status || 'Pending',
+      createdOn: order.createdOn
+    }));
 
-    const totalSales = 0;
-
-    const filteredRecentProducts = recentProducts.filter(
-      (product) => product.category
-    );
-    const filteredLowStockProducts = lowStockProducts.filter(
-      (product) => product.category
-    );
-
-    res.render("admin/dashboard", {
-      admin: adminData,
-      totalUsers: totalUsers || 0,
-      totalProducts: totalProducts || 0,
-      totalCategories: totalCategories || 0,
-      totalSales: totalSales || 0,
-      recentProducts: filteredRecentProducts || [],
-      lowStockProducts: filteredLowStockProducts || [],
+    res.render('admin/dashboard', {
+      totalCustomers,
+      totalProducts,
+      totalOrders,
+      totalRevenue,
+      recentOrders: formattedRecentOrders
     });
   } catch (error) {
-    console.error("Error in loadDashboard:", error);
-    res.redirect("/admin/pageError");
+    console.error('Error in loadDashboard:', error);
+    res.status(500).render('error', { message: 'Error loading dashboard' });
   }
 };
 

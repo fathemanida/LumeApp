@@ -4,14 +4,18 @@ const adminController = require("../controllers/admin/adminController");
 const customerController = require("../controllers/admin/customerController");
 const categoryController = require("../controllers/admin/categoryController");
 const productController = require("../controllers/admin/productController");
+const orderController = require("../controllers/admin/orderController");
 const {userAuth, adminAuth} = require("../middleware/auth");
+const walletController = require('../controllers/user/walletController');
+const couponController=require('../controllers/admin/couponController')
+const offerController = require('../controllers/admin/offerController');
 
 // Admin authentication routes
 router.get('/pageError', adminController.pageError);
 router.get("/login", adminController.loadLogin);
 router.post("/login", adminController.login);
 router.get("/logout", adminController.logout);
-router.get('/dashboard', adminController.loadDashboard);
+router.get('/dashboard', adminAuth, adminController.loadDashboard);
 
 // Customer management routes
 router.get("/users", adminAuth, customerController.customerInfo);
@@ -37,5 +41,25 @@ router.post('/edit-product/:id', adminAuth, productController.upload.array("imag
 router.get('/list-product/:id', adminAuth, productController.getListProduct);
 router.get('/unlist-product/:id', adminAuth, productController.getUnlistProduct);
 router.get('/delete-product/:id', adminAuth, productController.deleteProduct);
+
+// Order management routes
+router.get('/orders', adminAuth, orderController.getOrders);
+router.get('/orders/:orderId', adminAuth, orderController.getOrderDetails);
+router.post('/orders/:orderId/status', adminAuth, orderController.updateOrderStatus);
+router.post('/orders/:orderId/return-request', adminAuth, orderController.handleReturnRequest);
+
+// Return processing route
+router.post('/orders/:orderId/process-return', adminAuth, walletController.processReturnRefund);
+
+// Offers routes
+router.get('/offers', adminAuth, offerController.getAllOffers);
+
+router.get('/coupons', adminAuth, couponController.listCoupons);
+router.get('/coupons/add', adminAuth, couponController.showAddForm);
+router.post('/coupons', adminAuth, couponController.createCoupon);
+router.get('/coupons/edit/:id', adminAuth, couponController.showEditForm);
+router.put('/coupons/:id', adminAuth, couponController.updateCoupon);
+router.delete('/coupons/:id', adminAuth, couponController.deleteCoupon);
+router.put('/coupons/:id/toggle-status', adminAuth, couponController.toggleStatus);
 
 module.exports = router;

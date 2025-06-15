@@ -599,7 +599,7 @@ const productDetails = async (req, res) => {
     if (req.session.user) {
       userData = await User.findById(req.session.user._id);
     }
-
+    console.log('userrrrrrr at deatail pageeee',req.session.user);
     const productId = req.query.id;
 
     if (!productId) {
@@ -633,7 +633,7 @@ const productDetails = async (req, res) => {
       product,
       relatedProducts,
       category: categories,
-      currentUser: userData,
+      currentUser: req.session.user,
     });
   } catch (error) {
     console.error("Error in productDetails:", error);

@@ -8,6 +8,8 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
   <link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Jost&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <!-- Add Toastify CSS -->
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
   <style>
     :root {
       --dark-brown: #291d0e;
@@ -750,19 +752,17 @@
     <% products.forEach(product => { %>
       <div class="col product-item">
         <div class="product-card card text-center h-100" data-product-id="<%= product._id %>">
+          <i class="far fa-heart wishlist-icon" onclick="event.stopPropagation(); toggleWishlist(this, '<%= product._id %>')"></i>
           <a href="/product-details?id=<%= product._id %>" class="text-decoration-none">
-          <% if (!product.isListed) { %>
-            <div class="unlisted-overlay">
-              <span class="unlisted-badge">Not Available</span>
-            </div>
-          <% } else if (product.quantity <= 0) { %>
-            <div class="out-of-stock-overlay">
-              <span class="out-of-stock-badge">Out of Stock</span>
-            </div>
-          <% } %>
-
-          <a href="/product-details?id=<%= product._id %>" class="text-decoration-none">
-            <i class="far fa-heart wishlist-icon"></i>
+            <% if (!product.isListed) { %>
+              <div class="unlisted-overlay">
+                <span class="unlisted-badge">Not Available</span>
+              </div>
+            <% } else if (product.quantity <= 0) { %>
+              <div class="out-of-stock-overlay">
+                <span class="out-of-stock-badge">Out of Stock</span>
+              </div>
+            <% } %>
             <% if (product.new) { %>
               <span class="new-badge">New</span>
             <% } %>
@@ -777,10 +777,10 @@
               <% } %>
               <p class="product-price">
                 <% if (product.salePrice) { %>
-                  <strike class="text-muted">$<%= product.regularPrice.toLocaleString() %></strike>
-                  <span class="text-danger">$<%= product.salePrice.toLocaleString() %></span>
+                  <strike class="text-muted">₹<%= product.regularPrice.toLocaleString() %></strike>
+                  <span class="text-danger">₹<%= product.salePrice.toLocaleString() %></span>
                 <% } else { %>
-                  $<%= product.regularPrice.toLocaleString() %>
+                  ₹<%= product.regularPrice.toLocaleString() %>
                 <% } %>
               </p>
               <% if (product.sizes && product.sizes.length > 0) { %>
@@ -794,13 +794,13 @@
                   <% }); %>
                 </div>
               <% } %>
-               </a>
-              <button class="btn btn-dark w-100" onclick="addToCartWithSize('<%= product._id %>')" 
-                      <%= !product.isListed || product.quantity <= 0 ? 'disabled' : '' %>>
-                <%= !product.isListed ? 'Not Available' : (product.quantity <= 0 ? 'Out of Stock' : 'Add to Cart') %>
-              </button>
             </div>
-         
+          </a>
+          <button class="btn btn-outline-dark w-100" 
+                  <%=!product.isListed || product.quantity <=0 ? 'disabled' : '' %> 
+                  onclick="event.stopPropagation(); addToCart('<%= product._id %>', '<%= product.productName.replace(/'/g, "\\'") %>', '<%= product.regularPrice %>', '<%= product.salePrice %>', '<%= product.productImage[0] %>')">
+            <%= !product.isListed ? 'Not Available' : (product.quantity <=0 ? 'Out of Stock' : 'Add to Cart' ) %>
+          </button>
         </div>
       </div>
     <% }) %>
@@ -841,12 +841,16 @@
     </div>
   </div>
 
-<%-include("../../views/partials/user/fooret.ejs")  %>>
+<%- include("../../views/partials/user/fooret.ejs") %>
 
   <!-- Bootstrap JS and dependencies -->
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+    integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+    crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- Add Toastify JS -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
   
   <!-- Add hidden input for blocked status -->
   <input type="hidden" id="userBlockedStatus" value="<%= locals.user && locals.user.isBlocked ? 'true' : 'false' %>">
@@ -932,10 +936,46 @@
     });
 
     // Wishlist functionality
-    function toggleWishlist(icon) {
-      icon.classList.toggle('far');
-      icon.classList.toggle('fas');
-      icon.classList.toggle('text-danger');
+    async function toggleWishlist(icon, productId) {
+      try {
+        const response = await fetch('/wishlist/add', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ productId })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          icon.classList.toggle('far');
+          icon.classList.toggle('fas');
+          icon.classList.toggle('text-danger');
+
+          // Show toast notification
+          Toastify({
+            text: data.message || (icon.classList.contains('fas') ? "Added to wishlist" : "Removed from wishlist"),
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            backgroundColor: icon.classList.contains('fas') ? "#4CAF50" : "#f44336",
+            stopOnFocus: true
+          }).showToast();
+        } else {
+          throw new Error(data.message || 'Failed to update wishlist');
+        }
+      } catch (error) {
+        console.error('Wishlist error:', error);
+        Toastify({
+          text: error.message || "Failed to update wishlist",
+          duration: 3000,
+          gravity: "top",
+          position: "right",
+          backgroundColor: "#f44336",
+          stopOnFocus: true
+        }).showToast();
+      }
     }
 
     // Search functionality
@@ -1027,16 +1067,13 @@
     }
 
     function selectSize(button, size, productId) {
-      // Remove active class from all size buttons in the same product card
       const productCard = button.closest('.product-card');
       productCard.querySelectorAll('.size-btn').forEach(btn => {
         btn.classList.remove('active');
       });
       
-      // Add active class to clicked button
       button.classList.add('active');
       
-      // Store selected size in data attribute
       productCard.dataset.selectedSize = size;
     }
 
