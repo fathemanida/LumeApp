@@ -785,19 +785,20 @@
               <div class="product-card card text-center h-100 position-relative overflow-hidden">
                 <i class="far fa-heart wishlist-icon" onclick="event.stopPropagation(); toggleWishlist(this, '<%= product._id %>')"></i>
                 
-                <% if (product.productOffer && product.productOffer.active) { %>
+                <% if (product.offer) { %>
                   <span class="offer-badge">
-                    <div class="position-absolute top-0 end-0 translate-middle">
-                      <div class="pulse-ring position-absolute"></div>
-                      <div class="bg-cream rounded-circle" style="width:8px; height:8px;"></div>
-                    </div>
-                    <% if (product.productOffer.discountType === 'percentage') { %>
-                      <%= product.productOffer.discountValue %>% OFF
-                    <% } else { %>
-                      ₹<%= product.productOffer.discountValue %> OFF
-                    <% } %>
-                  </span>
-                <% } %>
+    <div class="position-absolute top-0 end-0 translate-middle">
+      <div class="pulse-ring position-absolute"></div>
+      <div class="bg-cream rounded-circle" style="width:8px; height:8px;"></div>
+    </div>
+    <% if (product.offer.discountType === 'percentage') { %>
+      <%= product.offer.discountValue %>% OFF
+    <% } else { %>
+      ₹<%= product.offer.discountValue %> OFF
+    <% } %>
+  </span>
+<% } %>
+
 
                 <a href="/product-details?id=<%= product._id %>" class="text-decoration-none">
                   <% if (product.new) { %>
@@ -833,12 +834,12 @@
                       <p class="product-category"><%= product.category.name %></p>
                     <% } %>
                     <p class="product-price">
-                      <% if (product.productOffer && product.productOffer.active) { %>
+                      <% if (product.offer) { %>
                         <span class="strike-price">₹<%= product.regularPrice.toLocaleString() %></span>
                         <span class="discounted-price">
-                          ₹<%= product.productOffer.discountType === 'percentage'
-                            ? (product.regularPrice - (product.regularPrice * product.productOffer.discountValue / 100)).toFixed(2)
-                            : (product.regularPrice - product.productOffer.discountValue).toFixed(2) %>
+                          ₹<%= product.offer.discountType === 'percentage'
+                            ? (product.regularPrice - (product.regularPrice * product.offer.discountValue / 100)).toFixed(2)
+                            : (product.regularPrice - product.offer.discountValue).toFixed(2) %>
                         </span>
                       <% } else { %>
                         <span class="regular-price">₹<%= product.regularPrice.toLocaleString() %></span>

@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Offer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <style>
+        /* Dark Theme Variables */
+        :root {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --accent-color: #dac6a4;
+            --border-color: #404040;
+            --input-bg: #333333;
+            --hover-bg: #404040;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            --dark-brown: #5c4d3c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Jost', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background-color: var(--bg-secondary);
+            padding: 2rem 1.5rem;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .brand {
+            font-family: 'Aboreto', cursive;
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            letter-spacing: 1px;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 0.75rem 1rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .nav-link i {
+            width: 20px;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .nav-link:hover {
+            background-color: var(--hover-bg);
+            color: var(--accent-color);
+            transform: translateX(4px);
+        }
+
+        .nav-link.active {
+            background-color: var(--hover-bg);
+            color: var(--accent-color);
+            font-weight: 500;
+            border-left: 3px solid var(--accent-color);
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+            background-color: var(--bg-primary);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-family: 'Aboreto', cursive;
+            font-size: 2rem;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        /* Form Styles */
+        .form-container {
+            background: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px var(--shadow-color);
+            margin-top: 2rem;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .form-group.full-width {
+            flex: 2;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            border-color: var(--accent-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(218, 198, 164, 0.2);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .form-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: var(--bg-primary);
+        }
+
+        .btn-primary:hover {
+            background-color: #c5b393;
+        }
+
+        .btn-secondary {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--hover-bg);
+        }
+
+        /* Selection Section */
+        .selection-section {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: var(--input-bg);
+            border-radius: 4px;
+        }
+
+        .selection-grid {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 1rem;
+            background-color: var(--input-bg);
+            border-radius: 0.375rem;
+            margin-top: 1rem;
+        }
+
+        .selection-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            border-radius: 0.375rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .selection-item:hover {
+            background-color: var(--hover-bg);
+        }
+
+        .selection-item.selected {
+            background-color: var(--accent-color);
+            color: var(--bg-primary);
+        }
+
+        .selection-item label {
+            flex: 1;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .selection-grid::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .selection-grid::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+            border-radius: 4px;
+        }
+
+        .selection-grid::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        .selection-grid::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-color);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 240px;
+            }
+            .main-content {
+                margin-left: 240px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                z-index: 1000;
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .form-row {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            .form-group {
+                width: 100%;
+            }
+            .form-container {
+                padding: 1rem;
+            }
+        }
+        .nav-menu ul {
+    list-style: none;
+}
+.nav-menu {
+    list-style: none;
+}.nav-menu {
+    list-style: none;
+}
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">LUME</div>
+    <ul class="nav-menu">
+      <li class="nav-item">
+        <a href="/admin/dashboard" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/product" class="nav-link active"><i class="fas fa-box"></i> Product</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/orders" class="nav-link"><i class="fas fa-shopping-cart"></i> Orders</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/users" class="nav-link"><i class="fas fa-users"></i> Users</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/Category" class="nav-link"><i class="fas fa-tags"></i> Category</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/offers" class="nav-link"><i class="fas fa-ticket-alt"></i> Offers</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/settings" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/banner" class="nav-link"><i class="fas fa-image"></i> Banner</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/Coupons" class="nav-link"><i class="fas fa-ticket-alt"></i> Coupons</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/logout" class="nav-link logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </li>
+    </ul>
+  </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="header">
+            <h1 class="page-title">Edit Offer</h1>
+            <a href="/offers" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Offers
+            </a>
+        </div>
+
+        <!-- Offer Form -->
+        <div class="form-container">
+            <form id="offer-form">
+                <input type="hidden" id="offer-id" value="<%= offer._id %>">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="offer-name" class="form-label">Offer Name</label>
+                        <input type="text" id="offer-name" class="form-input" value="<%= offer.name %>" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="offer-code" class="form-label">Offer Code</label>
+                        <input type="text" id="offer-code" class="form-input" value="<%= offer.code %>" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Discount Type:</label>
+                        <select id="discount-type" class="form-input">
+                            <option value="percentage" <%= offer.discountType === 'percentage' ? 'selected' : '' %>>Percentage</option>
+                            <option value="flat" <%= offer.discountType === 'flat' ? 'selected' : '' %>>Flat</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Discount Value:</label>
+                        <input type="number" id="discount-value" class="form-input" min="0" step="0.01" value="<%= offer.discountValue %>" required>
+                        <div id="discount-value-error" class="error-message text-sm mt-1"></div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Start Date:</label>
+                        <input type="date" id="start-date" class="form-input" value="<%= offer.startDate.toISOString().split('T')[0] %>" required>
+                        <div id="start-date-error" class="error-message text-sm mt-1"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">End Date:</label>
+                        <input type="date" id="end-date" class="form-input" value="<%= offer.endDate.toISOString().split('T')[0] %>" required>
+                        <div id="end-date-error" class="error-message text-sm mt-1"></div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <label for="applicable-on" class="form-label">Applicable On</label>
+                        <select id="applicable-on" class="form-input">
+                            <option value="">Select option</option>
+                            <option value="all" <%= offer.applicableOn === 'all' ? 'selected' : '' %>>All Products</option>
+                            <option value="categories" <%= offer.applicableOn === 'categories' ? 'selected' : '' %>>Selected Categories</option>
+                            <option value="products" <%= offer.applicableOn === 'products' ? 'selected' : '' %>>Selected Products</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Dynamic Selection Sections -->
+                <div id="category-selection" class="selection-section <%= offer.applicableOn === 'categories' ? '' : 'hidden' %>">
+                    <h3 class="form-label">Select Categories</h3>
+                    <div class="selection-grid" id="category-grid">
+                        <!-- Categories will be loaded here dynamically -->
+                    </div>
+                </div>
+
+                <div id="product-selection" class="selection-section <%= offer.applicableOn === 'products' ? '' : 'hidden' %>">
+                    <h3 class="form-label">Select Products</h3>
+                    <div class="selection-grid" id="product-grid">
+                        <!-- Products will be loaded here dynamically -->
+                    </div>
+                </div>
+
+                <div class="form-footer">
+                    <button type="button" class="btn btn-secondary">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Offer</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        // DOM Elements
+        const applicableOnSelect = document.getElementById('applicable-on');
+        const categorySelection = document.getElementById('category-selection');
+        const productSelection = document.getElementById('product-selection');
+        const categoryGrid = document.getElementById('category-grid');
+        const productGrid = document.getElementById('product-grid');
+        const discountTypeSelect = document.getElementById('discount-type');
+        const discountValueInput = document.getElementById('discount-value');
+        const discountValueError = document.getElementById('discount-value-error');
+        const offerId = document.getElementById('offer-id').value;
+
+        // Toastify configuration
+        const showToast = (message, type = 'success') => {
+            const backgroundColor = type === 'success' ? '#4CAF50' : '#f44336';
+            Toastify({
+                text: message,
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: backgroundColor,
+                stopOnFocus: true,
+            }).showToast();
+        };
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                // Fetch categories and products from the backend
+                const [categoriesResponse, productsResponse] = await Promise.all([
+                    fetch('/admin/category?search=&page=1&limit=100&json=true', {
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    }),
+                    fetch('/admin/product?search=&page=1&limit=100&json=true', {
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    })
+                ]);
+
+                if (!categoriesResponse.ok || !productsResponse.ok) {
+                    throw new Error('Failed to fetch data from server');
+                }
+
+                const categoriesData = await categoriesResponse.json();
+                const productsData = await productsResponse.json();
+
+                if (categoriesData.success && productsData.success) {
+                    // Store the data globally
+                    window.categories = categoriesData.categories;
+                    window.products = productsData.products;
+
+                    // Initial render
+                    renderCategories();
+                    renderProducts();
+
+                    // Pre-select categories and products
+                    const offer = <%- JSON.stringify(offer) %>;
+                    if (offer.categories && offer.categories.length > 0) {
+                        offer.categories.forEach(catId => {
+                            const checkbox = document.querySelector(`input[name="categories"][value="${catId}"]`);
+                            if (checkbox) {
+                                checkbox.checked = true;
+                                checkbox.closest('.selection-item').classList.add('selected');
+                            }
+                        });
+                    }
+
+                    if (offer.products && offer.products.length > 0) {
+                        offer.products.forEach(prodId => {
+                            const checkbox = document.querySelector(`input[name="products"][value="${prodId}"]`);
+                            if (checkbox) {
+                                checkbox.checked = true;
+                                checkbox.closest('.selection-item').classList.add('selected');
+                            }
+                        });
+                    }
+                } else {
+                    throw new Error('Failed to fetch data');
+                }
+
+                // Set minimum date for start date (today)
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('start-date').min = today;
+
+                // Set minimum date for end date (same as start date)
+                document.getElementById('start-date').addEventListener('change', function() {
+                    document.getElementById('end-date').min = this.value;
+                });
+
+                // Handle discount value validation
+                discountValueInput.addEventListener('input', validateDiscountValue);
+                discountTypeSelect.addEventListener('change', validateDiscountValue);
+            } catch (error) {
+                console.error('Error initializing page:', error);
+                showToast('Error loading data: ' + error.message, 'error');
+            }
+        });
+
+        // Handle applicable on selection change
+        applicableOnSelect.addEventListener('change', function() {
+            categorySelection.classList.add('hidden');
+            productSelection.classList.add('hidden');
+
+            if (this.value === 'categories') {
+                categorySelection.classList.remove('hidden');
+            } else if (this.value === 'products') {
+                productSelection.classList.remove('hidden');
+            }
+        });
+
+        // Render categories with search functionality
+        function renderCategories(searchTerm = '') {
+            categoryGrid.innerHTML = '';
+            const filteredCategories = window.categories.filter(category => 
+                category.name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+
+            if (filteredCategories.length === 0) {
+                categoryGrid.innerHTML = '<div class="text-center p-4">No categories found</div>';
+                return;
+            }
+
+            filteredCategories.forEach(category => {
+                const item = document.createElement('div');
+                item.className = 'selection-item';
+                item.innerHTML = `
+                    <input type="checkbox" id="cat-${category._id}" name="categories" value="${category._id}" class="hidden">
+                    <label for="cat-${category._id}" class="w-full cursor-pointer">
+                        ${category.name}
+                    </label>
+                `;
+                
+                // Add click handler for the entire item
+                item.addEventListener('click', function(e) {
+                    const checkbox = this.querySelector('input[type="checkbox"]');
+                    checkbox.checked = !checkbox.checked;
+                    this.classList.toggle('selected', checkbox.checked);
+                });
+
+                categoryGrid.appendChild(item);
+            });
+        }
+
+        // Render products with search functionality
+        function renderProducts(searchTerm = '') {
+            productGrid.innerHTML = '';
+            const filteredProducts = window.products.filter(product => 
+                product.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (product.category && product.category.name.toLowerCase().includes(searchTerm.toLowerCase()))
+            );
+
+            if (filteredProducts.length === 0) {
+                productGrid.innerHTML = '<div class="text-center p-4">No products found</div>';
+                return;
+            }
+
+            filteredProducts.forEach(product => {
+                const item = document.createElement('div');
+                item.className = 'selection-item';
+                item.innerHTML = `
+                    <input type="checkbox" id="prod-${product._id}" name="products" value="${product._id}" class="hidden">
+                    <label for="prod-${product._id}" class="w-full cursor-pointer">
+                        ${product.productName} (${product.category ? product.category.name : 'No Category'})
+                    </label>
+                `;
+                
+                // Add click handler for the entire item
+                item.addEventListener('click', function(e) {
+                    const checkbox = this.querySelector('input[type="checkbox"]');
+                    checkbox.checked = !checkbox.checked;
+                    this.classList.toggle('selected', checkbox.checked);
+                });
+
+                productGrid.appendChild(item);
+            });
+        }
+
+        // Add search functionality with improved styling
+        const categorySearch = document.createElement('input');
+        categorySearch.type = 'text';
+        categorySearch.className = 'form-input mt-2 mb-4';
+        categorySearch.placeholder = 'Search categories...';
+        categorySearch.addEventListener('input', (e) => renderCategories(e.target.value));
+        categoryGrid.parentElement.insertBefore(categorySearch, categoryGrid);
+
+        const productSearch = document.createElement('input');
+        productSearch.type = 'text';
+        productSearch.className = 'form-input mt-2 mb-4';
+        productSearch.placeholder = 'Search products...';
+        productSearch.addEventListener('input', (e) => renderProducts(e.target.value));
+        productGrid.parentElement.insertBefore(productSearch, productGrid);
+
+        // Validate discount value
+        function validateDiscountValue() {
+            const value = parseFloat(discountValueInput.value);
+            const type = discountTypeSelect.value;
+
+            if (isNaN(value)) {
+                discountValueError.textContent = 'Please enter a valid number';
+                return false;
+            }
+
+            if (type === 'percentage' && (value < 0 || value > 100)) {
+                discountValueError.textContent = 'Percentage must be between 0 and 100';
+                return false;
+            }
+
+            if (type === 'flat' && value < 0) {
+                discountValueError.textContent = 'Amount must be positive';
+                return false;
+            }
+
+            discountValueError.textContent = '';
+            return true;
+        }
+
+        // Form submission
+        document.getElementById('offer-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            if (!validateDiscountValue()) {
+                return;
+            }
+
+            // Collect form data
+            const formData = {
+                name: document.getElementById('offer-name').value,
+                code: document.getElementById('offer-code').value,
+                discountType: discountTypeSelect.value,
+                discountValue: parseFloat(discountValueInput.value),
+                startDate: document.getElementById('start-date').value,
+                endDate: document.getElementById('end-date').value,
+                applicableOn: applicableOnSelect.value,
+                categories: [],
+                products: []
+            };
+
+            // Get selected categories if applicable
+            if (formData.applicableOn === 'categories') {
+                const selectedCategories = document.querySelectorAll('input[name="categories"]:checked');
+                selectedCategories.forEach(cat => {
+                    formData.categories.push(cat.value);
+                });
+            }
+
+            // Get selected products if applicable
+            if (formData.applicableOn === 'products') {
+                const selectedProducts = document.querySelectorAll('input[name="products"]:checked');
+                selectedProducts.forEach(prod => {
+                    formData.products.push(prod.value);
+                });
+            }
+
+            try {
+                const response = await fetch(`/admin/edit-offer/${offerId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast('Offer updated successfully!');
+                    setTimeout(() => {
+                        window.location.href = '/admin/offers';
+                    }, 1500);
+                } else {
+                    throw new Error(result.message || 'Failed to update offer');
+                }
+            } catch (error) {
+                console.error('Error updating offer:', error);
+                showToast(error.message || 'Error updating offer. Please try again.', 'error');
+            }
+        });
+
+        // Cancel button
+        document.querySelector('.btn-secondary').addEventListener('click', function() {
+            if (confirm('Are you sure you want to cancel? All changes will be lost.')) {
+                window.location.href = '/admin/offers';
+            }
+        });
+    </script>
+</body>
+</html> 

@@ -7,452 +7,478 @@
   <link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Jost&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
+    /* Dark Theme Variables */
     :root {
-      --dark-brown: #291d0e;
-      --olive-green: #314216;
-      --light-bg: #f8f5f2;
-      --border-color: #d3c9be;
-      --status-active: #2ecc71;
-      --status-blocked: #e74c3c;
+        --bg-primary: #1a1a1a;
+        --bg-secondary: #2d2d2d;
+        --text-primary: #ffffff;
+        --text-secondary: #b3b3b3;
+        --accent-color: #dac6a4;
+        --border-color: #404040;
+        --input-bg: #333333;
+        --hover-bg: #404040;
+        --shadow-color: rgba(0, 0, 0, 0.3);
+        --status-active: #4caf50;
+        --status-blocked: #f44336;
     }
 
     * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Jost', sans-serif;
     }
 
-    html, body {
-      height: 100%;
-      font-family: 'Jost', sans-serif;
-      background-color: var(--light-bg);
-      color: var(--dark-brown);
+    body {
+        background-color: var(--bg-primary);
+        color: var(--text-primary);
+        min-height: 100vh;
+        display: flex;
     }
 
-    .dashboard {
-      display: flex;
-      min-height: 100vh;
-    }
-
+    /* Sidebar Styles */
     .sidebar {
-      width: 240px;
-      background: white;
-      border-right: 1px solid var(--border-color);
-      padding: 2rem 1.5rem;
+        width: 280px;
+        background-color: var(--bg-secondary);
+        padding: 2rem 1.5rem;
+        border-right: 1px solid var(--border-color);
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        height: 100vh;
+        overflow-y: auto;
     }
 
     .brand {
-      font-family: 'Aboreto', cursive;
-      font-size: 1.8rem;
-      margin-bottom: 2.5rem;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: var(--dark-brown);
+        font-family: 'Aboreto', cursive;
+        font-size: 1.5rem;
+        color: var(--accent-color);
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--border-color);
+        letter-spacing: 1px;
     }
 
     .nav-menu {
-      list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        flex: 1;
     }
 
     .nav-item {
-      margin-bottom: 1rem;
+        margin-bottom: 0.5rem;
     }
 
     .nav-link {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      text-decoration: none;
-      color: var(--dark-brown);
-      padding: 0.5rem 0.75rem;
-      transition: all 0.3s;
-      border-radius: 4px;
+        color: var(--text-secondary);
+        text-decoration: none;
+        padding: 0.75rem 1rem;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 0.95rem;
     }
 
-    .nav-link:hover, .nav-link.active {
-      color: var(--olive-green);
-      font-weight: 500;
-      background-color: rgba(49, 66, 22, 0.1);
+    .nav-link i {
+        width: 20px;
+        text-align: center;
+        color: var(--text-secondary);
+    }
+
+    .nav-link:hover {
+        background-color: var(--hover-bg);
+        color: var(--accent-color);
+        transform: translateX(4px);
     }
 
     .nav-link.active {
-      font-weight: 600;
-      background-color: var(--light-bg);
-      box-shadow: 3px 0 0 0 var(--olive-green) inset;
+        background-color: var(--hover-bg);
+        color: var(--accent-color);
+        font-weight: 500;
+        border-left: 3px solid var(--accent-color);
     }
 
     .nav-link.logout {
-      color: #c33;
-      margin-top: 1.5rem;
+        color: #c33;
+        margin-top: 1.5rem;
     }
 
+    /* Main Content Styles */
     .main-content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
+        flex: 1;
+        margin-left: 280px;
+        padding: 2rem;
+        background-color: var(--bg-primary);
     }
 
     .main-header {
-      background: white;
-      padding: 1rem 2rem;
-      border-bottom: 1px solid var(--border-color);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
     }
 
     .header-left {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
     }
 
     .mobile-menu-btn {
-      display: none;
-      background: none;
-      border: none;
-      font-size: 1.25rem;
-      cursor: pointer;
-      color: var(--dark-brown);
+        display: none;
+        background: none;
+        border: none;
+        font-size: 1.25rem;
+        cursor: pointer;
+        color: var(--text-primary);
     }
 
     .page-title {
-      font-size: 1.5rem;
-      font-weight: 500;
-      letter-spacing: 0.5px;
+        font-family: 'Aboreto', cursive;
+        font-size: 2rem;
+        color: var(--text-primary);
+        margin: 0;
     }
 
     .header-right {
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
     }
 
     .search-container {
-      position: relative;
-      display: flex;
-      margin-right: 15px;
+        position: relative;
+        display: flex;
+    }
+
+    .search-box {
+        flex: 1;
+        min-width: 300px;
+        position: relative;
+        box-shadow: 0 2px 6px rgb(129 83 50 / 49%);
     }
 
     .search-bar {
-      padding: 10px 40px 10px 15px;
-      border: 1px solid #ddd;
-      border-radius: 20px;
-      width: 220px;
-      transition: all 0.3s ease;
-      font-family: 'Jost', sans-serif;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        background-color: var(--input-bg);
+        color: var(--text-primary);
+        font-size: 0.9rem;
     }
 
     .search-bar:focus {
-      outline: none;
-      border-color: var(--olive-green);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-      transform: scale(1.02);
+        border-color: var(--accent-color);
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(218, 198, 164, 0.2);
     }
 
-    .search-btn {
-      padding: 10px 15px;
-      background: var(--olive-green);
-      border: none;
-      border-radius: 0 20px 20px 0;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      color: white;
+    .search-bar::placeholder {
+        color: var(--text-secondary);
     }
 
-    .search-btn:hover {
-      background: var(--dark-brown);
-      transform: translateY(-1px);
+    .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-secondary);
     }
 
     .clear-search {
-      position: absolute;
-      right: 50px;
-      top: 50%;
-      transform: translateY(-50%) scale(0.8);
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      color: var(--dark-brown);
-      cursor: pointer;
-      display: none;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .clear-search:hover {
-      background: #f5f5f5;
-      transform: translateY(-50%) scale(0.9);
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: transparent;
+        border: none;
+        color: var(--text-secondary);
+        cursor: pointer;
+        display: none;
+        align-items: center;
+        justify-content: center;
     }
 
     .search-bar:not(:placeholder-shown) + .clear-search {
-      display: flex;
+        display: flex;
     }
 
     .notification-btn {
-      background: none;
-      border: none;
-      position: relative;
-      cursor: pointer;
-      color: var(--dark-brown);
-      font-size: 1.1rem;
+        background: none;
+        border: none;
+        position: relative;
+        cursor: pointer;
+        color: var(--text-primary);
+        font-size: 1.1rem;
     }
 
     .notification-badge {
-      position: absolute;
-      top: -5px;
-      right: -5px;
-      background: #ff4757;
-      color: white;
-      border-radius: 50%;
-      width: 18px;
-      height: 18px;
-      font-size: 0.7rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background: #ff4757;
+        color: white;
+        border-radius: 50%;
+        width: 18px;
+        height: 18px;
+        font-size: 0.7rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .profile-dropdown {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      cursor: pointer;
-      position: relative;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        cursor: pointer;
+        position: relative;
     }
 
     .profile-img {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      object-fit: cover;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
     }
 
     .profile-name {
-      font-weight: 500;
+        font-weight: 500;
+        color: var(--text-primary);
     }
 
     .profile-dropdown-menu {
-      position: absolute;
-      top: 100%;
-      right: 0;
-      background: white;
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-      padding: 0.5rem 0;
-      min-width: 180px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      display: none;
-      z-index: 100;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        padding: 0.5rem 0;
+        min-width: 180px;
+        box-shadow: 0 2px 10px var(--shadow-color);
+        display: none;
+        z-index: 100;
     }
 
     .profile-dropdown:hover .profile-dropdown-menu {
-      display: block;
+        display: block;
     }
 
     .dropdown-item {
-      padding: 0.5rem 1rem;
-      display: block;
-      color: var(--dark-brown);
-      text-decoration: none;
-      transition: background-color 0.2s;
+        padding: 0.5rem 1rem;
+        display: block;
+        color: var(--text-secondary);
+        text-decoration: none;
+        transition: background-color 0.2s;
     }
 
     .dropdown-item:hover {
-      background-color: var(--light-bg);
+        background-color: var(--hover-bg);
+        color: var(--accent-color);
     }
 
     .content-area {
-      padding: 2rem;
-      flex: 1;
-      overflow-y: auto;
+        flex: 1;
     }
 
     .action-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
     }
 
     .section-title {
-      font-size: 1.25rem;
-      font-weight: 500;
+        font-size: 1.25rem;
+        font-weight: 500;
+        color: var(--text-primary);
     }
 
     .add-user-btn {
-      background-color: var(--olive-green);
-      color: white;
-      padding: 0.75rem 1.25rem;
-      border: none;
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.3s;
+        background-color: var(--accent-color);
+        color: var(--bg-primary);
+        padding: 0.75rem 1.25rem;
+        border: none;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s;
     }
 
     .add-user-btn:hover {
-      background-color: var(--dark-brown);
-      transform: translateY(-2px);
+        background-color: #c5b393;
+        transform: translateY(-2px);
     }
 
     .table-container {
-      background: white;
-      padding: 1.5rem;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(41, 29, 14, 0.05);
+        background-color: var(--bg-secondary);
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        overflow-x: auto;
+        box-shadow: 0 2px 6px rgb(129 83 50 / 49%);
     }
 
     table {
-      width: 100%;
-      border-collapse: collapse;
+        width: 100%;
+        border-collapse: collapse;
     }
 
     th {
-      text-align: left;
-      padding: 1rem;
-      background-color: var(--light-bg);
-      color: var(--dark-brown);
-      font-weight: 500;
+        text-align: left;
+        padding: 1rem;
+        background-color: var(--bg-primary);
+        color: var(--text-primary);
+        font-weight: 500;
+        white-space: nowrap;
+        border-bottom: 1px solid var(--border-color);
     }
 
     td {
-      padding: 1rem;
-      border-bottom: 1px solid var(--border-color);
+        padding: 1rem;
+        border-bottom: 1px solid var(--border-color);
+        color: var(--text-secondary);
+    }
+
+    tr:hover {
+        background-color: var(--hover-bg);
     }
 
     .user-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      object-fit: cover;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
     }
 
     .status-badge {
-      padding: 0.4rem 0.8rem;
-      border-radius: 12px;
-      font-size: 0.85rem;
-      font-weight: 500;
-      display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 500;
     }
 
     .status-active {
-      background-color: rgba(46, 204, 113, 0.1);
-      color: var(--status-active);
+        background-color: rgba(76, 175, 80, 0.2);
+        color: var(--status-active);
     }
 
     .status-blocked {
-      background-color: rgba(231, 76, 60, 0.1);
-      color: var(--status-blocked);
+        background-color: rgba(244, 67, 54, 0.2);
+        color: var(--status-blocked);
     }
 
     .action-btn {
-      padding: 0.5rem 0.75rem;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: all 0.2s;
-      margin-right: 0.5rem;
+        padding: 0.5rem;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s ease;
     }
 
     .block-btn {
-      background-color: rgba(137, 2, 2, 0.789);
-      color: white;
+        background-color: var(--status-blocked);
+        color: white;
     }
 
     .block-btn:hover {
-      background-color: #c0392b;
-      transform: translateY(-1px);
+        background-color: #d32f2f;
+        transform: translateY(-2px);
     }
 
     .unblock-btn {
-      background-color:rgb(43, 96, 43);
-      color: white;
+        background-color: var(--status-active);
+        color: white;
     }
 
     .unblock-btn:hover {
-      background-color: #27ae60;
-      transform: translateY(-1px);
+        background-color: #388e3c;
+        transform: translateY(-2px);
     }
 
     .pagination {
-      display: flex;
-      justify-content: flex-end;
-      gap: 0.5rem;
-      margin-top: 1.5rem;
-      align-items: center;
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.5rem;
+        margin-top: 1.5rem;
+        align-items: center;
     }
 
     .page-btn {
-      width: 36px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 4px;
-      border: none;
-      background-color: #e0e0e0;
-      cursor: pointer;
-      transition: all 0.3s ease;
+        padding: 0.5rem 1rem;
+        border: 1px solid var(--border-color);
+        background-color: var(--bg-secondary);
+        color: var(--text-primary);
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s ease;
     }
 
     .page-btn:hover:not(.active):not(:disabled) {
-      background-color: var(--olive-green);
-      color: white;
+        background-color: var(--accent-color);
+        color: var(--bg-primary);
+        border-color: var(--accent-color);
     }
 
     .page-btn.active {
-      background-color: var(--dark-brown);
-      color: white;
+        background-color: var(--accent-color);
+        color: var(--bg-primary);
+        border-color: var(--accent-color);
     }
 
     .page-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    @media (max-width: 1024px) {
+        .sidebar {
+            width: 240px;
+        }
+        .main-content {
+            margin-left: 240px;
+        }
     }
 
     @media (max-width: 768px) {
-      .sidebar {
-        position: fixed;
-        left: -240px;
-        top: 0;
-        bottom: 0;
-        z-index: 1000;
-        transition: left 0.3s;
-      }
-
-      .sidebar.active {
-        left: 0;
-      }
-
-      .mobile-menu-btn {
-        display: block;
-      }
-
-      .main-header {
-        padding: 1rem;
-      }
-
-      .search-bar {
-        min-width: 150px;
-      }
-
-      .profile-name {
-        display: none;
-      }
+        .sidebar {
+            transform: translateX(-100%);
+            position: fixed;
+            z-index: 1000;
+        }
+        .sidebar.active {
+            transform: translateX(0);
+        }
+        .main-content {
+            margin-left: 0;
+        }
+        .mobile-menu-btn {
+            display: block;
+        }
+        .search-box {
+            width: 100%;
+        }
+        .profile-name {
+            display: none;
+        }
     }
+    .nav-menu ul {
+    list-style: none;
+}.nav-menu {
+    list-style: none;
+}
   </style>
 </head>
 <body class="dashboard">
-  <aside class="sidebar">
+    <aside class="sidebar">
     <div class="brand">LUME</div>
     <ul class="nav-menu">
       <li class="nav-item">
@@ -471,10 +497,10 @@
         <a href="/admin/Category" class="nav-link"><i class="fas fa-tags"></i> Category</a>
       </li>
       <li class="nav-item">
-        <a href="/admin/offer" class="nav-link"><i class="fas fa-ticket-alt"></i> Offers</a>
+        <a href="/admin/offers" class="nav-link"><i class="fas fa-ticket-alt"></i> Offers</a>
       </li>
       <li class="nav-item">
-        <a href="/admin/setting" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
+        <a href="/admin/settings" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
       </li>
       <li class="nav-item">
         <a href="/admin/banner" class="nav-link"><i class="fas fa-image"></i> Banner</a>
@@ -499,19 +525,19 @@
       <div class="header-right">
         <div class="search-container">
           <form id="searchForm" action="/admin/users" method="GET">
-            <input 
-              type="text"
-              class="search-bar" 
-              placeholder="Search users..." 
-              name="search"
-              value="<%= typeof search !== 'undefined' ? search : '' %>"
-            >
-            <button type="button" class="clear-search">
-              <i class="fas fa-times"></i>
-            </button>
-            <button type="submit" class="search-btn">
-              <i class="fas fa-search"></i>
-            </button>
+            <div class="search-box">
+              <i class="fas fa-search search-icon"></i>
+              <input 
+                type="text"
+                class="search-bar" 
+                placeholder="Search users..." 
+                name="search"
+                value="<%= typeof search !== 'undefined' ? search : '' %>"
+              >
+              <button type="button" class="clear-search">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
           </form>
         </div>
         
@@ -534,7 +560,7 @@
     <div class="content-area">
       <div class="action-bar">
         <h2 class="section-title">Users</h2>
-       
+        <button class="add-user-btn"><i class="fas fa-plus"></i> Add User</button>
       </div>
 
       <div class="table-container">
@@ -544,7 +570,6 @@
               <th>User Image</th>
               <th>User Name</th>
               <th>Email</th>
-             
               <th>Date of Creation</th>
               <th>Status</th>
               <th>Action</th>
@@ -556,40 +581,30 @@
                 <td><img src="/images/user.jpg" alt="User" class="user-avatar"></td>
                 <td><%= data[i].name %></td>
                 <td><%= data[i].email %></td>
-                
                 <td><%= data[i].createdAt ? new Date(data[i].createdAt).toLocaleDateString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' }) : 'N/A' %></td>
                 <td>  
                   <span class="status-badge <%= data[i].isBlocked ? 'status-blocked' : 'status-active' %>">
                     <%= data[i].isBlocked ? 'Blocked' : 'Active' %>
                   </span>
-                
+                </td>
                 <td>
-                
-
                   <% if(data[i].isBlocked === false) { %>
-                    <button class="action-btn unblock-btn" title="Unblock User" data-url="/admin/customerUnblocked?id=<%= data[i]._id %>" data-action="unblock">
-                      <span style="color: white;">Block</span>
+                    <button class="action-btn block-btn" title="Block User" data-url="/admin/customerBlocked?id=<%= data[i]._id %>" data-action="block">
+                      Block
                     </button>
                   <% } else { %>
-                    <button class="action-btn block-btn" title="Block User" data-url="/admin/customerBlocked?id=<%= data[i]._id %>" data-action="block">
-                      <span style="color: white;">Unblock</span>
+                    <button class="action-btn unblock-btn" title="Unblock User" data-url="/admin/customerUnblocked?id=<%= data[i]._id %>" data-action="unblock">
+                      Unblock
                     </button>
                   <% } %>
-                  
-                 
-                 
-                 
-                  
-                 
                 </td>
               </tr>
             <% } %>
           </tbody>
         </table>
 
-        
         <div class="pagination">
-          <span style="margin-right: 1rem; align-self: center;">Showing 1 to 10</span>
+          <span class="pagination-info" style="margin-right: 1rem;">Showing 1 to 10</span>
           <button class="page-btn" <%= currentPage === 1 ? 'disabled' : '' %> onclick="location.href='?page=<%= currentPage - 1 %>'"><</button>
           <% for(let i = 1; i <= totalPages; i++) { %>
             <button class="page-btn <%= currentPage === i ? 'active' : '' %>" onclick="location.href='?page=<%= i %>'">
@@ -630,7 +645,6 @@
         window.location.href = url.toString();
       });
 
-      
       if(clearSearch) {
         clearSearch.addEventListener('click', function() {
           searchInput.value = '';
@@ -640,7 +654,6 @@
         });
       }
 
-     
       document.querySelectorAll('.block-btn, .unblock-btn').forEach(btn => {
         btn.addEventListener('click', function() {
           const url = this.dataset.url;
@@ -651,7 +664,7 @@
             text: `Are you sure you want to ${actionType} this user?`,
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: actionType === 'block' ? '#e74c3c' : '#2ecc71',
+            confirmButtonColor: actionType === 'block' ? '#f44336' : '#4caf50',
             confirmButtonText: `Yes, ${actionType}`,
             cancelButtonText: 'Cancel'
           }).then((result) => {

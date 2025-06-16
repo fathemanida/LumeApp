@@ -46,20 +46,26 @@ const categoryInfo = async (req, res) => {
     }
 
     const page = parseInt(req.query.page) || 1;
-    const limit = 2;
+    const limit = parseInt(req.query.limit) || 2;
     const skip = (page - 1) * limit;
 
     const categoryName = await Category.find({
       name: { $regex: ".*" + search + ".*", $options: "i" },
+      isListed: true
     })
       .sort({ createdAt: -1 })
       .limit(limit)
       .skip(skip);
 
-    const totalCategory = await Category.countDocuments();
+    const totalCategory = await Category.countDocuments({
+      name: { $regex: ".*" + search + ".*", $options: "i" },
+      isListed: true
+    });
     const totalPages = Math.ceil(totalCategory / limit);
     const offset = (page - 1) * limit;
-    if (req.xhr || req.headers.accept.indexOf("json") > -1) {
+
+    // Always return JSON for AJAX requests
+    if (req.xhr || req.headers.accept.indexOf("json") > -1 || req.query.json === 'true') {
       return res.json({
         success: true,
         categories: categoryName,
@@ -79,7 +85,7 @@ const categoryInfo = async (req, res) => {
     });
   } catch (error) {
     console.error("Error in categoryInfo:", error);
-    if (req.xhr || req.headers.accept.indexOf("json") > -1) {
+    if (req.xhr || req.headers.accept.indexOf("json") > -1 || req.query.json === 'true') {
       return res.status(500).json({
         success: false,
         message: "Internal server error",

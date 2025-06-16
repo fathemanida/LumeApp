@@ -53,6 +53,10 @@ router.post('/orders/:orderId/process-return', adminAuth, walletController.proce
 
 // Offers routes
 router.get('/offers', adminAuth, offerController.getAllOffers);
+router.get('/add-offer', adminAuth, offerController.getAddOffer);
+router.post('/add-offer', adminAuth, offerController.createOffer);
+router.get('/edit-offer/:id', adminAuth, offerController.getEditOffer);
+router.put('/edit-offer/:id', adminAuth, offerController.updateOffer);
 
 router.get('/coupons', adminAuth, couponController.listCoupons);
 router.get('/coupons/add', adminAuth, couponController.showAddForm);

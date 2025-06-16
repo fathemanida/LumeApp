@@ -45,9 +45,10 @@ const productInfo = async (req, res) => {
   try {
     const search = req.query.search || "";
     const page = parseInt(req.query.page) || 1;
-    const limit = 6; 
+    const limit = parseInt(req.query.limit) || 6; 
 
     const searchQuery = {
+      isListed: true,
       $or: [
         { productName: { $regex: new RegExp(".*" + search + ".*", "i") } },
         { description: { $regex: new RegExp(".*" + search + ".*", "i") } },
@@ -55,7 +56,7 @@ const productInfo = async (req, res) => {
     };
 
     const matchingCategories = await Category.find({
-      categoryName: { $regex: new RegExp(".*" + search + ".*", "i") },
+      name: { $regex: new RegExp(".*" + search + ".*", "i") },
       isListed: true,
     }).select("_id");
 
@@ -80,6 +81,18 @@ const productInfo = async (req, res) => {
 
     const categories = await Category.find({ isListed: true });
 
+    // Return JSON for AJAX requests
+    if (req.xhr || req.headers.accept.indexOf("json") > -1 || req.query.json === 'true') {
+      return res.json({
+        success: true,
+        products: productData,
+        currentPage: page,
+        totalPages,
+        totalProducts,
+        offset
+      });
+    }
+
     res.render("product", {
       cat: categories || [],
       data: productData || [],
@@ -88,10 +101,16 @@ const productInfo = async (req, res) => {
       totalPages: totalPages,
       totalProducts: totalProducts, 
       startingNumber: (page - 1) * limit + 1, 
-      offset:offset,
+      offset: offset,
     });
   } catch (error) {
     console.error("Error in getAllProducts:", error);
+    if (req.xhr || req.headers.accept.indexOf("json") > -1 || req.query.json === 'true') {
+      return res.status(500).json({
+        success: false,
+        message: "Server error, please try again later"
+      });
+    }
     res.render("error", { message: "Server error, please try again later" });
   }
 };

@@ -7,7 +7,7 @@ const nodemailer = require("nodemailer");
 const env = require("dotenv").config();
 const session = require("express-session");
 const passport = require("passport");
-const { block } = require("sharp");
+const Offer = require("../../models/offerSchema");
 
 const loadLogin = async (req, res) => {
   try {
@@ -32,7 +32,7 @@ const login = async (req, res) => {
     }
 
     if (findUser.isBlocked) {
-      return res.render("login", { message: "You are blocked by admin" });
+      res.render("login", { message: "You are blocked by admin" });
     }
     const passwordMatch = await bcrypt.compare(password, findUser.password);
 
@@ -116,38 +116,9 @@ const logout = async (req, res) => {
 const verifyOtp = async (req, res) => {
   try {
     const { otp } = req.body;
-    const OTP_EXPIRY_SECONDS = 30;
-
-  req.session.otpGeneratedAt = new Date();
     console.log("Entered OTP:", otp);
     console.log("Stored OTP:", req.session.otp);
-    console.log("OTP Generated At:", req.session.otpGeneratedAt);
 
-   
-    if (!req.session.otp || !req.session.otpGeneratedAt) {
-      return res.status(400).json({
-        success: false,
-        message: "No active OTP found. Please request a new one.",
-      });
-    }
-
-   
-    const currentTime = Date.now();
-    const otpExpiryTime =
-      new Date(req.session.otpGeneratedAt).getTime() + OTP_EXPIRY_SECONDS * 1000;
-
-    if (currentTime > otpExpiryTime) {
-      
-      req.session.otp = null;
-      req.session.otpGeneratedAt = null;
-
-      return res.status(400).json({
-        success: false,
-        message: "OTP has expired. Please request a new one.",
-      });
-    }
-
-   
     if (otp === req.session.otp) {
       const user = req.session.userData;
       const passwordHash = await securePassword(user.password);
@@ -158,13 +129,13 @@ const verifyOtp = async (req, res) => {
         phone: user.phone,
         password: passwordHash,
       });
+      console.log("Did we reach here?");
 
       await saveUserData.save();
-
       req.session.user = saveUserData._id;
+
       req.session.otp = null;
-      req.session.otpGeneratedAt = null;
-      req.session.userData = null;
+      console.log("Did we reach here?");
 
       return res.json({
         success: true,
@@ -174,18 +145,17 @@ const verifyOtp = async (req, res) => {
     } else {
       return res.status(400).json({
         success: false,
-        message: "Invalid OTP. Please try again.",
+        message: "Invalid OTP, please try again!",
       });
     }
   } catch (error) {
-    console.error("Error in OTP verification:", error);
+    console.log("Error in OTP verification:", error);
     return res.status(500).json({
       success: false,
       message: "Internal server error",
     });
   }
 };
-
 
 const resendOtp = async (req, res) => {
   try {
@@ -263,40 +233,41 @@ const signup = async (req, res) => {
 const loadHome = async (req, res) => {
   try {
     const user = req.session.user;
-    console.log(req.session.user);
-    console.log(user);
     let isBlocked = false;
+
     if (user) {
       const dbUser = await User.findById(user.id);
-      if (dbUser && dbUser.isBlocked) {
+      if (dbUser?.isBlocked) {
         isBlocked = true;
       }
     }
-    
+
     const categories = await Category.find({ isListed: true });
     const categoryIds = categories.map((category) => category._id.toString());
-   
 
+    const currentDate = new Date();
+    const activeOffers = await Offer.find({
+      isActive: true,
+      startDate: { $lte: currentDate },
+      endDate: { $gte: currentDate },
+    });
 
     const page = parseInt(req.query.page) || 1;
     const limit = 9;
     const skip = (page - 1) * limit;
 
-    const products = await Product.find({
+    const baseQuery = {
       isListed: true,
       category: { $in: categoryIds },
       quantity: { $gt: 0 },
-    })
+    };
+
+    const products = await Product.find(baseQuery)
       .sort({ createdOn: -1 })
       .skip(skip)
       .limit(limit);
 
-    const totalProducts = await Product.countDocuments({
-      isListed: true,
-      category: { $in: categoryIds },
-      quantity: { $gt: 0 },
-    });
-
+    const totalProducts = await Product.countDocuments(baseQuery);
     const totalPages = Math.ceil(totalProducts / limit);
 
     const categoryWithIds = categories.map((category) => ({
@@ -305,56 +276,102 @@ const loadHome = async (req, res) => {
       image: category.image,
     }));
 
-   const featuredProducts = await Product.find({
-  featured: true,
-  isListed: true,
-  category: { $in: categoryIds },
-  quantity: { $gt: 0 },
-})
-  .sort({ createdAt: -1 })
-  .limit(3);
+    const featuredProductsRaw = await Product.find({
+      ...baseQuery,
+      featured: true,
+    })
+      .sort({ createdAt: -1 })
+      .limit(3);
 
-const newCollections = await Product.find({
-  new: true,
-  isListed: true,
-  category: { $in: categoryIds },
-  quantity: { $gt: 0 },
-})
-  .sort({ createdAt: -1 })
-  .limit(3);
-
-
+    const newCollectionsRaw = await Product.find({
+      ...baseQuery,
+      new: true,
+    })
+      .sort({ createdAt: -1 })
+      .limit(3);
 
     const categoriesWithProducts = await Product.aggregate([
-  {
-    $match: {
-      isListed: true,
-      category: { $in: categories.map((c) => c._id) },
-      quantity: { $gt: 0 },
-    },
-  },
-  {
-    $group: {
-      _id: "$category",
-    },
-  },
-  {
-    $limit: 4,
-  },
-]);
+      {
+        $match: {
+          isListed: true,
+          category: { $in: categories.map((c) => c._id) },
+          quantity: { $gt: 0 },
+        },
+      },
+      {
+        $group: {
+          _id: "$category",
+        },
+      },
+      {
+        $limit: 4,
+      },
+    ]);
 
+    // Utility: attach best offer
+    const attachBestOffer = (productList) =>
+      Promise.all(
+        productList.map(async (product) => {
+          const price = product.salePrice || product.regularPrice;
+          const matchedOffers = activeOffers.filter((offer) => {
+            if (offer.applicableOn === "all") return true;
+            if (
+              offer.applicableOn === "categories" &&
+              offer.categories.some(
+                (catId) => catId.toString() === product.category.toString()
+              )
+            )
+              return true;
+            if (
+              offer.applicableOn === "products" &&
+              offer.products.some(
+                (prodId) => prodId.toString() === product._id.toString()
+              )
+            )
+              return true;
+            return false;
+          });
+
+          let maxDiscount = 0;
+          let bestOffer = null;
+
+          matchedOffers.forEach((offer) => {
+            let discount =
+              offer.discountType === "percentage"
+                ? (price * offer.discountValue) / 100
+                : offer.discountValue;
+            if (discount > maxDiscount) {
+              maxDiscount = discount;
+              bestOffer = offer;
+            }
+          });
+
+          const productData = {
+            ...product._doc,
+            offer: bestOffer || null,
+          };
+
+          return productData;
+        })
+      );
+
+    // Apply offer logic
+    const productsWithOffers = await attachBestOffer(products);
+    const featuredWithOffers = await attachBestOffer(featuredProductsRaw);
+    const newCollectionsWithOffers = await attachBestOffer(newCollectionsRaw);
 
     res.render("home", {
-      user: user,
-      products: products,
-      totalProducts: totalProducts,
+      user,
+      products: productsWithOffers,
+      totalProducts,
       currentPage: page,
-      totalPages: totalPages,
+      totalPages,
       category: categoryWithIds,
-      featured: featuredProducts,
-      newCollections: newCollections,
+      featured: featuredWithOffers,
+      newCollections: newCollectionsWithOffers,
       categories: categoriesWithProducts,
-      blocked:isBlocked
+      blocked: isBlocked,
+      offers: activeOffers,
     });
   } catch (error) {
     console.error("Error loading home page:", error);
@@ -362,51 +379,40 @@ const newCollections = await Product.find({
   }
 };
 
+
 const loadShopAll = async (req, res) => {
   try {
-    const user = req.session.user;
     let userData = null;
     if (req.session.user?._id) {
       userData = await User.findById(req.session.user._id);
     }
+
     const searchQuery = req.query.search || "";
     const categories = await Category.find({ isListed: true });
-    const listedCategoryIds = categories.map(c => c._id);
-    let isBlocked = false;
-    if (user) {
-      const dbUser = await User.findById(user.id);
-      if (dbUser && dbUser.isBlocked) {
-        isBlocked = true;
-      }
-    }
-
-    console.log("Categories found:", categories.length);
+    const listedCategoryIds = categories.map(c => c._id.toString());
 
     const categoryId = req.query.category;
     const sortBy = req.query.sort;
 
     let query = {
+      isListed: true,
       isBlocked: false,
       quantity: { $gt: 0 },
+      category: { $in: listedCategoryIds },
     };
 
-    query.category = { $in: listedCategoryIds };
     if (searchQuery) {
       query.$or = [
-        { productName: { $regex: searchQuery, $options: 'i' } },
-        { description: { $regex: searchQuery, $options: 'i' } }
+        { productName: { $regex: searchQuery, $options: "i" } },
+        { description: { $regex: searchQuery, $options: "i" } },
       ];
     }
 
     if (categoryId && listedCategoryIds.includes(categoryId)) {
       query.category = categoryId;
-    } else {
-      query.category = { $in: listedCategoryIds };
     }
 
     const totalProducts = await Product.countDocuments(query);
-    console.log("\nTotal products:", totalProducts);
-
     const page = parseInt(req.query.page) || 1;
     const limit = 9;
     const skip = (page - 1) * limit;
@@ -433,13 +439,62 @@ const loadShopAll = async (req, res) => {
       }
     }
 
-    const products = await Product.find(query)
+    let products = await Product.find(query)
       .sort(sort)
       .skip(skip)
       .limit(limit)
-      .populate("category", "name");
+      .populate("category", "name")
+      .lean(); 
 
-    console.log("\nProducts found for current page:", products.length);
+    const now = new Date();
+
+    const offers = await Offer.find({
+      isActive: true,
+      startDate: { $lte: now },
+      endDate: { $gte: now },
+      applicableOn: { $in: ["all", "categories", "products"] },
+    }).lean();
+
+    products = products.map((product) => {
+  const matchedOffers = offers.filter((offer) => {
+    if (offer.applicableOn === "all") return true;
+    if (
+      offer.applicableOn === "categories" &&
+      offer.categories.some(cat => cat.toString() === product.category._id.toString())
+    ) return true;
+    if (
+      offer.applicableOn === "products" &&
+      offer.products.some(prod => prod.toString() === product._id.toString())
+    ) return true;
+    return false;
+  });
+
+  if (matchedOffers.length > 0) {
+    let maxDiscount = 0;
+    let bestOffer = null;
+
+    matchedOffers.forEach((offer) => {
+      let discount = 0;
+      if (offer.discountType === 'percentage') {
+        discount = (product.salePrice * offer.discountValue) / 100;
+      } else {
+        discount = offer.discountValue;
+      }
+
+      if (discount > maxDiscount) {
+        maxDiscount = discount;
+        bestOffer = offer;
+      }
+    });
+
+    if (bestOffer) {
+      product.offer = bestOffer;
+    }
+  }
+
+  return product;
+});
+
 
     const categoryData = categories.map((c) => ({
       _id: c._id,
@@ -447,10 +502,8 @@ const loadShopAll = async (req, res) => {
       image: c.image,
     }));
 
-    const Searchedproduct = await Product.find(query);
-
     res.render("shopAll", {
-      user: user,
+      user: userData,
       products,
       totalProducts,
       currentPage: page,
@@ -458,14 +511,14 @@ const loadShopAll = async (req, res) => {
       category: categoryData,
       selectedCategory: categoryId || null,
       selectedSort: sortBy || null,
-      searchQuery: Searchedproduct,
-      blocked: isBlocked
+      searchQuery: req.query.search || ""
     });
   } catch (error) {
     console.error("Error in loadShopAll:", error);
     res.status(500).render("error", { message: "Cannot load shop page" });
   }
 };
+
 
 const filterProduct = async (req, res) => {
   console.log("req received here");
@@ -599,7 +652,7 @@ const productDetails = async (req, res) => {
     if (req.session.user) {
       userData = await User.findById(req.session.user._id);
     }
-    console.log('userrrrrrr at deatail pageeee',req.session.user);
+
     const productId = req.query.id;
 
     if (!productId) {
@@ -619,7 +672,7 @@ const productDetails = async (req, res) => {
     const relatedProducts = await Product.find({
       category: product.category._id,
       _id: { $ne: product._id },
-     
+      isListed: true,
       quantity: { $gt: 0 },
     })
       .limit(4)
@@ -633,7 +686,7 @@ const productDetails = async (req, res) => {
       product,
       relatedProducts,
       category: categories,
-      currentUser: req.session.user,
+      currentUser: userData,
     });
   } catch (error) {
     console.error("Error in productDetails:", error);
@@ -645,21 +698,16 @@ const productDetails = async (req, res) => {
 
 const newArrivals = async (req, res) => {
   try {
-    const user = req.session.user?._id
+    const userData = req.session.user?._id
       ? await User.findById(req.session.user._id)
       : null;
 
     const categories = await Category.find({ isListed: true });
     const listedCategoryIds = categories.map((c) => c._id); 
-     let isBlocked = false;
-    if (user) {
-      const dbUser = await User.findById(user.id);
-      if (dbUser && dbUser.isBlocked) {
-        isBlocked = true;
-      }
-    }
+
     const query = {
-      
+      isListed: true,
+      status: "Available",
       isBlocked: false,
       quantity: { $gt: 0 },
       new: true,
@@ -695,12 +743,11 @@ const newArrivals = async (req, res) => {
       currentPage: page,
       totalPages,
       query: req.query,
-      user: user,
+      user: userData,
       totalProducts,
       category: categories,
       selectedCategory: null,
       selectedSort: null,
-      blocked:isBlocked,
     });
   } catch (error) {
     console.log("Error in new arrivals:", error);
@@ -711,26 +758,21 @@ const newArrivals = async (req, res) => {
 
 const featured = async (req, res) => {
   try {
-    const user = req.session.user?._id
+    const userData = req.session.user?._id
       ? await User.findById(req.session.user._id)
       : null;
 
     const categories = await Category.find({ isListed: true });
-   const listedCategoryIds = categories.map((c) => c._id);
- let isBlocked = false;
-    if (user) {
-      const dbUser = await User.findById(user.id);
-      if (dbUser && dbUser.isBlocked) {
-        isBlocked = true;
-      }
-    }
-const query = {
- 
-  isBlocked: false,
-  quantity: { $gt: 0 },
-  featured: true,
-  category: { $in: listedCategoryIds },
-};
+    const listedCategoryIds = categories.map((c) => c._id);
+
+    const query = {
+      isListed: true,
+      status: "Available",
+      isBlocked: false,
+      quantity: { $gt: 0 },
+      featured: true,
+      category: { $in: listedCategoryIds },
+    };
 
     const page = parseInt(req.query.page) || 1;
     const limit = 9;
@@ -746,13 +788,69 @@ const query = {
       .populate("category")
       .exec();
 
+    // Fetch valid offers
+    const now = new Date();
+    const offers = await Offer.find({
+      isActive: true,
+      startDate: { $lte: now },
+      endDate: { $gte: now },
+    });
+
+    // Attach best offer to each product
     const featuredWithPrices = await Promise.all(
       featuredData.map(async (product) => {
-        const salesPrice = product.regularPrice;
-        return {
+        const salesPrice = product.salePrice || product.regularPrice;
+
+        // Filter matching offers
+        const matchedOffers = offers.filter((offer) => {
+          if (offer.applicableOn === "all") return true;
+          if (
+            offer.applicableOn === "categories" &&
+            offer.categories.some(
+              (cat) => cat.toString() === product.category._id.toString()
+            )
+          ) {
+            return true;
+          }
+          if (
+            offer.applicableOn === "products" &&
+            offer.products.some(
+              (prod) => prod.toString() === product._id.toString()
+            )
+          ) {
+            return true;
+          }
+          return false;
+        });
+
+        // Find the highest discount offer
+        let maxDiscount = 0;
+        let bestOffer = null;
+
+        matchedOffers.forEach((offer) => {
+          let discount = 0;
+          if (offer.discountType === "percentage") {
+            discount = (salesPrice * offer.discountValue) / 100;
+          } else {
+            discount = offer.discountValue;
+          }
+
+          if (discount > maxDiscount) {
+            maxDiscount = discount;
+            bestOffer = offer;
+          }
+        });
+
+        // Attach best offer if found
+        const finalProduct = {
           ...product._doc,
           salesPrice,
         };
+        if (bestOffer) {
+          finalProduct.offer = bestOffer;
+        }
+
+        return finalProduct;
       })
     );
 
@@ -761,18 +859,18 @@ const query = {
       currentPage: page,
       totalPages,
       query: req.query,
-      user: user,
+      user: userData,
       totalProducts,
       category: categories,
       selectedCategory: null,
       selectedSort: null,
-      blocked:isBlocked
     });
   } catch (error) {
-    console.log("Error in new arrivals:", error);
+    console.log("Error in featured products:", error);
     res.render("page404");
   }
 };
+
 
 module.exports = {
   loadLogin,

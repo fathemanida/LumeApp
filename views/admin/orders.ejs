@@ -8,77 +8,106 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        /* Dark Theme Variables */
         :root {
-            --dark-brown: #291d0e;
-            --olive-green: #314216;
-            --light-bg: #f8f5f2;
-            --border-color: #d3c9be;
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --accent-color: #dac6a4;
+            --border-color: #404040;
+            --input-bg: #333333;
+            --hover-bg: #404040;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            --status-pending-bg: rgba(255, 243, 205, 0.2);
+            --status-pending-text: #856404;
+            --status-delivered-bg: rgba(76, 175, 80, 0.2);
+            --status-delivered-text: #4caf50;
+            --status-processing-bg: rgba(204, 229, 255, 0.2);
+            --status-processing-text: #004085;
+            --status-shipped-bg: rgba(209, 236, 241, 0.2);
+            --status-shipped-text: #0c5460;
+            --status-cancelled-bg: rgba(244, 67, 54, 0.2);
+            --status-cancelled-text: #f44336;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }
-
-        html, body {
-            height: 100%;
             font-family: 'Jost', sans-serif;
-            background-color: var(--light-bg);
-            color: var(--dark-brown);
         }
 
-        .dashboard {
-            display: flex;
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
             min-height: 100vh;
+            display: flex;
         }
 
+        /* Sidebar Styles */
         .sidebar {
-            width: 240px;
-            background: white;
-            border-right: 1px solid var(--border-color);
+            width: 280px;
+            background-color: var(--bg-secondary);
             padding: 2rem 1.5rem;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
         }
 
         .brand {
             font-family: 'Aboreto', cursive;
-            font-size: 1.8rem;
-            margin-bottom: 2.5rem;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            color: var(--dark-brown);
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            letter-spacing: 1px;
         }
 
         .nav-menu {
-            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex: 1;
         }
 
         .nav-item {
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
         }
 
         .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 0.75rem 1rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            text-decoration: none;
-            color: var(--dark-brown);
-            padding: 0.5rem 0.75rem;
-            transition: all 0.3s;
-            border-radius: 4px;
+            font-size: 0.95rem;
         }
 
-        .nav-link:hover,
+        .nav-link i {
+            width: 20px;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .nav-link:hover {
+            background-color: var(--hover-bg);
+            color: var(--accent-color);
+            transform: translateX(4px);
+        }
+
         .nav-link.active {
-            color: var(--olive-green);
+            background-color: var(--hover-bg);
+            color: var(--accent-color);
             font-weight: 500;
-            background-color: rgba(49, 66, 22, 0.1);
-        }
-
-        .nav-link.active {
-            font-weight: 600;
-            background-color: var(--light-bg);
-            box-shadow: 3px 0 0 0 var(--olive-green) inset;
+            border-left: 3px solid var(--accent-color);
         }
 
         .nav-link.logout {
@@ -86,19 +115,19 @@
             margin-top: 1.5rem;
         }
 
+        /* Main Content Styles */
         .main-content {
             flex: 1;
-            display: flex;
-            flex-direction: column;
+            margin-left: 280px;
+            padding: 2rem;
+            background-color: var(--bg-primary);
         }
 
         .main-header {
-            background: white;
-            padding: 1rem 2rem;
-            border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 2rem;
         }
 
         .header-left {
@@ -107,72 +136,80 @@
             gap: 1rem;
         }
 
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+
+        .page-title {
+            font-family: 'Aboreto', cursive;
+            font-size: 2rem;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
         .header-right {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 1.5rem;
         }
 
         .search-container {
             position: relative;
             display: flex;
-            margin-right: 15px;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+            position: relative;
+            box-shadow: 0 2px 6px rgb(129 83 50 / 49%);
         }
 
         .search-bar {
-            padding: 10px 40px 10px 15px;
-            border: 1px solid #ddd;
-            border-radius: 20px;
-            width: 220px;
-            transition: all 0.3s ease;
-            font-family: 'Jost', sans-serif;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+            font-size: 0.9rem;
         }
 
         .search-bar:focus {
+            border-color: var(--accent-color);
             outline: none;
-            border-color: var(--olive-green);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-            transform: scale(1.02);
+            box-shadow: 0 0 0 2px rgba(218, 198, 164, 0.2);
         }
 
-        .search-btn {
-            padding: 10px 15px;
-            background: var(--dark-brown);
-            border: none;
-            border-radius: 0 20px 20px 0;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: white;
+        .search-bar::placeholder {
+            color: var(--text-secondary);
         }
 
-        .search-btn:hover {
-            background: var(--dark-brown);
-            transform: translateY(-1px);
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
         }
 
         .clear-search {
             position: absolute;
-            right: 50px;
+            right: 10px;
             top: 50%;
-            transform: translateY(-50%) scale(0.8);
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            color: var(--dark-brown);
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
             cursor: pointer;
             display: none;
-            transition: all 0.3s ease;
-            display: flex;
             align-items: center;
             justify-content: center;
-        }
-
-        .clear-search:hover {
-            background: #f5f5f5;
-            transform: translateY(-50%) scale(0.9);
         }
 
         .search-bar:not(:placeholder-shown) + .clear-search {
@@ -184,7 +221,7 @@
             border: none;
             position: relative;
             cursor: pointer;
-            color: #555;
+            color: var(--text-primary);
             font-size: 1.1rem;
         }
 
@@ -220,18 +257,19 @@
 
         .profile-name {
             font-weight: 500;
+            color: var(--text-primary);
         }
 
         .profile-dropdown-menu {
             position: absolute;
             top: 100%;
             right: 0;
-            background: white;
+            background: var(--bg-secondary);
             border: 1px solid var(--border-color);
             border-radius: 4px;
             padding: 0.5rem 0;
             min-width: 180px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 10px var(--shadow-color);
             display: none;
             z-index: 100;
         }
@@ -243,41 +281,28 @@
         .dropdown-item {
             padding: 0.5rem 1rem;
             display: block;
-            color: var(--dark-brown);
+            color: var(--text-secondary);
             text-decoration: none;
             transition: background-color 0.2s;
         }
 
         .dropdown-item:hover {
-            background-color: var(--light-bg);
-        }
-
-        .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 1.25rem;
-            cursor: pointer;
-            color: var(--dark-brown);
-        }
-
-        .page-title {
-            font-size: 1.5rem;
-            font-weight: 500;
-            letter-spacing: 0.5px;
+            background-color: var(--hover-bg);
+            color: var(--accent-color);
         }
 
         .content-area {
-            padding: 2rem;
             flex: 1;
             overflow-y: auto;
         }
 
         .table-container {
-            background: white;
-            padding: 1.5rem;
+            background-color: var(--bg-secondary);
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(41, 29, 14, 0.05);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+            box-shadow: 0 2px 6px rgb(129 83 50 / 49%);
         }
 
         table {
@@ -288,14 +313,21 @@
         th {
             text-align: left;
             padding: 1rem;
-            background-color: var(--light-bg);
-            color: var(--dark-brown);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
             font-weight: 500;
+            white-space: nowrap;
+            border-bottom: 1px solid var(--border-color);
         }
 
         td {
             padding: 1rem;
             border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        tr:hover {
+            background-color: var(--hover-bg);
         }
 
         .status {
@@ -307,34 +339,59 @@
         }
 
         .status-pending {
-            background-color: #fff3cd;
-            color: #856404;
+            background-color: var(--status-pending-bg);
+            color: var(--status-pending-text);
         }
 
         .status-delivered {
-            background-color: #d4edda;
-            color: #155724;
+            background-color: var(--status-delivered-bg);
+            color: var(--status-delivered-text);
         }
 
         .status-processing {
-            background-color: #cce5ff;
-            color: #004085;
+            background-color: var(--status-processing-bg);
+            color: var(--status-processing-text);
         }
 
         .status-shipped {
-            background-color: #d1ecf1;
-            color: #0c5460;
+            background-color: var(--status-shipped-bg);
+            color: var(--status-shipped-text);
         }
 
         .status-cancelled {
-            background-color: #f8d7da;
-            color: #721c24;
+            background-color: var(--status-cancelled-bg);
+            color: var(--status-cancelled-text);
+        }
+
+        .return-status {
+            margin-top: 5px;
+            font-size: 0.8rem;
+        }
+
+        .return-status div {
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .return-pending {
+            background-color: var(--status-cancelled-bg);
+            color: var(--status-cancelled-text);
+        }
+
+        .return-accepted {
+            background-color: var(--status-delivered-bg);
+            color: var(--status-delivered-text);
+        }
+
+        .return-rejected {
+            background-color: var(--status-cancelled-bg);
+            color: var(--status-cancelled-text);
         }
 
         .view-btn {
             padding: 0.5rem 1rem;
-            background-color: var(--olive-green);
-            color: white;
+            background-color: var(--accent-color);
+            color: var(--bg-primary);
             text-decoration: none;
             border-radius: 4px;
             font-size: 0.9rem;
@@ -342,7 +399,7 @@
         }
 
         .view-btn:hover {
-            background-color: var(--dark-brown);
+            background-color: #c5b393;
             transform: translateY(-2px);
         }
 
@@ -351,51 +408,66 @@
             justify-content: flex-end;
             gap: 0.5rem;
             margin-top: 1.5rem;
+            align-items: center;
         }
 
         .page-btn {
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
             border-radius: 4px;
-            border: none;
-            background-color: #e0e0e0;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.3s ease;
             text-decoration: none;
         }
 
-        .page-btn.active {
-            background-color: var(--dark-brown);
-            color: white;
+        .page-btn:hover:not(.active):not([style*="pointer-events: none"]) {
+            background-color: var(--accent-color);
+            color: var(--bg-primary);
+            border-color: var(--accent-color);
         }
 
-        .page-btn:hover:not(.active) {
-            background-color: #d0d0d0;
+        .page-btn.active {
+            background-color: var(--accent-color);
+            color: var(--bg-primary);
+            border-color: var(--accent-color);
+        }
+
+        .page-btn[style*="pointer-events: none"] {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 240px;
+            }
+            .main-content {
+                margin-left: 240px;
+            }
         }
 
         @media (max-width: 768px) {
             .sidebar {
+                transform: translateX(-100%);
                 position: fixed;
-                left: -240px;
-                top: 0;
-                bottom: 0;
                 z-index: 1000;
-                transition: left 0.3s;
             }
-
             .sidebar.active {
-                left: 0;
+                transform: translateX(0);
             }
-
+            .main-content {
+                margin-left: 0;
+            }
             .mobile-menu-btn {
                 display: block;
             }
-
-            .main-header {
-                padding: 1rem;
+            .search-box {
+                width: 100%;
+            }
+            .profile-name {
+                display: none;
             }
         }
 
@@ -408,26 +480,32 @@
         }
 
         .toast {
-            background-color: white;
+            background-color: var(--bg-secondary);
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 10px var(--shadow-color);
         }
 
         .toast-header {
-            background-color: var(--dark-brown);
-            color: white;
-            border-bottom: none;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-color);
         }
 
         .toast-header .btn-close {
-            color: white;
-            filter: brightness(0) invert(1);
+            color: var(--text-primary);
+            filter: brightness(0.8);
         }
 
         .toast-body {
-            color: var(--dark-brown);
+            color: var(--text-secondary);
             font-size: 0.95rem;
         }
+        .nav-menu ul {
+    list-style: none;
+}
+.nav-menu {
+    list-style: none;
+}
     </style>
 </head>
 <body class="dashboard">
@@ -480,14 +558,14 @@
             <div class="header-right">
                 <div class="search-container">
                     <form id="searchForm" action="/admin/orders" method="GET">
-                        <input type="text" class="search-bar" placeholder="Search orders..." name="search"
-                            value="<%= typeof search !== 'undefined' ? search : '' %>">
-                        <button type="button" class="clear-search">
-                            <i class="fas fa-times"></i>
-                        </button>
-                        <button type="submit" class="search-btn">
-                            <i class="fas fa-search"></i>
-                        </button>
+                        <div class="search-box">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" class="search-bar" placeholder="Search orders..." name="search"
+                                value="<%= typeof search !== 'undefined' ? search : '' %>">
+                            <button type="button" class="clear-search">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
                     </form>
                 </div>
                 <button class="notification-btn">
@@ -542,7 +620,7 @@
                                         <% const firstItem = order.orderItems[0] %>
                                         <%= firstItem.productId ? firstItem.productId.productName : 'Product not found' %>
                                         <% if (order.orderItems.length > 1) { %>
-                                            <span style="color: #666;">+<%= order.orderItems.length - 1 %> more</span>
+                                            <span style="color: var(--text-secondary);">+<%= order.orderItems.length - 1 %> more</span>
                                         <% } %>
                                     <% } else { %>
                                         No items
@@ -555,17 +633,17 @@
                                         <%= order.status %>
                                     </span>
                                     <% if (order.returnRequest) { %>
-                                        <div class="return-status" style="margin-top: 5px; font-size: 0.8rem;">
+                                        <div class="return-status">
                                             <% if (order.returnRequest.status === 'Pending') { %>
-                                                <div style="color: #721c24; background-color: #f8d7da; padding: 4px 8px; border-radius: 4px;">
+                                                <div class="return-pending">
                                                     <i class="fas fa-exclamation-circle"></i> Return Requested
                                                 </div>
                                             <% } else if (order.returnRequest.status === 'Accepted') { %>
-                                                <div style="color: #155724; background-color: #d4edda; padding: 4px 8px; border-radius: 4px;">
+                                                <div class="return-accepted">
                                                     <i class="fas fa-check-circle"></i> Return Accepted
                                                 </div>
                                             <% } else if (order.returnRequest.status === 'Rejected') { %>
-                                                <div style="color: #721c24; background-color: #f8d7da; padding: 4px 8px; border-radius: 4px;">
+                                                <div class="return-rejected">
                                                     <i class="fas fa-times-circle"></i> Return Rejected
                                                 </div>
                                             <% } %>
@@ -583,14 +661,14 @@
                 </table>
 
                 <div class="pagination">
-                    <span style="margin-right: 1rem; align-self: center;">
+                    <span style="margin-right: 1rem; align-self: center; color: var(--text-secondary);">
                         Showing <%= currentPage %> of <%= totalPages %>
                     </span>
 
                     <% if (currentPage > 1) { %>
-                        <a href="?page=<%= currentPage - 1 %>" class="page-btn">&lt;</a>
+                        <a href="?page=<%= currentPage - 1 %>" class="page-btn"><</a>
                     <% } else { %>
-                        <span class="page-btn" style="opacity: 0.5; pointer-events: none;">&lt;</span>
+                        <span class="page-btn" style="opacity: 0.5; pointer-events: none;"><</span>
                     <% } %>
 
                     <% for(let i = 1; i <= totalPages; i++) { %>
@@ -602,9 +680,9 @@
                     <% } %>
 
                     <% if (currentPage < totalPages) { %>
-                        <a href="?page=<%= currentPage + 1 %>" class="page-btn">&gt;</a>
+                        <a href="?page=<%= currentPage + 1 %>" class="page-btn">></a>
                     <% } else { %>
-                        <span class="page-btn" style="opacity: 0.5; pointer-events: none;">&gt;</span>
+                        <span class="page-btn" style="opacity: 0.5; pointer-events: none;">></span>
                     <% } %>
                 </div>
             </div>
@@ -677,11 +755,10 @@
             });
             bsToast.show();
 
-            // Remove toast from DOM after it's hidden
             toast.addEventListener('hidden.bs.toast', () => {
                 toast.remove();
             });
         }
     </script>
 </body>
-</html> 
+</html>

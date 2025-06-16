@@ -1,83 +1,112 @@
+        });
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard | LUME Admin</title>
-    <link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Jost&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     <style>
+        /* Dark Theme Variables */
         :root {
-            --dark-brown: #291d0e;
-            --olive-green: #314216;
-            --light-bg: #f8f5f2;
-            --border-color: #d3c9be;
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --accent-color: #dac6a4;
+            --accent-gradient: linear-gradient(45deg, #dac6a4, #f0d8a8);
+            --border-color: #404040;
+            --input-bg: #333333;
+            --hover-bg: #404040;
+            --shadow-color: rgba(0, 0, 0, 0.4);
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }
-
-        html, body {
-            height: 100%;
             font-family: 'Jost', sans-serif;
-            background-color: var(--light-bg);
-            color: var(--dark-brown);
         }
 
-        .dashboard {
-            display: flex;
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
             min-height: 100vh;
+            display: flex;
         }
 
+        /* Sidebar Styles */
         .sidebar {
-            width: 240px;
-            background: white;
-            border-right: 1px solid var(--border-color);
+            width: 280px;
+            background-color: var(--bg-secondary);
             padding: 2rem 1.5rem;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
         }
 
         .brand {
             font-family: 'Aboreto', cursive;
             font-size: 1.8rem;
-            margin-bottom: 2.5rem;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            color: var(--dark-brown);
+            color: var(--accent-color);
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(218, 198, 164, 0.3);
         }
 
         .nav-menu {
-            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex: 1;
         }
 
         .nav-item {
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
         }
 
         .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            text-decoration: none;
-            color: var(--dark-brown);
-            padding: 0.5rem 0.75rem;
-            transition: all 0.3s;
-            border-radius: 4px;
+            font-size: 0.95rem;
+            position: relative;
+            overflow: hidden;
         }
 
-        .nav-link:hover,
-        .nav-link.active {
-            color: var(--olive-green);
-            font-weight: 500;
-            background-color: rgba(49, 66, 22, 0.1);
+        .nav-link i {
+            width: 20px;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .nav-link:hover {
+            background: var(--accent-gradient);
+            color: var(--bg-primary);
+            transform: translateX(4px);
         }
 
         .nav-link.active {
+            background: var(--accent-gradient);
+            color: var(--bg-primary);
             font-weight: 600;
-            background-color: var(--light-bg);
-            box-shadow: 3px 0 0 0 var(--olive-green) inset;
+            border-left: 4px solid var(--accent-color);
         }
 
         .nav-link.logout {
@@ -85,19 +114,27 @@
             margin-top: 1.5rem;
         }
 
+        /* Main Content Styles */
         .main-content {
             flex: 1;
-            display: flex;
-            flex-direction: column;
+            margin-left: 280px;
+            padding: 2rem;
+            background-color: var(--bg-primary);
         }
 
         .main-header {
-            background: white;
-            padding: 1rem 2rem;
+            background: var(--bg-secondary);
+            padding: 1.5rem 2rem;
+            border-radius: 12px;
             border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 90;
+            box-shadow: 0 4px 12px var(--shadow-color);
         }
 
         .header-left {
@@ -112,13 +149,15 @@
             border: none;
             font-size: 1.25rem;
             cursor: pointer;
-            color: var(--dark-brown);
+            color: var(--text-primary);
         }
 
         .page-title {
-            font-size: 1.5rem;
-            font-weight: 500;
-            letter-spacing: 0.5px;
+            font-family: 'Aboreto', cursive;
+            font-size: 1.8rem;
+            color: var(--accent-color);
+            margin: 0;
+            text-shadow: 0 0 8px rgba(218, 198, 164, 0.3);
         }
 
         .header-right {
@@ -128,12 +167,20 @@
         }
 
         .notification-btn {
-            background: none;
+            background: var(--input-bg);
             border: none;
             position: relative;
             cursor: pointer;
-            color: var(--dark-brown);
-            font-size: 1.1rem;
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .notification-btn:hover {
+            background: var(--hover-bg);
+            transform: scale(1.1);
         }
 
         .notification-badge {
@@ -143,9 +190,9 @@
             background: #ff4757;
             color: white;
             border-radius: 50%;
-            width: 18px;
-            height: 18px;
-            font-size: 0.7rem;
+            width: 20px;
+            height: 20px;
+            font-size: 0.8rem;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -160,26 +207,28 @@
         }
 
         .profile-img {
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             object-fit: cover;
+            border: 2px solid var(--accent-color);
         }
 
         .profile-name {
             font-weight: 500;
+            color: var(--text-primary);
         }
 
         .profile-dropdown-menu {
             position: absolute;
             top: 100%;
             right: 0;
-            background: white;
+            background: var(--bg-secondary);
             border: 1px solid var(--border-color);
-            border-radius: 4px;
+            border-radius: 8px;
             padding: 0.5rem 0;
-            min-width: 180px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            min-width: 200px;
+            box-shadow: 0 4px 12px var(--shadow-color);
             display: none;
             z-index: 100;
         }
@@ -189,15 +238,16 @@
         }
 
         .dropdown-item {
-            padding: 0.5rem 1rem;
+            padding: 0.75rem 1.5rem;
             display: block;
-            color: var(--dark-brown);
+            color: var(--text-primary);
             text-decoration: none;
-            transition: background-color 0.2s;
+            transition: all 0.3s ease;
         }
 
         .dropdown-item:hover {
-            background-color: var(--light-bg);
+            background: var(--accent-gradient);
+            color: var(--bg-primary);
         }
 
         .content-area {
@@ -206,200 +256,358 @@
             overflow-y: auto;
         }
 
-        .action-bar {
+        /* Sales Report Section */
+        .report-controls {
+            background: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px var(--shadow-color);
             display: flex;
-            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1.5rem;
             align-items: center;
-            margin-bottom: 1.5rem;
+            background: linear-gradient(145deg, var(--bg-secondary), #353535);
         }
 
-        .section-title {
-            font-size: 1.25rem;
+        .report-title {
+            font-size: 1.8rem;
+            margin-right: auto;
+            color: var(--accent-color);
             font-weight: 500;
         }
 
-
-        .content-area {
-            padding: 2rem;
-            flex: 1;
-            overflow-y: auto;
+        .report-filter {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            flex-wrap: wrap;
         }
 
-        /* Dashboard Specific Styles */
-        .stats-grid {
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .filter-label {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .filter-select, .filter-date {
+            padding: 0.75rem 1.25rem;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-select:focus, .filter-date:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 8px rgba(218, 198, 164, 0.3);
+        }
+
+        .generate-btn {
+            padding: 0.75rem 2rem;
+            background: var(--accent-gradient);
+            color: var(--bg-primary);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Sales Summary Cards */
+        .sales-summary {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
             margin-bottom: 2rem;
         }
 
-        .stat-card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        .summary-card {
+            background: linear-gradient(145deg, var(--bg-secondary), #353535);
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 6px 15px var(--shadow-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .summary-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--accent-color);
+        }
+
+        .summary-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: var(--accent-gradient);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .summary-card:hover::after {
+            transform: scaleX(1);
+        }
+
+        .summary-title {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.75rem;
+            font-weight: 500;
         }
 
-        .stat-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
+        .summary-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: var(--accent-color);
         }
 
-        .stat-info {
-            flex: 1;
-        }
-
-        .stat-value {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-
-        .stat-label {
-            color: #666;
+        .summary-change {
             font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 400;
         }
 
-        .icon-customers { background-color: rgba(52, 152, 219, 0.1); color: #3498db; }
-        .icon-products { background-color: rgba(46, 204, 113, 0.1); color: #2ecc71; }
-        .icon-revenue { background-color: rgba(155, 89, 182, 0.1); color: #9b59b6; }
-        .icon-orders { background-color: rgba(241, 196, 15, 0.1); color: #f1c40f; }
-
-        .recent-activity {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        .change-up {
+            color: var(--success-color);
         }
 
-        .activity-header {
+        .change-down {
+            color: #f44336;
+        }
+
+        .summary-icon {
+            position: absolute;
+            right: 2rem;
+            top: 2rem;
+            font-size: 2.5rem;
+            opacity: 0.15;
+            color: var(--accent-color);
+        }
+
+        /* Chart Container */
+        .chart-container {
+            background: linear-gradient(145deg, var(--bg-secondary), #353535);
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            position: relative;
+            height: 450px;
+            border: 1px solid var(--border-color);
+        }
+
+        .chart-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1.5rem;
         }
 
-        .activity-title {
-            font-size: 1.2rem;
+        .chart-title {
+            font-size: 1.5rem;
+            color: var(--accent-color);
             font-weight: 500;
         }
 
-        .activity-list {
-            list-style: none;
+        .chart-legend {
+            display: flex;
+            gap: 1.5rem;
         }
 
-        .activity-item {
+        .legend-item {
             display: flex;
             align-items: center;
-            gap: 1rem;
-            padding: 1rem 0;
+            gap: 0.75rem;
+            font-size: 0.9rem;
+            font-weight: 400;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+
+        /* Sales Table */
+        .sales-table-container {
+            background: linear-gradient(145deg, var(--bg-secondary), #353535);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        .sales-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .sales-table th {
+            text-align: left;
+            padding: 1.25rem;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-weight: 600;
+            white-space: nowrap;
             border-bottom: 1px solid var(--border-color);
         }
 
-        .activity-item:last-child {
-            border-bottom: none;
+        .sales-table td {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
         }
 
-        .activity-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--light-bg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
+        .sales-table tr:hover {
+            background-color: var(--hover-bg);
         }
 
-        .activity-details {
-            flex: 1;
-        }
-
-        .activity-text {
-            margin-bottom: 0.25rem;
-        }
-
-        .activity-time {
+        .badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
             font-size: 0.85rem;
-            color: #666;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background-color: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+        }
+
+        .badge-warning {
+            background-color: rgba(255, 152, 0, 0.2);
+            color: #ff9800;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fadeIn {
+            animation: fadeIn 0.8s ease forwards;
+        }
+
+        .delay-1 { animation-delay: 0.2s; }
+        .delay-2 { animation-delay: 0.4s; }
+        .delay-3 { animation-delay: 0.6s; }
+        .delay-4 { animation-delay: 0.8s; }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 240px;
+            }
+            .main-content {
+                margin-left: 240px;
+            }
         }
 
         @media (max-width: 768px) {
             .sidebar {
+                transform: translateX(-100%);
                 position: fixed;
-                left: -240px;
-                top: 0;
-                bottom: 0;
                 z-index: 1000;
-                transition: left 0.3s;
             }
-
             .sidebar.active {
-                left: 0;
+                transform: translateX(0);
             }
-
+            .main-content {
+                margin-left: 0;
+            }
             .mobile-menu-btn {
                 display: block;
             }
-
-            .main-header {
-                padding: 1rem;
-            }
-
             .profile-name {
                 display: none;
             }
+            .sales-summary {
+                grid-template-columns: 1fr 1fr;
+            }
+            .report-filter {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
 
-            .stats-grid {
+        @media (max-width: 480px) {
+            .sales-summary {
                 grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body class="dashboard">
-    <aside class="sidebar">
-        <div class="brand">LUME</div>
-        <ul class="nav-menu">
-            <li class="nav-item">
-                <a href="/admin/dashboard" class="nav-link active"><i class="fas fa-home"></i> Dashboard</a>
-            </li>
-            <li class="nav-item">
-                <a href="/admin/product" class="nav-link"><i class="fas fa-box"></i> Product</a>
-            </li>
-            <li class="nav-item">
-                <a href="/admin/orders" class="nav-link"><i class="fas fa-shopping-cart"></i> Orders</a>
-            </li>
-            <li class="nav-item">
-                <a href="/admin/users" class="nav-link"><i class="fas fa-users"></i> Users</a>
-            </li>
-            <li class="nav-item">
-                <a href="/admin/Category" class="nav-link"><i class="fas fa-tags"></i> Category</a>
-            </li>
-            <li class="nav-item">
-                <a href="/admin/offers" class="nav-link"><i class="fas fa-ticket-alt"></i> Offers</a>
-            </li>
-            <li class="nav-item">
-                <a href="/admin/settings" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
-            </li>
-            <li class="nav-item">
-                <a href="/admin/banner" class="nav-link"><i class="fas fa-image"></i> Banner</a>
-            </li>
-            <li class="nav-item">
-                <a href="/admin/Coupons" class="nav-link"><i class="fas fa-ticket-alt"></i> Coupons</a>
-            </li>
-            <li class="nav-item">
-                <a href="/admin/logout" class="nav-link logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
-            </li>
-        </ul>
-    </aside>
+  <aside class="sidebar">
+    <div class="brand">LUME</div>
+    <ul class="nav-menu">
+      <li class="nav-item">
+        <a href="/admin/dashboard" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/product" class="nav-link active"><i class="fas fa-box"></i> Product</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/orders" class="nav-link"><i class="fas fa-shopping-cart"></i> Orders</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/users" class="nav-link"><i class="fas fa-users"></i> Users</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/Category" class="nav-link"><i class="fas fa-tags"></i> Category</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/offers" class="nav-link"><i class="fas fa-ticket-alt"></i> Offers</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/settings" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/banner" class="nav-link"><i class="fas fa-image"></i> Banner</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/Coupons" class="nav-link"><i class="fas fa-ticket-alt"></i> Coupons</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/logout" class="nav-link logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </li>
+    </ul>
+  </aside>
 
     <div class="main-content">
         <header class="main-header">
@@ -407,9 +615,13 @@
                 <button class="mobile-menu-btn" id="mobileMenuBtn">
                     <i class="fas fa-bars"></i>
                 </button>
-                <h2 class="page-title">DASHBOARD</h2>
+                <h2 class="page-title">SALES REPORT</h2>
             </div>
             <div class="header-right">
+                <button class="notification-btn">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </button>
                 <div class="profile-dropdown">
                     <img src="https://i.pravatar.cc/80" alt="Profile" class="profile-img">
                     <span class="profile-name">Admin</span>
@@ -423,69 +635,155 @@
         </header>
 
         <div class="content-area">
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon icon-customers">
-                        <i class="fas fa-users"></i>
+            <!-- Report Controls -->
+            <div class="report-controls animate-fadeIn">
+                <h3 class="report-title">Sales Analytics</h3>
+                <div class="report-filter">
+                    <div class="filter-group">
+                        <label class="filter-label">Period:</label>
+                        <select class="filter-select" id="report-period">
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="yearly">Yearly</option>
+                            <option value="custom">Custom Range</option>
+                        </select>
                     </div>
-                    <div class="stat-info">
-                        <div class="stat-value"><%= totalCustomers %></div>
-                        <div class="stat-label">Total Customers</div>
+                    <div class="filter-group" id="date-range-group">
+                        <label class="filter-label">From:</label>
+                        <input type="date" class="filter-date" id="start-date">
+                        <label class="filter-label">To:</label>
+                        <input type="date" class="filter-date" id="end-date">
                     </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-icon icon-products">
-                        <i class="fas fa-box"></i>
-                    </div>
-                    <div class="stat-info">
-                        <div class="stat-value"><%= totalProducts %></div>
-                        <div class="stat-label">Total Products</div>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-icon icon-revenue">
-                        <i class="fas fa-rupee-sign"></i>
-                    </div>
-                    <div class="stat-info">
-                        <div class="stat-value">₹<%= totalRevenue.toLocaleString() %></div>
-                        <div class="stat-label">Total Revenue</div>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-icon icon-orders">
-                        <i class="fas fa-shopping-cart"></i>
-                    </div>
-                    <div class="stat-info">
-                        <div class="stat-value"><%= totalOrders %></div>
-                        <div class="stat-label">Total Orders</div>
-                    </div>
+                    <button class="generate-btn" id="generate-report">
+                        <i class="fas fa-chart-line"></i> Generate Report
+                    </button>
                 </div>
             </div>
 
-            <div class="recent-activity">
-                <div class="activity-header">
-                    <h3 class="activity-title">Recent Orders</h3>
+            <!-- Sales Summary Cards -->
+<div class="sales-summary">
+    <!-- Total Orders -->
+    <div class="summary-card animate-fadeIn delay-1">
+        <div class="summary-title">
+            <i class="fas fa-shopping-cart"></i> Total Orders
+        </div>
+        <div class="summary-value" id="total-orders">
+            <%= salesData.summary.totalOrders.value %>
+        </div>
+        <div class="summary-change <%= salesData.summary.totalOrders.change >= 0 ? 'change-up' : 'change-down' %>">
+            <i class="fas fa-arrow-<%= salesData.summary.totalOrders.change >= 0 ? 'up' : 'down' %>"></i>
+            <%= Math.abs(salesData.summary.totalOrders.change).toFixed(1) %>% from last period
+        </div>
+        <i class="fas fa-shopping-bag summary-icon"></i>
+    </div>
+
+    <!-- Total Sales -->
+    <div class="summary-card animate-fadeIn delay-2">
+        <div class="summary-title">
+            <i class="fas fa-rupee-sign"></i> Total Sales
+        </div>
+        <div class="summary-value" id="total-sales">
+₹<%= Number(salesData.summary.totalSales.value).toLocaleString('en-IN') %>
+        </div>
+        <div class="summary-change <%= salesData.summary.totalSales.change >= 0 ? 'change-up' : 'change-down' %>">
+            <i class="fas fa-arrow-<%= salesData.summary.totalSales.change >= 0 ? 'up' : 'down' %>"></i>
+            <%= Math.abs(salesData.summary.totalSales.change).toFixed(1) %>% from last period
+        </div>
+        <i class="fas fa-wallet summary-icon"></i>
+    </div>
+
+    <!-- Discounts -->
+    <div class="summary-card animate-fadeIn delay-3">
+        <div class="summary-title">
+            <i class="fas fa-tag"></i> Discounts Applied
+        </div>
+        <div class="summary-value" id="total-discounts">
+₹<%= Number(salesData.summary.totalDiscounts.value).toLocaleString('en-IN') %>
+        </div>
+        <div class="summary-change <%= salesData.summary.totalDiscounts.change >= 0 ? 'change-up' : 'change-down' %>">
+            <i class="fas fa-arrow-<%= salesData.summary.totalDiscounts.change >= 0 ? 'up' : 'down' %>"></i>
+            <%= Math.abs(salesData.summary.totalDiscounts.change).toFixed(1) %>% from last period
+        </div>
+        <i class="fas fa-percentage summary-icon"></i>
+    </div>
+
+    <!-- Coupons Used -->
+    <div class="summary-card animate-fadeIn delay-4">
+        <div class="summary-title">
+            <i class="fas fa-ticket-alt"></i> Coupons Used
+        </div>
+        <div class="summary-value" id="total-coupons">
+            <%= salesData.summary.totalCoupons.value %>
+        </div>
+        <div class="summary-change <%= salesData.summary.totalCoupons.change >= 0 ? 'change-up' : 'change-down' %>">
+            <i class="fas fa-arrow-<%= salesData.summary.totalCoupons.change >= 0 ? 'up' : 'down' %>"></i>
+            <%= Math.abs(salesData.summary.totalCoupons.change).toFixed(1) %>% from last period
+        </div>
+        <i class="fas fa-tags summary-icon"></i>
+    </div>
+</div>
+
+
+            <!-- Sales Chart -->
+            <div class="chart-container animate-fadeIn">
+                <div class="chart-header">
+                    <h3 class="chart-title">Sales Performance</h3>
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #dac6a4;"></div>
+                            <span>Gross Sales</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #f0d8a8;"></div>
+                            <span>Discounts</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #b3a47c;"></div>
+                            <span>Net Sales</span>
+                        </div>
+                    </div>
                 </div>
-                <ul class="activity-list">
-                    <% recentOrders.forEach(order => { %>
-                        <li class="activity-item">
-                            <div class="activity-icon">
-                                <i class="fas fa-shopping-bag"></i>
-                            </div>
-                            <div class="activity-details">
-                                <div class="activity-text">
-                                    Order #<%= order.orderNumber %> - <%= order.status %>
-                                </div>
-                                <div class="activity-time">
-                                    <%= new Date(order.createdOn).toLocaleDateString() %>
-                                </div>
-                            </div>
-                        </li>
-                    <% }) %>
-                </ul>
+                <canvas id="salesChart"></canvas>
+            </div>
+
+            <!-- Sales Data Table -->
+            <div class="sales-table-container animate-fadeIn">
+                <h3 class="chart-title">Detailed Sales Data</h3>
+                <table class="sales-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Orders</th>
+                            <th>Gross Sales</th>
+                            <th>Discounts</th>
+                            <th>Coupons</th>
+                            <th>Net Sales</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                  <tbody>
+  <% salesData.tableData.forEach((row) => { %>
+    <tr>
+      <td><%= row.date %></td>
+      <td><%= row.orders %></td>
+      <td>₹<%= row.grossSales.toLocaleString() %></td>
+      <td>₹<%= row.discounts.toLocaleString() %></td>
+      <td><%= row.coupons %></td>
+      <td>₹<%= row.netSales.toLocaleString() %></td>
+      <td>
+        <% if (row.status === 'Holiday') { %>
+          <span class="badge badge-warning"><%= row.status %></span>
+        <% } else { %>
+          <span class="badge badge-success"><%= row.status %></span>
+        <% } %>
+      </td>
+    </tr>
+  <% }); %>
+</tbody>
+
+
+                </table>
             </div>
         </div>
     </div>
@@ -494,6 +792,212 @@
         // Mobile menu toggle
         document.getElementById('mobileMenuBtn').addEventListener('click', function() {
             document.querySelector('.sidebar').classList.toggle('active');
+        });
+
+        // Date range visibility
+        const periodSelect = document.getElementById('report-period');
+        const dateRangeGroup = document.getElementById('date-range-group');
+
+        periodSelect.addEventListener('change', function() {
+            if (this.value === 'custom') {
+                dateRangeGroup.style.display = 'flex';
+            } else {
+                dateRangeGroup.style.display = 'none';
+            }
+        });
+
+        // Initialize with date range hidden
+        dateRangeGroup.style.display = 'none';
+
+        // Set default dates
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        document.getElementById('start-date').valueAsDate = yesterday;
+        document.getElementById('end-date').valueAsDate = today;
+
+        // Chart initialization
+        let salesChart;
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        
+        function initChart(data) {
+            if (salesChart) {
+                salesChart.destroy();
+            }
+            
+            salesChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [
+                        {
+                            label: 'Gross Sales',
+                            data: data.datasets[0].data,
+                            backgroundColor: 'rgba(218, 198, 164, 0.7)',
+                            borderColor: 'rgba(218, 198, 164, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Discounts',
+                            data: data.datasets[1].data,
+                            backgroundColor: 'rgba(240, 216, 168, 0.7)',
+                            borderColor: 'rgba(240, 216, 168, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Net Sales',
+                            data: data.datasets[2].data,
+                            backgroundColor: 'rgba(179, 164, 124, 0.7)',
+                            borderColor: 'rgba(179, 164, 124, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '₹' + value.toLocaleString();
+                                },
+                                color: 'rgba(255, 255, 255, 0.7)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ₹' + context.raw.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+        }
+
+        // Function to update summary cards
+        function updateSummaryCards(data) {
+            const formatCurrency = (value) => '₹' + value.toLocaleString();
+            const formatPercentage = (value) => value.toFixed(1) + '%';
+
+            // Update Total Orders
+            document.getElementById('total-orders').textContent = data.totalOrders.value.toLocaleString();
+            const ordersChange = document.querySelector('#total-orders').nextElementSibling;
+            ordersChange.innerHTML = `<i class="fas fa-arrow-${data.totalOrders.change >= 0 ? 'up' : 'down'}"></i> ${formatPercentage(Math.abs(data.totalOrders.change))} from last period`;
+            ordersChange.className = `summary-change ${data.totalOrders.change >= 0 ? 'change-up' : 'change-down'}`;
+
+            // Update Total Sales
+            document.getElementById('total-sales').textContent = formatCurrency(data.totalSales.value);
+            const salesChange = document.querySelector('#total-sales').nextElementSibling;
+            salesChange.innerHTML = `<i class="fas fa-arrow-${data.totalSales.change >= 0 ? 'up' : 'down'}"></i> ${formatPercentage(Math.abs(data.totalSales.change))} from last period`;
+            salesChange.className = `summary-change ${data.totalSales.change >= 0 ? 'change-up' : 'change-down'}`;
+
+            // Update Total Discounts
+            document.getElementById('total-discounts').textContent = formatCurrency(data.totalDiscounts.value);
+            const discountsChange = document.querySelector('#total-discounts').nextElementSibling;
+            discountsChange.innerHTML = `<i class="fas fa-arrow-${data.totalDiscounts.change >= 0 ? 'up' : 'down'}"></i> ${formatPercentage(Math.abs(data.totalDiscounts.change))} from last period`;
+            discountsChange.className = `summary-change ${data.totalDiscounts.change >= 0 ? 'change-up' : 'change-down'}`;
+
+            // Update Total Coupons
+            document.getElementById('total-coupons').textContent = data.totalCoupons.value.toLocaleString();
+            const couponsChange = document.querySelector('#total-coupons').nextElementSibling;
+            couponsChange.innerHTML = `<i class="fas fa-arrow-${data.totalCoupons.change >= 0 ? 'up' : 'down'}"></i> ${formatPercentage(Math.abs(data.totalCoupons.change))} from last period`;
+            couponsChange.className = `summary-change ${data.totalCoupons.change >= 0 ? 'change-up' : 'change-down'}`;
+        }
+
+        // Function to update sales table
+        function updateSalesTable(data) {
+            const tbody = document.querySelector('.sales-table tbody');
+            tbody.innerHTML = '';
+
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${row.date}</td>
+                    <td>${row.orders}</td>
+                    <td>₹${row.grossSales.toLocaleString()}</td>
+                    <td>₹${row.discounts.toLocaleString()}</td>
+                    <td>${row.coupons}</td>
+                    <td>₹${row.netSales.toLocaleString()}</td>
+                    <td><span class="badge badge-${row.status === 'Active' ? 'success' : 'warning'}">${row.status}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Function to update dashboard
+        function updateDashboard() {
+            const period = document.getElementById('report-period').value;
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+
+            const params = new URLSearchParams({
+                period,
+                ...(period === 'custom' && { startDate, endDate })
+            });
+
+            window.location.href = `/admin/dashboard?${params.toString()}`;
+        }
+
+        // Generate report button click handler
+        const generateBtn = document.getElementById('generate-report');
+        generateBtn.addEventListener('click', function() {
+            anime({
+                targets: ['.summary-card', '#salesChart', '.sales-table-container'],
+                opacity: [1, 0.5],
+                duration: 300,
+                easing: 'linear',
+                complete: updateDashboard
+            });
+        });
+
+        // Initialize dashboard with data from server
+        const salesData = JSON.parse('<%- JSON.stringify(salesData) %>');
+        updateSummaryCards(salesData.summary);
+        initChart(salesData.chartData);
+        updateSalesTable(salesData.tableData);
+
+        // Initial animations
+        anime({
+            targets: '.summary-card',
+            translateY: [30, 0],
+            opacity: [0, 1],
+            delay: anime.stagger(100),
+            duration: 800,
+            easing: 'easeOutExpo'
+        });
+
+        anime({
+            targets: '.chart-container, .sales-table-container',
+            translateY: [30, 0],
+            opacity: [0, 1],
+            delay: 400,
+            duration: 800,
+            easing: 'easeOutExpo'
         });
     </script>
 </body>
