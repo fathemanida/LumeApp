@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <style>
         :root {
             --primary-dark: #2c1e0f;
@@ -810,59 +812,34 @@
                 <a href="/checkout" class="back-btn">Back to Checkout</a>
             </div>
 
-            <!-- Order Summary Section -->
+            <!-- Order Summary -->
             <div class="order-summary">
                 <h3>Order Summary</h3>
                 <% if (cart && cart.items && cart.items.length > 0) { %>
-                    <% 
-                        const total = cart.subtotal;
-                        const shipping = total < 3000 ? 50 : 0;
-                        const taxRate = total < 3000 ? 0.02 : 0.04;
-                        const tax = (total * taxRate) / (1 + taxRate);
-                        const subtotal = total - tax - shipping;
-                    %>
-                    <% cart.items.forEach(item => { %>
-                        <div class="summary-row">
-                            <span><%= item.productId.productName %> (x<%= item.quantity %>)</span>
-                            <span>₹<%= item.totalPrice.toFixed(2) %></span>
-                        </div>
-                    <% }) %>
-                    <div class="summary-row expected-delivery">
-                        <span>Expected Delivery</span>
-                        <span><%= new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></span>
-                    </div>
+                  
                     <div class="summary-row">
                         <span>Subtotal</span>
-                        <span>₹<%= subtotal.toFixed(2) %></span>
-                    </div>
-                    <div class="summary-row">
-                        <span>Tax (<%= (taxRate * 100).toFixed(0) %>%)</span>
-                        <span>₹<%= tax.toFixed(2) %></span>
-                    </div>
-                    <div class="summary-row">
-                        <span>Shipping</span>
-                        <span>₹<%= shipping.toFixed(2) %></span>
+                        <span>₹<%= cart.subtotal.toFixed(2) %></span>
                     </div>
                     <% if (cart.discount > 0) { %>
-                        <div class="summary-row">
+                        <div class="summary-row text-success">
                             <span>Discount</span>
                             <span>-₹<%= cart.discount.toFixed(2) %></span>
                         </div>
                     <% } %>
                     <div class="summary-row">
-                        <strong>Total</strong>
-                        <strong>₹<%= (total - (cart.discount || 0)).toFixed(2) %></strong>
+                        <span>Shipping</span>
+                        <span>₹<%= cart.shipping.toFixed(2) %></span>
                     </div>
-
-                    <!-- Delivery Address -->
-                    <div class="address-details default">
-                        <h4>Delivery Address</h4>
-                        <p><%= address.name %>, <%= address.houseNo || '' %>, <%= address.roadArea || '' %></p>
-                        <p><%= address.city %>, <%= address.state %> - <%= address.pincode %></p>
-                        <p>Phone: <%= address.phone %></p>
+                  
+                    <div class="summary-row total">
+                        <span>Total</span>
+                        <span>₹<%= cart.totalPrice.toFixed(2) %></span>
                     </div>
                 <% } else { %>
-                    <p>No items in cart</p>
+                    <div class="summary-row">
+                        <span>No items in cart</span>
+                    </div>
                 <% } %>
             </div>
         </div>
@@ -916,173 +893,160 @@
   }
 </style>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded');
-            const payNowBtn = document.getElementById('payNowBtn');
-            if (payNowBtn) {
-                console.log('Pay Now button found');
-            } else {
-                console.log('Pay Now button not found');
-            }
+   <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM loaded');
+        const payNowBtn = document.getElementById('payNowBtn');
+        if (payNowBtn) {
+            console.log('Pay Now button found');
+        } else {
+            console.log('Pay Now button not found');
+        }
+    });
+
+    function showPaymentForm(method) {
+        console.log('Showing payment form for method:', method);
+        document.querySelectorAll('.payment-form').forEach(form => {
+            form.classList.remove('active');
         });
+        document.getElementById(`${method}Form`).classList.add('active');
 
-        function showPaymentForm(method) {
-            console.log('Showing payment form for method:', method);
-            document.querySelectorAll('.payment-form').forEach(form => {
-                form.classList.remove('active');
-            });
-            document.getElementById(`${method}Form`).classList.add('active');
-
-            const payNowBtn = document.getElementById('payNowBtn');
-            if (method === 'cod') {
-                payNowBtn.disabled = false;
-            } else {
-                validateForm(method);
-            }
+        const payNowBtn = document.getElementById('payNowBtn');
+        if (method === 'cod') {
+            payNowBtn.disabled = false;
+        } else {
+            validateForm(method);
         }
+    }
 
-        function validateForm(method) {
-            console.log('Validating form for method:', method);
-            const payNowBtn = document.getElementById('payNowBtn');
-            if (method === 'razorpay') {
-                payNowBtn.disabled = false;
-            } else if (method === 'upi') {
-                const upiId = document.getElementById('upiId').value;
-                payNowBtn.disabled = !upiId;
+    function validateForm(method) {
+        console.log('Validating form for method:', method);
+        const payNowBtn = document.getElementById('payNowBtn');
+        if (method === 'razorpay') {
+            payNowBtn.disabled = false;
+        } else if (method === 'upi') {
+            const upiId = document.getElementById('upiId').value;
+            payNowBtn.disabled = !upiId;
+        }
+    }
+
+    var isRetry = '<%= orderId ? 'true' : 'false' %>';
+
+    let paymentInProgress = false;
+    async function processPayment() {
+        if (paymentInProgress) return;
+        paymentInProgress = true;
+        const payBtn = document.getElementById('payNowBtn');
+        if (payBtn) {
+            payBtn.disabled = true;
+            payBtn.textContent = 'Processing...';
+        }
+        const method = document.querySelector('input[name="paymentMethod"]:checked').value;
+        const addressId = '<%= address._id %>';
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        if (loadingOverlay) loadingOverlay.style.display = 'block';
+        try {
+            const payload = { method, addressId };
+            if (method === 'upi') {
+                payload.upiId = document.getElementById('upiId').value;
             } else if (method === 'wallet') {
-                const walletId = document.getElementById('walletId').value;
-                payNowBtn.disabled = !walletId;
+                payload.walletId = document.getElementById('walletId').value;
             }
-        }
-
-        async function processPayment() {
-            const method = document.querySelector('input[name="paymentMethod"]:checked').value;
-            
-            if (method === 'razorpay') {
-                try {
-                    const loadingOverlay = document.getElementById('loadingOverlay');
-                    loadingOverlay.style.display = 'flex';
-
-                    const totalAmount = parseFloat(document.querySelector('.payment-container').dataset.totalAmount);
-
-                    const res = await fetch('/create-order', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ 
-                            amount: totalAmount,
-                            addressId: '<%= address._id %>'
-                        })
-                    });
-
-                    if (!res.ok) {
-                        const errorData = await res.json();
-                        throw new Error(errorData.message || `HTTP error! status: ${res.status}`);
-                    }
-
-                    const data = await res.json();
-
-                    if (!data.success) {
-                        throw new Error(data.message || "Order creation failed");
-                    }
-
-                    const options = {
-                        key: "<%= RAZORPAY_KEY_ID %>", 
-                        amount: data.amount,
-                        currency: data.currency,
-                        name: "Lume",
-                        description: "Order Payment",
-                        order_id: data.razorpayOrderId,
-                        handler: async function (response) {
-                            try {
-                                console.log('Payment response:', response);
-                                console.log('Order data:', data);
-
-                                const verifyRes = await fetch('/verify-payment', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({
-                                        razorpay_payment_id: response.razorpay_payment_id,
-                                        razorpay_order_id: response.razorpay_order_id,
-                                        razorpay_signature: response.razorpay_signature,
-                                        orderId: data.orderId,
-                                        addressId: '<%= address._id %>'
-                                    })
-                                });
-
-                                if (!verifyRes.ok) {
-                                    const errorData = await verifyRes.json();
-                                    throw new Error(errorData.message || `HTTP error! status: ${verifyRes.status}`);
-                                }
-
-                                const verifyData = await verifyRes.json();
-                                console.log('Verification response:', verifyData);
-                                
-                                if (verifyData.success) {
-                                    if (verifyData.redirect) {
-                                        window.location.href = verifyData.redirect;
-                                    } else {
-                                        window.location.href = `/payment-confirmation?orderId=${data.orderId}`;
-                                    }
-                                } else {
-                                    throw new Error(verifyData.message || "Verification failed");
-                                }
-                            } catch (error) {
-                                console.error('Payment verification error:', error);
-                                Swal.fire("Payment Failed", error.message || "Payment verification failed", "error");
-                            } finally {
-                                loadingOverlay.style.display = 'none';
+            const res = await fetch('/payment/process', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.message || `HTTP error! status: ${res.status}`);
+            }
+            const data = await res.json();
+            if (data.razorpayOrderId) {
+                // Razorpay flow
+                const options = {
+                    key: "<%= RAZORPAY_KEY_ID %>",
+                    amount: data.amount,
+                    currency: data.currency,
+                    name: "Lume",
+                    description: "Order Payment",
+                    order_id: data.razorpayOrderId,
+                    handler: async function (response) {
+                        try {
+                            const verifyRes = await fetch('/verify-payment', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    razorpay_payment_id: response.razorpay_payment_id,
+                                    razorpay_order_id: response.razorpay_order_id,
+                                    razorpay_signature: response.razorpay_signature,
+                                    orderId: data.orderId,
+                                    addressId: addressId
+                                })
+                            });
+                            if (!verifyRes.ok) {
+                                const errorData = await verifyRes.json();
+                                throw new Error(errorData.message || `HTTP error! status: ${verifyRes.status}`);
                             }
-                        },
-                        prefill: {
-                            name: "<%= user.name %>",
-                            email: "<%= user.email %>",
-                            contact: "<%= address.phone %>"
-                        },
-                        theme: {
-                            color: "#F6C90E"
-                        },
-                        modal: {
-                            ondismiss: function() {
-                                loadingOverlay.style.display = 'none';
+                            const verifyData = await verifyRes.json();
+                            if (verifyData.redirect) {
+                                window.location.href = verifyData.redirect;
                             }
+                        } catch (error) {
+                            window.location.href = `/payment-failed?orderId=${data.orderId}&error=${encodeURIComponent(error.message)}`;
                         }
-                    };
-
-                    const rzp = new Razorpay(options);
-                    rzp.open();
-                } catch (error) {
-                    loadingOverlay.style.display = 'none';
-                    Swal.fire("Error", error.message, "error");
-                }
-            } else {
-                const otherPaymentData = { method, addressId: '<%= address._id %>' };
-
-                if (method === 'upi') {
-                    otherPaymentData.upiId = document.getElementById('upiId').value;
-                } else if (method === 'wallet') {
-                    otherPaymentData.walletId = document.getElementById('walletId').value;
-                }
-
-                const response = await fetch('/proceed-payment', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(otherPaymentData)
+                    },
+                    prefill: {
+                        name: "<%= user.name %>",
+                        email: "<%= user.email %>",
+                        contact: "<%= user.phone %>"
+                    },
+                    theme: { color: "#3399cc" },
+                    modal: {
+                        ondismiss: function() {
+                            window.location.href = `/payment-failed?orderId=${data.orderId}&error=Payment cancelled by user`;
+                        }
+                    }
+                };
+                const rzp = new Razorpay(options);
+                rzp.on('payment.failed', function (response) {
+                    window.location.href = `/payment-failed?orderId=${data.orderId}&error=${encodeURIComponent(response.error.description || 'Payment failed')}`;
                 });
-
-                const data = await response.json();
-                if (data.success) {
-                    window.location.href = `/payment-confirmation?orderId=${data.orderId}`;
-                } else {
-                    Swal.fire("Payment Failed", data.message || "Try again", "error");
-                }
+                rzp.open();
+            } else if (data.redirect) {
+                window.location.href = data.redirect;
+            } else {
+                let errorMessage = data.message || "Payment failed";
+                Swal.fire({
+                    title: "Payment Failed",
+                    text: errorMessage,
+                    icon: "error",
+                    confirmButtonColor: "#2c1e0f"
+                });
             }
+        } catch (error) {
+            if (loadingOverlay) loadingOverlay.style.display = 'none';
+            if (payBtn) {
+                payBtn.disabled = false;
+                payBtn.textContent = 'Pay Now';
+            }
+            paymentInProgress = false;
+            Swal.fire({
+                title: "Payment Failed",
+                text: error.message,
+                icon: "error",
+                confirmButtonColor: "#2c1e0f"
+            });
         }
+    }
 
-        document.getElementById('upiId')?.addEventListener('input', () => validateForm('upi'));
-        document.getElementById('walletId')?.addEventListener('input', () => validateForm('wallet'));
+    // Event listeners
+    document.getElementById('upiId')?.addEventListener('input', () => validateForm('upi'));
+    document.getElementById('walletId')?.addEventListener('input', () => validateForm('wallet'));
+    document.getElementById('payNowBtn')?.addEventListener('click', processPayment);
 
-        showPaymentForm('cod');
-    </script>
+    // Initialize with COD form
+    showPaymentForm('cod');
+</script>
 </body>
 </html>

@@ -8,11 +8,9 @@ const getAllOffers = async (req, res) => {
     const limit = 10;
     const skip = (page - 1) * limit;
 
-    // Get total count of offers
     const totalOffers = await Offer.countDocuments();
     const totalPages = Math.ceil(totalOffers / limit);
 
-    // Fetch offers with pagination
     const offers = await Offer.find()
       .sort({ createdAt: -1 })
       .skip(skip)
@@ -37,7 +35,6 @@ const getAllOffers = async (req, res) => {
 
 const getAddOffer = async (req, res) => {
   try {
-    // Get all categories and products for selection
     const categories = await Category.find({ isListed: true });
     const products = await Product.find({ isListed: true }).populate('category');
 
@@ -70,7 +67,6 @@ const createOffer = async (req, res) => {
       products
     } = req.body;
 
-    // Validate required fields
     if (!name || !code || !discountType || !discountValue || !startDate || !endDate || !applicableOn) {
       return res.status(400).json({
         success: false,
@@ -78,7 +74,6 @@ const createOffer = async (req, res) => {
       });
     }
 
-    // Check if offer code already exists
     const existingOffer = await Offer.findOne({ code: code.toUpperCase() });
     if (existingOffer) {
       return res.status(400).json({
@@ -87,7 +82,6 @@ const createOffer = async (req, res) => {
       });
     }
 
-    // Create new offer
     const newOffer = new Offer({
       name,
       code: code.toUpperCase(),
@@ -101,10 +95,8 @@ const createOffer = async (req, res) => {
       isActive: true
     });
 
-    // Save the offer
     await newOffer.save();
 
-    // If applicable on categories, update category offers
     if (applicableOn === 'categories' && categories.length > 0) {
       await Category.updateMany(
         { _id: { $in: categories } },
@@ -122,7 +114,6 @@ const createOffer = async (req, res) => {
       );
     }
 
-    // If applicable on products, update product offers
     if (applicableOn === 'products' && products.length > 0) {
       await Product.updateMany(
         { _id: { $in: products } },
@@ -191,7 +182,6 @@ const updateOffer = async (req, res) => {
             products
         } = req.body;
 
-        // Validate required fields
         if (!name || !code || !discountType || !discountValue || !startDate || !endDate || !applicableOn) {
             return res.status(400).json({
                 success: false,
@@ -199,7 +189,6 @@ const updateOffer = async (req, res) => {
             });
         }
 
-        // Check if offer code already exists (excluding current offer)
         const existingOffer = await Offer.findOne({ 
             code: code.toUpperCase(),
             _id: { $ne: offerId }
@@ -212,7 +201,6 @@ const updateOffer = async (req, res) => {
             });
         }
 
-        // Find the current offer
         const currentOffer = await Offer.findById(offerId);
         if (!currentOffer) {
             return res.status(404).json({
@@ -221,7 +209,6 @@ const updateOffer = async (req, res) => {
             });
         }
 
-        // Update the offer
         const updatedOffer = await Offer.findByIdAndUpdate(
             offerId,
             {
@@ -238,7 +225,6 @@ const updateOffer = async (req, res) => {
             { new: true }
         );
 
-        // Remove offer from previously selected categories
         if (currentOffer.applicableOn === 'categories' && currentOffer.categories.length > 0) {
             await Category.updateMany(
                 { _id: { $in: currentOffer.categories } },
@@ -246,15 +232,13 @@ const updateOffer = async (req, res) => {
             );
         }
 
-        // Remove offer from previously selected products
-        if (currentOffer.applicableOn === 'products' && currentOffer.products.length > 0) {
+      if (currentOffer.applicableOn === 'products' && currentOffer.products.length > 0) {
             await Product.updateMany(
                 { _id: { $in: currentOffer.products } },
                 { $unset: { offer: 1 } }
             );
         }
 
-        // Update new categories if applicable
         if (applicableOn === 'categories' && categories.length > 0) {
             await Category.updateMany(
                 { _id: { $in: categories } },
@@ -272,7 +256,6 @@ const updateOffer = async (req, res) => {
             );
         }
 
-        // Update new products if applicable
         if (applicableOn === 'products' && products.length > 0) {
             await Product.updateMany(
                 { _id: { $in: products } },
@@ -305,10 +288,52 @@ const updateOffer = async (req, res) => {
     }
 };
 
+const deleteOffer = async (req, res) => {
+    try {
+        const offerId = req.params.id;
+        
+        const offer = await Offer.findById(offerId);
+        if (!offer) {
+            return res.status(404).json({
+                success: false,
+                message: 'Offer not found'
+            });
+        }
+
+        if (offer.applicableOn === 'categories' && offer.categories.length > 0) {
+            await Category.updateMany(
+                { _id: { $in: offer.categories } },
+                { $unset: { categoryOffer: 1 } }
+            );
+        }
+
+        if (offer.applicableOn === 'products' && offer.products.length > 0) {
+            await Product.updateMany(
+                { _id: { $in: offer.products } },
+                { $unset: { offer: 1 } }
+            );
+        }
+
+        await Offer.findByIdAndDelete(offerId);
+
+        res.status(200).json({
+            success: true,
+            message: 'Offer deleted successfully'
+        });
+    } catch (error) {
+        console.error('Error deleting offer:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Error deleting offer'
+        });
+    }
+};
+
 module.exports = {
   getAllOffers,
   getAddOffer,
   createOffer,
   getEditOffer,
-  updateOffer
+  updateOffer,
+  deleteOffer
 }; 

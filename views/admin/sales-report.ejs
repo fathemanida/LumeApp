@@ -1,0 +1,469 @@
+        });
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | LUME Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/admin/sales-report.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+  
+</head>
+<body class="dashboard">
+  <aside class="sidebar">
+    <div class="brand">LUME</div>
+    <ul class="nav-menu">
+      <li class="nav-item">
+        <a href="/admin/dashboard" class="nav-link "><i class="fas fa-home"></i> Dashboard</a>
+      </li>
+       <li class="nav-item">
+        <a href="/admin/sales-report" class="nav-link active"><i class="fas fa-chart-line"></i> Sales Report</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/product" class="nav-link "><i class="fas fa-box"></i> Product</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/orders" class="nav-link"><i class="fas fa-shopping-cart"></i> Orders</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/users" class="nav-link"><i class="fas fa-users"></i> Users</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/Category" class="nav-link"><i class="fas fa-tags"></i> Category</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/offers" class="nav-link"><i class="fas fa-ticket-alt"></i> Offers</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/settings" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/banner" class="nav-link"><i class="fas fa-image"></i> Banner</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/Coupons" class="nav-link"><i class="fas fa-ticket-alt"></i> Coupons</a>
+      </li>
+      <li class="nav-item">
+        <a href="/admin/logout" class="nav-link logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </li>
+    </ul>
+  </aside>
+
+    <div class="main-content">
+        <header class="main-header">
+            <div class="header-left">
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h2 class="page-title">SALES REPORT</h2>
+            </div>
+            <div class="header-right">
+                <button class="notification-btn">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </button>
+                <div class="profile-dropdown">
+                    <img src="https://i.pravatar.cc/80" alt="Profile" class="profile-img">
+                    <span class="profile-name">Admin</span>
+                    <div class="profile-dropdown-menu">
+                        <a href="#" class="dropdown-item"><i class="fas fa-user"></i> Profile</a>
+                        <a href="#" class="dropdown-item"><i class="fas fa-cog"></i> Settings</a>
+                        <a href="/admin/logout" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="content-area">
+            <!-- Report Controls -->
+            <div class="report-controls animate-fadeIn">
+                <h3 class="report-title">Sales Analytics</h3>
+                <div class="report-filter">
+                    <div class="filter-group">
+                        <label class="filter-label">Period:</label>
+                        <select class="filter-select" id="report-period">
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="yearly">Yearly</option>
+                            <option value="custom">Custom Range</option>
+                        </select>
+                    </div>
+                    <div class="filter-group" id="date-range-group">
+                        <label class="filter-label">From:</label>
+                        <input type="date" class="filter-date" id="start-date">
+                        <label class="filter-label">To:</label>
+                        <input type="date" class="filter-date" id="end-date">
+                    </div>
+                    <button class="generate-btn" id="generate-report">
+                        <i class="fas fa-chart-line"></i> Generate Report
+                    </button>
+                    <div class="download-buttons">
+                        <button class="download-btn excel" id="download-excel">
+                            <i class="fas fa-file-excel"></i> Download Excel
+                        </button>
+                        <button class="download-btn pdf" id="download-pdf">
+                            <i class="fas fa-file-pdf"></i> Download PDF
+                    </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sales Summary Cards -->
+<div class="sales-summary">
+    <!-- Total Orders -->
+    <div class="summary-card animate-fadeIn delay-1">
+        <div class="summary-title">
+            <i class="fas fa-shopping-cart"></i> Total Orders
+        </div>
+        <div class="summary-value" id="total-orders">
+            <%= salesData.summary.totalOrders.value %>
+        </div>
+        <div class="summary-change <%= salesData.summary.totalOrders.change >= 0 ? 'change-up' : 'change-down' %>">
+            <i class="fas fa-arrow-<%= salesData.summary.totalOrders.change >= 0 ? 'up' : 'down' %>"></i>
+            <%= Math.abs(salesData.summary.totalOrders.change).toFixed(1) %>% from last period
+        </div>
+        <i class="fas fa-shopping-bag summary-icon"></i>
+    </div>
+
+    <!-- Total Sales -->
+    <div class="summary-card animate-fadeIn delay-2">
+        <div class="summary-title">
+            <i class="fas fa-rupee-sign"></i> Total Sales
+        </div>
+        <div class="summary-value" id="total-sales">
+₹<%= Number(salesData.summary.totalSales.value).toLocaleString('en-IN') %>
+        </div>
+        <div class="summary-change <%= salesData.summary.totalSales.change >= 0 ? 'change-up' : 'change-down' %>">
+            <i class="fas fa-arrow-<%= salesData.summary.totalSales.change >= 0 ? 'up' : 'down' %>"></i>
+            <%= Math.abs(salesData.summary.totalSales.change).toFixed(1) %>% from last period
+        </div>
+        <i class="fas fa-wallet summary-icon"></i>
+    </div>
+
+    <!-- Discounts -->
+    <div class="summary-card animate-fadeIn delay-3">
+        <div class="summary-title">
+            <i class="fas fa-tag"></i> Discounts Applied
+        </div>
+        <div class="summary-value" id="total-discounts">
+₹<%= Number(salesData.summary.totalDiscounts.value).toLocaleString('en-IN') %>
+        </div>
+        <div class="summary-change <%= salesData.summary.totalDiscounts.change >= 0 ? 'change-up' : 'change-down' %>">
+            <i class="fas fa-arrow-<%= salesData.summary.totalDiscounts.change >= 0 ? 'up' : 'down' %>"></i>
+            <%= Math.abs(salesData.summary.totalDiscounts.change).toFixed(1) %>% from last period
+        </div>
+        <i class="fas fa-percentage summary-icon"></i>
+    </div>
+
+    <!-- Coupons Used -->
+    <div class="summary-card animate-fadeIn delay-4">
+        <div class="summary-title">
+            <i class="fas fa-ticket-alt"></i> Coupons Used
+        </div>
+        <div class="summary-value" id="total-coupons">
+            <%= salesData.summary.totalCoupons.value %>
+        </div>
+        <div class="summary-change <%= salesData.summary.totalCoupons.change >= 0 ? 'change-up' : 'change-down' %>">
+            <i class="fas fa-arrow-<%= salesData.summary.totalCoupons.change >= 0 ? 'up' : 'down' %>"></i>
+            <%= Math.abs(salesData.summary.totalCoupons.change).toFixed(1) %>% from last period
+        </div>
+        <i class="fas fa-tags summary-icon"></i>
+    </div>
+</div>
+
+
+            <!-- Sales Chart -->
+            <div class="chart-container animate-fadeIn">
+                <div class="chart-header">
+                    <h3 class="chart-title">Sales Performance</h3>
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #dac6a4;"></div>
+                            <span>Gross Sales</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #f0d8a8;"></div>
+                            <span>Discounts</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #b3a47c;"></div>
+                            <span>Net Sales</span>
+                        </div>
+                    </div>
+                </div>
+                <canvas id="salesChart"></canvas>
+            </div>
+
+            <!-- Sales Data Table -->
+            <div class="sales-table-container animate-fadeIn">
+                <h3 class="chart-title">Detailed Sales Data</h3>
+                <table class="sales-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Orders</th>
+                            <th>Gross Sales</th>
+                            <th>Discounts</th>
+                            <th>Coupons</th>
+                            <th>Net Sales</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                  <tbody>
+  <% salesData.tableData.forEach((row) => { %>
+    <tr>
+      <td><%= row.date %></td>
+      <td><%= row.orders %></td>
+      <td>₹<%= row.grossSales.toLocaleString() %></td>
+      <td>₹<%= row.discounts.toLocaleString() %></td>
+      <td><%= row.coupons %></td>
+      <td>₹<%= row.netSales.toLocaleString() %></td>
+      <td>
+        <% if (row.status === 'Holiday') { %>
+          <span class="badge badge-warning"><%= row.status %></span>
+        <% } else { %>
+          <span class="badge badge-success"><%= row.status %></span>
+        <% } %>
+      </td>
+    </tr>
+  <% }); %>
+</tbody>
+
+
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.toggle('active');
+        });
+
+        const periodSelect = document.getElementById('report-period');
+        const dateRangeGroup = document.getElementById('date-range-group');
+
+        periodSelect.addEventListener('change', function() {
+            if (this.value === 'custom') {
+                dateRangeGroup.style.display = 'flex';
+            } else {
+                dateRangeGroup.style.display = 'none';
+            }
+        });
+
+        dateRangeGroup.style.display = 'none';
+
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        document.getElementById('start-date').valueAsDate = yesterday;
+        document.getElementById('end-date').valueAsDate = today;
+
+        let salesChart;
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        
+        function initChart(data) {
+            if (salesChart) {
+                salesChart.destroy();
+            }
+            
+            salesChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [
+                        {
+                            label: 'Gross Sales',
+                            data: data.datasets[0].data,
+                            backgroundColor: 'rgba(218, 198, 164, 0.7)',
+                            borderColor: 'rgba(218, 198, 164, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Discounts',
+                            data: data.datasets[1].data,
+                            backgroundColor: 'rgba(240, 216, 168, 0.7)',
+                            borderColor: 'rgba(240, 216, 168, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Net Sales',
+                            data: data.datasets[2].data,
+                            backgroundColor: 'rgba(179, 164, 124, 0.7)',
+                            borderColor: 'rgba(179, 164, 124, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '₹' + value.toLocaleString();
+                                },
+                                color: 'rgba(255, 255, 255, 0.7)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ₹' + context.raw.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+        }
+
+        function updateSummaryCards(data) {
+            const formatCurrency = (value) => '₹' + value.toLocaleString();
+            const formatPercentage = (value) => value.toFixed(1) + '%';
+
+            document.getElementById('total-orders').textContent = data.totalOrders.value.toLocaleString();
+            const ordersChange = document.querySelector('#total-orders').nextElementSibling;
+            ordersChange.innerHTML = `<i class="fas fa-arrow-${data.totalOrders.change >= 0 ? 'up' : 'down'}"></i> ${formatPercentage(Math.abs(data.totalOrders.change))} from last period`;
+            ordersChange.className = `summary-change ${data.totalOrders.change >= 0 ? 'change-up' : 'change-down'}`;
+
+            document.getElementById('total-sales').textContent = formatCurrency(data.totalSales.value);
+            const salesChange = document.querySelector('#total-sales').nextElementSibling;
+            salesChange.innerHTML = `<i class="fas fa-arrow-${data.totalSales.change >= 0 ? 'up' : 'down'}"></i> ${formatPercentage(Math.abs(data.totalSales.change))} from last period`;
+            salesChange.className = `summary-change ${data.totalSales.change >= 0 ? 'change-up' : 'change-down'}`;
+
+            document.getElementById('total-discounts').textContent = formatCurrency(data.totalDiscounts.value);
+            const discountsChange = document.querySelector('#total-discounts').nextElementSibling;
+            discountsChange.innerHTML = `<i class="fas fa-arrow-${data.totalDiscounts.change >= 0 ? 'up' : 'down'}"></i> ${formatPercentage(Math.abs(data.totalDiscounts.change))} from last period`;
+            discountsChange.className = `summary-change ${data.totalDiscounts.change >= 0 ? 'change-up' : 'change-down'}`;
+
+            document.getElementById('total-coupons').textContent = data.totalCoupons.value.toLocaleString();
+            const couponsChange = document.querySelector('#total-coupons').nextElementSibling;
+            couponsChange.innerHTML = `<i class="fas fa-arrow-${data.totalCoupons.change >= 0 ? 'up' : 'down'}"></i> ${formatPercentage(Math.abs(data.totalCoupons.change))} from last period`;
+            couponsChange.className = `summary-change ${data.totalCoupons.change >= 0 ? 'change-up' : 'change-down'}`;
+        }
+
+        function updateSalesTable(data) {
+            const tbody = document.querySelector('.sales-table tbody');
+            tbody.innerHTML = '';
+
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${row.date}</td>
+                    <td>${row.orders}</td>
+                    <td>₹${row.grossSales.toLocaleString()}</td>
+                    <td>₹${row.discounts.toLocaleString()}</td>
+                    <td>${row.coupons}</td>
+                    <td>₹${row.netSales.toLocaleString()}</td>
+                    <td><span class="badge badge-${row.status === 'Active' ? 'success' : 'warning'}">${row.status}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateSalesReport() {
+            const period = document.getElementById('report-period').value;
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+
+            const params = new URLSearchParams({
+                period,
+                ...(period === 'custom' && { startDate, endDate })
+            });
+
+            window.location.href = `/admin/sales-report?${params.toString()}`;
+        }
+
+        const generateBtn = document.getElementById('generate-report');
+        generateBtn.addEventListener('click', function() {
+            anime({
+                targets: ['.summary-card', '#salesChart', '.sales-table-container'],
+                opacity: [1, 0.5],
+                duration: 300,
+                easing: 'linear',
+                complete: updateSalesReport
+            });
+        });
+
+        const salesData = JSON.parse('<%- JSON.stringify(salesData) %>');
+        updateSummaryCards(salesData.summary);
+        initChart(salesData.chartData);
+        updateSalesTable(salesData.tableData);
+
+        anime({
+            targets: '.summary-card',
+            translateY: [30, 0],
+            opacity: [0, 1],
+            delay: anime.stagger(100),
+            duration: 800,
+            easing: 'easeOutExpo'
+        });
+
+        anime({
+            targets: '.chart-container, .sales-table-container',
+            translateY: [30, 0],
+            opacity: [0, 1],
+            delay: 400,
+            duration: 800,
+            easing: 'easeOutExpo'
+        });
+
+        // Download functionality
+        document.getElementById('download-excel').addEventListener('click', function() {
+            const period = document.getElementById('report-period').value;
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+
+            const params = new URLSearchParams({
+                period,
+                format: 'excel',
+                ...(period === 'custom' && { startDate, endDate })
+            });
+
+            window.location.href = `/admin/download-report?${params.toString()}`;
+        });
+
+        document.getElementById('download-pdf').addEventListener('click', function() {
+            const period = document.getElementById('report-period').value;
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+
+            const params = new URLSearchParams({
+                period,
+                format: 'pdf',
+                ...(period === 'custom' && { startDate, endDate })
+            });
+
+            window.location.href = `/admin/download-report?${params.toString()}`;
+        });
+    </script>
+</body>
+</html>

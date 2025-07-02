@@ -20,6 +20,9 @@
       <li class="nav-item">
         <a href="/admin/dashboard" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
       </li>
+       <li class="nav-item">
+        <a href="/admin/sales-report" class="nav-link"><i class="fas fa-chart-line"></i> Sales Report</a>
+      </li>
       <li class="nav-item">
         <a href="/admin/product" class="nav-link"><i class="fas fa-box"></i> Product</a>
       </li>
@@ -200,30 +203,39 @@
             });
         });
         
-        // Delete functionality
+        // Delete functionality with SweetAlert2
         document.querySelectorAll('.btn-delete').forEach(btn => {
             btn.addEventListener('click', async function() {
                 const couponId = this.dataset.couponId;
-                
-                if (confirm('Are you sure you want to delete this coupon?')) {
-                    try {
-                        const response = await fetch(`/admin/coupons/${couponId}`, {
-                            method: 'DELETE'
-                        });
-                        
-                        if (response.ok) {
-                            // Remove the row from the table
-                            btn.closest('tr').remove();
-                            showToast('Coupon deleted successfully');
-                        } else {
-                            const result = await response.json();
-                            showToast(result.message || 'Error deleting coupon', 'error');
+                // Use SweetAlert2 for confirmation
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: 'Do you really want to delete this coupon? This action cannot be undone.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#c62828',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete it!',
+                    cancelButtonText: 'Cancel'
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        try {
+                            const response = await fetch(`/admin/coupons/${couponId}`, {
+                                method: 'DELETE'
+                            });
+                            if (response.ok) {
+                                btn.closest('tr').remove();
+                                Swal.fire('Deleted!', 'Coupon deleted successfully.', 'success');
+                            } else {
+                                const result = await response.json();
+                                Swal.fire('Error', result.message || 'Error deleting coupon', 'error');
+                            }
+                        } catch (error) {
+                            console.error('Error:', error);
+                            Swal.fire('Error', 'Error deleting coupon', 'error');
                         }
-                    } catch (error) {
-                        console.error('Error:', error);
-                        showToast('Error deleting coupon', 'error');
                     }
-                }
+                });
             });
         });
         
@@ -238,6 +250,8 @@
             }).showToast();
         }
     </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         /* iOS Style Switch */
@@ -412,6 +426,11 @@
         .table td {
             vertical-align: middle;
         }
+         .nav-menu ul {
+    list-style: none;
+}.nav-menu {
+    list-style: none;
+}
     </style>
 </body>
 </html>

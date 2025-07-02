@@ -16,8 +16,11 @@
       <li class="nav-item">
         <a href="/admin/dashboard" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
       </li>
+       <li class="nav-item">
+        <a href="/admin/sales-report" class="nav-link"><i class="fas fa-chart-line"></i> Sales Report</a>
+      </li>
       <li class="nav-item">
-        <a href="/admin/product" class="nav-link active"><i class="fas fa-box"></i> Product</a>
+        <a href="/admin/product" class="nav-link "><i class="fas fa-box"></i> Product</a>
       </li>
       <li class="nav-item">
         <a href="/admin/orders" class="nav-link"><i class="fas fa-shopping-cart"></i> Orders</a>
@@ -26,7 +29,7 @@
         <a href="/admin/users" class="nav-link"><i class="fas fa-users"></i> Users</a>
       </li>
       <li class="nav-item">
-        <a href="/admin/Category" class="nav-link"><i class="fas fa-tags"></i> Category</a>
+        <a href="/admin/Category" class="nav-link active"><i class="fas fa-tags"></i> Category</a>
       </li>
       <li class="nav-item">
         <a href="/admin/offers" class="nav-link"><i class="fas fa-ticket-alt"></i> Offers</a>
@@ -105,7 +108,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <% for(let i = 0; i < cat.length; i++) { %>
+                    <% for(let i = 0; i < cat.length; i++) { 
+                        let offer = null;
+                        if (typeof categoryOffers !== 'undefined' && categoryOffers.length > 0) {
+                          offer = categoryOffers.find(o => Array.isArray(o.categories) && o.categories.some(cid => cid.toString() === cat[i]._id.toString()));
+                        }
+                    %>
                         <tr>
                             <td><%= offset + i + 1 %></td>
                             <td><%= cat[i].name %></td>
@@ -114,24 +122,22 @@
                             </td>
                             <td class="description-column"><%= cat[i].description %></td>
                             <td>
-                                <% if(cat[i].categoryOffer && cat[i].categoryOffer.active) { %>
-                                    <span class="badge badge-success">Active</span>
+                                <% if(offer) { %>
+                                    <span class="badge badge-success"><%= offer.code %></span>
                                 <% } else { %>
-                                    <span class="badge badge-secondary">Inactive</span>
+                                    <span class="badge badge-secondary">No Offer</span>
                                 <% } %>
                             </td>
                             <td>
-                                <% if(cat[i].categoryOffer && cat[i].categoryOffer.isActive) { %>
-                                    <%= cat[i].categoryOffer.discountType === 'PERCENTAGE' ? 
-                                        cat[i].categoryOffer.discountValue + '%' : 
-                                        '$' + cat[i].categoryOffer.discountValue %>
+                                <% if(offer) { %>
+                                    <%= offer.discountType === 'percentage' ? offer.discountValue + '% OFF' : '₹' + offer.discountValue + ' OFF' %>
                                 <% } else { %>
                                     -
                                 <% } %>
                             </td>
                             <td>
-                                <% if(cat[i].categoryOffer && cat[i].categoryOffer.isActive) { %>
-                                    <%= new Date(cat[i].categoryOffer.endDate).toLocaleDateString() %>
+                                <% if(offer) { %>
+                                    <%= new Date(offer.endDate).toLocaleDateString() %>
                                 <% } else { %>
                                     -
                                 <% } %>

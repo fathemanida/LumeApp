@@ -68,7 +68,6 @@ const offerSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// Pre-save middleware to validate discount value based on type
 offerSchema.pre('save', function(next) {
     if (this.discountType === 'percentage' && this.discountValue > 100) {
         next(new Error('Percentage discount cannot be greater than 100%'));
@@ -76,7 +75,6 @@ offerSchema.pre('save', function(next) {
     next();
 });
 
-// Method to check if offer is currently valid
 offerSchema.methods.isValid = function() {
     const now = new Date();
     return this.isActive && 
@@ -84,7 +82,6 @@ offerSchema.methods.isValid = function() {
            now <= this.endDate;
 };
 
-// Method to calculate discount amount
 offerSchema.methods.calculateDiscount = function(originalPrice) {
     if (!this.isValid()) return 0;
     

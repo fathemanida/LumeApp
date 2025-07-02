@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Failed | LUME</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Jost&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <!-- Left side - Brand -->
+        <div class="brand" id="sidebarToggle">
+            <i class="fas fa-leaf brand-icon"></i>
+            <span class="brand-text">LUME</span>
+        </div>
+        <!-- Center - Navigation Links -->
+        <ul class="nav-links">
+            <li class="mx-2"><a href="/" class="nav-link">Home</a></li>
+            <li class="mx-2"><a href="/shopAll" class="nav-link">Shop All</a></li>
+            <li class="mx-2"><a href="/featured" class="nav-link">Featured</a></li>
+            <li class="mx-2"><a href="/new-arrivals" class="nav-link">New Arrivals</a></li>
+        </ul>
+        <!-- Right side - Icons -->
+        <ul class="icon-links">
+            <li class="mx-2">
+                <form action="/shopAll" method="GET" class="search-form">
+                    <div class="search-container">
+                        <input type="text" name="search" placeholder="Search products..." class="search-input">
+                        <button type="submit" class="search-button">
+                            <i class="fas fa-search search-icon"></i>
+                        </button>
+                    </div>
+                </form>
+            </li>
+            <li class="mx-2"><a href="/wishlist" class="icon-link"><i class="fas fa-heart wishlist-icon"></i></a></li>
+            <li class="mx-2"><a href="/cart" class="icon-link"><i class="fas fa-shopping-cart cart-icon"></i></a></li>
+            <li class="mx-2">
+                <div class="profile-dropdown">
+                    <a href="#" class="icon-link"><i class="far fa-user profile-icon"></i></a>
+                    <div class="profile-dropdown-content">
+                        <% if (locals.user) { %>
+                            <a href="/profile"><i class="fas fa-user"></i> My Profile</a>
+                            <a href="/orders"><i class="fas fa-box"></i> My Orders</a>
+                            <a href="/wishlist"><i class="fas fa-heart"></i> Wishlist</a>
+                            <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        <% } else { %>
+                            <a href="/login"><i class="fas fa-sign-in-alt"></i> Login</a>
+                            <a href="/signup"><i class="fas fa-user-plus"></i> Sign Up</a>
+                        <% } %>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center p-5">
+                        <div class="mb-4">
+                            <i class="fas fa-times-circle text-danger" style="font-size: 4rem;"></i>
+                        </div>
+                        <h2 class="mb-4" style="font-family: 'Aboreto', cursive; color: var(--darker-text);">Payment Failed</h2>
+                        <p class="text-muted mb-4">
+                            We're sorry, but your payment could not be processed at this time. 
+                            This could be due to various reasons such as:
+                        </p>
+                        <ul class="text-muted text-start mb-4">
+                            <li>Insufficient funds in your account</li>
+                            <li>Bank declined the transaction</li>
+                            <li>Network connectivity issues</li>
+                            <li>Session timeout</li>
+                        </ul>
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="/cart" class="btn btn-outline-primary">
+                                <i class="fas fa-shopping-cart me-2"></i>Back to Cart
+                            </a>
+                            <a href="<%= orderId ? ('/proceed-payment?orderId=' + orderId) : '/checkout' %>" class="btn btn-primary btn-try-again">
+                                <i class="fas fa-credit-card me-2"></i>Try Again
+                            </a>
+                            <a href="/orders" class="btn btn-secondary">
+                                <i class="fas fa-list me-2"></i>View Orders
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        :root {
+            --soft-beige: #D4B996;
+            --muted-green: #A9BA9D;
+            --light-bg: #f8f5f2;
+            --border-color: #e0d8cc;
+            --offer-red: #e63946;
+            --dark-text: #2c1810;
+            --darker-text: #1a0f0a;
+            --primary-color: #A9BA9D;
+            --primary-dark: #79896d;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            font-family: 'Jost', sans-serif;
+            color: var(--dark-text);
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            background: linear-gradient(145deg, #ffffff, #f8f5f2);
+            box-shadow: 0 4px 20px rgba(212, 185, 150, 0.15);
+        }
+
+        .text-danger {
+            color: var(--offer-red) !important;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-family: 'Jost', sans-serif;
+        }
+
+        .btn-primary {
+            background: linear-gradient(145deg, var(--muted-green), var(--primary-dark));
+            border: none;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(145deg, var(--primary-dark), var(--muted-green));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(121, 137, 109, 0.3);
+            color: white;
+        }
+
+        .btn-outline-primary {
+            color: var(--muted-green);
+            border: 2px solid var(--muted-green);
+            background: transparent;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--muted-green);
+            color: white;
+            border-color: var(--muted-green);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(145deg, #6c757d, #5a6268);
+            border: none;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(145deg, #5a6268, #6c757d);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Navbar styles (same as before) */
+        .navbar {
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: nowrap;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .brand-text {
+            font-family: 'Aboreto', cursive;
+            font-size: 1.8rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--darker-text);
+            transition: color 0.3s ease;
+            font-weight: 400;
+            line-height: 1;
+        }
+        .brand-icon {
+            font-size: 1.4rem;
+            color: var(--muted-green);
+            transition: transform 0.3s ease;
+        }
+        .brand:hover .brand-text {
+            color: var(--muted-green);
+        }
+        .brand:hover .brand-icon {
+            transform: rotate(-15deg);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            flex: 1;
+            justify-content: center;
+        }
+        .nav-link {
+            color: var(--darker-text);
+            font-family: 'Jost', sans-serif;
+            font-size: 0.9rem;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+        }
+        .nav-link:hover {
+            color: var(--muted-green);
+            transform: translateY(-2px);
+        }
+
+        .icon-links {
+            display: flex;
+            align-items: center;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .icon-link {
+            color: var(--darker-text);
+            font-size: 1.1rem;
+            padding: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        .icon-link:hover {
+            color: var(--muted-green);
+            transform: translateY(-2px);
+        }
+
+        .search-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .search-input {
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            padding-right: 2.5rem;
+            font-family: 'Jost', sans-serif;
+            width: 200px;
+            transition: all 0.3s ease;
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: var(--darker-text);
+            box-shadow: 0 0 0 2px rgba(44, 30, 15, 0.1);
+        }
+        .search-button {
+            position: absolute;
+            right: 10px;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        .search-icon {
+            color: var(--darker-text);
+        }
+        .search-icon:hover {
+            color: var(--muted-green);
+        }
+
+        .profile-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .profile-dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: white;
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            z-index: 1000;
+            border-radius: 4px;
+            padding: 0.5rem 0;
+        }
+        .profile-dropdown:hover .profile-dropdown-content {
+            display: block;
+        }
+        .profile-dropdown-content a {
+            color: var(--darker-text);
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            display: block;
+            font-size: 0.9rem;
+            transition: background-color 0.3s ease;
+        }
+        .profile-dropdown-content a:hover {
+            background-color: var(--light-bg);
+            color: var(--muted-green);
+        }
+        .profile-dropdown-content a i {
+            margin-right: 0.5rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                padding: 1rem;
+            }
+            .brand {
+                margin-bottom: 1rem;
+            }
+            .nav-links {
+                margin: 1rem 0;
+                flex-wrap: wrap;
+            }
+            .search-input {
+                width: 180px;
+            }
+            .d-flex {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .btn {
+                width: 100%;
+            }
+        }
+
+        .btn-try-again {
+            background: linear-gradient(90deg, #e63946 0%, #A9BA9D 100%);
+            color: #fff;
+            font-weight: 700;
+            box-shadow: 0 4px 16px rgba(230, 57, 70, 0.15);
+            border: none;
+            letter-spacing: 1px;
+            transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+        }
+        .btn-try-again:hover, .btn-try-again:focus {
+            background: linear-gradient(90deg, #A9BA9D 0%, #e63946 100%);
+            color: #fff;
+            transform: translateY(-3px) scale(1.04);
+            box-shadow: 0 8px 24px rgba(230, 57, 70, 0.25);
+        }
+    </style>
+</body>
+</html>

@@ -769,17 +769,6 @@
             const wishlistItem = document.querySelector(`[data-product-id="${productId}"]`).closest('.wishlist-item');
             const selectedSize = wishlistItem.dataset.selectedSize;
 
-            if (!selectedSize) {
-                Toastify({
-                    text: "Please select a size",
-                    duration: 3000,
-                    gravity: "top",
-                    position: "right",
-                    backgroundColor: "#e74c3c"
-                }).showToast();
-                return;
-            }
-
             try {
                 const response = await fetch('/cart/add', {
                     method: 'POST',
@@ -796,8 +785,10 @@
                 const data = await response.json();
 
                 if (response.ok) {
+                    // Remove from wishlist after adding to cart
+                    await removeFromWishlist(productId, false); // false = don't show toast again
                     Toastify({
-                        text: "Added to cart successfully",
+                        text: "Added to cart and removed from wishlist",
                         duration: 3000,
                         gravity: "top",
                         position: "right",
@@ -817,7 +808,8 @@
             }
         }
 
-        async function removeFromWishlist(productId) {
+        // Update removeFromWishlist to optionally skip toast
+        async function removeFromWishlist(productId, showToast = true) {
             try {
                 const response = await fetch('/wishlist/add', {
                     method: 'POST',
@@ -836,24 +828,28 @@
                     if (remainingItems.length === 0) {
                         location.reload();
                     }
-                    Toastify({
-                        text: "Removed from wishlist",
-                        duration: 3000,
-                        gravity: "top",
-                        position: "right",
-                        backgroundColor: "#2ecc71"
-                    }).showToast();
+                    if (showToast) {
+                        Toastify({
+                            text: "Removed from wishlist",
+                            duration: 3000,
+                            gravity: "top",
+                            position: "right",
+                            backgroundColor: "#2ecc71"
+                        }).showToast();
+                    }
                 } else {
                     throw new Error(data.message || 'Failed to remove from wishlist');
                 }
             } catch (error) {
-                Toastify({
-                    text: error.message || "Failed to remove from wishlist",
-                    duration: 3000,
-                    gravity: "top",
-                    position: "right",
-                    backgroundColor: "#e74c3c"
-                }).showToast();
+                if (showToast) {
+                    Toastify({
+                        text: error.message || "Failed to remove from wishlist",
+                        duration: 3000,
+                        gravity: "top",
+                        position: "right",
+                        backgroundColor: "#e74c3c"
+                    }).showToast();
+                }
             }
         }
     </script>

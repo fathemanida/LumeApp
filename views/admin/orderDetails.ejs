@@ -348,7 +348,7 @@
                                     </div>
                                 <% } %>
                             </div>
-                            <% if (order.returnRequest.status === 'Pending') { %>
+                            <% if (order.status === 'Return Requested') { %>
                                 <div class="return-request-actions" style="margin-top: 1rem; display: flex; gap: 1rem;">
                                     <button onclick="handleReturnRequest('accept')" class="btn btn-success">
                                         <i class="fas fa-check"></i> Accept Return
@@ -398,7 +398,12 @@
                         <div class="info-item">
                             <%= order.address.name %><br
                             <%= order.address.city %>, <%= order.address.state %><br>
-                            <%= order.address.pincode %>
+                            <%= order.address.pincode %>,
+                            <%= order.address.phone %>,<br>
+                            <%= order.address.state %>,
+                            <%= order.address.houseNo %>,
+                            <%= order.address.roadArea %>
+                            
                         </div>
                     <% } else { %>
                         <div class="info-item">Address not available</div>
@@ -424,16 +429,13 @@
             <div class="order-summary">
                 <div class="summary-row">
                     <span>Subtotal</span>
-                    <span>₹<%= (order.totalAmount - order.shipping - order.tax + (order.discount || 0)).toFixed(2) %></span>
+                    <span>₹<%= order.subtotal %></span>
                 </div>
                 <div class="summary-row">
                     <span>Shipping</span>
                     <span>₹<%= order.shipping.toFixed(2) %></span>
                 </div>
-                <div class="summary-row">
-                    <span>Tax</span>
-                    <span>₹<%= order.tax.toFixed(2) %></span>
-                </div>
+            
                 <% if (order.discount) { %>
                     <div class="summary-row">
                         <span>Discount</span>

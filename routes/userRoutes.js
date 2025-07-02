@@ -4,8 +4,8 @@ const userController=require('../controllers/user/userController');
 const passport = require('passport');
 const profileController=require('../controllers/user/profileControllers');
 const cartController=require('../controllers/user/cartController')
-const orderControlller=require('../controllers/user/orderController.js')
-const paymnetController=require('../controllers/user/paymentController.js')
+const orderController=require('../controllers/user/orderController.js')
+const paymentController=require('../controllers/user/paymentController.js')
 const wishlistController=require('../controllers/user/wishlistController.js')
 const userAuth=require("../middleware/auth")
 const multer = require('multer');
@@ -54,7 +54,7 @@ router.get('/check-auth', (req, res) => {
     });
   }
 });
-
+router.get('/hello',userController.hello)
 router.get('/login',userController.loadLogin);
 router.post("/login",userController.login);
 router.get('/logout',userController.logout)
@@ -132,18 +132,20 @@ router.post('/remove-coupon',userAuth.isLogin, cartController.removeCoupon);
 router.get('/checkout',userAuth.isLogin,cartController.getCheckout)
 
 
-router.get('/proceed-payment',userAuth.isLogin,paymnetController.paymentMethod)
+router.get('/proceed-payment',userAuth.isLogin,paymentController.paymentMethod)
 
-router.post('/create-order',userAuth.isLogin,paymnetController.createOrder)
+router.post('/create-order',userAuth.isLogin,paymentController.createOrder)
 
-router.post('/verify-payment',userAuth.isLogin,paymnetController.verifyPayment)
+router.post('/verify-payment',userAuth.isLogin,paymentController.verifyPayment)
 
-router.post('/payment/process', userAuth.isLogin, paymnetController.processPayment)
-router.get('/payment-confirmation',userAuth.isLogin,paymnetController.paymentConfirmation)
-router.get('/orders',userAuth.isLogin,orderControlller.orders)
-router.get('/orders/:orderId', userAuth.isLogin, orderControlller.orderDetails)
-router.post('/orders/:orderId/cancel', userAuth.isLogin, orderControlller.cancelOrder)
-router.post('/orders/:orderId/return', userAuth.isLogin, orderControlller.submitReturnRequest)
+router.post('/payment/process', userAuth.isLogin, paymentController.processPayment)
+router.get('/payment-confirmation',userAuth.isLogin,paymentController.paymentConfirmation)
+router.get('/orders',userAuth.isLogin,orderController.orders)
+router.get('/orders/:orderId', userAuth.isLogin, orderController.orderDetails)
+router.post('/orders/:orderId/cancel', userAuth.isLogin, orderController.cancelOrder)
+router.post('/orders/:orderId/return', userAuth.isLogin, orderController.returnRequest)
+router.get('/orders/:orderId/invoice', userAuth.isLogin, orderController.downloadInvoice)
+router.post('/orders/:orderId/items/:itemId/cancel', userAuth.isLogin, orderController.cancelOrderItem)
 
 router.post('/wishlist/add',userAuth.isLogin,wishlistController.addToWishlist)
 router.get('/wishlist', userAuth.isLogin, wishlistController.getWishlist)
@@ -152,5 +154,7 @@ router.get('/wishlist', userAuth.isLogin, wishlistController.getWishlist)
 router.get('/wallet', userAuth.isLogin, walletController.getWallet);
 router.get('/wallet/transactions', userAuth.isLogin, walletController.getTransactions);
 router.post('/wallet/refund', userAuth.isLogin, walletController.addRefund);
+
+router.get('/payment-failed', userAuth.isLogin, paymentController.paymentFailure);
 
 module.exports=router;

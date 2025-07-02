@@ -13,7 +13,7 @@ const processReturnRefund = async (req) => {
             });
         }
 
-        const order = await Order.findById(orderId).populate('orderItems.productId');
+        const order = await Order.findById(orderId).populate('items.productId');
 
         if (!order || order.status !== 'Return Requested') {
             return res.status(400).json({

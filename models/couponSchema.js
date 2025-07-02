@@ -47,7 +47,21 @@ const couponSchema = new mongoose.Schema({
   isActive: {
     type: Boolean,
     default: true
-  }
+  },
+  usedBy: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    validate: {
+      validator: function(v) {
+        // Ensure no duplicate user IDs in usedBy array
+        return this.usedBy.filter(id => id.toString() === v.toString()).length <= 1;
+      },
+      message: 'User has already used this coupon'
+    }
+  }]
 });
+
+// Add compound index to prevent duplicate coupon usage
+couponSchema.index({ code: 1, 'usedBy': 1 });
 
 module.exports = mongoose.model("Coupon", couponSchema);

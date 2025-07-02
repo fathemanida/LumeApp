@@ -1,6 +1,7 @@
 const Category = require("../../models/categorySchema");
 const fs = require("fs");
 const path = require("path");
+const Offer = require('../../models/offerSchema');
 
 const multer = require("multer");
 
@@ -46,7 +47,7 @@ const categoryInfo = async (req, res) => {
     }
 
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 2;
+    const limit = parseInt(req.query.limit) || 5;
     const skip = (page - 1) * limit;
 
     const categoryName = await Category.find({
@@ -64,7 +65,8 @@ const categoryInfo = async (req, res) => {
     const totalPages = Math.ceil(totalCategory / limit);
     const offset = (page - 1) * limit;
 
-    // Always return JSON for AJAX requests
+    const categoryOffers = await Offer.find({ applicableOn: 'categories', isActive: true });
+
     if (req.xhr || req.headers.accept.indexOf("json") > -1 || req.query.json === 'true') {
       return res.json({
         success: true,
@@ -72,6 +74,7 @@ const categoryInfo = async (req, res) => {
         currentPage: page,
         totalPages,
         totalCategory,
+        categoryOffers
       });
     }
 
@@ -82,6 +85,7 @@ const categoryInfo = async (req, res) => {
       totalCategory,
       search,
       offset,
+      categoryOffers
     });
   } catch (error) {
     console.error("Error in categoryInfo:", error);
@@ -144,7 +148,6 @@ const addCategory = async (req, res) => {
           parsedOffer.discountType = parsedOffer.discountType.toLowerCase();
         }
         
-        // Set active status based on the offer data
         parsedOffer.active = parsedOffer.isActive;
         
         if (parsedOffer.active) {
@@ -335,7 +338,6 @@ const editCategory = async (req, res) => {
       });
     }
 
-    // Check if another category with same name exists
     const existingCategory = await Category.findOne({
       name,
       _id: { $ne: categoryId }
@@ -356,7 +358,6 @@ const editCategory = async (req, res) => {
           parsedOffer.discountType = parsedOffer.discountType.toLowerCase();
         }
         
-        // Set active status based on the offer data
         parsedOffer.active = parsedOffer.isActive;
         
         if (parsedOffer.active) {
@@ -390,16 +391,13 @@ const editCategory = async (req, res) => {
       }
     }
 
-    // Update category data
     const updateData = {
       name,
       description,
       categoryOffer: parsedOffer
     };
 
-    // Handle image upload if provided
     if (req.file) {
-      // Delete old image
       const oldImagePath = path.join( category.image);
       if (fs.existsSync(oldImagePath)) {
         fs.unlinkSync(oldImagePath);

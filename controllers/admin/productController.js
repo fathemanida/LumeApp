@@ -48,7 +48,6 @@ const productInfo = async (req, res) => {
     const limit = parseInt(req.query.limit) || 6; 
 
     const searchQuery = {
-      isListed: true,
       $or: [
         { productName: { $regex: new RegExp(".*" + search + ".*", "i") } },
         { description: { $regex: new RegExp(".*" + search + ".*", "i") } },
@@ -73,6 +72,14 @@ const productInfo = async (req, res) => {
       .populate({
         path: "category",
         select: "name",
+      })
+      .populate({
+        path: 'offer',
+        match: {
+          isActive: true,
+          startDate: { $lte: new Date() },
+          endDate: { $gte: new Date() }
+        }
       });
 
     const totalProducts = await Product.countDocuments(searchQuery);
@@ -81,7 +88,6 @@ const productInfo = async (req, res) => {
 
     const categories = await Category.find({ isListed: true });
 
-    // Return JSON for AJAX requests
     if (req.xhr || req.headers.accept.indexOf("json") > -1 || req.query.json === 'true') {
       return res.json({
         success: true,
@@ -355,10 +361,10 @@ const editProduct = async (req, res) => {
       });
     }
 
-    if (salePrice && (isNaN(salePrice) || salePrice >= regularPrice)) {
+    if (salePrice && (isNaN(salePrice) || salePrice > regularPrice)) {
       return res.status(400).json({
         success: false,
-        message: "Sale price must be less than regular price",
+        message: "Sale price must be less than or equal to regular price",
       });
     }
 
@@ -498,10 +504,8 @@ const getListProduct = async (req, res) => {
       });
     }
 
-    // Update the product's listing status
     product.isListed = true;
     
-    // If there's an active offer, ensure it's properly formatted
     if (product.productOffer && product.productOffer.active) {
       product.productOffer = {
         active: true,
@@ -511,7 +515,6 @@ const getListProduct = async (req, res) => {
         endDate: product.productOffer.endDate
       };
     } else {
-      // If no offer or inactive, set default values
       product.productOffer = {
         active: false,
         discountType: 'percentage',

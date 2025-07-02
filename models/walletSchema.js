@@ -40,14 +40,11 @@ const walletSchema = new mongoose.Schema({
         default: 0
     },
     transactions: [transactionSchema],
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
-    updatedAt: {
-        type: Date,
-        default: Date.now
-    }
+   
+  
+},
+{
+     timestamps: true
 });
 
 walletSchema.pre('save', function(next) {

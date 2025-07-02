@@ -289,14 +289,60 @@
         }
 
         /* Profile Content Styles */
-        .profile-header {
-            display: flex;
-            align-items: center;
-            gap: 2rem;
-            margin-bottom: 2rem;
-            padding-bottom: 2rem;
-            border-bottom: 1px solid var(--border-color);
-        }
+     .profile-header {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    padding: 2rem;
+    border-bottom: 1px solid var(--border-color);
+    border-radius: 12px;
+    background-color: var(--card-bg); /* You can also use #1e1e1e or custom color */
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    will-change: transform;
+}
+
+.profile-header:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Shine effect */
+.profile-header::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+    transform: rotate(25deg);
+    opacity: 0;
+    transition: opacity 0.4s ease, transform 0.8s ease;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.profile-header:hover::after {
+    opacity: 1;
+    transform: translateX(100%) rotate(25deg);
+}
+
+/* Dot-circle effect */
+.profile-header::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    width: 80px;
+    height: 80px;
+    background-color: var(--accent-color);
+    opacity: 0.1;
+    border-radius: 50%;
+    z-index: 0;
+}
 
         .profile-image {
             width: 120px;
@@ -341,6 +387,71 @@
             .content-area {
                 padding: 1.5rem;
             }
+        }
+
+        /* Add these styles to your existing CSS */
+        .referral-section {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 8px;
+            margin-top: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .referral-section h3 {
+            color: var(--accent-color);
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .referral-code-container {
+            background: var(--darker-bg);
+            padding: 1.5rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .referral-code {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .referral-code span {
+            font-family: monospace;
+            font-size: 1.25rem;
+            color: var(--text-primary);
+            letter-spacing: 1px;
+            padding: 0.5rem 1rem;
+            background: var(--bg-primary);
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+
+        .copy-btn {
+            background: var(--accent-color);
+            color: var(--darker-bg);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #d4b47c;
+            transform: translateY(-2px);
+        }
+
+        .referral-info {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin: 0;
         }
     </style>
 </head>
@@ -461,6 +572,20 @@
                         <% } %>
                     </div>
                 </div>
+
+                <!-- Referral Code Section -->
+                <div class="referral-section">
+                    <h3>Your Referral Code</h3>
+                    <div class="referral-code-container">
+                        <div class="referral-code">
+                            <span><%= users.referalCode %></span>
+                            <button class="copy-btn" onclick="copyReferralCode()">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                        </div>
+                        <p class="referral-info">Share this code with friends and earn ₹100 when they sign up!</p>
+                    </div>
+                </div>
             </div>
         </div>
     <% } else { %>
@@ -532,6 +657,21 @@
                 window.location.href = '/profile/delete';
             }
         });
+
+        function copyReferralCode() {
+            const code = '<%= users.referalCode %>';
+            navigator.clipboard.writeText(code).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                btn.style.background = 'var(--success-color)';
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.style.background = 'var(--accent-color)';
+                }, 2000);
+            });
+        }
     </script>
 </body>
 </html>

@@ -9,12 +9,16 @@ const {userAuth, adminAuth} = require("../middleware/auth");
 const walletController = require('../controllers/user/walletController');
 const couponController=require('../controllers/admin/couponController')
 const offerController = require('../controllers/admin/offerController');
+const BannerController=require('../controllers/admin/bannerController');
+const bannerSchema = require('../models/bannerSchema');
 
 // Admin authentication routes
 router.get('/pageError', adminController.pageError);
 router.get("/login", adminController.loadLogin);
 router.post("/login", adminController.login);
 router.get("/logout", adminController.logout);
+router.get('/sales-report', adminAuth, adminController.loadSalesreport);
+router.get('/download-report', adminAuth, adminController.downloadReport);
 router.get('/dashboard', adminAuth, adminController.loadDashboard);
 
 // Customer management routes
@@ -57,6 +61,7 @@ router.get('/add-offer', adminAuth, offerController.getAddOffer);
 router.post('/add-offer', adminAuth, offerController.createOffer);
 router.get('/edit-offer/:id', adminAuth, offerController.getEditOffer);
 router.put('/edit-offer/:id', adminAuth, offerController.updateOffer);
+router.delete('/delete-offer/:id', adminAuth, offerController.deleteOffer);
 
 router.get('/coupons', adminAuth, couponController.listCoupons);
 router.get('/coupons/add', adminAuth, couponController.showAddForm);
@@ -65,5 +70,14 @@ router.get('/coupons/edit/:id', adminAuth, couponController.showEditForm);
 router.put('/coupons/:id', adminAuth, couponController.updateCoupon);
 router.delete('/coupons/:id', adminAuth, couponController.deleteCoupon);
 router.put('/coupons/:id/toggle-status', adminAuth, couponController.toggleStatus);
+
+
+
+router.get('/banner',adminAuth,BannerController.getBanner);
+router.get('banners/add',adminAuth,BannerController.loadAddbanner);
+router.post('/banners/add/:id',adminAuth,BannerController.addBanner)
+
+
+
 
 module.exports = router;

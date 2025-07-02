@@ -2,6 +2,8 @@ const Order = require('../../models/orderSchema');
 const User = require('../../models/userSchema');
 const mongoose = require('mongoose');
 const walletController = require('./walletController');
+const Wallet = require('../../models/walletSchema');
+const Product = require('../../models/productSchema');
 
 const getOrders = async (req, res) => {
     try {
@@ -17,7 +19,7 @@ const getOrders = async (req, res) => {
                     { orderNumber: { $regex: search, $options: 'i' } },
                     { 'userId.name': { $regex: search, $options: 'i' } },
                     { 'userId.email': { $regex: search, $options: 'i' } },
-                    { 'orderItems.productId.productName': { $regex: search, $options: 'i' } }
+                    { 'items.productId.productName': { $regex: search, $options: 'i' } }
                 ]
             };
         }
@@ -27,7 +29,7 @@ const getOrders = async (req, res) => {
 
         const orders = await Order.find(searchQuery)
             .populate({
-                path: 'orderItems.productId',
+                path: 'items.productId',
                 model: 'Product',
                 select: 'productName productImage regularPrice salePrice quantity'
             })
@@ -46,7 +48,7 @@ const getOrders = async (req, res) => {
             return {
                 ...order,
                 orderNumber: order._id.toString().slice(-6).toUpperCase(),
-                totalAmount: order.finalAmount || 0,
+                totalAmount: order.totalAmount || 0,
                 status: order.status || 'Pending',
                 paymentMethod: order.paymentMethod || 'COD',
                 userId: order.userId ? {
@@ -84,7 +86,7 @@ const getOrderDetails = async (req, res) => {
 
         const order = await Order.findById(orderId)
             .populate({
-                path: 'orderItems.productId',
+                path: 'items.productId',
                 model: 'Product',
                 select: 'productName productImage regularPrice salePrice quantity'
             })
@@ -117,6 +119,23 @@ const getOrderDetails = async (req, res) => {
                 };
             }
         }
+      const totalAmount = order.totalAmount || itemsTotal;
+const shipping = totalAmount > 1500 ? 0 : 40;
+      const subtotal = parseFloat((totalAmount  - shipping).toFixed(2));
+
+        if (order.returnRequest && order.returnRequest.items && order.returnRequest.items.length > 0) {
+            for (const item of order.returnRequest.items) {
+                if (item.productId) {
+                    const product = await Product.findById(item.productId).select('productName');
+                    if (product) {
+                        item.productId = {
+                            _id: product._id,
+                            productName: product.productName
+                        };
+                    }
+                }
+            }
+        }
 
         const formattedOrder = {
             ...order,
@@ -126,7 +145,7 @@ const getOrderDetails = async (req, res) => {
                 month: 'long',
                 day: 'numeric'
             }),
-            items: order.orderItems.map(item => ({
+            items: order.items.map(item => ({
                 name: item.productId?.productName || 'Product not found',
                 image: Array.isArray(item.productId?.productImage) && item.productId.productImage.length
                     ? `/uploads/product/${item.productId.productImage[0]}`
@@ -135,12 +154,12 @@ const getOrderDetails = async (req, res) => {
                 quantity: item.quantity || 0,
                 total: (item.price || 0) * (item.quantity || 0)
             })),
-            totalAmount: order.finalAmount || 0,
+            totalAmount: order.totalAmount || 0,
             shipping: order.shipping || 0,
-            tax: order.tax || 0,
             discount: order.discount || 0,
             status: order.status || 'Pending',
             paymentMethod: order.paymentMethod || 'COD',
+            subtotal:subtotal,
             userId: userData || {
                 name: 'User not found',
                 email: 'No email'
@@ -162,12 +181,68 @@ const updateOrderStatus = async (req, res) => {
         const orderId = req.params.orderId;
         const { status } = req.body;
 
-        const order = await Order.findById(orderId);
+        const order = await Order.findById(orderId).populate('items.productId');
         if (!order) {
             return res.status(404).json({
                 success: false,
                 message: 'Order not found'
             });
+        }
+        
+        const previousStatus = order.status;
+
+        if (status === 'Cancelled' && previousStatus !== 'Cancelled') {
+            if (order.paymentMethod !== 'COD' && order.totalAmount > 0) {
+                let wallet = await Wallet.findOne({ userId: order.userId });
+                if (!wallet) {
+                    wallet = new Wallet({ userId: order.userId, balance: 0, transactions: [] });
+                }
+                wallet.balance += order.totalAmount;
+                wallet.transactions.push({
+                    type: 'CREDITSS',
+                    amount: order.totalAmount,
+                    description: `Refund for cancelled order #${order.orderId}`,
+                    orderId: order._id,
+                });
+                await wallet.save();
+            }
+
+            for (const item of order.items) {
+                const product = item.productId;
+                if (product) {
+                    const newStock = product.quantity + item.quantity;
+                    await Product.findByIdAndUpdate(product._id, {
+                       quantity: newStock,
+                       status: newStock > 0 ? 'Available' : 'Out of Stock'
+                    });
+                }
+            }
+        } else if (status === 'Returned' && previousStatus !== 'Returned') {
+            if (order.totalAmount > 0) {
+                 let wallet = await Wallet.findOne({ userId: order.userId });
+                 if (!wallet) {
+                    wallet = new Wallet({ userId: order.userId, balance: 0, transactions: [] });
+                 }
+                 wallet.balance += order.totalAmount;
+                 wallet.transactions.push({
+                    type: 'CREDIT',
+                    amount: order.totalAmount,
+                    description: `Refund for returned order #${order.orderId}`,
+                    orderId: order._id,
+                 });
+                 await wallet.save();
+            }
+            
+            for (const item of order.items) {
+                const product = item.productId;
+                if (product) {
+                    const newStock = product.quantity + item.quantity;
+                    await Product.findByIdAndUpdate(product._id, {
+                        quantity: newStock,
+                        status: newStock > 0 ? 'Available' : 'Out of Stock'
+                    });
+                }
+            }
         }
 
         order.status = status;
@@ -198,7 +273,7 @@ const handleReturnRequest = async (req, res) => {
             });
         }
 
-        const order = await Order.findById(orderId).populate('orderItems.productId');
+        const order = await Order.findById(orderId).populate('items.productId');
 
         if (!order) {
             return res.status(404).json({
@@ -216,9 +291,21 @@ const handleReturnRequest = async (req, res) => {
 
         if (action === 'accept') {
             try {
-                const result = await walletController.processReturnRefund(req);
+                const fakeReq = { params: { orderId }, body: { status: 'Returned' } };
+                const fakeRes = {
+                    json: (data) => {
+                        if (!data.success) {
+                            throw new Error(data.message || 'Failed to update order status.');
+                        }
+                    },
+                    status: (code) => ({
+                        json: (data) => {
+                            throw new Error(data.message || `Request failed with status code ${code}`);
+                        }
+                    })
+                };
+                await updateOrderStatus(fakeReq, fakeRes);
                 
-                order.status = 'Returned';
                 order.returnRequest.status = 'Accepted';
                 order.returnRequest.respondedAt = new Date();
                 await order.save();
@@ -231,7 +318,7 @@ const handleReturnRequest = async (req, res) => {
                 console.error('Error processing return refund:', error);
                 return res.status(500).json({
                     success: false,
-                    message: 'Error processing return refund'
+                    message: error.message || 'Error processing return refund'
                 });
             }
         } else if (action === 'reject') {

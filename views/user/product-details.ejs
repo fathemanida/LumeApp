@@ -780,7 +780,7 @@
     }
 
     .status-badge.out-of-stock {
-      background-color: #ffc107;
+      background-color:rgb(190 148 19)
       color: #000;
     }
 
@@ -824,6 +824,59 @@
 
     .btn-close {
       filter: invert(1);
+    }
+
+    .offer-badges {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.2rem;
+      flex-wrap: wrap;
+    }
+    .offer-badge {
+      display: flex;
+      align-items: center;
+      padding: 0.5rem 1.2rem;
+      border-radius: 999px;
+      font-size: 1.08rem;
+      font-weight: 500;
+      background: linear-gradient(90deg, #ffe6b3 0%, #fff7e6 100%);
+      color: #7a4c00;
+      box-shadow: 0 2px 8px rgba(212, 185, 150, 0.10);
+      border: 1.5px solid #f3e0c0;
+      letter-spacing: 0.5px;
+      transition: box-shadow 0.2s;
+    }
+    .offer-badge .fa-tag, .offer-badge .fa-tags {
+      font-size: 1.3em;
+      margin-right: 0.7em;
+      color: #b88a2b;
+    }
+    .offer-badge .offer-type {
+      font-weight: 600;
+      margin-left: 0.3em;
+    }
+    .offer-badge.category {
+      background: linear-gradient(90deg, #e6ffe6 0%, #f6fff6 100%);
+      color: #1a6a1a;
+      border-color: #c0f3c0;
+    }
+    .offer-badge.category .fa-tags {
+      color: #3bb13b;
+    }
+    .offer-badge + .offer-badge {
+      margin-left: 0;
+    }
+    .offer-badges .info-text {
+      font-size: 0.98rem;
+      color: #7a4c00;
+      margin-top: 0.3rem;
+      margin-left: 0.2rem;
+      display: flex;
+      align-items: center;
+    }
+    .offer-badges .info-text .fa-info-circle {
+      margin-right: 0.4em;
+      color: #b88a2b;
     }
   </style>
 </head>
@@ -988,6 +1041,36 @@
         <div class="product-info">
           <h1 class="mb-3"><%= product.productName %></h1>
           
+          <!-- Offer Badges/Box -->
+          <% if (product.offer || (product.category && product.category.categoryOffer)) { %>
+            <div class="offer-badges">
+              <% if (product.offer) { %>
+                <span class="offer-badge">
+                  <i class="fas fa-tag"></i>
+                  <span><%= product.offer.name ? product.offer.name : 'Product Offer' %>:</span>
+                  <span class="offer-type">
+                    <%= product.offer.discountType === 'percentage' ? (product.offer.discountValue + '% OFF') : ('₹' + product.offer.discountValue + ' OFF') %>
+                  </span>
+                </span>
+              <% } %>
+              <% if (product.category && product.category.categoryOffer) { %>
+                <span class="offer-badge category">
+                  <i class="fas fa-tags"></i>
+                  <span><%= product.category.categoryOffer.name ? product.category.categoryOffer.name : 'Category Offer' %>:</span>
+                  <span class="offer-type">
+                    <%= product.category.categoryOffer.discountType === 'percentage' ? (product.category.categoryOffer.discountValue + '% OFF') : ('₹' + product.category.categoryOffer.discountValue + ' OFF') %>
+                  </span>
+                </span>
+              <% } %>
+              <% if (product.offer && product.category && product.category.categoryOffer) { %>
+                <span class="info-text">
+                  <i class="fas fa-info-circle"></i>
+                  The best discount is applied automatically at checkout.
+                </span>
+              <% } %>
+            </div>
+          <% } %>
+
           <!-- Status Badge -->
           <% if (!product.isListed) { %>
             <div class="status-badge unavailable">
@@ -999,12 +1082,25 @@
             </div>
           <% } %>
 
-          <div class="price-section">
-            <% if (product.salePrice && product.salePrice < product.regularPrice) { %>
-              <span class="text-muted text-decoration-line-through me-2">₹<%= product.regularPrice.toLocaleString('en-IN') %></span>
-              <span class="text-danger">₹<%= product.salePrice.toLocaleString('en-IN') %></span>
+          <div class="product-price">
+            <% if (product.offer) { %>
+              <% if (product.salePrice && product.salePrice < product.regularPrice) { %>
+                <span class="strike-price">₹<%= product.salePrice.toLocaleString() %></span>
+              <% } else { %>
+                <span class="strike-price">₹<%= product.regularPrice.toLocaleString() %></span>
+              <% } %>
+              <span class="discounted-price">
+                ₹<%= product.offer.discountType === 'percentage' 
+                  ? (product.salePrice ? (product.salePrice - (product.salePrice * product.offer.discountValue / 100)).toFixed(2)
+                    : (product.regularPrice - (product.regularPrice * product.offer.discountValue / 100)).toFixed(2))
+                  : (product.salePrice ? (product.salePrice - product.offer.discountValue).toFixed(2)
+                    : (product.regularPrice - product.offer.discountValue).toFixed(2)) %>
+              </span>
+            <% } else if (product.salePrice && product.salePrice < product.regularPrice) { %>
+              <span class="strike-price">₹<%= product.regularPrice.toLocaleString() %></span>
+              <span class="discounted-price">₹<%= product.salePrice.toLocaleString() %></span>
             <% } else { %>
-              <span class="h4">₹<%= product.regularPrice.toLocaleString('en-IN') %></span>
+              <span class="regular-price">₹<%= product.regularPrice.toLocaleString() %></span>
             <% } %>
           </div>
 

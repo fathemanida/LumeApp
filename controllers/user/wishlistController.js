@@ -84,7 +84,7 @@ const getWishlist = async (req, res) => {
         .filter(item => item !== null)
     };
 
-    res.render('user/wishlist', {
+    res.render('wishlist', {
       wishlist: populatedWishlist,
       user: req.session.user
     });

@@ -1,12 +1,13 @@
 const Order = require('../../models/orderSchema');
 const Wallet = require('../../models/walletSchema');
 const User = require('../../models/userSchema');
+const Product = require('../../models/productSchema');
 
 const cancelOrReturnOrder = async (req, res) => {
   try {
     const { orderId, actionType } = req.body; 
 
-    const order = await Order.findById(orderId);
+    const order = await Order.findById(orderId).populate('items.productId');
 
     if (!order || order.status === 'Cancelled' || order.status === 'Returned') {
       return res.status(400).json({
@@ -15,9 +16,11 @@ const cancelOrReturnOrder = async (req, res) => {
       });
     }
 
-    // Handle cancellation - direct refund
     if (actionType === 'cancel') {
-      // Process refund if payment was not COD
+        if (order.status === 'Shipped' || order.status === 'Delivered') {
+            return res.status(400).json({ success: false, message: 'Cannot cancel order at this stage.' });
+        }
+        
       if (order.paymentMethod !== 'COD') {
         let wallet = await Wallet.findOne({ userId: order.userId });
         
@@ -31,43 +34,44 @@ const cancelOrReturnOrder = async (req, res) => {
 
         const transaction = {
           type: 'CREDIT',
-          amount: order.finalAmount,
+          amount: order.totalAmount,
           description: `Direct refund for cancelled order #${order.orderId}`,
           orderId: order._id,
           status: 'COMPLETED',
           createdAt: new Date()
         };
 
-        wallet.balance += order.finalAmount;
+        wallet.balance += order.totalAmount;
         wallet.transactions.push(transaction);
         await wallet.save();
 
-        // Update user's wallet reference if not set
         await User.findByIdAndUpdate(order.userId, { wallet: wallet._id });
+      } 
+      
+      for (const item of order.items) {
+        const product = item.productId;
+        if (product) {
+            const newStock = product.quantity + item.quantity;
+            await Product.findByIdAndUpdate(product._id, {
+                quantity: newStock,
+                status: newStock > 0 ? 'Available' : 'Out of Stock'
+            });
+        }
+      }
+      
+      order.status = 'Cancelled';
+      await order.save();
 
-        // Update order status to Cancelled
-        order.status = 'Cancelled';
-        await order.save();
-
-        return res.status(200).json({
-          success: true,
-          message: 'Order cancelled and amount refunded to wallet successfully'
-        });
-      } else {
-        // For COD orders, just cancel without refund
-        order.status = 'Cancelled';
-        await order.save();
-
-        return res.status(200).json({
+      return res.status(200).json({
           success: true,
           message: 'Order cancelled successfully'
-        });
-      }
+      });
     }
 
-    // Handle return - requires admin confirmation
     if (actionType === 'return') {
-      // Set status to Return Requested
+        if (order.status !== 'Delivered') {
+            return res.status(400).json({ success: false, message: 'Only delivered orders can be returned.' });
+        }
       order.status = 'Return Requested';
       await order.save();
 
@@ -97,7 +101,7 @@ const processReturnRefund = async (req, res) => {
       });
     }
 
-    const order = await Order.findById(orderId).populate('orderItems.productId');
+    const order = await Order.findById(orderId).populate('items.productId');
 
     if (!order || order.status !== 'Return Requested') {
       return res.status(400).json({
@@ -172,7 +176,7 @@ const getWallet = async (req, res) => {
 
           const sortedTransactions = wallet.transactions.sort((a, b) => b.createdAt - a.createdAt);
 
-    res.render('user/wallet', {
+    res.render('wallet', {
       user: user,
       wallet: wallet || { balance: 0, transactions: [] },
       transactions: sortedTransactions || []
@@ -201,10 +205,18 @@ const getTransactions = async (req, res) => {
   }
 };
 
-const addRefund = async (req, res) => {
+
+const addRefund = async (req) => {
   try {
-    const userId = req.session.user._id;
-    const { amount, orderId, description } = req.body;
+    const userId = req.session?.user?._id;
+    if (!userId) throw new Error('Missing user session');
+
+    let { amount, orderId, description } = req.body;
+
+    amount = Number(amount);
+    if (isNaN(amount) || amount <= 0) {
+      return { success: false, message: 'Invalid refund amount' };
+    }
 
     let wallet = await Wallet.findOne({ userId });
 
@@ -213,7 +225,8 @@ const addRefund = async (req, res) => {
       amount,
       description: description || 'Order refund',
       orderId,
-      status: 'COMPLETED'
+      status: 'COMPLETED',
+      date: new Date()
     };
 
     if (!wallet) {
@@ -229,17 +242,21 @@ const addRefund = async (req, res) => {
 
     await wallet.save();
 
-    res.status(200).json({ success: true, message: 'Refund credited to wallet' });
+    return { success: true, message: 'Refund credited to wallet' };
   } catch (error) {
     console.error('Error refunding to wallet:', error);
-    res.status(500).json({ success: false, message: 'Wallet refund failed' });
+    return { success: false, message: 'Wallet refund failed', error };
   }
 };
+
+
+
 
 module.exports = {
     getWallet,
     getTransactions,
     addRefund,
     cancelOrReturnOrder,
-    processReturnRefund
+    processReturnRefund,
+    addRefund
 };

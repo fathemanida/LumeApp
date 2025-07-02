@@ -6,582 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Product Management | LUME Admin</title>
   <link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Jost&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/admin/product.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    /* Dark Theme Variables */
-    :root {
-      --bg-primary: #1a1a1a;
-      --bg-secondary: #2d2d2d;
-      --text-primary: #ffffff;
-      --text-secondary: #b3b3b3;
-      --accent-color: #dac6a4;
-      --border-color: #404040;
-      --input-bg: #333333;
-      --hover-bg: #404040;
-      --shadow-color: rgba(0, 0, 0, 0.3);
-      --status-active: #4caf50;
-      --status-inactive: #f44336;
-    }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Jost', sans-serif;
-    }
-
-    body {
-      background-color: var(--bg-primary);
-      color: var(--text-primary);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    /* Dashboard Layout */
-    .dashboard {
-      display: flex;
-      min-height: 100vh;
-      position: relative;
-    }
-
-    /* Sidebar Styles */
-    .sidebar {
-      width: 280px;
-      background-color: var(--bg-secondary);
-      padding: 2rem 1.5rem;
-      border-right: 1px solid var(--border-color);
-      display: flex;
-      flex-direction: column;
-      position: fixed;
-      height: 100vh;
-      overflow-y: auto;
-      z-index: 1000;
-      transition: transform 0.3s ease;
-    }
-
-    .sidebar-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: rgba(0, 0, 0, 0.5);
-      z-index: 999;
-      display: none;
-    }
-
-    .brand {
-      font-family: 'Aboreto', cursive;
-      font-size: 1.5rem;
-      color: var(--accent-color);
-      margin-bottom: 2rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid var(--border-color);
-      letter-spacing: 1px;
-    }
-
-    .nav-menu {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      list-style: none;
-      flex: 1;
-    }
-
-    .nav-item {
-      margin-bottom: 0.5rem;
-    }
-
-    .nav-link {
-      color: var(--text-secondary);
-      text-decoration: none;
-      padding: 0.75rem 1rem;
-      border-radius: 4px;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      font-size: 0.95rem;
-    }
-
-    .nav-link i {
-      width: 20px;
-      text-align: center;
-      color: var(--text-secondary);
-    }
-
-    .nav-link:hover {
-      background-color: var(--hover-bg);
-      color: var(--accent-color);
-      transform: translateX(4px);
-    }
-
-    .nav-link.active {
-      background-color: var(--hover-bg);
-      color: var(--accent-color);
-      font-weight: 500;
-      border-left: 3px solid var(--accent-color);
-    }
-
-    .nav-link.logout {
-      color: #ff6b6b;
-      margin-top: auto;
-      margin-bottom: 1rem;
-    }
-
-    .nav-link.logout:hover {
-      background-color: rgba(255, 107, 107, 0.1);
-    }
-
-    /* Main Content Styles */
-    .main-content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      margin-left: 280px;
-      transition: margin-left 0.3s ease;
-    }
-
-    .main-header {
-      background-color: var(--bg-secondary);
-      padding: 1.5rem 2rem;
-      border-bottom: 1px solid var(--border-color);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .mobile-menu-btn {
-      display: none;
-      background: none;
-      border: none;
-      color: var(--text-primary);
-      font-size: 1.25rem;
-      cursor: pointer;
-    }
-
-    .page-title {
-      font-family: 'Aboreto', cursive;
-      font-size: 1.5rem;
-      color: var(--text-primary);
-      margin: 0;
-    }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-    }
-
-    /* Search Bar */
-    .search-container {
-      position: relative;
-      display: flex;
-      box-shadow: 0 2px 6px rgb(129 83 50 / 49%);
-    }
-
-    .search-bar {
-      width: 220px;
-      padding: 0.75rem 1rem 0.75rem 2.5rem;
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-      background-color: var(--input-bg);
-      color: var(--text-primary);
-      font-size: 0.9rem;
-      transition: all 0.3s ease;
-    }
-
-    .search-bar:focus {
-      outline: none;
-      border-color: var(--accent-color);
-      box-shadow: 0 0 0 2px rgba(218, 198, 164, 0.2);
-    }
-
-    .search-btn {
-      padding: 0 1rem;
-      background-color: var(--accent-color);
-      color: var(--bg-primary);
-      border: none;
-      border-radius: 0 4px 4px 0;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .search-btn:hover {
-      background-color: #c5b393;
-    }
-
-    .clear-search {
-      position: absolute;
-      right: 50px;
-      top: 50%;
-      transform: translateY(-50%) scale(0.8);
-      background: var(--input-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      color: var(--text-secondary);
-      cursor: pointer;
-      display: none;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .clear-search:hover {
-      background: var(--hover-bg);
-      transform: translateY(-50%) scale(0.9);
-    }
-
-    .search-bar:not(:placeholder-shown)+.clear-search {
-      display: flex;
-    }
-
-    /* Notification and Profile */
-    .notification-btn {
-      background: none;
-      border: none;
-      position: relative;
-      cursor: pointer;
-      color: var(--text-primary);
-      font-size: 1.1rem;
-    }
-
-    .notification-badge {
-      position: absolute;
-      top: -5px;
-      right: -5px;
-      background: #ff4757;
-      color: white;
-      border-radius: 50%;
-      width: 18px;
-      height: 18px;
-      font-size: 0.7rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .profile-dropdown {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      cursor: pointer;
-      position: relative;
-    }
-
-    .profile-img {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-
-    .profile-name {
-      font-weight: 500;
-    }
-
-    .profile-dropdown-menu {
-      position: absolute;
-      top: 100%;
-      right: 0;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-      padding: 0.5rem 0;
-      min-width: 180px;
-      box-shadow: 0 2px 10px var(--shadow-color);
-      display: none;
-      z-index: 100;
-    }
-
-    .profile-dropdown:hover .profile-dropdown-menu {
-      display: block;
-    }
-
-    .dropdown-item {
-      padding: 0.5rem 1rem;
-      display: block;
-      color: var(--text-secondary);
-      text-decoration: none;
-      transition: all 0.3s ease;
-    }
-
-    .dropdown-item:hover {
-      background-color: var(--hover-bg);
-      color: var(--accent-color);
-    }
-
-    /* Content Area */
-    .content-area {
-      padding: 2rem;
-      flex: 1;
-      overflow-y: auto;
-    }
-
-    .action-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1.5rem;
-    }
-
-    .section-title {
-      font-size: 1.25rem;
-      font-weight: 500;
-      color: var(--accent-color);
-    }
-
-    .add-product-btn {
-      background-color: var(--accent-color);
-      color: var(--bg-primary);
-      padding: 0.75rem 1.25rem;
-      border: none;
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .add-product-btn:hover {
-      background-color: #c5b393;
-      transform: translateY(-2px);
-    }
-
-    /* Table Styles */
-    .table-container {
-      background-color: var(--bg-secondary);
-      border-radius: 8px;
-      padding: 1.5rem;
-      margin-bottom: 2rem;
-      overflow-x: auto;
-      box-shadow: 0 2px 6px rgb(129 83 50 / 49%);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    th {
-      text-align: left;
-      padding: 1rem;
-      background-color: var(--bg-primary);
-      color: var(--text-primary);
-      font-weight: 500;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    td {
-      padding: 1rem;
-      border-bottom: 1px solid var(--border-color);
-      color: var(--text-secondary);
-    }
-
-    tr:hover {
-      background-color: var(--hover-bg);
-    }
-
-    .product-image {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      object-fit: cover;
-    }
-
-    /* Status Badges */
-    .status-listed {
-      background-color: rgba(76, 175, 80, 0.2);
-      color: var(--status-active);
-      padding: 0.4rem 0.8rem;
-      border-radius: 12px;
-      font-size: 0.85rem;
-      font-weight: 500;
-      display: inline-block;
-    }
-
-    .status-unlisted {
-      background-color: rgba(244, 67, 54, 0.2);
-      color: var(--status-inactive);
-      padding: 0.4rem 0.8rem;
-      border-radius: 12px;
-      font-size: 0.85rem;
-      font-weight: 500;
-      display: inline-block;
-    }
-
-    /* Action Buttons */
-    .action-buttons {
-      display: flex;
-      gap: 0.5rem;
-      align-items: center;
-    }
-
-    .action-btn {
-      padding: 0.5rem;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 32px;
-      height: 32px;
-      background: transparent;
-      color: var(--text-secondary);
-    }
-
-    .edit-btn {
-      background-color: rgba(218, 198, 164, 0.2);
-      color: var(--accent-color);
-    }
-
-    .edit-btn:hover {
-      background-color: rgba(218, 198, 164, 0.3);
-      transform: translateY(-1px);
-    }
-
-    .list-btn {
-      background-color: rgba(76, 175, 80, 0.2);
-      color: var(--status-active);
-    }
-
-    .list-btn:hover {
-      background-color: rgba(76, 175, 80, 0.3);
-      transform: translateY(-1px);
-    }
-
-    .unlist-btn {
-      background-color: rgba(244, 67, 54, 0.2);
-      color: var(--status-inactive);
-    }
-
-    .unlist-btn:hover {
-      background-color: rgba(244, 67, 54, 0.3);
-      transform: translateY(-1px);
-    }
-
-    .offer-price {
-      font-weight: 500;
-      color: var(--accent-color);
-    }
-
-    .offer-btn {
-      background-color: var(--accent-color);
-      color: var(--bg-primary);
-      padding: 0.5rem 0.75rem;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .offer-btn:hover {
-      background-color: #c5b393;
-      transform: translateY(-1px);
-    }
-
-    .delete-btn {
-      background-color: rgba(244, 67, 54, 0.2);
-      color: #f44336;
-    }
-
-    .delete-btn:hover {
-      background-color: rgba(244, 67, 54, 0.3);
-      transform: translateY(-1px);
-    }
-
-    /* Pagination */
-    .pagination {
-      display: flex;
-      justify-content: flex-end;
-      gap: 0.5rem;
-      margin-top: 1.5rem;
-      align-items: center;
-    }
-
-    .page-btn {
-      width: 36px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 4px;
-      border: 1px solid var(--border-color);
-      background-color: var(--bg-secondary);
-      color: var(--text-secondary);
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-decoration: none;
-    }
-
-    .page-btn:hover:not(.active):not(:disabled) {
-      background-color: var(--accent-color);
-      color: var(--bg-primary);
-      border-color: var(--accent-color);
-      text-decoration: none;
-    }
-
-    .page-btn.active {
-      background-color: var(--accent-color);
-      color: var(--bg-primary);
-      border-color: var(--accent-color);
-    }
-
-    .page-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      text-decoration: none;
-    }
-
-    /* Responsive Design */
-    @media (max-width: 1024px) {
-      .sidebar {
-        width: 240px;
-      }
-      .main-content {
-        margin-left: 240px;
-      }
-    }
-
-    @media (max-width: 768px) {
-      .sidebar {
-        transform: translateX(-100%);
-        position: fixed;
-        z-index: 1000;
-      }
-      .sidebar.active {
-        transform: translateX(0);
-      }
-      .main-content {
-        margin-left: 0;
-      }
-      .mobile-menu-btn {
-        display: block;
-      }
-      .search-bar {
-        min-width: 150px;
-      }
-      .profile-name {
-        display: none;
-      }
-    }
-  </style>
 </head>
 
 <body class="dashboard">
@@ -591,6 +18,9 @@
     <ul class="nav-menu">
       <li class="nav-item">
         <a href="/admin/dashboard" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
+      </li>
+       <li class="nav-item">
+        <a href="/admin/sales-report" class="nav-link"><i class="fas fa-chart-line"></i> Sales Report</a>
       </li>
       <li class="nav-item">
         <a href="/admin/product" class="nav-link active"><i class="fas fa-box"></i> Product</a>
@@ -696,10 +126,18 @@
                   <%= data[i].category ? data[i].category.name : 'No Category' %>
                 </td>
                 <td>
-                  $<%= data[i] && data[i].price ? data[i].price.toFixed(2) : '0.00' %>
+                  <% if (data[i].salePrice && data[i].salePrice < data[i].regularPrice) { %>
+                    <span style="text-decoration: line-through; color: var(--text-secondary);">₹<%= data[i].regularPrice.toFixed(2) %></span>
+                    <br>
+                    <span style="color: var(--accent-color);">₹<%= data[i].salePrice.toFixed(2) %></span>
+                  <% } else { %>
+                    ₹<%= data[i].regularPrice.toFixed(2) %>
+                  <% } %>
                 </td>
                 <td>
                   <% if (data[i] && data[i].productOffer && data[i].productOffer.active) { %>
+                    <span class="badge badge-success">Active</span>
+                  <% } else if (data[i] && data[i].offer && data[i].offer.isActive) { %>
                     <span class="badge badge-success">Active</span>
                   <% } else { %>
                     <span class="badge badge-secondary">Inactive</span>
@@ -710,7 +148,13 @@
                     <% if (data[i].productOffer.discountType === 'percentage') { %>
                       <%= data[i].productOffer.discountValue %>%
                     <% } else { %>
-                      $<%= data[i].productOffer.discountValue.toFixed(2) %>
+                      ₹<%= data[i].productOffer.discountValue.toFixed(2) %>
+                    <% } %>
+                  <% } else if (data[i] && data[i].offer && data[i].offer.isActive) { %>
+                    <% if (data[i].offer.discountType === 'percentage') { %>
+                      <%= data[i].offer.discountValue %>%
+                    <% } else { %>
+                      ₹<%= data[i].offer.discountValue.toFixed(2) %>
                     <% } %>
                   <% } else { %>
                     -
@@ -719,12 +163,14 @@
                 <td>
                   <% if (data[i] && data[i].productOffer && data[i].productOffer.active) { %>
                     <%= new Date(data[i].productOffer.endDate).toLocaleDateString() %>
+                  <% } else if (data[i] && data[i].offer && data[i].offer.isActive) { %>
+                    <%= new Date(data[i].offer.endDate).toLocaleDateString() %>
                   <% } else { %>
                     -
                   <% } %>
                 </td>
                 <td>
-                  <%= data[i].quantity %>
+                  <%= data[i].quantity || data[i].productStock || 0 %>
                 </td>
                 <td>
                   <% if (data[i].isListed) { %>

@@ -290,28 +290,60 @@
         }
 
         /* Wallet Section */
-        .wallet-balance-card {
-            background: linear-gradient(135deg, #242424 0%, #1e1e1e 100%);
-            border-radius: 10px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            border: 1px solid var(--border-color);
-            position: relative;
-            overflow: hidden;
-        }
+       .wallet-balance-card {
+    background: linear-gradient(135deg, #242424 0%, #1e1e1e 100%);
+    border-radius: 10px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border-color);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    will-change: transform;
+}
 
-        .wallet-balance-card::before {
-            content: '';
-            position: absolute;
-            top: -20px;
-            right: -20px;
-            width: 100px;
-            height: 100px;
-            background-color: var(--accent-color);
-            opacity: 0.1;
-            border-radius: 50%;
-        }
+.wallet-balance-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Shine Effect */
+.wallet-balance-card::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transform: rotate(25deg);
+    opacity: 0;
+    transition: opacity 0.4s ease, transform 0.8s ease;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.wallet-balance-card:hover::after {
+    opacity: 1;
+    transform: translateX(100%) rotate(25deg);
+}
+
+/* Optional: the original dot-circle remains as soft background element */
+.wallet-balance-card::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    width: 100px;
+    height: 100px;
+    background-color: var(--accent-color);
+    opacity: 0.1;
+    border-radius: 50%;
+    z-index: 0;
+}
+
+        
 
         .wallet-balance-card h2 {
             font-family: 'Aboreto', cursive;
@@ -351,14 +383,15 @@
             gap: 0.5rem;
         }
 
-        .primary-btn {
+          .primary-btn {
             background-color: var(--accent-color);
-            color: #121212;
+            color: var(--dark-bg);
         }
 
         .primary-btn:hover {
             background-color: #d4b47c;
-            transform: translateY(-2px);
+              transform: scale(1);
+    box-shadow: 0 3px 5px #c5a3677e;
         }
 
         .secondary-btn {
@@ -500,6 +533,15 @@
         .custom-toast .toast-close:hover {
             opacity: 1;
         }
+           tbody tr:hover {
+        background-color: #000;
+        color: #fff;
+        transition: background-color 0.3s ease;
+    }
+
+    tbody tr {
+        transition: background-color 0.3s ease;
+    }
     </style>
 </head>
 <body>
@@ -603,19 +645,10 @@
                 <!-- Wallet Balance Card -->
                 <div class="wallet-balance-card">
                     <h2>Current Balance</h2>
-                    <div class="balance-amount">$<%= (wallet && wallet.balance) ? wallet.balance.toFixed(2) : '0.00' %></div>
-                    <p>Available for purchases and withdrawals</p>
+                    <div class="balance-amount">₹<%= (wallet && wallet.balance) ? wallet.balance.toFixed(2) : '0.00' %></div>
+                    <p>Available for purchases</p>
                     
-                    <div class="wallet-actions">
-                        <button class="wallet-btn primary-btn">
-                            <i class="fas fa-plus"></i>
-                            Add Funds
-                        </button>
-                        <button class="wallet-btn secondary-btn">
-                            <i class="fas fa-exchange-alt"></i>
-                            Transfer
-                        </button>
-                    </div>
+                   
                 </div>
 
                 <!-- Transactions History -->
@@ -652,7 +685,7 @@
                                         <td><%= transaction && transaction.createdAt ? new Date(transaction.createdAt).toLocaleDateString() : 'N/A' %></td>
                                         <td class="transaction-amount <%= transaction && transaction.type === 'CREDIT' ? 'credit' : 'debit' %>">
                                             <% if (transaction && transaction.type === 'CREDIT') { %>+<% } else { %>-<% } %>
-                                            $<%= transaction && transaction.amount ? transaction.amount.toFixed(2) : '0.00' %>
+                                            ₹<%= transaction && transaction.amount ? transaction.amount.toFixed(2) : '0.00' %>
                                         </td>
                                     </tr>
                                 <% }); %>

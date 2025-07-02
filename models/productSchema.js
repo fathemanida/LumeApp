@@ -103,9 +103,16 @@ const productSchema = new Schema(
       type: Date,
       default: Date.now,
     },
+    
   },
   { timestamps: true }
 );
+productSchema.virtual('offer', {
+  ref: 'Offer',
+  localField: '_id',
+  foreignField: 'products',
+  justOne: true
+});
 
 const Product = mongoose.model("Product", productSchema);
 

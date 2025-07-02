@@ -7,230 +7,9 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600&family=Aboreto&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" href="/css/admin/product.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
-  <style>
-    :root {
-      --dark-brown: #291d0e;
-      --olive-green: #314216;
-      --light-bg: #f8f5f2;
-      --border-color: #d3c9be;
-      --error: #e74c3c;
-    }
 
-    html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      font-family: 'Jost', sans-serif;
-    }
-
-    .bg-light-bg { background-color: var(--light-bg); }
-    .bg-white { background-color: #ffffff; }
-    .rounded-lg { border-radius: 8px; }
-    .shadow-lg { box-shadow: 0 5px 25px rgba(41, 29, 14, 0.08); }
-    .max-w-5xl { max-width: 64rem; }
-    .mx-auto { margin-left: auto; margin-right: auto; }
-    .min-h-screen { min-height: 100vh; }
-    .p-6 { padding: 1.5rem; }
-    .text-2xl { font-size: 1.5rem; }
-    .font-aboreto { font-family: 'Aboreto', cursive; }
-    .text-dark-brown { color: var(--dark-brown); }
-    .mb-6 { margin-bottom: 1.5rem; }
-    .text-center { text-align: center; }
-    .uppercase { text-transform: uppercase; }
-    .letter-spacing-1-5 { letter-spacing: 1.5px; }
-    .grid { display: grid; }
-    .grid-cols-1 { grid-template-columns: 1fr; }
-    .md\\:grid-cols-2 { @media (min-width: 768px) { grid-template-columns: repeat(2, 1fr); } }
-    .gap-6 { gap: 1.5rem; }
-    .gap-4 { gap: 1rem; }
-    .md\\:col-span-1 { @media (min-width: 768px) { grid-column: span 1; } }
-    .md\\:col-span-2 { @media (min-width: 768px) { grid-column: span 2; } }
-    .block { display: block; }
-    .mb-2 { margin-bottom: 0.5rem; }
-    .mb-1 { margin-bottom: 0.25rem; }
-    .font-jost { font-family: 'Jost', sans-serif; }
-    .font-medium { font-weight: 500; }
-    .text-sm { font-size: 0.875rem; }
-    .flex { display: flex; }
-    .relative { position: relative; }
-    .w-24 { width: 6rem; }
-    .h-24 { height: 6rem; }
-    .border-2 { border-width: 2px; }
-    .border-dashed { border-style: dashed; }
-    .border-border-color { border-color: var(--border-color); }
-    .bg-light-bg { background-color: var(--light-bg); }
-    .items-center { align-items: center; }
-    .justify-center { justify-content: center; }
-    .form-control { position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
-    .cursor-pointer { cursor: pointer; }
-    .absolute { position: absolute; }
-    .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
-    .w-full { width: 100%; }
-    .h-full { height: 100%; }
-    .object-cover { object-fit: cover; }
-    .hidden { display: none; }
-    .form-hint { font-size: 0.8rem; color: var(--dark-brown); opacity: 0.7; margin-top: 0.25rem; }
-    .thumbnail { position: relative; display: inline-block; }
-    .thumbnail img { width: 50px; height: auto; border-radius: 4px; }
-    .remove-icon { position: absolute; top: -5px; right: -5px; background: var(--error); color: #ffffff; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1rem; }
-    .fixed { position: fixed; }
-    .bg-dark-brown { background-color: var(--dark-brown); }
-    .bg-opacity-50 { background-color: rgba(41, 29, 14, 0.5); }
-    .z-50 { z-index: 50; }
-    .text-xl { font-size: 1.25rem; }
-    .mb-4 { margin-bottom: 1rem; }
-    .mt-4 { margin-top: 1rem; }
-    .justify-end { justify-content: flex-end; }
-    .gap-2 { gap: 0.5rem; }
-    .text-white { color: #ffffff; }
-    .px-4 { padding-left: 1rem; padding-right: 1rem; }
-    .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
-    .rounded { border-radius: 0.25rem; }
-    .p-4 { padding: 1rem; }
-    .p-2 { padding: 0.5rem; }
-    .border-b { border-bottom: 1px solid; }
-    .bg-transparent { background-color: transparent; }
-    .focus\\:border-dark-brown:focus { border-color: var(--dark-brown); }
-    .outline-none { outline: none; }
-    .flex-col { flex-direction: column; }
-    .mt-1 { margin-top: 0.25rem; }
-    .mt-2 { margin-top: 0.5rem; }
-    .error-message { color: var(--error); font-size: 0.8rem; margin-top: 0.25rem; display: none; }
-    .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
-    .mt-5 { margin-top: 1.25rem; }
-    .letter-spacing-0-8 { letter-spacing: 0.8px; }
-    .hover\\:bg-olive-green:hover { background-color: var(--olive-green); }
-    .hover\\:text-white:hover { color: #ffffff; }
-    .transition-all { transition: all 0.3s ease; }
-    .transition-opacity { transition: opacity 0.3s ease; }
-    .accent-dark-brown { accent-color: var(--dark-brown); }
-    .mr-1 { margin-right: 0.25rem; }
-    .size-tag { background-color: var(--dark-brown); color: #ffffff; padding: 0.25rem 0.5rem; border-radius: 4px; display: flex; align-items: center; gap: 0.5rem; }
-    .size-tag .remove-size { cursor: pointer; font-size: 0.8rem; }
-    .flex-wrap { flex-wrap: wrap; }
-    .w-1\\/2 { width: 50%; }
-
-    /* Improved Image CSS */
-    .image-container { 
-      position: relative; 
-      width: 6rem; 
-      height: 6rem; 
-      border: 2px dashed var(--border-color); 
-      border-radius: 8px; 
-      background: var(--light-bg); 
-      overflow: hidden; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-    }
-    .image-container img { 
-      width: 100%; 
-      height: 100%; 
-      object-fit: cover; 
-      border-radius: 6px; 
-    }
-    .image-container .hover-overlay { 
-      position: absolute; 
-      inset: 0; 
-      background: rgba(41, 29, 14, 0.5); 
-      opacity: 0; 
-      transition: opacity 0.3s ease; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-    }
-    .image-container:hover .hover-overlay { 
-      opacity: 1; 
-    }
-    .image-container .upload-label { 
-      cursor: pointer; 
-      padding: 0.5rem; 
-      background: rgba(255, 255, 255, 0.8); 
-      border-radius: 50%; 
-      transition: background 0.3s ease; 
-    }
-    .image-container .upload-label:hover { 
-      background: rgba(255, 255, 255, 1); 
-    }
-    .image-container .upload-icon { 
-      color: var(--dark-brown); 
-      font-size: 1.25rem; 
-    }
-    .image-container .plus-icon { 
-      color: var(--dark-brown); 
-      font-size: 1.5rem; 
-    }
-
-    /* Improved Crop Modal CSS */
-    #cropModal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(41, 29, 14, 0.5);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-      padding: 1rem;
-      overflow-y: auto;
-    }
-    #cropModal .modal-content {
-      background: #ffffff;
-      padding: 1.5rem;
-      border-radius: 8px;
-      width: 100%;
-      max-width: 500px;
-      max-height: 90vh;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-      overflow: hidden;
-    }
-    #cropModal .crop-image-container {
-      max-height: 50vh;
-      width: 100%;
-      overflow: hidden;
-    }
-    #cropModal img#cropImage {
-      max-height: 50vh;
-      width: 100%;
-      object-fit: contain;
-    }
-    #cropModal .modal-footer {
-      margin-top: 1rem;
-      display: flex;
-      justify-content: flex-end;
-      gap: 0.5rem;
-      padding-top: 0.5rem;
-    }
-    #cropModal button {
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
-      font-family: 'Jost', sans-serif;
-      font-size: 0.875rem;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-
-    @media (max-width: 768px) {
-      .md\\:col-span-1, .md\\:col-span-2 { grid-column: span 1; }
-      #cropModal .modal-content {
-        width: 95%;
-        max-height: 95vh;
-      }
-      #cropModal .crop-image-container,
-      #cropModal img#cropImage {
-        max-height: 45vh;
-      }
-      .image-container { 
-        width: 5rem; 
-        height: 5rem; 
-      }
-    }
-  </style>
 </head>
 <body>
   <div class="bg-light-bg p-6 min-h-screen">
@@ -355,7 +134,7 @@
             <label class="block mb-1 font-jost text-dark-brown font-medium text-sm">Stock Count:</label>
             <input type="number" name="quantity" id="quantity"
               class="w-full p-2 border-b border-border-color bg-transparent text-dark-brown font-jost focus:border-dark-brown outline-none"
-              min="0" readonly value="<%= product.quantity %>">
+              min="0" value="<%= product.quantity %>">
             <div id="quantity-error" class="error-message text-dark-brown text-sm mt-1"></div>
           </div>
           <div class="flex flex-col">
@@ -443,6 +222,7 @@
     const enableOfferCheckbox = document.getElementById("enable-offer");
     const offerForm = document.getElementById("offer-form");
     let isSubmitting = false;
+    let editIndex = null;
 
     function handleSingleImageUpload(event, index) {
       const file = event.target.files[0];
@@ -624,7 +404,11 @@
     function initializeSizes() {
       const selectedOption = categorySelect.options[categorySelect.selectedIndex];
       const categoryName = selectedOption ? selectedOption.getAttribute("data-name") : "";
-      if (["Ring", "Necklace", "Bracelet", "Earring"].includes(categoryName)) {
+      // Always show sizes if product already has sizes
+      if (selectedSizes.length > 0) {
+        dynamicSizesSection.style.display = "block";
+        updateSizesList();
+      } else if (["Ring", "Necklace", "Bracelet", "Earring"].includes(categoryName)) {
         dynamicSizesSection.style.display = "block";
         updateSizesList();
       }
@@ -649,6 +433,44 @@
       }
     });
 
+    function updateSizesList() {
+      sizesList.innerHTML = "";
+      let totalQuantity = 0;
+
+      selectedSizes.forEach((item, index) => {
+        const sizeTag = document.createElement("div");
+        sizeTag.classList.add("size-tag");
+        sizeTag.innerHTML = `
+          <span class="size-value">${item.size} (${item.quantity})</span>
+          <span class="remove-size">×</span>
+        `;
+        // Edit on click
+        sizeTag.querySelector(".size-value").addEventListener("click", () => {
+          sizeInput.value = item.size;
+          sizeQuantityInput.value = item.quantity;
+          editIndex = index;
+          addSizeBtn.textContent = "Update";
+        });
+        // Remove
+        sizeTag.querySelector(".remove-size").addEventListener("click", () => {
+          selectedSizes.splice(index, 1);
+          updateSizesList();
+          if (editIndex === index) {
+            sizeInput.value = "";
+            sizeQuantityInput.value = "";
+            editIndex = null;
+            addSizeBtn.textContent = "Add";
+          }
+        });
+        sizesList.appendChild(sizeTag);
+        totalQuantity += Number(item.quantity) || 0;
+      });
+
+      stockInput.value = totalQuantity > 0 ? totalQuantity : 0;
+      sizesInput.value = JSON.stringify(selectedSizes);
+      console.log("Total quantity updated:", totalQuantity);
+    }
+
     addSizeBtn.addEventListener("click", function() {
       const size = sizeInput.value.trim();
       const quantity = parseInt(sizeQuantityInput.value.trim() || 0);
@@ -669,41 +491,27 @@
         return;
       }
 
-      if (!selectedSizes.some(item => item.size === size)) {
-        selectedSizes.push({ size, quantity });
-        updateSizesList();
-        console.log("Size and quantity added:", size, quantity);
+      if (editIndex !== null) {
+        // Prevent duplicate size on update
+        if (selectedSizes.some((item, idx) => item.size === size && idx !== editIndex)) {
+          displayErrorMessage("sizes-error", "This size is already added");
+          return;
+        }
+        selectedSizes[editIndex] = { size, quantity };
+        editIndex = null;
+        addSizeBtn.textContent = "Add";
       } else {
-        displayErrorMessage("sizes-error", "This size is already added");
+        if (!selectedSizes.some(item => item.size === size)) {
+          selectedSizes.push({ size, quantity });
+        } else {
+          displayErrorMessage("sizes-error", "This size is already added");
+          return;
+        }
       }
+      updateSizesList();
       sizeInput.value = "";
       sizeQuantityInput.value = "";
     });
-
-    function updateSizesList() {
-      sizesList.innerHTML = "";
-      let totalQuantity = 0;
-
-      selectedSizes.forEach((item, index) => {
-        const sizeTag = document.createElement("div");
-        sizeTag.classList.add("size-tag");
-        sizeTag.innerHTML = `
-          <span>${item.size} (${item.quantity})</span>
-          <span class="remove-size">×</span>
-        `;
-        sizeTag.querySelector(".remove-size").addEventListener("click", () => {
-          selectedSizes.splice(index, 1);
-          updateSizesList();
-          console.log("Size removed:", item.size);
-        });
-        sizesList.appendChild(sizeTag);
-        totalQuantity += Number(item.quantity) || 0;
-      });
-
-      stockInput.value = totalQuantity > 0 ? totalQuantity : 0;
-      sizesInput.value = JSON.stringify(selectedSizes);
-      console.log("Total quantity updated:", totalQuantity);
-    }
 
     enableOfferCheckbox.addEventListener("change", function() {
       console.log("Enable offer checkbox changed:", enableOfferCheckbox.checked);
@@ -871,8 +679,8 @@
         console.log("Validation failed: Invalid image types");
       }
 
-      if (salePrice && parseFloat(salePrice) >= parseFloat(regularPrice)) {
-        displayErrorMessage("salePrice-error", "Sale price must be less than regular price");
+      if (salePrice && parseFloat(salePrice) > parseFloat(regularPrice)) {
+        displayErrorMessage("salePrice-error", "Sale price must be less than or equal to regular price");
         isValid = false;
         console.log("Validation failed: Invalid sale price");
       }

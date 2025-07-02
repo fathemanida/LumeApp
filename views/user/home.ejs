@@ -16,7 +16,6 @@
       --dark-brown: #291d0e;
       --olive-green: #314216;
       --light-bg: #f0e9e0;
-      /* Darkened background */
       --border-color: #d3c9be;
       --soft-beige: #D4B996;
       --muted-green: #A9BA9D;
@@ -222,7 +221,7 @@
 
     .hero-img {
       transition: transform 0.3s ease, box-shadow 0.3s ease;
-      width: 50%;
+      width: 100%;
       height: 500px;
       object-fit: cover;
     }
@@ -285,8 +284,8 @@
 
     .offer-badge {
       position: absolute;
-      bottom: 158px;
-      right: 22px;
+      top: 10px;
+      right: 10px;
       background-color: #603a10;
       color: white;
       font-family: 'Jost', sans-serif;
@@ -383,8 +382,8 @@
     /* Badges */
     .new-badge {
       position: absolute;
-      top: 23px;
-      left: 23px;
+      top: 10px;
+      left: 10px;
       background-color: var(--muted-green);
       color: white;
       font-family: 'Jost', sans-serif;
@@ -392,21 +391,6 @@
       padding: 0.3rem 0.6rem;
       border-radius: 12px;
       text-transform: uppercase;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .offer-badge {
-      position: absolute;
-      bottom: 158px;
-      right: 22px;
-      background-color: #603a10;
-      color: white;
-      font-family: 'Jost', sans-serif;
-      font-size: 0.65rem;
-      padding: 0.3rem 0.6rem;
-      border-radius: 12px;
-      text-transform: uppercase;
-      z-index: 2;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
@@ -439,7 +423,7 @@
       font-size: 0.9rem;
       padding: 0.6rem 1rem;
       border-radius: 8px;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      transitionunion: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       margin-top: 0.5rem;
       box-shadow: 0 2px 8px rgba(121, 137, 109, 0.2);
       position: relative;
@@ -642,8 +626,15 @@
 
     /* Main Content Container */
     .main-content-container {
-      padding-left: 5.5rem;
-      padding-right: 5.5rem;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    @media (min-width: 576px) {
+      .main-content-container {
+        padding-left: 2rem;
+        padding-right: 2rem;
+      }
     }
 
     @media (min-width: 768px) {
@@ -743,23 +734,23 @@
     }
 
     .carousel-caption {
-      background: rgba(0, 0, 0, 0.5);
-      padding: 2rem;
+      padding: 1rem 2rem;
       border-radius: 8px;
-      max-width: 600px;
+      max-width: 100%;
       margin: 0 auto;
+      bottom: 10%;
     }
 
     .carousel-caption h2 {
       font-family: 'Aboreto', cursive;
-      font-size: 2.5rem;
+      font-size: clamp(1.5rem, 5vw, 2.5rem);
       margin-bottom: 1rem;
       color: white;
     }
 
     .carousel-caption p {
       font-family: 'Jost', sans-serif;
-      font-size: 1.2rem;
+      font-size: clamp(0.9rem, 3vw, 1.2rem);
       color: white;
     }
 
@@ -779,7 +770,6 @@
 
     .carousel-control-prev-icon,
     .carousel-control-next-icon {
-      background-color: var(--dark-brown);
       padding: 1.5rem;
       border-radius: 50%;
     }
@@ -790,7 +780,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background-color: rgba(0, 0, 0, 0.4);
+      background-color: rgba(0, 0, 0, 0.447);
       z-index: 1;
     }
 
@@ -802,7 +792,7 @@
 
     .banner-title {
       font-family: 'Aboreto', cursive;
-      font-size: 4rem;
+      font-size: clamp(2rem, 8vw, 4rem);
       color: white;
       text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
       margin-bottom: 1rem;
@@ -810,7 +800,7 @@
 
     .quote-text {
       font-family: 'Jost', sans-serif;
-      font-size: 1.5rem;
+      font-size: clamp(1rem, 4vw, 1.5rem);
       color: white;
       text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     }
@@ -843,11 +833,180 @@
       color: white;
       border-color: var(--muted-green);
     }
+
+    /* Responsive Adjustments */
+    @media (max-width: 576px) {
+      .hero-img {
+        height: 300px;
+      }
+      .product-card {
+        padding: 0.3rem;
+      }
+      .product-title {
+        font-size: 1rem;
+      }
+      .product-price .discounted-price {
+        font-size: 1rem;
+      }
+      .search-input {
+        width: 150px;
+      }
+      .search-input:focus {
+        width: 180px;
+      }
+      .banner-section {
+        margin-bottom: 2rem;
+      }
+      /* Show two cards per row on phones */
+      .row.row-cols-1 > .col,
+      .row.row-cols-1.row-cols-sm-2 > .col {
+        flex: 0 0 50%;
+        max-width: 50%;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .row-cols-sm-3 > .col {
+        flex: 0 0 50%;
+        max-width: 50%;
+      }
+
+      .sidebar {
+        width: 250px;
+        left: -250px;
+      }
+
+      .spotlight-highlight .spotlight-details-col .d-flex {
+        align-items: center !important;
+        text-align: center !important;
+      }
+    }
+
+    @media (max-width: 992px) {
+      .row-cols-md-4 > .col {
+        flex: 0 0 50%;
+        max-width: 50%;
+      }
+    }
+
+    /* Spotlight Product Highlight */
+    .spotlight-highlight {
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      justify-content: center;
+      background: linear-gradient(120deg, #fffbe6 60%, #f9e7c4 100%);
+      border-radius: 18px;
+      box-shadow: 0 12px 48px 0 rgba(41,29,14,0.18), 0 2.5px 16px 0 rgba(169,186,157,0.15), 0 0 60px 10px rgba(255,215,130,0.08);
+      overflow: hidden;
+      position: relative;
+      margin-bottom: 2rem;
+      min-height: 480px;
+      transition: box-shadow 0.3s, min-height 0.3s;
+    }
+    .spotlight-highlight .spotlight-img-col {
+      flex: 1 1 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f7f3ea;
+      position: relative;
+      min-width: 0;
+      min-height: 480px;
+    }
+    .spotlight-highlight .spotlight-img-col img {
+      max-width: 100%;
+      max-height: 420px;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(41,29,14,0.10);
+      position: relative;
+      z-index: 2;
+    }
+    .spotlight-highlight .spotlight-details-col {
+      flex: 1 1 50%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 2.5rem 2rem;
+      background: transparent;
+      min-width: 0;
+    }
+    .spotlight-highlight .product-title {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    .spotlight-highlight .product-category {
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      color: var(--muted-green);
+    }
+    .spotlight-highlight .product-price {
+      font-size: 1.3rem;
+      margin-bottom: 1.2rem;
+    }
+    .spotlight-highlight .btn {
+      font-size: 1.1rem;
+      padding: 0.7rem 2.2rem;
+      margin-top: 1.2rem;
+    }
+    .spotlight-highlight .offer-badge, .spotlight-highlight .new-badge {
+      position: static;
+      margin-right: 0.7rem;
+      margin-bottom: 0.7rem;
+      display: inline-block;
+    }
+    .spotlight-highlight .wishlist-icon {
+      position: absolute;
+      top: 39px;
+      right: 100px;
+      z-index: 3;
+      background: rgba(255,255,255,0.95);
+      padding: 0.7rem;
+      border-radius: 50%;
+      font-size: 1.5rem;
+      box-shadow: 0 2px 8px rgba(41,29,14,0.10);
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+    .spotlight-highlight .wishlist-icon:hover {
+      color: #ff6b6b;
+      transform: scale(1.1);
+      background: #fff7e0;
+      box-shadow: 0 4px 16px rgba(41,29,14,0.15);
+    }
+    /* Shining effect */
+    .spotlight-shine {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+      background: linear-gradient(120deg, rgba(255,255,255,0.0) 60%, rgba(255,255,255,0.5) 80%, rgba(255,255,255,0.0) 100%);
+      animation: shine-move 2.5s infinite linear;
+      z-index: 1;
+    }
+    @keyframes shine-move {
+      0% { background-position: -200px 0; }
+      100% { background-position: 400px 0; }
+    }
+    @media (max-width: 768px) {
+      .spotlight-highlight {
+        flex-direction: column;
+        min-height: unset;
+      }
+      .spotlight-highlight .spotlight-img-col, .spotlight-highlight .spotlight-details-col {
+        padding: 1.2rem 1rem;
+        min-height: unset;
+      }
+      .spotlight-highlight .spotlight-details-col {
+        padding-top: 0;
+      }
+      .spotlight-highlight .wishlist-icon {
+        top: 12px;
+        right: 12px;
+      }
+    }
   </style>
 </head>
 
 <body>
-  <!-- Rest of your HTML content remains the same -->
   <!-- Overlay -->
   <div class="overlay" id="overlay"></div>
 
@@ -875,13 +1034,11 @@
           Sort By <i class="fas fa-chevron-down"></i>
         </div>
         <div class="sidebar-items">
-
           <div class="sidebar-item">Price: Low to High</div>
           <div class="sidebar-item">Price: High to Low</div>
           <div class="sidebar-item">A-Z</div>
           <div class="sidebar-item">Z-A</div>
           <div class="sidebar-item">Newest First</div>
-
         </div>
       </div>
 
@@ -901,602 +1058,659 @@
   <!-- Navbar -->
   <%- include("../../views/partials/user/header") %>
 
-    <!-- Banner Section -->
-    <div class="banner-section">
-      <div class="position-relative">
-        <div class="overlay-dark"></div>
-        <img src="/uploads/images/f1a46c99ca2102a14e3bf1112213ca1b.jpg" class="d-block w-100" alt="LUME"
-          style="height: 600px; object-fit: cover;">
-        <div class="carousel-caption">
-          <h1 class="banner-title">LUME</h1>
-          <p class="quote-text">"Where elegance meets timeless beauty"</p>
+  <!-- Banner Section -->
+  <div class="banner-section">
+    <div id="bannerCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
+      <div class="carousel-indicators">
+        <button type="button" data-bs-target="#bannerCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+        <button type="button" data-bs-target="#bannerCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+        <button type="button" data-bs-target="#bannerCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+      </div>
+      <div class="carousel-inner">
+        <div class="carousel-item active">
+          <div class="overlay-dark"></div>
+          <img src="/Uploads/images/banner-1.png" class="d-block w-100 hero-img" alt="Banner 1"
+            style="height: clamp(300px, 50vw, 600px); object-fit: cover;">
+          <div class="carousel-caption">
+            <h1 class="banner-title">LUME</h1>
+            <p class="quote-text">"Where elegance meets timeless beauty"</p>
+          </div>
+        </div>
+        <div class="carousel-item">
+          <div class="overlay-dark"></div>
+          <img src="/Uploads/images/banner-2.png" class="d-block w-100 hero-img" alt="Banner 2"
+            style="height: clamp(300px, 50vw, 600px); object-fit: cover;">
+          <div class="carousel-caption">
+            <h1 class="banner-title">The Art of Less</h1>
+            <p class="quote-text">"Purity in form, perfection in simplicity. These anti-ornaments are not stripped down, but elevated — where every curve is considered, every line intentional. Less, here, is not absence — but essence."</p>
+          </div>
+        </div>
+        <div class="carousel-item">
+          <div class="overlay-dark"></div>
+          <img src="/Uploads/images/banner-3.png" class="d-block w-100 hero-img" alt="Banner 3"
+            style="height: clamp(300px, 50vw, 600px); object-fit: cover;">
+          <div class="carousel-caption">
+            <h1 class="banner-title">Echoes of Form </h1>
+            <p class="quote-text">"Minimalism made lyrical. This collection honors structure and silhouette, drawing inspiration from architecture, movement, and breath. Each piece — a study in refined proportion"</p>
+          </div>
         </div>
       </div>
+      <button class="carousel-control-prev" type="button" data-bs-target="#bannerCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#bannerCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
     </div>
+  </div>
 
-    <section class="text-center py-5" style="background-color: #f9f7f5;">
-      <h2 class="section-heading display-6">FEATURED</h2>
-      <p class="section-subtext mt-2">Explore our newest arrivals with timeless charm and elegance</p>
-    </section>
-
-    <section class="row row-cols-1 row-cols-sm-3 g-4 px-4 py-5">
-      <% if (featured && featured.length> 0) { %>
-        <% featured.forEach(product=> { %>
-          <div class="col">
-            <div class="product-card card text-center h-100" data-product-id="<%= product._id %>">
+  <!-- Spotlight Product Section -->
+  <section class="py-5 main-content-container" style="background-color: #f9f7f5;">
+    <h2 class="section-heading display-6 text-center">SPOTLIGHT PRODUCT</h2>
+    <p class="section-subtext mt-2 text-center">Discover our latest standout piece</p>
+    <div class="row justify-content-center">
+      <% if (spotlightProduct && spotlightProduct.length > 0) { %>
+        <div class="col-12">
+          <div class="spotlight-highlight position-relative">
+            <a href="/product-details?id=<%= spotlightProduct[0]._id %>" class="spotlight-img-col text-decoration-none" style="cursor:pointer; position:relative;">
+              <img src="/Uploads/product/<%= spotlightProduct[0].productImage[0] %>" alt="<%= spotlightProduct[0].productName %>" />
+              <% if (spotlightProduct[0].productImage[1]) { %>
+                <img src="/Uploads/product/<%= spotlightProduct[0].productImage[1] %>" class="product-img-secondary d-none d-md-block" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;opacity:0.15;z-index:1;" alt="<%= spotlightProduct[0].productName %> - Secondary View">
+              <% } %>
+              <span class="spotlight-shine"></span>
               <i class="far fa-heart wishlist-icon"
-                onclick="event.stopPropagation(); toggleWishlist(this, '<%= product._id %>')"></i>
-              <% if (product.offer) { %>
-                <span class="offer-badge">
-                  <% if (product.offer.discountType==='percentage' ) { %>
-                    <%= product.offer.discountValue %>% OFF
-                      <% } else { %>
-                        ₹<%= product.offer.discountValue %> OFF
-                          <% } %>
-                </span>
-                <% } %>
-                  <a href="/product-details?id=<%= product._id %>" class="text-decoration-none">
-                    <div class="product-image-container">
-                      <img src="/uploads/product/<%= product.productImage[0] %>" alt="<%= product.productName %>"
-                        class="product-img">
-                      <% if (product.productImage[1]) { %>
-                        <img src="/uploads/product/<%= product.productImage[1] %>" class="product-img-secondary"
-                          alt="<%= product.productName %> - Secondary View">
-                        <% } %>
-                    </div>
-                    <div class="product-info">
-                      <p class="product-title card-title">
-                        <%= product.productName %>
-                      </p>
-                      <% if (product.category?.name) { %>
-                        <p class="product-category">
-                          <%= product.category.name %>
-                        </p>
-                        <% } %>
-                          <div class="product-price">
-                            <% if (product.offer) { %>
-                              <span class="strike-price">₹<%= product.regularPrice.toLocaleString() %></span>
-                              <span class="discounted-price">
-                                ₹<%= product.offer.discountType==='percentage' ? (product.regularPrice -
-                                  (product.regularPrice * product.offer.discountValue / 100)).toFixed(2) :
-                                  (product.regularPrice - product.offer.discountValue).toFixed(2) %>
-                              </span>
-                              <% } else { %>
-                                <span class="regular-price">₹<%= product.regularPrice.toLocaleString() %></span>
-                                <% } %>
-                          </div>
-                          <% if (product.sizes && product.sizes.length> 0) { %>
-                            <div class="size-options">
-                              <% product.sizes.forEach(size=> { %>
-                                <button class="btn btn-sm size-btn"
-                                  onclick="event.stopPropagation(); selectSize(this, '<%= size.size %>', '<%= product._id %>')"
-                                  data-size="<%= size.size %>">
-                                  <%= size.size %>
-                                </button>
-                                <% }); %>
-                            </div>
-                            <% } %>
-                    </div>
-                  </a>
-                  <button class="btn w-100" onclick="event.stopPropagation(); addToCartWithSize('<%= product._id %>')">
-                    Add to Cart
-                  </button>
-            </div>
-          </div>
-          <% }) %>
-            <% } else { %>
-              <div class="col-12 text-center">
-                <p class="text-muted">No featured products available</p>
-              </div>
-              <% } %>
-    </section>
-
-    <!-- New Collection Banner -->
-    <section class="text-center py-5" style="background-color: #f9f7f5;">
-      <h2 class="section-heading display-6">NEW COLLECTION</h2>
-      <p class="section-subtext mt-2">Discover our curated selection of iconic pieces</p>
-    </section>
-
-    <section class="row row-cols-1 row-cols-sm-3 g-4 px-4 py-5">
-      <% if (newCollections && newCollections.length> 0) { %>
-        <% newCollections.forEach(product=> { %>
-          <div class="col">
-            <div class="product-card card text-center h-100">
-              <i class="far fa-heart wishlist-icon" onclick="toggleWishlist(this)"></i>
-              <% if (product.offer) { %>
-                <span class="position-absolute top-0 end-0 m-2 badge bg-danger">
-                  <% if (product.offer.discountType==='percentage' ) { %>
-                    <%= product.offer.discountValue %>%
-                      <% } else { %>
-                        ₹<%= product.offer.discountValue %> OFF
-                          <% } %>
-                </span>
-                <% } %>
-                  <a href="/product-details?id=<%= product._id %>" class="text-decoration-none">
-                    <div class="product-image-container">
-                      <img src="/uploads/product/<%= product.productImage[0] %>" alt="<%= product.productName %>"
-                        class="product-img">
-                      <% if (product.productImage[1]) { %>
-                        <img src="/uploads/product/<%= product.productImage[1] %>" class="product-img-secondary"
-                          alt="<%= product.productName %> - Secondary View">
-                        <% } %>
-                    </div>
-                    <span class="new-badge">New</span>
-                    <div class="product-info">
-                      <p class="product-title card-title">
-                        <%= product.productName %>
-                      </p>
-                      <% if (product.category?.name) { %>
-                        <p class="product-category">
-                          <%= product.category.name %>
-                        </p>
-                        <% } %>
-                           <div class="product-price">
-                            <% if (product.offer) { %>
-                              <span class="strike-price">₹<%= product.regularPrice.toLocaleString() %></span>
-                              <span class="discounted-price">
-                                ₹<%= product.offer.discountType==='percentage' ? (product.regularPrice -
-                                  (product.regularPrice * product.offer.discountValue / 100)).toFixed(2) :
-                                  (product.regularPrice - product.offer.discountValue).toFixed(2) %>
-                              </span>
-                              <% } else { %>
-                                <span class="regular-price">₹<%= product.regularPrice.toLocaleString() %></span>
-                                <% } %>
-                          </div>
-                    </div>
-                  </a>
-                  <button class="btn w-100" onclick="event.stopPropagation(); addToCart('<%= product._id %>')">
-                    Add to Cart
-                  </button>
-            </div>
-          </div>
-          <% }) %>
-            <% } else { %>
-              <div class="col-12 text-center">
-                <p class="text-muted">No new products available</p>
-              </div>
-              <% } %>
-    </section>
-
-    <!-- SELECT YOUR SPARKLE Banner -->
-    <div class="sparkle-banner text-center py-3 fs-4">SELECT YOUR SPARKLE</div>
-
-    <!-- Active Offers Section -->
-    <section class="text-center py-5" style="background-color: #f9f7f5;">
-      <h2 class="section-heading display-6">SPECIAL OFFERS</h2>
-      <p class="section-subtext mt-2">Exclusive deals and discounts for our valued customers</p>
-    </section>
-
-    <section class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4 px-4 py-5">
-      <% if (offers && offers.length> 0) { %>
-        <% offers.forEach(offer=> { %>
-          <div class="col">
-            <div class="product-card card text-center h-100">
-              <div class="product-info p-4">
-                <h3 class="product-title mb-3">
-                  <%= offer.name %>
-                </h3>
-                <div class="offer-details mb-3">
-                  <p class="mb-2">
-                    <strong>Code:</strong>
-                    <%= offer.code %>
-                  </p>
-                  <p class="mb-2">
-                    <strong>Discount:</strong>
-                    <% if (offer.discountType==='percentage' ) { %>
-                      <%= offer.discountValue %>%
-                        <% } else { %>
-                          ₹<%= offer.discountValue %>
-                            <% } %>
-                  </p>
-                  <p class="mb-2">
-                    <strong>Valid From:</strong>
-                    <%= new Date(offer.startDate).toLocaleDateString() %>
-                  </p>
-                  <p class="mb-2">
-                    <strong>Valid Until:</strong>
-                    <%= new Date(offer.endDate).toLocaleDateString() %>
-                  </p>
-                  <p class="mb-2">
-                    <strong>Applicable On:</strong>
-                    <% if (offer.applicableOn==='all' ) { %>
-                      All Products
-                      <% } else if (offer.applicableOn==='categories' ) { %>
-                        Selected Categories
-                        <% } else if (offer.applicableOn==='products' ) { %>
-                          Selected Products
-                          <% } %>
-                  </p>
-                  <% const currentDate=new Date(); const isActive=currentDate>= new Date(offer.startDate) && currentDate
-                    <= new Date(offer.endDate); %>
-                      <p class="mb-2">
-                        <strong>Status:</strong>
-                        <span class="<%= isActive ? 'text-success' : 'text-warning' %>">
-                          <%= isActive ? 'Active Now' : 'Coming Soon' %>
-                        </span>
-                      </p>
-                </div>
-                <div class="offer-actions">
-                  <a href="/products" class="btn w-100">Shop Now</a>
-                </div>
-              </div>
-            </div>
-          </div>
-          <% }) %>
-            <% } else { %>
-              <div class="col-12 text-center">
-                <p class="text-muted">No active offers available at the moment</p>
-              </div>
-              <% } %>
-    </section>
-
-    <!-- Product Categories -->
-    <section class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4 px-4 py-5">
-      <% if (category && category.length> 0) { %>
-        <% category.forEach(category=> { %>
-          <div class="col">
-            <a href="/filter?category=<%= category._id %>" class="text-decoration-none">
-              <div class="product-card card text-center h-100">
-                <% if (category.offer && category.offer.active) { %>
-                  <span class="position-absolute top-0 end-0 m-2 badge bg-danger">
-                    <% if (category.offer.discountType==='percentage' ) { %>
-                      <%= category.offer.discountValue %>%
-                        <% } else { %>
-                          ₹<%= category.offer.discountValue %> OFF
-                            <% } %>
-                  </span>
-                  <% } %>
-                    <div class="product-image-container">
-                      <img src="\uploads\category\<%= category.image %>" alt="<%= category.name %>" class="product-img">
-                    </div>
-                    <div class="product-info">
-                      <p class="product-title card-title">
-                        <%= category.name %>
-                      </p>
-                      <% if (category.offer && category.offer.active) { %>
-                        <p class="text-danger mb-0">
-                          <small>Category Offer Active</small>
-                        </p>
-                        <% } %>
-                    </div>
-              </div>
+                onclick="event.preventDefault(); event.stopPropagation(); toggleWishlist(this, '<%= spotlightProduct[0]._id %>')"></i>
             </a>
-          </div>
-          <% }) %>
-            <% } else { %>
-              <div class="col-12 text-center">
-                <p class="text-muted">No categories available</p>
-              </div>
+            <div class="spotlight-details-col d-flex flex-column justify-content-center align-items-center" style="height:100%; min-height:320px;">
+              <span class="new-badge">New Arrival</span>
+              <% if (spotlightProduct[0].offer) { %>
+                <span class="offer-badge">
+                  <% if (spotlightProduct[0].offer.discountType === 'percentage') { %>
+                    <%= spotlightProduct[0].offer.discountValue %>% OFF
+                  <% } else { %>
+                    ₹<%= spotlightProduct[0].offer.discountValue %> OFF
+                  <% } %>
+                </span>
               <% } %>
-    </section>
+              <a href="/product-details?id=<%= spotlightProduct[0]._id %>" class="text-decoration-none flex-grow-1" style="cursor:pointer;">
+                <div class="d-flex flex-column align-items-center text-center w-100" style="max-width: 500px;">
+                  <p class="product-title card-title mb-2" style="font-size:2rem;font-weight:600;line-height:1.2;">
+                    <%= spotlightProduct[0].productName %>
+                  </p>
+                  <% if (spotlightProduct[0].description) { %>
+                    <p class="product-description mb-2" style="font-size:1.08rem;color:#6b4c1b;opacity:0.92;line-height:1.5;">
+                      <%= spotlightProduct[0].description.length > 180 ? spotlightProduct[0].description.substring(0,180) + '...' : spotlightProduct[0].description %>
+                    </p>
+                  <% } %>
+                  <% if (spotlightProduct[0].category?.name) { %>
+                    <p class="product-category mb-2" style="color:var(--muted-green);font-size:1.1rem;">
+                      <%= spotlightProduct[0].category.name %>
+                    </p>
+                  <% } %>
+                  <div class="product-price mb-3" style="font-size:1.3rem;">
+                    <% if (spotlightProduct[0].offer) { %>
+                      <% if (spotlightProduct[0].salePrice && spotlightProduct[0].salePrice < spotlightProduct[0].regularPrice) { %>
+                        <span class="strike-price">₹<%= spotlightProduct[0].salePrice.toLocaleString() %></span>
+                      <% } else { %>
+                        <span class="strike-price">₹<%= spotlightProduct[0].regularPrice.toLocaleString() %></span>
+                      <% } %>
+                      <span class="discounted-price ms-2">
+                        ₹<%= spotlightProduct[0].offer.discountType === 'percentage' 
+                          ? (spotlightProduct[0].salePrice ? (spotlightProduct[0].salePrice - (spotlightProduct[0].salePrice * spotlightProduct[0].offer.discountValue / 100)).toFixed(2)
+                            : (spotlightProduct[0].regularPrice - (spotlightProduct[0].regularPrice * spotlightProduct[0].offer.discountValue / 100)).toFixed(2))
+                          : (spotlightProduct[0].salePrice ? (spotlightProduct[0].salePrice - spotlightProduct[0].offer.discountValue).toFixed(2)
+                            : (spotlightProduct[0].regularPrice - spotlightProduct[0].offer.discountValue).toFixed(2)) %>
+                      </span>
+                    <% } else { %>
+                      <span class="price">₹<%= spotlightProduct[0].salePrice && spotlightProduct[0].salePrice < spotlightProduct[0].regularPrice ? spotlightProduct[0].salePrice.toLocaleString() : spotlightProduct[0].regularPrice.toLocaleString() %></span>
+                    <% } %>
+                  </div>
+                </div>
+              </a>
+              <button class="btn w-auto" id="spotlightAddToCartBtn" onclick="event.stopPropagation(); spotlightAddToCart('<%= spotlightProduct[0]._id %>')">
+                Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+      <% } else { %>
+        <div class="col-12 text-center">
+          <p class="text-muted">No spotlight product available</p>
+        </div>
+      <% } %>
+    </div>
+  </section>
 
-    <!-- Footer -->
-    <%-include("../partials/user/fooret.ejs")%>
+  <section class="text-center py-5" style="background-color: #f9f7f5;">
+    <h2 class="section-heading display-6">FEATURED</h2>
+    <p class="section-subtext mt-2">Explore our newest arrivals with timeless charm and elegance</p>
+  </section>
 
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-      integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-      crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
-      integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
-      crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-    <script>
-      const sidebar = document.getElementById('sidebar');
-      const overlay = document.getElementById('overlay');
-      const sidebarToggle = document.getElementById('sidebarToggle');
-      const searchToggle = document.getElementById('searchToggle');
-      const searchContainer = document.getElementById('searchContainer');
+  <section class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4 px-4 py-5 main-content-container">
+    <% if (featured && featured.length> 0) { %>
+      <% featured.forEach((product, i)=> { %>
+        <div class="col<%= i >= 2 ? ' d-none d-sm-block' : '' %>">
+          <div class="product-card card text-center h-100" data-product-id="<%= product._id %>">
+            <i class="far fa-heart wishlist-icon"
+              onclick="event.stopPropagation(); toggleWishlist(this, '<%= product._id %>')"></i>
+            <% if (product.offer) { %>
+              <span class="offer-badge">
+                <% if (product.offer.discountType === 'percentage') { %>
+                  <%= product.offer.discountValue %>% OFF
+                <% } else { %>
+                  ₹<%= product.offer.discountValue %> OFF
+                <% } %>
+              </span>
+            <% } %>
+                <a href="/product-details?id=<%= product._id %>" class="text-decoration-none">
+                  <div class="product-image-container">
+                    <img src="/Uploads/product/<%= product.productImage[0] %>" alt="<%= product.productName %>"
+                      class="product-img">
+                    <% if (product.productImage[1]) { %>
+                      <img src="/Uploads/product/<%= product.productImage[1] %>" class="product-img-secondary"
+                        alt="<%= product.productName %> - Secondary View">
+                      <% } %>
+                  </div>
+                  <div class="product-info">
+                    <p class="product-title card-title">
+                      <%= product.productName %>
+                    </p>
+                    <% if (product.category?.name) { %>
+                      <p class="product-category">
+                        <%= product.category.name %>
+                      </p>
+                      <% } %>
+                        <div class="product-price">
+                          <% if (product.offer) { %>
+                            <% if (product.salePrice && product.salePrice < product.regularPrice) { %>
+                              <span class="strike-price">₹<%= product.salePrice.toLocaleString() %></span>
+                            <% } else { %>
+                              <span class="strike-price">₹<%= product.regularPrice.toLocaleString() %></span>
+                            <% } %>
+                            <span class="discounted-price">
+                              ₹<%= product.offer.discountType === 'percentage' 
+                                ? (product.salePrice ? (product.salePrice - (product.salePrice * product.offer.discountValue / 100)).toFixed(2)
+                                  : (product.regularPrice - (product.regularPrice * product.offer.discountValue / 100)).toFixed(2))
+                                : (product.salePrice ? (product.salePrice - product.offer.discountValue).toFixed(2)
+                                  : (product.regularPrice - product.offer.discountValue).toFixed(2)) %>
+                            </span>
+                          <% } else if (product.salePrice && product.salePrice < product.regularPrice) { %>
+                            <span class="strike-price">₹<%= product.regularPrice.toLocaleString() %></span>
+                            <span class="discounted-price">₹<%= product.salePrice.toLocaleString() %></span>
+                          <% } else { %>
+                            <span class="regular-price">₹<%= product.regularPrice.toLocaleString() %></span>
+                          <% } %>
+                        </div>
+                        <% if (product.sizes && product.sizes.length> 0) { %>
+                          <div class="size-options">
+                            <% product.sizes.forEach(size=> { %>
+                              <button class="btn btn-sm size-btn"
+                                onclick="event.stopPropagation(); selectSize(this, '<%= size.size %>', '<%= product._id %>')"
+                                data-size="<%= size.size %>">
+                                <%= size.size %>
+                              </button>
+                            <% }); %>
+                          </div>
+                          <% } %>
+                  </div>
+                </a>
+                <button class="btn w-100" onclick="event.stopPropagation(); addToCartWithSize('<%= product._id %>')">
+                  Add to Cart
+                </button>
+          </div>
+        </div>
+        <% }) %>
+          <% } else { %>
+            <div class="col-12 text-center">
+              <p class="text-muted">No featured products available</p>
+            </div>
+            <% } %>
+  </section>
 
-      sidebarToggle.addEventListener('click', () => {
-        sidebar.classList.toggle('open');
-        overlay.classList.toggle('active');
-      });
+  <!-- New Collection Banner -->
+  <section class="text-center py-5" style="background-color: #f9f7f5;">
+    <h2 class="section-heading display-6">NEW COLLECTION</h2>
+    <p class="section-subtext mt-2">Discover our curated selection of iconic pieces</p>
+  </section>
 
-      overlay.addEventListener('click', () => {
+  <section class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4 px-4 py-5 main-content-container">
+    <% if (newCollections && newCollections.length> 0) { %>
+      <% newCollections.forEach((product, i)=> { %>
+        <div class="col<%= i >= 2 ? ' d-none d-sm-block' : '' %>">
+          <div class="product-card card text-center h-100">
+            <i class="far fa-heart wishlist-icon" onclick="toggleWishlist(this)"></i>
+            <% if (product.offer) { %>
+              <span class="offer-badge">
+                <% if (product.offer.discountType==='percentage' ) { %>
+                  <%= product.offer.discountValue %>%
+                    <% } else { %>
+                      ₹<%= product.offer.discountValue %> OFF
+                        <% } %>
+              </span>
+              <% } %>
+                <a href="/product-details?id=<%= product._id %>" class="text-decoration-none">
+                  <div class="product-image-container">
+                    <img src="/Uploads/product/<%= product.productImage[0] %>" alt="<%= product.productName %>"
+                      class="product-img">
+                    <% if (product.productImage[1]) { %>
+                      <img src="/Uploads/product/<%= product.productImage[1] %>" class="product-img-secondary"
+                        alt="<%= product.productName %> - Secondary View">
+                      <% } %>
+                  </div>
+                  <span class="new-badge">New</span>
+                  <div class="product-info">
+                    <p class="product-title card-title">
+                      <%= product.productName %>
+                    </p>
+                    <% if (product.category?.name) { %>
+                      <p class="product-category">
+                        <%= product.category.name %>
+                      </p>
+                      <% } %>
+                         <div class="product-price">
+                          <% if (product.offer) { %>
+                            <% if (product.salePrice && product.salePrice < product.regularPrice) { %>
+                              <span class="strike-price">₹<%= product.salePrice.toLocaleString() %></span>
+                            <% } else { %>
+                              <span class="strike-price">₹<%= product.regularPrice.toLocaleString() %></span>
+                            <% } %>
+                            <span class="discounted-price">
+                              ₹<%= product.offer.discountType === 'percentage' 
+                                ? (product.salePrice ? (product.salePrice - (product.salePrice * product.offer.discountValue / 100)).toFixed(2)
+                                  : (product.regularPrice - (product.regularPrice * product.offer.discountValue / 100)).toFixed(2))
+                                : (product.salePrice ? (product.salePrice - product.offer.discountValue).toFixed(2)
+                                  : (product.regularPrice - product.offer.discountValue).toFixed(2)) %>
+                            </span>
+                          <% } else if (product.salePrice && product.salePrice < product.regularPrice) { %>
+                            <span class="strike-price">₹<%= product.regularPrice.toLocaleString() %></span>
+                            <span class="discounted-price">₹<%= product.salePrice.toLocaleString() %></span>
+                          <% } else { %>
+                            <span class="regular-price">₹<%= product.regularPrice.toLocaleString() %></span>
+                          <% } %>
+                        </div>
+                  </div>
+                </a>
+                <button class="btn w-100" onclick="event.stopPropagation(); addToCart('<%= product._id %>')">
+                  Add to Cart
+                </button>
+          </div>
+        </div>
+        <% }) %>
+          <% } else { %>
+            <div class="col-12 text-center">
+              <p class="text-muted">No new products available</p>
+            </div>
+            <% } %>
+  </section>
+
+  <!-- SELECT YOUR SPARKLE Banner -->
+  <div class="sparkle-banner text-center py-3 fs-4">SELECT YOUR SPARKLE</div>
+
+
+
+
+  <!-- Product Categories -->
+  <section class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4 px-4 py-5 main-content-container">
+    <% if (category && category.length> 0) { %>
+      <% category.forEach(category=> { %>
+        <div class="col">
+          <a href="/filter?category=<%= category._id %>" class="text-decoration-none">
+            <div class="product-card card text-center h-100">
+              <% if (category.offer && category.offer.active) { %>
+                <span class="offer-badge">
+                  <% if (category.offer.discountType==='percentage' ) { %>
+                    <%= category.offer.discountValue %>%
+                      <% } else { %>
+                        ₹<%= category.offer.discountValue %> OFF
+                          <% } %>
+                </span>
+                <% } %>
+                  <div class="product-image-container">
+                    <img src="\Uploads\category\<%= category.image %>" alt="<%= category.name %>" class="product-img">
+                  </div>
+                  <div class="product-info">
+                    <p class="product-title card-title">
+                      <%= category.name %>
+                    </p>
+                    <% if (category.offer && category.offer.active) { %>
+                      <p class="text-danger mb-0">
+                        <small>Category Offer Active</small>
+                      </p>
+                      <% } %>
+                  </div>
+            </div>
+          </a>
+        </div>
+        <% }) %>
+          <% } else { %>
+            <div class="col-12 text-center">
+              <p class="text-muted">No categories available</p>
+            </div>
+            <% } %>
+  </section>
+
+  <!-- Footer -->
+  <%-include("../partials/user/fooret.ejs")%>
+
+  <!-- Bootstrap JS and dependencies -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+    integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  <script>
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const searchToggle = document.getElementById('searchToggle');
+    const searchContainer = document.getElementById('searchContainer');
+
+    sidebarToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('open');
+      overlay.classList.toggle('active');
+    });
+
+    overlay.addEventListener('click', () => {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('active');
+    });
+
+    searchToggle.addEventListener('click', (e) => {
+      e.preventDefault();
+      searchContainer.classList.toggle('active');
+      if (searchContainer.classList.contains('active')) {
+        searchContainer.querySelector('input').focus();
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!searchContainer.contains(e.target) && e.target !== searchToggle) {
+        searchContainer.classList.remove('active');
+      }
+    });
+
+    function toggleCategory(element) {
+      const items = element.nextElementSibling;
+      const icon = element.querySelector('i');
+
+      items.classList.toggle('open');
+
+      if (items.classList.contains('open')) {
+        icon.classList.remove('fa-chevron-down');
+        icon.classList.add('fa-chevron-up');
+      } else {
+        icon.classList.remove('fa-chevron-up');
+        icon.classList.add('fa-chevron-down');
+      }
+    }
+
+    document.querySelectorAll('.sidebar-item').forEach(item => {
+      item.addEventListener('click', function () {
+        console.log('Navigating to:', this.textContent);
         sidebar.classList.remove('open');
         overlay.classList.remove('active');
       });
+    });
 
-
-      searchToggle.addEventListener('click', (e) => {
-        e.preventDefault();
-        searchContainer.classList.toggle('active');
-        if (searchContainer.classList.contains('active')) {
-          searchContainer.querySelector('input').focus();
-        }
-      });
-
-
-      document.addEventListener('click', (e) => {
-        if (!searchContainer.contains(e.target) && e.target !== searchToggle) {
-          searchContainer.classList.remove('active');
-        }
-      });
-
-
-      function toggleCategory(element) {
-        const items = element.nextElementSibling;
-        const icon = element.querySelector('i');
-
-        items.classList.toggle('open');
-
-        if (items.classList.contains('open')) {
-          icon.classList.remove('fa-chevron-down');
-          icon.classList.add('fa-chevron-up');
-        } else {
-          icon.classList.remove('fa-chevron-up');
-          icon.classList.add('fa-chevron-down');
-        }
-      }
-
-
-      document.querySelectorAll('.sidebar-item').forEach(item => {
-        item.addEventListener('click', function () {
-          console.log('Navigating to:', this.textContent);
-          sidebar.classList.remove('open');
-          overlay.classList.remove('active');
+    async function toggleWishlist(iconElement, productId) {
+      try {
+        const response = await fetch('/wishlist/add', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ productId })
         });
-      });
 
+        const data = await response.json();
 
-      async function toggleWishlist(iconElement, productId) {
-        try {
-          const response = await fetch('/wishlist/add', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ productId })
-          });
+        if (data.success) {
+          iconElement.classList.toggle('far');
+          iconElement.classList.toggle('fas');
+          iconElement.classList.toggle('text-danger');
 
-          const data = await response.json();
-
-          if (data.success) {
-            // Toggle heart icon
-            iconElement.classList.toggle('far');
-            iconElement.classList.toggle('fas');
-            iconElement.classList.toggle('text-danger');
-
-            // Show toast
-            Toastify({
-              text: iconElement.classList.contains('fas') ? "Added to Wishlist 💖" : "Removed from Wishlist ❌",
-              duration: 3000,
-              gravity: "top",
-              position: "right",
-              backgroundColor: iconElement.classList.contains('fas') ? "#4CAF50" : "#f44336",
-              stopOnFocus: true
-            }).showToast();
-          } else {
-            Toastify({
-              text: data.message || "Something went wrong",
-              duration: 3000,
-              gravity: "top",
-              position: "right",
-              backgroundColor: "#f44336"
-            }).showToast();
-          }
-        } catch (err) {
-          console.error('Wishlist error:', err);
           Toastify({
-            text: "Server error. Try again later.",
+            text: iconElement.classList.contains('fas') ? "Added to Wishlist 💖" : "Removed from Wishlist ❌",
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            backgroundColor: iconElement.classList.contains('fas') ? "#4CAF50" : "#f44336",
+            stopOnFocus: true
+          }).showToast();
+        } else {
+          Toastify({
+            text: data.message || "Something went wrong",
             duration: 3000,
             gravity: "top",
             position: "right",
             backgroundColor: "#f44336"
           }).showToast();
         }
+      } catch (err) {
+        console.error('Wishlist error:', err);
+        Toastify({
+          text: "Server error. Try again later.",
+          duration: 3000,
+          gravity: "top",
+          position: "right",
+          backgroundColor: "#f44336"
+        }).showToast();
       }
+    }
 
+    document.addEventListener('DOMContentLoaded', function () {
+      const headerSearch = document.getElementById('headerSearch');
+      const sidebarSearch = document.getElementById('sidebarSearch');
+      const productItems = document.querySelectorAll('.product-item');
 
-      document.addEventListener('DOMContentLoaded', function () {
-        const headerSearch = document.getElementById('headerSearch');
-        const sidebarSearch = document.getElementById('sidebarSearch');
-        const productItems = document.querySelectorAll('.product-item');
+      function performSearch(searchTerm) {
+        searchTerm = searchTerm.trim().toLowerCase();
 
-        function performSearch(searchTerm) {
-          searchTerm = searchTerm.trim().toLowerCase();
+        productItems.forEach(item => {
+          const productName = item.dataset.name;
+          const productCategory = item.dataset.category;
 
-          productItems.forEach(item => {
-            const productName = item.dataset.name;
-            const productCategory = item.dataset.category;
-
-            if (searchTerm === '' ||
-              productName.includes(searchTerm) ||
-              productCategory.includes(searchTerm)) {
-              item.style.display = '';
-            } else {
-              item.style.display = 'none';
-            }
-          });
-
-          // Update product count
-          const visibleProducts = document.querySelectorAll('.product-item[style=""]').length;
-          const totalProducts = productItems.length;
-          const countElement = document.querySelector('.d-flex.align-items-center span');
-          if (countElement) {
-            countElement.textContent = `Showing ${visibleProducts} of ${totalProducts} products`;
-          }
-        }
-
-        // Header search functionality
-        if (headerSearch) {
-          headerSearch.addEventListener('input', function () {
-            performSearch(this.value);
-          });
-        }
-
-        // Sidebar search functionality
-        if (sidebarSearch) {
-          sidebarSearch.addEventListener('input', function () {
-            performSearch(this.value);
-          });
-
-          document.getElementById('sidebarSearchForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-            performSearch(sidebarSearch.value);
-          });
-
-          document.getElementById('sidebarSearchBtn').addEventListener('click', function (e) {
-            e.preventDefault();
-            performSearch(sidebarSearch.value);
-          });
-        }
-
-        // Search toggle functionality
-        if (searchToggle && searchContainer) {
-          searchToggle.addEventListener('click', (e) => {
-            e.preventDefault();
-            searchContainer.classList.toggle('active');
-            if (searchContainer.classList.contains('active')) {
-              headerSearch.focus();
-            } else {
-              headerSearch.value = '';
-              performSearch(''); // Reset search when closing
-            }
-          });
-
-          // Close search when clicking outside
-          document.addEventListener('click', (e) => {
-            if (!searchContainer.contains(e.target) && e.target !== searchToggle) {
-              searchContainer.classList.remove('active');
-              headerSearch.value = '';
-              performSearch(''); // Reset search when closing
-            }
-          });
-        }
-      });
-
-  // Check if user is blocked
-  <% if (locals.blocked) { %>
-        Swal.fire({
-          title: 'Account Blocked',
-          text: 'Your account has been blocked by the administrator. Please contact support for assistance.',
-          icon: 'error',
-          confirmButtonColor: '#291d0e',
-          allowOutsideClick: false,
-          allowEscapeKey: false,
-          allowEnterKey: false,
-          showCloseButton: false,
-          showCancelButton: false,
-          showDenyButton: false,
-          showConfirmButton: true,
-          confirmButtonText: 'Ok',
-          willClose: () => {
-            window.location.href = '/logout';
+          if (searchTerm === '' ||
+            productName.includes(searchTerm) ||
+            productCategory.includes(searchTerm)) {
+            item.style.display = '';
+          } else {
+            item.style.display = 'none';
           }
         });
-  <% } %>
 
-        function addToCart(productId, size = null) {
-          // Check if user is logged in
-          fetch('/check-auth')
-            .then(response => response.json())
-            .then(data => {
-              if (!data.isAuthenticated) {
-                Swal.fire({
-                  icon: 'info',
-                  title: 'Login Required',
-                  text: 'Please login or signup to add items to cart',
-                  showCancelButton: true,
-                  confirmButtonText: 'Login',
-                  cancelButtonText: 'Signup',
-                  confirmButtonColor: '#291d0e',
-                  cancelButtonColor: '#314216'
-                }).then((result) => {
-                  if (result.isConfirmed) {
-                    window.location.href = '/login';
-                  } else if (result.dismiss === Swal.DismissReason.cancel) {
-                    window.location.href = '/signup';
-                  }
-                });
-                return;
+        const visibleProducts = document.querySelectorAll('.product-item[style=""]').length;
+        const totalProducts = productItems.length;
+        const countElement = document.querySelector('.d-flex.align-items-center span');
+        if (countElement) {
+          countElement.textContent = `Showing ${visibleProducts} of ${totalProducts} products`;
+        }
+      }
+
+      if (headerSearch) {
+        headerSearch.addEventListener('input', function () {
+          performSearch(this.value);
+        });
+      }
+
+      if (sidebarSearch) {
+        sidebarSearch.addEventListener('input', function () {
+          performSearch(this.value);
+        });
+
+        document.getElementById('sidebarSearchForm').addEventListener('submit', function (e) {
+          e.preventDefault();
+          performSearch(sidebarSearch.value);
+        });
+
+        document.getElementById('sidebarSearchBtn').addEventListener('click', function (e) {
+          e.preventDefault();
+          performSearch(sidebarSearch.value);
+        });
+      }
+
+      if (searchToggle && searchContainer) {
+        searchToggle.addEventListener('click', (e) => {
+          e.preventDefault();
+          searchContainer.classList.toggle('active');
+          if (searchContainer.classList.contains('active')) {
+            headerSearch.focus();
+          } else {
+            headerSearch.value = '';
+            performSearch('');
+          }
+        });
+
+        document.addEventListener('click', (e) => {
+          if (!searchContainer.contains(e.target) && e.target !== searchToggle) {
+            searchContainer.classList.remove('active');
+            headerSearch.value = '';
+            performSearch('');
+          }
+        });
+      }
+    });
+
+    <% if (locals.blocked) { %>
+      Swal.fire({
+        title: 'Account Blocked',
+        text: 'Your account has been blocked by the administrator. Please contact support for assistance.',
+        icon: 'error',
+        confirmButtonColor: '#291d0e',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        allowEnterKey: false,
+        showCloseButton: false,
+        showCancelButton: false,
+        showDenyButton: false,
+        showConfirmButton: true,
+        confirmButtonText: 'Ok',
+        willClose: () => {
+          window.location.href = '/logout';
+        }
+      });
+    <% } %>
+
+    function addToCart(productId, size = null) {
+      fetch('/check-auth')
+        .then(response => response.json())
+        .then(data => {
+          if (!data.isAuthenticated) {
+            Swal.fire({
+              icon: 'info',
+              title: 'Login Required',
+              text: 'Please login or signup to add items to cart',
+              showCancelButton: true,
+              confirmButtonText: 'Login',
+              cancelButtonText: 'Signup',
+              confirmButtonColor: '#291d0e',
+              cancelButtonColor: '#314216'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                window.location.href = '/login';
+              } else if (result.dismiss === Swal.DismissReason.cancel) {
+                window.location.href = '/signup';
               }
+            });
+            return;
+          }
 
-              // If user is authenticated, proceed with adding to cart
-              fetch('/cart/add', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Accept': 'application/json'
-                },
-                body: JSON.stringify({
-                  productId: productId,
-                  quantity: 1,
-                  size: size
-                })
-              })
-                .then(response => {
-                  if (!response.ok) {
-                    return response.json().then(err => Promise.reject(err));
-                  }
-                  return response.json();
-                })
-                .then(data => {
-                  if (data.success) {
-                    Swal.fire({
-                      icon: 'success',
-                      title: 'Added to Cart',
-                      text: data.message,
-                      showConfirmButton: false,
-                      timer: 1500
-                    });
-                  } else {
-                    throw new Error(data.message || 'Failed to add to cart');
-                  }
-                })
-                .catch(error => {
-                  Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: error.message || 'Failed to add item to cart',
-                    confirmButtonColor: '#291d0e'
-                  });
+          fetch('/cart/add', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+              productId: productId,
+              quantity: 1,
+              size: size
+            })
+          })
+            .then(response => {
+              if (!response.ok) {
+                return response.json().then(err => Promise.reject(err));
+              }
+              return response.json();
+            })
+            .then(data => {
+              if (data.success) {
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Added to Cart',
+                  text: data.message,
+                  showConfirmButton: false,
+                  timer: 1500
                 });
+              } else {
+                throw new Error(data.message || 'Failed to add to cart');
+              }
             })
             .catch(error => {
-              console.error('Auth check error:', error);
               Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: 'Failed to check authentication status',
+                text: error.message || 'Failed to add item to cart',
                 confirmButtonColor: '#291d0e'
               });
             });
-        }
-
-      function selectSize(button, size, productId) {
-        // Remove active class from all size buttons in the same product card
-        const productCard = button.closest('.product-card');
-        productCard.querySelectorAll('.size-btn').forEach(btn => {
-          btn.classList.remove('active');
-        });
-
-        // Add active class to clicked button
-        button.classList.add('active');
-
-        // Store selected size in data attribute
-        productCard.dataset.selectedSize = size;
-      }
-
-      function addToCartWithSize(productId) {
-        const productCard = document.querySelector(`[data-product-id="${productId}"]`);
-        const selectedSize = productCard.dataset.selectedSize;
-
-        if (productCard.querySelector('.size-btn') && !selectedSize) {
+        })
+        .catch(error => {
+          console.error('Auth check error:', error);
           Swal.fire({
-            icon: 'warning',
-            title: 'Size Required',
-            text: 'Please select a size before adding to cart',
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to check authentication status',
             confirmButtonColor: '#291d0e'
           });
-          return;
-        }
+        });
+    }
 
-        addToCart(productId, selectedSize);
+    function selectSize(button, size, productId) {
+      const productCard = button.closest('.product-card');
+      productCard.querySelectorAll('.size-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+
+      button.classList.add('active');
+
+      productCard.dataset.selectedSize = size;
+    }
+
+    function addToCartWithSize(productId) {
+      const productCard = document.querySelector(`[data-product-id="${productId}"]`);
+      const selectedSize = productCard.dataset.selectedSize;
+
+      if (productCard.querySelector('.size-btn') && !selectedSize) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Size Required',
+          text: 'Please select a size before adding to cart',
+          confirmButtonColor: '#291d0e'
+        });
+        return;
       }
-    </script>
+
+      addToCart(productId, selectedSize);
+    }
+
+    function spotlightAddToCart(productId) {
+      const btn = document.getElementById('spotlightAddToCartBtn');
+      const originalText = btn.textContent;
+      btn.textContent = 'Adding to Cart...';
+      btn.disabled = true;
+      addToCart(productId);
+      setTimeout(() => {
+        btn.textContent = originalText;
+        btn.disabled = false;
+      }, 1500);
+    }
+  </script>
 </body>
 
 </html>

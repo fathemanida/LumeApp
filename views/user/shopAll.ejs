@@ -652,7 +652,7 @@
 
     .out-of-stock-overlay {
       position: absolute;
-      top: -10px;
+      top: 10px;
       left: 10px;
       background-color: #dc3545;
       color: white;
@@ -772,11 +772,9 @@
   <div class="container-fluid py-4 main-content-container">
     <div class="row">
       <div class="col-12">
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
           <h4 class="mb-0">All Products</h4>
-          <div class="d-flex align-items-center">
-            <span class="me-3">Showing <%= products.length %> of <%= totalProducts %> products</span>
-          </div>
+          
         </div>
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4" id="productsGrid">
           <% if (products && products.length > 0) { %>
@@ -835,12 +833,21 @@
                     <% } %>
                     <p class="product-price">
                       <% if (product.offer) { %>
-                        <span class="strike-price">₹<%= product.regularPrice.toLocaleString() %></span>
+                        <% if (product.salePrice && product.salePrice < product.regularPrice) { %>
+                          <span class="strike-price">₹<%= product.salePrice.toLocaleString() %></span>
+                        <% } else { %>
+                          <span class="strike-price">₹<%= product.regularPrice.toLocaleString() %></span>
+                        <% } %>
                         <span class="discounted-price">
-                          ₹<%= product.offer.discountType === 'percentage'
-                            ? (product.regularPrice - (product.regularPrice * product.offer.discountValue / 100)).toFixed(2)
-                            : (product.regularPrice - product.offer.discountValue).toFixed(2) %>
+                          ₹<%= product.offer.discountType === 'percentage' 
+                            ? (product.salePrice ? (product.salePrice - (product.salePrice * product.offer.discountValue / 100)).toFixed(2)
+                              : (product.regularPrice - (product.regularPrice * product.offer.discountValue / 100)).toFixed(2))
+                            : (product.salePrice ? (product.salePrice - product.offer.discountValue).toFixed(2)
+                              : (product.regularPrice - product.offer.discountValue).toFixed(2)) %>
                         </span>
+                      <% } else if (product.salePrice && product.salePrice < product.regularPrice) { %>
+                        <span class="strike-price">₹<%= product.regularPrice.toLocaleString() %></span>
+                        <span class="discounted-price">₹<%= product.salePrice.toLocaleString() %></span>
                       <% } else { %>
                         <span class="regular-price">₹<%= product.regularPrice.toLocaleString() %></span>
                       <% } %>
@@ -897,47 +904,35 @@
     const searchToggle = document.getElementById('searchToggle');
     const searchContainer = document.getElementById('searchContainer');
 
-    <% if (locals.user && locals.user.isBlocked) { %>
-      Swal.fire({
-        title: 'Account Blocked',
-        text: 'Your account has been blocked by the administrator. Please contact support for assistance.',
-        icon: 'error',
-        confirmButtonColor: '#D4B996',
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-        allowEnterKey: false,
-        showCloseButton: false,
-        showCancelButton: false,
-        showDenyButton: false,
-        confirmButtonText: 'Ok'
-      }).then(() => {
-        window.location.href = '/logout';
+    if (sidebarToggle) {
+      sidebarToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('active');
       });
-    <% } %>
+    }
 
-    sidebarToggle.addEventListener('click', () => {
-      sidebar.classList.toggle('open');
-      overlay.classList.toggle('active');
-    });
+    if (overlay) {
+      overlay.addEventListener('click', () => {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('active');
+      });
+    }
 
-    overlay.addEventListener('click', () => {
-      sidebar.classList.remove('open');
-      overlay.classList.remove('active');
-    });
+    if (searchToggle && searchContainer) {
+      searchToggle.addEventListener('click', (e) => {
+        e.preventDefault();
+        searchContainer.classList.toggle('active');
+        if (searchContainer.classList.contains('active')) {
+          searchContainer.querySelector('input').focus();
+        }
+      });
 
-    searchToggle.addEventListener('click', (e) => {
-      e.preventDefault();
-      searchContainer.classList.toggle('active');
-      if (searchContainer.classList.contains('active')) {
-        searchContainer.querySelector('input').focus();
-      }
-    });
-
-    document.addEventListener('click', (e) => {
-      if (!searchContainer.contains(e.target) && e.target !== searchToggle) {
-        searchContainer.classList.remove('active');
-      }
-    });
+      document.addEventListener('click', (e) => {
+        if (!searchContainer.contains(e.target) && e.target !== searchToggle) {
+          searchContainer.classList.remove('active');
+        }
+      });
+    }
 
     function toggleCategory(element) {
       const items = element.nextElementSibling;
@@ -1031,6 +1026,39 @@
         e.preventDefault();
         performSearch();
       });
+
+      // Main search bar logic
+      const mainSearchInput = document.getElementById('mainSearchInput');
+      const mainSearchForm = document.getElementById('mainSearchForm');
+      const mainProductCount = document.getElementById('mainProductCount');
+
+      function filterProductsMain() {
+        const searchTerm = mainSearchInput.value.trim().toLowerCase();
+        let visibleCount = 0;
+        productItems.forEach(item => {
+          const productName = item.dataset.name;
+          const productCategory = item.dataset.category;
+          if (
+            searchTerm === '' ||
+            productName.includes(searchTerm) ||
+            productCategory.includes(searchTerm)
+          ) {
+            item.style.display = '';
+            visibleCount++;
+          } else {
+            item.style.display = 'none';
+          }
+        });
+        if (mainProductCount) {
+          mainProductCount.textContent = `Showing ${visibleCount} of ${productItems.length} products`;
+        }
+      }
+
+      mainSearchInput.addEventListener('input', filterProductsMain);
+      mainSearchForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        filterProductsMain();
+      });
     });
 
     async function addToCart(productId, productName, regularPrice, salePrice, productImage) {
@@ -1038,21 +1066,17 @@
         const authResponse = await fetch('/check-auth');
         const authData = await authResponse.json();
         if (!authData.isAuthenticated) {
-          const result = await Swal.fire({
-            icon: 'info',
-            title: 'Login Required',
-            text: 'Please login or signup to add items to cart',
-            showCancelButton: true,
-            confirmButtonText: 'Login',
-            cancelButtonText: 'Signup',
-            confirmButtonColor: '#D4B996',
-            cancelButtonColor: '#A9BA9D'
-          });
-          if (result.isConfirmed) {
+          Toastify({
+            text: "Please login or signup to add items to cart",
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#D4B996",
+            stopOnFocus: true
+          }).showToast();
+          setTimeout(function() {
             window.location.href = '/login';
-          } else if (result.dismiss === Swal.DismissReason.cancel) {
-            window.location.href = '/signup';
-          }
+          }, 2000);
           return;
         }
 
@@ -1064,27 +1088,44 @@
 
         const result = await response.json();
         if (response.ok) {
-          Swal.fire({
-            title: 'Success!',
+          Toastify({
             text: 'Product added to cart successfully',
-            icon: 'success',
-            confirmButtonColor: '#D4B996',
-            confirmButtonText: 'OK'
-          });
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#4CAF50",
+            stopOnFocus: true
+          }).showToast();
         } else {
           throw new Error(result.message || 'Failed to add product to cart');
         }
       } catch (error) {
         console.error('Cart error:', error);
-        Swal.fire({
-          title: 'Error!',
+        Toastify({
           text: error.message || 'An error occurred while adding the product to cart',
-          icon: 'error',
-          confirmButtonColor: '#D4B996',
-          confirmButtonText: 'OK'
-        });
+          duration: 3000,
+          gravity: "top",
+          position: "right",
+          backgroundColor: "#e63946",
+          stopOnFocus: true
+        }).showToast();
       }
     }
   </script>
+  <% if (locals.user && locals.user.isBlocked) { %>
+  <script>
+    Toastify({
+      text: "Your account has been blocked by the administrator. Please contact support for assistance.",
+      duration: 4000,
+      gravity: "top",
+      position: "center",
+      backgroundColor: "#e63946",
+      stopOnFocus: true
+    }).showToast();
+    setTimeout(function() {
+      window.location.href = '/logout';
+    }, 4000);
+  </script>
+  <% } %>
 </body>
 </html>

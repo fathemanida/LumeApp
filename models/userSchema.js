@@ -1,4 +1,3 @@
-// models/User.js
 
 const mongoose = require('mongoose');
 const {Schema}=mongoose
@@ -88,7 +87,7 @@ const userSchema = new mongoose.Schema({
 
 
 
-}, { timestamps: true }); // creates createdAt and updatedAt automatically
+}, { timestamps: true }); 
 
 const User = mongoose.model('User', userSchema);
 

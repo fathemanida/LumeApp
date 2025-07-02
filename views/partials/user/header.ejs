@@ -11,17 +11,13 @@
       <li class="mx-2"><a href="/new-arrivals" class="nav-link">New Arrivals</a></li>
     </ul>
 
-    <!-- Right side - Icons -->
+    <!-- Right side - Icons and Search Bar -->
     <ul class="d-flex align-items-center list-unstyled mb-0">
-      <!-- Search Bar -->
+      <!-- Prominent Search Bar -->
       <li class="mx-2">
-        <form action="/shopAll" method="GET" class="d-flex align-items-center">
-          <div class="search-container">
-            <input type="text" name="search" placeholder="Search products..." class="search-input form-control">
-            <button type="submit" class="search-button">
-              <i class="fas fa-search"></i>
-            </button>
-          </div>
+        <form action="/shopAll" method="GET" class="d-flex align-items-center" style="min-width:220px;">
+          <input type="text" name="search" placeholder="Search products..." class="form-control me-2" style="min-width:140px;">
+          <button type="submit" class="btn btn-outline-dark"><i class="fas fa-search"></i></button>
         </form>
       </li>
 
