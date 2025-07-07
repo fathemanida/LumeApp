@@ -331,11 +331,10 @@ const loadHome = async (req, res) => {
     });
 
     const page = parseInt(req.query.page) || 1;
-    const limit = 9;
+    const limit = 12;
     const skip = (page - 1) * limit;
 
     const baseQuery = {
-      
       category: { $in: categoryIds },
       
     };
@@ -359,14 +358,14 @@ const loadHome = async (req, res) => {
       featured: true,
     })
       .sort({ createdAt: -1 })
-      .limit(3);
+      .limit(6);
 
     const newCollectionsRaw = await Product.find({
       ...baseQuery,
       new: true,
     })
       .sort({ createdAt: -1 })
-      .limit(3);
+      .limit(6);
 
     const categoriesWithProducts = await Product.aggregate([
       {
@@ -497,7 +496,7 @@ const loadShopAll = async (req, res) => {
 
     const totalProducts = await Product.countDocuments(query);
     const page = parseInt(req.query.page) || 1;
-    const limit = 9;
+    const limit = 12;
     const skip = (page - 1) * limit;
     const totalPages = Math.ceil(totalProducts / limit);
 
@@ -709,7 +708,7 @@ const filterProduct = async (req, res) => {
 
     const sort = sortOptions[sortBy] || { createdOn: -1 };
     const page = parseInt(req.query.page) || 1;
-    const limit = 9;
+    const limit = 12;
     const skip = (page - 1) * limit;
 
     const totalProducts = await Product.countDocuments(query);
@@ -718,6 +717,56 @@ const filterProduct = async (req, res) => {
       .skip(skip)
       .limit(limit)
       .populate("category", "name");
+
+    // Fetch active offers
+    const now = new Date();
+    const offers = await Offer.find({
+      isActive: true,
+      startDate: { $lte: now },
+      endDate: { $gte: now },
+      applicableOn: { $in: ["all", "categories", "products"] },
+    }).lean();
+
+    // Attach best offer to each filtered product
+    const filteredProductsWithOffers = filteredProducts.map((product) => {
+      const matchedOffers = offers.filter((offer) => {
+        if (offer.applicableOn === "all") return true;
+        if (
+          offer.applicableOn === "categories" &&
+          offer.categories.some(cat => cat.toString() === product.category._id.toString())
+        ) return true;
+        if (
+          offer.applicableOn === "products" &&
+          offer.products.some(prod => prod.toString() === product._id.toString())
+        ) return true;
+        return false;
+      });
+
+      if (matchedOffers.length > 0) {
+        let maxDiscount = 0;
+        let bestOffer = null;
+
+        matchedOffers.forEach((offer) => {
+          let discount = 0;
+          if (offer.discountType === 'percentage') {
+            discount = (product.salePrice * offer.discountValue) / 100;
+          } else {
+            discount = offer.discountValue;
+          }
+
+          if (discount > maxDiscount) {
+            maxDiscount = discount;
+            bestOffer = offer;
+          }
+        });
+
+        if (bestOffer) {
+          product.offer = bestOffer;
+        }
+      }
+
+      return product;
+    });
 
     const totalPages = Math.ceil(totalProducts / limit);
 
@@ -729,7 +778,7 @@ const filterProduct = async (req, res) => {
 
     res.render("shopAll", {
       user: userData,
-      products: filteredProducts,
+      products: filteredProductsWithOffers,
       totalProducts,
       currentPage: page,
       totalPages,
@@ -849,7 +898,7 @@ const newArrivals = async (req, res) => {
     };
 
     const page = parseInt(req.query.page) || 1;
-    const limit = 9;
+    const limit = 12;
     const skip = (page - 1) * limit;
 
     const totalProducts = await Product.countDocuments(query);
@@ -909,7 +958,7 @@ const featured = async (req, res) => {
     };
 
     const page = parseInt(req.query.page) || 1;
-    const limit = 9;
+    const limit = 12;
     const skip = (page - 1) * limit;
 
     const totalProducts = await Product.countDocuments(query);

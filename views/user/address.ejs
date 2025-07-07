@@ -8,31 +8,32 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --dark-bg: #1a1a1a;
-            --darker-bg: #121212;
-            --card-bg: #242424;
-            --text-primary: #e0e0e0;
-            --text-secondary: #b0b0b0;
-            --accent-color: #c5a267;
-            --border-color: #333333;
+            --soft-beige: #D4B996;
+            --muted-green: #A9BA9D;
+            --light-bg: #f8f5f2;
+            --border-color: #e0d8cc;
+            --offer-red: #e63946;
+            --dark-text: #2c1810;
+            --darker-text: #1a0f0a;
+            --card-bg: #ffffff;
             --success-color: #4caf50;
             --error-color: #f44336;
         }
 
         body {
             font-family: 'Jost', sans-serif;
-            background-color: var(--dark-bg);
+            background-color: #f0e9e0;
             margin: 0;
             padding: 0;
             min-height: 100vh;
-            color: var(--text-primary);
+            color: var(--dark-text);
             display: flex;
             flex-direction: column;
         }
 
         /* Navbar styles */
         .navbar {
-            background: var(--darker-bg);
+            background: white;
             border-bottom: 1px solid var(--border-color);
             padding: 1rem 2rem;
             display: flex;
@@ -46,13 +47,13 @@
             font-size: 1.5rem;
             letter-spacing: 1.5px;
             text-transform: uppercase;
-            color: var(--text-primary);
+            color: var(--darker-text);
             cursor: pointer;
             transition: color 0.3s ease;
         }
 
         .brand:hover {
-            color: var(--accent-color);
+            color: var(--muted-green);
         }
 
         .nav-links {
@@ -65,7 +66,7 @@
         }
 
         .nav-link {
-            color: var(--text-primary);
+            color: var(--darker-text);
             font-family: 'Jost', sans-serif;
             font-size: 0.9rem;
             text-decoration: none;
@@ -74,8 +75,8 @@
         }
 
         .nav-link:hover {
-            color: var(--accent-color);
-            transform: translateY(-2px);
+            color: var(--muted-green);
+            font-weight: 500;
         }
 
         .icon-links {
@@ -87,15 +88,14 @@
         }
 
         .icon-link {
-            color: var(--text-primary);
+            color: var(--darker-text);
             font-size: 1.1rem;
             padding: 0.5rem;
             transition: all 0.3s ease;
         }
 
         .icon-link:hover {
-            color: var(--accent-color);
-            transform: translateY(-2px);
+            color: var(--muted-green);
         }
 
         /* Profile Dropdown */
@@ -108,9 +108,9 @@
             display: none;
             position: absolute;
             right: 0;
-            background-color: var(--card-bg);
+            background-color: white;
             min-width: 160px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
             z-index: 1000;
             border-radius: 4px;
             padding: 0.5rem 0;
@@ -122,7 +122,7 @@
         }
 
         .profile-dropdown-content a {
-            color: var(--text-primary);
+            color: var(--dark-text);
             padding: 0.75rem 1rem;
             text-decoration: none;
             display: block;
@@ -131,8 +131,8 @@
         }
 
         .profile-dropdown-content a:hover {
-            background-color: var(--darker-bg);
-            color: var(--accent-color);
+            background-color: var(--light-bg);
+            color: var(--muted-green);
         }
 
         .profile-dropdown-content a i {
@@ -147,10 +147,10 @@
             flex: 1;
         }
 
-        /* Elegant Dark Sidebar */
+        /* Elegant Sidebar */
         .sidebar {
             width: 280px;
-            background-color: var(--darker-bg);
+            background-color: white;
             padding: 2rem 1.5rem;
             border-right: 1px solid var(--border-color);
             display: flex;
@@ -160,7 +160,7 @@
         .sidebar-title {
             font-family: 'Aboreto', cursive;
             font-size: 1.5rem;
-            color: var(--accent-color);
+            color: var(--muted-green);
             margin-bottom: 2rem;
             padding-bottom: 1rem;
             border-bottom: 1px solid var(--border-color);
@@ -175,7 +175,7 @@
         }
 
         .sidebar-nav a {
-            color: var(--text-primary);
+            color: var(--dark-text);
             text-decoration: none;
             padding: 0.75rem 1rem;
             border-radius: 4px;
@@ -189,20 +189,20 @@
         .sidebar-nav a i {
             width: 20px;
             text-align: center;
-            color: var(--accent-color);
+            color: var(--muted-green);
         }
 
         .sidebar-nav a:hover {
-            background-color: rgba(197, 162, 103, 0.1);
-            color: var(--accent-color);
+            background-color: rgba(169, 186, 157, 0.1);
+            color: var(--muted-green);
             transform: translateX(4px);
         }
 
         .sidebar-nav a.active {
-            background-color: rgba(197, 162, 103, 0.2);
-            color: var(--accent-color);
+            background-color: rgba(169, 186, 157, 0.2);
+            color: var(--muted-green);
             font-weight: 500;
-            border-left: 3px solid var(--accent-color);
+            border-left: 3px solid var(--muted-green);
         }
 
         .sidebar-actions {
@@ -229,14 +229,14 @@
         }
 
         .logout-btn {
-            background-color: rgba(197, 162, 103, 0.1);
-            color: var(--text-primary);
+            background-color: rgba(169, 186, 157, 0.1);
+            color: var(--dark-text);
             border: 1px solid var(--border-color);
         }
 
         .logout-btn:hover {
-            background-color: rgba(197, 162, 103, 0.2);
-            border-color: var(--accent-color);
+            background-color: rgba(169, 186, 157, 0.2);
+            border-color: var(--muted-green);
         }
 
         .delete-btn {
@@ -265,63 +265,62 @@
         .page-title {
             font-family: 'Aboreto', cursive;
             font-size: 2rem;
-            color: var(--accent-color);
+            color: var(--muted-green);
             margin: 0;
         }
 
-/* Address Grid */
-.address-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem;
-    margin-top: 2rem;
-}
+        /* Address Grid */
+        .address-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
 
-/* Address Card */
-.address-card {
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 1.5rem;
-    position: relative;
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Optimize transition */
-    will-change: transform, box-shadow; /* Hint browser for smoother animation */
-    overflow: hidden; /* Clip shimmer overflow */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
+        /* Address Card */
+        .address-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
 
-.address-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
-}
+        .address-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+        }
 
-/* Shine effect */
-.address-card::before {
-    content: '';
-    position: absolute;
-    top: -100%;
-    left: -50%;
-    width: 200%;
-    height: 300%;
-    background: linear-gradient(120deg, transparent, rgba(0, 0, 0, 0.79), transparent);
-    transform: translateX(-100%) rotate(25deg);
-    opacity: 0;
-    transition: opacity 0.3s ease, transform 0.6s ease;
-    pointer-events: none;
-    z-index: 1;
-}
+        /* Shine effect */
+        .address-card::before {
+            content: '';
+            position: absolute;
+            top: -100%;
+            left: -50%;
+            width: 200%;
+            height: 300%;
+            background: linear-gradient(120deg, transparent, rgba(212, 185, 150, 0.3), transparent);
+            transform: translateX(-100%) rotate(25deg);
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.6s ease;
+            pointer-events: none;
+            z-index: 1;
+        }
 
-.address-card:hover::before {
-    opacity: 1;
-    transform: translateX(100%) rotate(25deg);
-}
+        .address-card:hover::before {
+            opacity: 1;
+            transform: translateX(100%) rotate(25deg);
+        }
 
         .address-type {
             position: absolute;
             top: 1rem;
             right: 1rem;
-            background-color: var(--accent-color);
-            color: var(--dark-bg);
+            background-color: var(--muted-green);
+            color: white;
             padding: 0.25rem 0.75rem;
             border-radius: 20px;
             font-size: 0.8rem;
@@ -331,11 +330,11 @@
             font-family: 'Aboreto', cursive;
             font-size: 1.25rem;
             margin-bottom: 0.5rem;
-            color: var(--text-primary);
+            color: var(--dark-text);
         }
 
         .address-details {
-            color: var(--text-secondary);
+            color: #666;
             font-size: 0.9rem;
             line-height: 1.5;
         }
@@ -364,14 +363,14 @@
         }
 
         .edit-btn {
-            background-color: var(--accent-color);
-            color: var(--dark-bg);
+            background-color: var(--muted-green);
+            color: white;
         }
 
         .edit-btn:hover {
-            background-color: #d4b47c;
-              transform: scale(1);
-    box-shadow: 0 3px 5px #c5a3677e;
+            background-color: var(--soft-beige);
+            transform: translateY(-2px);
+            box-shadow: 0 3px 5px rgba(169, 186, 157, 0.3);
         }
 
         .delete-btn {
@@ -384,54 +383,43 @@
             background-color: rgba(244, 67, 54, 0.1);
         }
 
-       .add-address-btn {
-    margin-top: 2rem;
-    padding: 1rem 2rem;
-    background: linear-gradient(135deg, #edc786, #c5a267);
-    border-radius: 6px;
-    border: 2px solid transparent;
-    color: rgb(1, 0, 0);
-    font-weight: bold;
-    text-align: center;
-    cursor: pointer;
-    font-size: 1rem;
-    font-family: 'Aboreto', cursive;
-    position: relative;
-    overflow: hidden;
-    transition: all 0.4s ease-in-out;
-}
+        .add-address-btn {
+            margin-top: 2rem;
+            padding: 1rem 2rem;
+            background: var(--muted-green);
+            border-radius: 6px;
+            border: none;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+            font-size: 1rem;
+            font-family: 'Aboreto', cursive;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
 
-.add-address-btn::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.5), transparent);
-    transform: rotate(25deg);
-    opacity: 0;
-    transition: opacity 0.4s, transform 0.8s;
-}
-
-.add-address-btn:hover::before {
-    opacity: 1;
-    transform: translateX(100%) rotate(25deg);
-}
-
-.add-address-btn:hover {
-    transform: scale(1.03);
-    box-shadow: 0 8px 20px #c5a267;
-}
+        .add-address-btn:hover {
+            background-color: var(--soft-beige);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(169, 186, 157, 0.3);
+        }
 
         .no-addresses {
             text-align: center;
             padding: 2rem;
-            color: var(--text-secondary);
+            color: #666;
             font-style: italic;
-            background: var(--card-bg);
+            background: white;
             border-radius: 8px;
             border: 1px solid var(--border-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         /* Responsive */
@@ -452,6 +440,67 @@
             .address-grid {
                 grid-template-columns: 1fr;
             }
+
+            .page-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--soft-beige);
+            color: white;
+            padding: 40px 0;
+            font-family: 'Jost', sans-serif;
+            line-height: 1.6;
+        }
+
+        .footer-container {
+            display: flex;
+            justify-content: center;
+            gap: 120px;
+            padding: 0 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-column h3 {
+            font-family: 'Aboreto', cursive;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .footer-column ul {
+            list-style: none;
+            padding: 0;
+            font-size: 0.9rem;
+        }
+
+        .footer-column li {
+            margin-bottom: 8px;
+        }
+
+        .footer-column a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-column a:hover {
+            color: var(--light-bg);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            font-size: 0.8rem;
+            padding-top: 30px;
+            margin-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.7);
         }
     </style>
 </head>
@@ -502,7 +551,7 @@
 
     <% if (locals.user) { %>
         <div class="main-container">
-            <!-- Elegant Dark Sidebar -->
+            <!-- Sidebar -->
             <div class="sidebar">
                 <div class="sidebar-title">My Account</div>
                 <div class="sidebar-nav">
@@ -605,46 +654,40 @@
     <% } %>
 
     <!-- Footer -->
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
-    <footer style="background-color: #121212; color: #b0b0b0; padding: 40px 0; font-family: 'Cinzel', serif; line-height: 1.6; border-top: 1px solid #333;">
-        <div style="display: flex; justify-content: center; gap: 120px; padding: 0 20px; max-width: 1200px; margin: 0 auto;">
-            <div>
-                <h3 style="font-size: 18px; margin-bottom: 15px; letter-spacing: 1px; text-transform: uppercase; color: #c5a267;">Company</h3>
-                <ul style="list-style: none; padding: 0; font-size: 14px;">
-                    <li style="margin-bottom: 8px;"><a href="/about-us" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">About Us</a></li>
-                    <li style="margin-bottom: 8px;"><a href="/careers" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Careers</a></li>
-                    <li style="margin-bottom: 8px;"><a href="/contact" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Contact</a></li>
-                    <li style="margin-bottom: 8px;"><a href="/privacy-policy" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Privacy Policy</a></li>
+    <footer>
+        <div class="footer-container">
+            <div class="footer-column">
+                <h3>Company</h3>
+                <ul>
+                    <li><a href="/about-us">About Us</a></li>
+                    <li><a href="/careers">Careers</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                    <li><a href="/privacy-policy">Privacy Policy</a></li>
                 </ul>
             </div>
-            <div>
-                <h3 style="font-size: 18px; margin-bottom: 15px; letter-spacing: 1px; text-transform: uppercase; color: #c5a267;">Shop</h3>
-                <ul style="list-style: none; padding: 0; font-size: 14px;">
-                    <li style="margin-bottom: 8px;"><a href="/rings" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Rings</a></li>
-                    <li style="margin-bottom: 8px;"><a href="/necklaces" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Necklaces</a></li>
-                    <li style="margin-bottom: 8px;"><a href="/earrings" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Earrings</a></li>
-                    <li style="margin-bottom: 8px;"><a href="/bracelets" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Bracelets</a></li>
+            <div class="footer-column">
+                <h3>Shop</h3>
+                <ul>
+                    <li><a href="/rings">Rings</a></li>
+                    <li><a href="/necklaces">Necklaces</a></li>
+                    <li><a href="/earrings">Earrings</a></li>
+                    <li><a href="/bracelets">Bracelets</a></li>
                 </ul>
             </div>
-            <div>
-                <h3 style="font-size: 18px; margin-bottom: 15px; letter-spacing: 1px; text-transform: uppercase; color: #c5a267;">Connect With Us</h3>
-                <ul style="list-style: none; padding: 0; font-size: 14px;">
-                    <li style="margin-bottom: 8px;"><a href="https://instagram.com" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Instagram</a></li>
-                    <li style="margin-bottom: 8px;"><a href="https://facebook.com" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Facebook</a></li>
-                    <li style="margin-bottom: 8px;"><a href="https://pinterest.com" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Pinterest</a></li>
-                    <li style="margin-bottom: 8px;"><a href="https://twitter.com" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Twitter</a></li>
+            <div class="footer-column">
+                <h3>Connect With Us</h3>
+                <ul>
+                    <li><a href="https://instagram.com">Instagram</a></li>
+                    <li><a href="https://facebook.com">Facebook</a></li>
+                    <li><a href="https://pinterest.com">Pinterest</a></li>
+                    <li><a href="https://twitter.com">Twitter</a></li>
                 </ul>
             </div>
         </div>
-        <div style="text-align: center; font-size: 12px; padding-top: 30px; margin-top: 30px; border-top: 1px solid #333; color: #666;">
+        <div class="footer-bottom">
             © 2024 Lume Jewelry. All Rights Reserved.
         </div>
     </footer>
-    <style>
-        footer a:hover {
-            color: #c5a267;
-        }
-    </style>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>

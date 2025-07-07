@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FAQ - LUME</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Jost&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    body {
+      background: #f8f5f2;
+      color: #2c1810;
+      font-family: 'Jost', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .faq-container {
+      display: flex;
+      min-height: 100vh;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2.5rem 1rem 2rem 1rem;
+      gap: 2.5rem;
+    }
+    .faq-sidebar {
+      min-width: 200px;
+      max-width: 220px;
+      background: none;
+      padding-top: 2rem;
+    }
+    .faq-sidebar ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .faq-sidebar li {
+      margin-bottom: 1.2rem;
+    }
+    .faq-sidebar a {
+      color: #3a2414;
+      text-decoration: none;
+      font-size: 1.05rem;
+      font-family: 'Jost', sans-serif;
+      transition: color 0.2s;
+    }
+    .faq-sidebar a.active, .faq-sidebar a:hover {
+      color: #8a9b7d;
+      font-weight: 500;
+    }
+    .faq-main {
+      flex: 1;
+      padding-top: 2rem;
+    }
+    .faq-title {
+      font-family: 'Aboreto', cursive;
+      font-size: 2.2rem;
+      color: #3a2414;
+      text-align: center;
+      margin-bottom: 2.5rem;
+      letter-spacing: 1.5px;
+    }
+    .faq-intro {
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+      text-align: center;
+      color: #2c1810;
+    }
+    .accordion-button {
+      background: none;
+      color: #2c1810;
+      font-family: 'Jost', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 500;
+      border: none;
+      border-bottom: 1px solid #e0d8cc;
+      border-radius: 0;
+      box-shadow: none;
+      padding: 1.1rem 0.5rem;
+      transition: background 0.2s;
+    }
+    .accordion-button:not(.collapsed) {
+      color: #8a9b7d;
+      background: #f5e6d3;
+      border-bottom: 1px solid #d4b996;
+    }
+    .accordion-item {
+      border: none;
+      border-bottom: 1px solid #e0d8cc;
+      background: none;
+    }
+    .accordion-body {
+      background: none;
+      color: #2c1810;
+      font-size: 1rem;
+      padding: 1rem 0.5rem 1.2rem 0.5rem;
+    }
+    @media (max-width: 900px) {
+      .faq-container {
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+      .faq-sidebar {
+        max-width: 100%;
+        min-width: 0;
+        padding-top: 0;
+        text-align: center;
+      }
+      .faq-main {
+        padding-top: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <%- include("../partials/user/header") %>
+  <div class="faq-container">
+    <nav class="faq-sidebar">
+      <ul>
+        <li><a href="/contact">Contact Us</a></li>
+        <li><a href="/faqs" class="active">FAQ</a></li>
+        <li><a href="/shipping-returns">Shipping</a></li>
+        <li><a href="/track-order">Track My Order</a></li>
+        <li><a href="/returns">Returns</a></li>
+        <li><a href="/recycle-upgrade">Recycle & Upgrade</a></li>
+        <li><a href="/jewellery-care">Jewellery Care</a></li>
+      </ul>
+    </nav>
+    <main class="faq-main">
+      <div class="faq-title">ASSISTANCE & CUSTOMER CARE</div>
+      <div class="faq-intro">
+        <b>Welcome to our FAQ section!</b> Here, you'll find answers to the most frequently asked questions, all in one easy-to-navigate section. If you have any further queries, please do not hesitate to reach out to our team directly.
+      </div>
+      <div class="accordion" id="faqAccordion">
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="faq1">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="false" aria-controls="collapse1">
+              What is Gold Vermeil?
+            </button>
+          </h2>
+          <div id="collapse1" class="accordion-collapse collapse" aria-labelledby="faq1" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+              Gold vermeil is a thick layer of gold (at least 2.5 microns) electroplated over sterling silver. It offers the look and feel of solid gold at a more affordable price.
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="faq2">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2" aria-expanded="false" aria-controls="collapse2">
+I’m buying a gift but don’t know the ring size!            </button>
+          </h2>
+          <div id="collapse2" class="accordion-collapse collapse" aria-labelledby="faq2" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+Please refer to our ring size guide for help. If buying a ring as a gift, we recommend choosing a general size and ordering a ring sizer. If the ring doesn’t fit, we can exchange* it for the correct size (provided it is unworn and in perfect condition).
+
+*Please note we cannot exchange solid gold items, but we can assist you with resizing if needed. Please reach out to our team for more information.            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="faq3">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3" aria-expanded="false" aria-controls="collapse3">
+              How long do Made to Order pieces take to make?
+            </button>
+          </h2>
+          <div id="collapse3" class="accordion-collapse collapse" aria-labelledby="faq3" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+              Made to order pieces typically take 2-4 weeks to craft, depending on the complexity and availability of materials.
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="faq4">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4" aria-expanded="false" aria-controls="collapse4">
+              What is your return policy?
+            </button>
+          </h2>
+          <div id="collapse4" class="accordion-collapse collapse" aria-labelledby="faq4" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+              We accept returns within 7 days of delivery for unworn, undamaged items in their original packaging. Please see our Return Policy for details.
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="faq5">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse5" aria-expanded="false" aria-controls="collapse5">
+              Am I able to return or exchange a made-to-order piece?
+            </button>
+          </h2>
+          <div id="collapse5" class="accordion-collapse collapse" aria-labelledby="faq5" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+              Made-to-order and customized pieces are not eligible for return or exchange unless there is a manufacturing defect.
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="faq6">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse6" aria-expanded="false" aria-controls="collapse6">
+              Customisable or bespoke?
+            </button>
+          </h2>
+          <div id="collapse6" class="accordion-collapse collapse" aria-labelledby="faq6" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+              Yes, we offer customisation and bespoke services. Please contact us to discuss your ideas and requirements.
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="faq7">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse7" aria-expanded="false" aria-controls="collapse7">
+              I'm not sure if the size I ordered will fit perfectly. Can I swap sizes?
+            </button>
+          </h2>
+          <div id="collapse7" class="accordion-collapse collapse" aria-labelledby="faq7" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+              We offer one free size exchange within 7 days of delivery, provided the item is unworn and in original condition.
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <%- include("../partials/user/fooret.ejs") %>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

@@ -13,10 +13,12 @@
   <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
   <style>
     :root {
-      --dark-brown: #291d0e;
-      --olive-green: #314216;
-      --light-bg: #f8f5f2;
-      --border-color: #d3c9be;
+      --theme-title-font: 'Aboreto', sans-serif;
+      --theme-body-font: 'Aboreto', sans-serif;
+      --theme-black: #111;
+      --theme-gray: #888;
+      --theme-highlight: #95951581;
+      --theme-border: #e0e0e0;
     }
 
     /* Base Styles */
@@ -25,8 +27,8 @@
       height: 100%;
       margin: 0;
       padding: 0;
-      background-color: var(--light-bg);
-      font-family: 'Jost', sans-serif;
+      background-color: #f0e9e0;
+      font-family: 'Aboreto', sans-serif;
       color: var(--dark-brown);
     }
 
@@ -54,7 +56,7 @@
 
     .nav-link {
       color: var(--dark-brown);
-      font-family: 'Jost', sans-serif;
+      font-family: 'Aboreto', sans-serif;
       font-size: 0.9rem;
       transition: all 0.3s ease;
       padding: 0.5rem 1rem;
@@ -91,7 +93,7 @@
       border: 1px solid var(--border-color);
       border-radius: 4px;
       padding: 0.5rem 1rem;
-      font-family: 'Jost', sans-serif;
+      font-family: 'Aboreto', sans-serif;
       width: 200px;
       transition: all 0.3s ease;
       background-color: var(--light-bg);
@@ -201,10 +203,11 @@
     }
 
     .product-images {
-      background: white;
-      padding: 1.5rem;
-      border-radius: 4px;
-      box-shadow: 0 2px 10px rgba(41, 29, 14, 0.05);
+      background: transparent !important;
+      padding: 0 !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      border: none !important;
     }
 
     .main-image {
@@ -218,7 +221,7 @@
       width: 100%;
       height: auto;
       display: block;
-      border-radius: 4px;
+      border-radius: 0 !important;
     }
 
     .main-image:hover img {
@@ -234,9 +237,9 @@
     .thumbnail {
       cursor: pointer;
       transition: all 0.3s ease;
-      border-radius: 4px;
+      border-radius: 0 !important;
       overflow: hidden;
-      border: 1px solid var(--border-color);
+      border: none !important;
     }
 
     .thumbnail:hover {
@@ -248,197 +251,197 @@
       width: 80px;
       height: 80px;
       object-fit: cover;
+      border-radius: 0 !important;
     }
 
     .product-info {
-      background: white;
-      padding: 2rem;
-      border-radius: 8px;
-      box-shadow: 0 4px 20px rgba(41, 29, 14, 0.08);
-      transition: all 0.3s ease;
+      background: none !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
+      padding: 0 !important;
+      font-family: var(--theme-body-font);
     }
 
     .product-info h1 {
-      font-family: 'Aboreto', cursive;
-      color: var(--dark-brown);
-      letter-spacing: 1px;
-      margin-bottom: 1.5rem;
+      font-family: var(--theme-title-font);
+      font-size: 2.6rem;
       font-weight: 400;
+      color: var(--theme-black);
+      margin-bottom: 0.5em;
+      letter-spacing: 0;
+    }
+
+    .product-price {
       font-size: 2rem;
-      line-height: 1.3;
+      color: var(--theme-black);
+      font-family: var(--theme-title-font);
+      margin-bottom: 0.2em;
     }
 
-    .price-section {
-      margin-bottom: 2rem;
-      padding: 1rem;
-      background: var(--light-bg);
-      border-radius: 6px;
+    .product-price .strike-price {
+      color: var(--theme-gray);
+      text-decoration: line-through;
+      font-size: 1.3rem;
+      margin-right: 0.5em;
     }
 
-    .price-section .text-muted {
-      color: #999 !important;
-      font-size: 1.1rem;
+    .product-price .discounted-price, .product-price .regular-price {
+      color: var(--theme-black);
+      font-size: 2rem;
+      font-weight: 400;
     }
 
-    .price-section .text-danger {
-      color: #dc3545;
-      font-weight: 600;
-      font-size: 1.5rem;
+    .product-info .description,
+    .product-meta,
+    .product-meta strong,
+    .product-info .description p {
+      font-family: 'Jost', Arial, sans-serif !important;
+      font-size: 1.05rem;
+      color: var(--theme-gray);
+      font-weight: 400;
+      letter-spacing: 0;
     }
 
-    .description {
-      margin-bottom: 2rem;
-      color: var(--dark-brown);
-      line-height: 1.8;
+    .offer-badges {
+      margin: 1.5em 0 1.5em 0;
+      gap: 0;
+    }
+
+    .offer-badge, .offer-badge.category {
+      background: var(--theme-highlight) !important;
+      color: #111 !important;
+      border: none !important;
+      border-radius: 0 !important;
+      font-size: 1.2rem;
+      font-family: var(--theme-body-font);
+      font-weight: 400;
+      box-shadow: none !important;
+      padding: 0.7em 1em;
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.5em;
+    }
+
+    .offer-badge i, .offer-badge.category i {
+      color: #111 !important;
+      font-size: 1.3em;
+      margin-right: 0.7em;
+    }
+
+    .offer-badges .info-text {
+      background: none !important;
+      color: var(--theme-gray) !important;
       font-size: 1rem;
-      padding: 1rem;
-      background: var(--light-bg);
-      border-radius: 6px;
-      word-wrap: break-word;
-      overflow-wrap: break-word;
-      white-space: pre-wrap;
-      max-height: 200px;
-      overflow-y: auto;
-    }
-
-    .description::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    .description::-webkit-scrollbar-track {
-      background: var(--light-bg);
-      border-radius: 3px;
-    }
-
-    .description::-webkit-scrollbar-thumb {
-      background: var(--border-color);
-      border-radius: 3px;
-    }
-
-    .description::-webkit-scrollbar-thumb:hover {
-      background: var(--dark-brown);
-    }
-
-    .description p {
-      margin: 0;
+      margin: 0.5em 0 0 0;
       padding: 0;
     }
 
-    .size-section {
-      margin-bottom: 1.5rem;
+    .status-badge, .status-badge.unavailable, .status-badge.out-of-stock {
+      background: none !important;
+      color: var(--theme-gray) !important;
+      border: none !important;
+      font-size: 1.1rem;
+      margin: 1em 0;
+      padding: 0;
+      box-shadow: none !important;
     }
 
-    .size-section h5 {
-      font-family: 'Aboreto', cursive;
-      margin-bottom: 0.75rem;
+    .status-badge i {
+      color: var(--theme-gray) !important;
+      margin-right: 0.5em;
+    }
+
+    .product-meta {
+      color: var(--theme-gray);
+      font-size: 1rem;
+      margin-top: 2em;
+    }
+
+    .product-meta strong {
+      color: var(--theme-black);
       font-weight: 400;
     }
 
-    .size-options {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-    }
-
-    .size-btn {
-      border: 1px solid var(--border-color);
-      background: transparent;
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
-      transition: all 0.3s ease;
-      min-width: 50px;
-      text-align: center;
-    }
-
-    .size-btn:hover {
-      border-color: var(--dark-brown);
-      transform: translateY(-2px);
-    }
-
-    .size-btn.active {
-      background-color: var(--dark-brown);
-      color: white;
-      border-color: var(--dark-brown);
-    }
-
-    .quantity-section {
-      margin-bottom: 1.5rem;
-    }
-
     .quantity-section h5 {
-      font-family: 'Aboreto', cursive;
-      margin-bottom: 0.75rem;
+      font-family: var(--theme-body-font);
+      font-size: 1.1rem;
+      color: var(--theme-gray);
+      margin-bottom: 0.5em;
       font-weight: 400;
     }
 
     .input-group {
-      width: 150px;
+      width: 140px;
+      border-radius: 0 !important;
+      border: 1px solid var(--theme-border);
+      background: none;
+      box-shadow: none;
+      overflow: hidden;
     }
 
     .input-group button {
-      background-color: var(--light-bg);
-      border: 1px solid var(--border-color);
-      transition: all 0.3s ease;
+      border: none;
+      background: none;
+      color: var(--theme-black);
+      font-size: 1.5rem;
+      width: 40px;
+      height: 40px;
+      border-radius: 0 !important;
+      box-shadow: none;
+      transition: background 0.2s;
     }
 
     .input-group button:hover {
-      background-color: var(--dark-brown);
-      color: white;
-      border-color: var(--dark-brown);
+      background: #f5f5f5;
+      color: var(--theme-black);
     }
 
     .input-group input {
-      text-align: center;
-      border: 1px solid var(--border-color);
-      background-color: var(--light-bg);
-    }
-
-    .action-buttons {
-      margin-bottom: 1.5rem;
-    }
-
-    .btn-dark {
-      background-color: var(--dark-brown);
       border: none;
-      padding: 0.75rem 1.5rem;
-      transition: all 0.3s ease;
+      background: none;
+      color: var(--theme-black);
+      font-size: 1.2rem;
+      width: 40px;
+      height: 40px;
+      border-radius: 0 !important;
+      box-shadow: none;
+      text-align: center;
+      padding: 0;
     }
 
-    .btn-dark:hover {
-      background-color: var(--olive-green);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(41, 29, 14, 0.2);
+    .action-buttons .btn, .action-buttons .btn-dark, .action-buttons .btn-outline-dark, .action-buttons .btn-outline-danger {
+      border-radius: 0 !important;
+      font-size: 1.1rem;
+      font-family: var(--theme-body-font);
+      box-shadow: none !important;
+      padding: 0.7em 1.2em;
     }
 
-    .btn-outline-dark {
-      border: 1px solid var(--dark-brown);
-      color: var(--dark-brown);
-      padding: 0.75rem 1.5rem;
-      transition: all 0.3s ease;
+    .action-buttons .btn-dark {
+      background: #111;
+      color: #fff;
+      border: none;
     }
 
-    .btn-outline-dark:hover {
-      background-color: var(--dark-brown);
-      color: white;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(41, 29, 14, 0.2);
+    .action-buttons .btn-outline-dark {
+      background: none;
+      color: #111;
+      border: 1px solid #111;
     }
 
-    .product-meta {
-      color: var(--dark-brown);
-      font-size: 0.9rem;
+    .action-buttons .btn-outline-danger {
+      background: none;
+      color: #d00;
+      border: 1px solid #d00;
     }
 
-    .product-meta p {
-      margin-bottom: 0.5rem;
-    }
-
-    .text-success {
-      color: #28a745 !important;
-    }
-
-    .text-danger {
-      color: #dc3545 !important;
+    @media (max-width: 768px) {
+      .product-info h1 {
+        font-size: 2rem;
+      }
+      .product-price {
+        font-size: 1.3rem;
+      }
     }
 
     /* Related Products */
@@ -473,6 +476,7 @@
       height: 200px;
       object-fit: cover;
       transition: transform 0.3s ease;
+      border-radius: 0 !important;
     }
 
     .product-card:hover .card-img-top {
@@ -484,7 +488,7 @@
     }
 
     .product-card .card-title {
-      font-family: 'Jost', sans-serif;
+      font-family: 'Aboreto', sans-serif;
       color: var(--dark-brown);
       font-size: 1rem;
       margin-bottom: 0.5rem;
@@ -512,7 +516,7 @@
 
     .footer-link {
       color: white;
-      font-family: 'Jost', sans-serif;
+      font-family: 'Aboreto', sans-serif;
       font-size: 0.9rem;
       transition: all 0.3s ease;
       display: block;
@@ -765,29 +769,6 @@
       line-height: 1.4;
     }
 
-    /* Status Badge Styles */
-    .status-badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
-      font-size: 0.9rem;
-      margin-bottom: 1rem;
-    }
-
-    .status-badge.unavailable {
-      color: rgb(72, 15, 15);
-    }
-
-    .status-badge.out-of-stock {
-      background-color:rgb(190 148 19)
-      color: #000;
-    }
-
-    .status-badge i {
-      margin-right: 0.5rem;
-    }
-
     /* Toast Styling */
     .toast {
       background-color: white;
@@ -817,7 +798,7 @@
 
     .toast-body {
       color: var(--dark-brown);
-      font-family: 'Jost', sans-serif;
+      font-family: 'Aboreto', sans-serif;
       font-size: 0.9rem;
       padding: 0.75rem;
     }
@@ -882,6 +863,8 @@
 </head>
 
 <body>
+  <%- include("../../views/partials/user/header") %>
+
   <!-- Toast Container -->
   <div class="position-fixed top-0 end-0 p-3" style="z-index: 1050;">
     <div id="notificationToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
@@ -1007,7 +990,7 @@
             <!-- Product Image with Status Overlay -->
             <img src="/Uploads/product/<%= product.productImage[0] %>"
                  alt="<%= product.productName %>"
-                 class="img-fluid rounded"
+                 class="img-fluid"
                  id="mainProductImage"
                  style="transition: transform 0.2s ease; transform-origin: center center;">
             <!-- Status Badge Overlay -->
@@ -1191,24 +1174,77 @@
     <!-- Related Products -->
     <% if (relatedProducts && relatedProducts.length > 0) { %>
       <div class="related-products mt-5">
-        <h3 class="mb-4">Related Products</h3>
-        <div class="row">
+        <h3 class="mb-4" style="font-family: 'Aboreto', serif; font-size:2rem; color:#444; letter-spacing:1px;">You May Also Like</h3>
+        <div class="row row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4" id="relatedProductsGrid">
           <% relatedProducts.forEach(relatedProduct => { %>
-            <div class="col-md-3">
-              <div class="card product-card">
+            <div class="col product-item">
+              <div class="product-card card text-center h-100 position-relative overflow-hidden" style="box-shadow:none;border-radius:0;background:transparent;">
                 <a href="/product-details?id=<%= relatedProduct._id %>" class="text-decoration-none">
-                  <img src="/Uploads/product/<%= relatedProduct.productImage[0] %>" class="card-img-top"
-                       alt="<%= relatedProduct.productName %>">
-                  <div class="card-body">
-                    <h5 class="card-title">
-                      <%= relatedProduct.productName %>
-                    </h5>
-                    <p class="card-text">
-                      <% if (relatedProduct.salePrice && relatedProduct.salePrice < relatedProduct.regularPrice) { %>
-                        <span class="text-muted text-decoration-line-through">$<%= relatedProduct.regularPrice.toLocaleString('en-IN') %></span>
-                        <span class="text-danger">$<%= relatedProduct.salePrice.toLocaleString('en-IN') %></span>
+                  <% if (relatedProduct.isListed && relatedProduct.offer) { %>
+                    <span class="offer-badge" style="position:absolute;bottom:15px;right:15px;background-color:#603a10;color:white;font-family:'Jost',sans-serif;font-size:0.65rem;padding:0.3rem 0.6rem;border-radius:0;text-transform:uppercase;z-index:2;">
+                      <% if (relatedProduct.offer.discountType === 'percentage') { %>
+                        <%= relatedProduct.offer.discountValue %>% OFF
                       <% } else { %>
-                        $<%= relatedProduct.regularPrice.toLocaleString('en-IN') %>
+                        ₹<%= relatedProduct.offer.discountValue %> OFF
+                      <% } %>
+                    </span>
+                  <% } %>
+                  <% if (relatedProduct.isListed && relatedProduct.new) { %>
+                    <span class="new-badge" style="position:absolute;top:15px;left:15px;background-color:#A9BA9D;color:white;font-family:'Jost',sans-serif;font-size:0.65rem;padding:0.3rem 0.6rem;border-radius:0;text-transform:uppercase;z-index:2;">New</span>
+                  <% } %>
+                  <div class="product-image-container" style="position:relative;width:100%;aspect-ratio:1;overflow:hidden;border-radius:0;background:transparent;">
+                    <img src="/uploads/product/<%= relatedProduct.productImage[0] %>"
+                         class="product-img <%= !relatedProduct.isListed ? 'unlisted-img' : (relatedProduct.quantity <= 0 ? 'out-of-stock-img' : '') %>"
+                         alt="<%= relatedProduct.productName %>"
+                         style="width:100%;height:100%;object-fit:cover;transition:opacity 0.3s ease;border-radius:0;position:relative;z-index:1;">
+                    <img src="/uploads/product/<%= relatedProduct.productImage[1] %>"
+                         class="product-img-secondary"
+                         alt="<%= relatedProduct.productName %> - Secondary View"
+                         style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.3s ease;border-radius:0;z-index:2;">
+                  </div>
+                  <style>
+                  #relatedProductsGrid .product-image-container { position:relative; overflow:hidden; border-radius:0 !important; box-shadow:none !important; }
+                  #relatedProductsGrid .product-img, #relatedProductsGrid .product-img-secondary { border-radius:0 !important; box-shadow:none !important; }
+                  #relatedProductsGrid .product-image-container:hover .product-img { opacity:0; }
+                  #relatedProductsGrid .product-image-container:hover .product-img-secondary { opacity:1; }
+                  #relatedProductsGrid .product-img-secondary { pointer-events:none; }
+                  </style>
+                  <% if (!relatedProduct.isListed) { %>
+                    <div class="unlisted-overlay" style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.7);z-index:1;display:flex;align-items:center;justify-content:center;border-radius:0;box-shadow:none;">
+                      <span class="unlisted-badge" style="background:#5b0a0a;color:white;padding:5px 10px;border-radius:0;font-weight:lighter;font-family:'Jost',sans-serif;font-size:0.9rem;">Unlisted</span>
+                    </div>
+                  <% } %>
+                  <% if (relatedProduct.quantity <= 0 && relatedProduct.isListed) { %>
+                    <div class="out-of-stock-overlay" style="position:absolute;top:10px;left:10px;background-color:#dc3545;color:white;padding:5px 10px;border-radius:0;font-size:0.65rem;font-weight:bold;z-index:2;box-shadow:none !important;font-family:'Jost',sans-serif;">Out of Stock</div>
+                  <% } %>
+                  <div class="product-info" style="padding:1rem 0;text-align:center;background:transparent;">
+                    <p class="product-title card-title <%= !relatedProduct.isListed ? 'text-muted' : '' %>" style="font-family:'Aboreto',cursive;font-size:1rem;color:#1a0f0a;margin-bottom:0.5rem;font-weight:500;letter-spacing:0.5px;">
+                      <%= relatedProduct.productName %>
+                    </p>
+                    <% if (relatedProduct.category?.name) { %>
+                      <p class="product-category" style="color:#A9BA9D;font-size:0.8rem;margin-bottom:0.5rem;text-transform:uppercase;letter-spacing:1px;font-family:'Jost',sans-serif;">
+                        <%= relatedProduct.category.name %>
+                      </p>
+                    <% } %>
+                    <p class="product-price" style="font-weight:500;margin-bottom:1rem;display:flex;gap:0.5rem;align-items:center;justify-content:center;">
+                      <% if (relatedProduct.offer) { %>
+                      <% if (relatedProduct.salePrice && relatedProduct.salePrice < relatedProduct.regularPrice) { %>
+                          <span class="strike-price" style="color:#666;text-decoration:line-through;font-size:0.9rem;">₹<%= relatedProduct.salePrice.toLocaleString() %></span>
+                      <% } else { %>
+                          <span class="strike-price" style="color:#666;text-decoration:line-through;font-size:0.9rem;">₹<%= relatedProduct.regularPrice.toLocaleString() %></span>
+                        <% } %>
+                        <span class="discounted-price" style="color:#e63946;font-weight:600;font-size:1.1rem;">
+                          ₹<%= relatedProduct.offer.discountType === 'percentage' 
+                            ? (relatedProduct.salePrice ? (relatedProduct.salePrice - (relatedProduct.salePrice * relatedProduct.offer.discountValue / 100)).toFixed(2)
+                              : (relatedProduct.regularPrice - (relatedProduct.regularPrice * relatedProduct.offer.discountValue / 100)).toFixed(2))
+                            : (relatedProduct.salePrice ? (relatedProduct.salePrice - relatedProduct.offer.discountValue).toFixed(2)
+                              : (relatedProduct.regularPrice - relatedProduct.offer.discountValue).toFixed(2)) %>
+                        </span>
+                      <% } else if (relatedProduct.salePrice && relatedProduct.salePrice < relatedProduct.regularPrice) { %>
+                        <span class="strike-price" style="color:#666;text-decoration:line-through;font-size:0.9rem;">₹<%= relatedProduct.regularPrice.toLocaleString() %></span>
+                        <span class="discounted-price" style="color:#e63946;font-weight:600;font-size:1.1rem;">₹<%= relatedProduct.salePrice.toLocaleString() %></span>
+                      <% } else { %>
+                        <span class="regular-price" style="color:#666;text-decoration:line-through;font-size:0.9rem;">₹<%= relatedProduct.regularPrice.toLocaleString() %></span>
                       <% } %>
                     </p>
                   </div>

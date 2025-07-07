@@ -119,9 +119,14 @@ const getOrderDetails = async (req, res) => {
                 };
             }
         }
-      const totalAmount = order.totalAmount || itemsTotal;
+        let subtotal=0
+        basePrice = order.items[0].productId.salePrice && order.items[0].productId.salePrice < order.items[0].productId.regularPrice
+          ? order.items[0].productId.salePrice
+          : order.items[0].productId.regularPrice;
+        const originalPrice = basePrice * order.items[0].quantity;
+      const totalAmount = order.totalAmount || originalPrice;
 const shipping = totalAmount > 1500 ? 0 : 40;
-      const subtotal = parseFloat((totalAmount  - shipping).toFixed(2));
+        subtotal += originalPrice;
 
         if (order.returnRequest && order.returnRequest.items && order.returnRequest.items.length > 0) {
             for (const item of order.returnRequest.items) {
@@ -136,7 +141,6 @@ const shipping = totalAmount > 1500 ? 0 : 40;
                 }
             }
         }
-
         const formattedOrder = {
             ...order,
             orderNumber: order._id.toString().slice(-6).toUpperCase(),

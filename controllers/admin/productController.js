@@ -151,7 +151,7 @@ const addProduct = async (req, res) => {
       sizes,
       productOffer
     } = req.body;
-
+console.log(isNew);
     if (!productName || !description || !category || !regularPrice || !quantity) {
       return res.status(400).json({ message: 'Please fill all required fields' });
     }
@@ -233,10 +233,10 @@ const addProduct = async (req, res) => {
     if (isNaN(parsedQuantity) || parsedQuantity < 0) {
       return res.status(400).json({ message: 'Quantity must be a non-negative integer' });
     }
-
-    const parsedFeatured = featured === 'yes';
-    const parsedNew = isNew === 'yes';
-
+  
+    const parsedFeatured = featured === 'yes'?true:false
+    const parsedNew = isNew === 'yes'?true:false
+console.log(parsedFeatured,parsedNew,'parsed');
     const imagePaths = req.files.map(file => file.filename);
 
 
@@ -437,8 +437,9 @@ const editProduct = async (req, res) => {
         finalPrice = Math.max(regularPrice - parsedOffer.discountValue, 0);
       }
     }
-
-    const updateData = {
+const parsedFeatured = featured === 'yes'?true:false
+    const parsedNew = isNew === 'yes'?true:false   
+     const updateData = {
       productName,
       description,
       category,
@@ -446,8 +447,8 @@ const editProduct = async (req, res) => {
       salePrice: finalPrice,
       quantity,
       sizes: parsedSizes,
-      featured: featured === 'true',
-      new: isNew === 'true',
+      featured: parsedFeatured,
+      new: parsedNew,
       productOffer: parsedOffer
     };
 

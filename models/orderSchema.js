@@ -117,6 +117,11 @@ const orderSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
+    coupon: {
+        code: { type: String },
+        discount: { type: Number },
+        type: { type: String }
+    },
    
   address: {
     type: mongoose.Schema.Types.ObjectId,

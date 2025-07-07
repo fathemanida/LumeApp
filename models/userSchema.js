@@ -1,4 +1,3 @@
-
 const mongoose = require('mongoose');
 const {Schema}=mongoose
 const userSchema = new mongoose.Schema({
@@ -81,8 +80,11 @@ const userSchema = new mongoose.Schema({
         searchedOn:{
             type:Date  ,
             default:Date.now
-        }
-        
+        },
+        usedCoupons: [{
+          code: { type: String },
+          usedOn: { type: Date, default: Date.now }
+        }]
     
 
 

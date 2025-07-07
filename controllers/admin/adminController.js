@@ -176,7 +176,6 @@ const loadSalesreport = async (req, res) => {
       console.log('Last order date:', orders[orders.length - 1].createdOn);
     }
 
-    // Exclude cancelled and returned orders
     const filteredOrders = orders.filter(order => order.status !== 'Cancelled' && order.status !== 'Returned');
 
     const totalOrders = filteredOrders.length;
@@ -184,6 +183,7 @@ const loadSalesreport = async (req, res) => {
     const totalDiscounts = filteredOrders.reduce((sum, order) => 
       sum + (order.couponDiscount || 0) + (order.offerDiscount || 0), 0);
     const totalCoupons = filteredOrders.filter(order => order.usedCoupon).length;
+    console.log('userd cpn',totalCoupons);
 
     console.log('Summary data:', {
         totalOrders,
@@ -378,7 +378,6 @@ const downloadReport = async (req, res) => {
       console.log('Last order date:', orders[orders.length - 1].createdOn);
     }
 
-    // Exclude cancelled and returned orders
     const filteredOrders = orders.filter(order => order.status !== 'Cancelled' && order.status !== 'Returned');
 
     const reportData = filteredOrders.map(order => {
@@ -668,7 +667,7 @@ const loadDashboard = async (req, res) => {
             productSales[productId] = { name: item.productId.productName, count: 0, revenue: 0 };
           }
           productSales[productId].count += item.quantity;
-          productSales[productId].revenue += (item.totalAmount || 0) * item.quantity;
+          productSales[productId].revenue += (item.price || 0) * item.quantity;
         }
       });
     });

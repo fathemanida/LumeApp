@@ -206,6 +206,7 @@ const cart = async (req, res) => {
     }).select('code discountType discountValue maxDiscount minOrderAmount expiryDate usedBy');
 
     if (!cart || cart.items.length === 0) {
+      console.log(coupons,'coupon in cart');
       return res.render('cart', {
         user: req.session.user,
         items: [],
@@ -311,7 +312,8 @@ const cart = async (req, res) => {
       item.couponDiscount = itemCouponDiscount;
       item.totalPrice = item.originalPrice - item.offerDiscount - itemCouponDiscount;
     });
-
+    console.log('coupon at cart',cart.appliedCoupon);
+console.log('cart',req.session.user,cart.items,totalPrice,totalCouponDiscount,totalOfferDiscount,shipping,finalPrice,'coup',coupons,'applied',cart.appliedCoupon);
     res.render('cart', {
       user: req.session.user,
       items: cart.items,
@@ -788,7 +790,7 @@ const applyCoupon = async (req, res) => {
         }
       }
 
-     if (product.category?.categoryOffer?.active) {
+      if (product.category?.categoryOffer?.active) {
         const catOffer = product.category.categoryOffer;
         if (catOffer.discountType === 'percentage') {
           const discount = (itemTotal * catOffer.discountValue) / 100;
@@ -801,7 +803,6 @@ const applyCoupon = async (req, res) => {
 
       totalOfferDiscount += largestDiscount;
     });
-    console.log(totalOfferDiscount,'off dis');
 
     const coupon = await Coupon.findOne({
       code: code.toUpperCase(),
@@ -813,37 +814,49 @@ const applyCoupon = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid or expired coupon code' });
     }
 
-    if (coupon.usedBy && Array.isArray(coupon.usedBy) && coupon.usedBy.includes(userId)) {
-      return res.status(400).json({ success: false, message: 'Coupon already used' });
-    }
+    const alreadyUsed = await User.findOne({
+      _id: userId,
+      usedCoupons: coupon._id
+    });
 
-    const latestCoupon = await Coupon.findById(coupon._id);
-    if (latestCoupon.usedBy && Array.isArray(latestCoupon.usedBy) && latestCoupon.usedBy.includes(userId)) {
+    if (alreadyUsed) {
       return res.status(400).json({ success: false, message: 'Coupon already used' });
     }
 
     if (coupon.minOrderAmount && totalPrice < coupon.minOrderAmount) {
-      return res.status(400).json({ 
-        success: false, 
-        message: `Minimum order amount of ₹${coupon.minOrderAmount} required for this coupon` 
+      return res.status(400).json({
+        success: false,
+        message: `Minimum order amount of ₹${coupon.minOrderAmount} required for this coupon`
       });
     }
 
+    let totalAfterOff = totalPrice - totalOfferDiscount;
+
     let couponDiscount = 0;
     if (coupon.discountType === 'PERCENTAGE') {
-      couponDiscount = (totalPrice * coupon.discountValue) / 100;
+      couponDiscount = (totalAfterOff * coupon.discountValue) / 100;
       if (coupon.maxDiscount) {
         couponDiscount = Math.min(couponDiscount, coupon.maxDiscount);
-        console.log(couponDiscount,'coupondis');
       }
     } else {
       couponDiscount = coupon.discountValue;
     }
-    console.log(couponDiscount,'cpn diss');
 
     cart.appliedCoupon = coupon._id;
+    cart.appliedCouponDetails = coupon;
     cart.discount = couponDiscount;
     await cart.save();
+
+    await Coupon.findByIdAndUpdate(coupon._id, { $addToSet: { usedBy: userId } });
+
+await User.findByIdAndUpdate(userId, {
+  $addToSet: {
+    usedCoupons: {
+      code: coupon.code.toUpperCase(),
+      usedOn: new Date()
+    }
+  }
+});
 
     const shipping = totalPrice >= 1500 ? 0 : 40;
     const finalPrice = totalPrice - totalOfferDiscount - couponDiscount + shipping;
@@ -860,7 +873,7 @@ const applyCoupon = async (req, res) => {
       totals: {
         subtotal: totalPrice,
         offerDiscount: totalOfferDiscount,
-        couponDiscount: couponDiscount,
+        couponDiscount,
         shipping,
         finalPrice
       }
@@ -879,16 +892,18 @@ const applyCoupon = async (req, res) => {
 const removeCoupon = async (req, res) => {
   try {
     const userId = req.session.user.id;
+
     const cart = await Cart.findOne({ userId })
       .populate({
         path: 'items.productId',
         select: 'productName regularPrice salePrice stock'
-      });
+      })
+      .populate('appliedCoupon'); 
 
     if (!cart) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Cart not found' 
+      return res.status(404).json({
+        success: false,
+        message: 'Cart not found'
       });
     }
 
@@ -896,16 +911,31 @@ const removeCoupon = async (req, res) => {
       if (!item.productId) {
         return total;
       }
-      const price = item.productId.salePrice <= item.productId.regularPrice ? 
-        item.productId.salePrice : item.productId.regularPrice;
+      const price = item.productId.salePrice <= item.productId.regularPrice
+        ? item.productId.salePrice
+        : item.productId.regularPrice;
       return total + (price * item.quantity);
     }, 0);
 
+    const couponId = cart.appliedCoupon?._id;
+    const couponCode = cart.appliedCoupon?.code;
+
     cart.appliedCoupon = null;
+    cart.appliedCouponDetails = null;
     cart.discount = 0;
     await cart.save();
 
-    const shipping = totalPrice > 1500 ? 0 : 40;
+    if (couponId) {
+      await Coupon.findByIdAndUpdate(couponId, { $pull: { usedBy: userId } });
+    }
+
+    if (couponCode) {
+      await User.findByIdAndUpdate(userId, {
+        $pull: { usedCoupons: { code: couponCode.toUpperCase() } }
+      });
+    }
+
+    const shipping = totalPrice >= 1500 ? 0 : 40;
     const finalPrice = totalPrice + shipping;
 
     res.json({
@@ -918,15 +948,17 @@ const removeCoupon = async (req, res) => {
         finalPrice: finalPrice
       }
     });
+
   } catch (error) {
     console.error('Error removing coupon:', error);
-    res.status(500).json({ 
-      success: false, 
+    res.status(500).json({
+      success: false,
       message: 'Error removing coupon',
-      error: error.message 
+      error: error.message
     });
   }
 };
+
 
 const placeOrder = async (req, res) => {
   console.log('sdffhgvmbgfgsdfadgfdhgmhvfgdsdggfh');

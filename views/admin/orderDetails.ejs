@@ -427,21 +427,29 @@
             </div>
 
             <div class="order-summary">
+                  
                 <div class="summary-row">
                     <span>Subtotal</span>
-                    <span>₹<%= order.subtotal %></span>
+                    <span>₹<%= order.totalAmount %></span>
                 </div>
-                <div class="summary-row">
+               
+            
+                <% if (order.offerDiscount) { %>
+                    <div class="summary-row">
+                        <span>Discount</span>
+                        <span>-₹<%= order.offerDiscount.toFixed(2) %></span>
+                    </div>
+                <% } %>
+                 <% if (order.couponDiscount) { %>
+                    <div class="summary-row">
+                        <span>Discount</span>
+                        <span>-₹<%= order.couponDiscount.toFixed(2) %></span>
+                    </div>
+                <% } %>
+                 <div class="summary-row">
                     <span>Shipping</span>
                     <span>₹<%= order.shipping.toFixed(2) %></span>
                 </div>
-            
-                <% if (order.discount) { %>
-                    <div class="summary-row">
-                        <span>Discount</span>
-                        <span>-₹<%= order.discount.toFixed(2) %></span>
-                    </div>
-                <% } %>
                 <div class="summary-row">
                     <span>Total</span>
                     <span>₹<%= order.totalAmount.toFixed(2) %></span>

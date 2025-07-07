@@ -55,46 +55,61 @@
         </ul>
     </nav>
 
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card shadow-sm">
-                    <div class="card-body text-center p-5">
-                        <div class="mb-4">
-                            <i class="fas fa-times-circle text-danger" style="font-size: 4rem;"></i>
-                        </div>
-                        <h2 class="mb-4" style="font-family: 'Aboreto', cursive; color: var(--darker-text);">Payment Failed</h2>
-                        <p class="text-muted mb-4">
-                            We're sorry, but your payment could not be processed at this time. 
-                            This could be due to various reasons such as:
-                        </p>
-                        <ul class="text-muted text-start mb-4">
-                            <li>Insufficient funds in your account</li>
-                            <li>Bank declined the transaction</li>
-                            <li>Network connectivity issues</li>
-                            <li>Session timeout</li>
-                        </ul>
-                        <div class="d-flex justify-content-center gap-3">
-                            <a href="/cart" class="btn btn-outline-primary">
-                                <i class="fas fa-shopping-cart me-2"></i>Back to Cart
-                            </a>
-                            <a href="<%= orderId ? ('/proceed-payment?orderId=' + orderId) : '/checkout' %>" class="btn btn-primary btn-try-again">
-                                <i class="fas fa-credit-card me-2"></i>Try Again
-                            </a>
-                            <a href="/orders" class="btn btn-secondary">
-                                <i class="fas fa-list me-2"></i>View Orders
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div class="container-fluid main-content-container" style="background:#f0e9e0;min-height:70vh;padding:3rem 0;">
+      <div class="d-flex flex-column align-items-center justify-content-center" style="min-height:60vh;">
+        <div class="mb-4">
+          <i class="fas fa-times-circle" style="font-size:4rem;color:#e63946;"></i>
         </div>
+        <h2 class="mb-3" style="font-family:'Aboreto',cursive;color:var(--darker-text);font-size:2.2rem;">Payment Failed</h2>
+        <div class="mb-3" style="font-size:3rem;">
+        </div>
+        <div class="mb-3" style="max-width:420px;text-align:center;color:#7a6c5d;font-size:1.08rem;">
+          <strong>Need help?</strong> Our support team is here for you 24/7. If you have questions or need assistance, <a href="/contact" class="support-link" style="color:var(--muted-green);font-weight:500;">contact us</a> and we'll get you back on track!
+        </div>
+        <p class="mb-3" style="color:#6c757d;font-size:1.1rem;max-width:400px;text-align:center;">
+          We're sorry, but your payment could not be processed at this time.<br>
+          This could be due to various reasons such as:
+        </p>
+        <ul class="mb-4" style="color:#888;max-width:400px;text-align:left;font-size:1rem;">
+          <li>Insufficient funds in your account</li>
+          <li>Bank declined the transaction</li>
+          <li>Network connectivity issues</li>
+          <li>Session timeout</li>
+        </ul>
+        <hr style="border: none; border-top: 1px solid #e0d8cc; width: 100px; margin: 2rem auto;">
+        <div class="mb-3" style="max-width:420px;text-align:center;color:#7a6c5d;font-size:1.08rem;">
+          <strong>Oops! Something went wrong.</strong> Don't worry, your cart is safe and you can try again anytime.<br>
+        </div>
+        <% if (orderId) { %>
+          <div class="mb-2" style="color:#888;font-size:0.98rem;">
+            <strong>Order Reference:</strong> <%= orderId %>
+          </div>
+        <% } %>
+        <div class="mb-3" style="font-size:1rem;">
+          <a href="/faq" class="support-link">Payment FAQs</a> |
+          <a href="/refund-policy" class="support-link">Refund Policy</a>
+        </div>
+        <a href="https://wa.me/18001234567" class="continue-shopping-btn" style="background:#465121;color:white;padding:0.8rem 1.5rem;font-size:1.05rem;text-transform:uppercase;letter-spacing:0.5px;border:none;border-radius:0;display:inline-flex;align-items:center;gap:0.6rem;margin-bottom:1.2rem;">
+          <i class="fab fa-whatsapp"></i> Chat on WhatsApp
+        </a>
+        <div class="d-flex flex-wrap justify-content-center gap-2" style="margin-top:0.5rem;">
+          <a href="/cart" class="continue-shopping-btn" style="background:var(--darker-text);color:white;padding:0.7rem 1.3rem;font-size:1rem;text-transform:uppercase;letter-spacing:0.5px;border:none;border-radius:0;display:inline-flex;align-items:center;gap:0.6rem;min-height:unset;">
+            <i class="fas fa-shopping-cart"></i>Back to Cart
+          </a>
+          <a href="/proceed-payment<%= orderId ? ('?orderId=' + orderId) : '' %>" class="continue-shopping-btn" style="background:var(--muted-green);color:white;padding:0.7rem 1.3rem;font-size:1rem;text-transform:uppercase;letter-spacing:0.5px;border:none;border-radius:0;display:inline-flex;align-items:center;gap:0.6rem;min-height:unset;">
+            <i class="fas fa-credit-card"></i>Try Again
+          </a>
+          <a href="/orders" class="continue-shopping-btn" style="background:#6c757d;color:white;padding:0.7rem 1.3rem;font-size:1rem;text-transform:uppercase;letter-spacing:0.5px;border:none;border-radius:0;display:inline-flex;align-items:center;gap:0.6rem;min-height:unset;">
+            <i class="fas fa-list"></i>View Orders
+          </a>
+        </div>
+      </div>
     </div>
-
+<%- include('../partials/user/fooret.ejs')  %>
     <style>
         :root {
             --soft-beige: #D4B996;
-            --muted-green: #A9BA9D;
+            --muted-green: #5e5a25;
             --light-bg: #f8f5f2;
             --border-color: #e0d8cc;
             --offer-red: #e63946;
@@ -105,7 +120,7 @@
         }
 
         body {
-            background-color: var(--light-bg);
+            background-color: #f0e9e0;
             font-family: 'Jost', sans-serif;
             color: var(--dark-text);
         }
@@ -353,6 +368,23 @@
             color: #fff;
             transform: translateY(-3px) scale(1.04);
             box-shadow: 0 8px 24px rgba(230, 57, 70, 0.25);
+        }
+
+        .continue-shopping-btn, .continue-shopping-btn:visited, .continue-shopping-btn:active, .continue-shopping-btn:hover {
+            text-decoration: none !important;
+        }
+        a, a:visited, a:active, a:hover {
+            text-decoration: none !important;
+        }
+
+        .support-link, .support-link:visited, .support-link:active, .support-link:hover {
+            text-decoration: none !important;
+            color: var(--muted-green);
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .support-link:hover {
+            color: var(--darker-text);
         }
     </style>
 </body>

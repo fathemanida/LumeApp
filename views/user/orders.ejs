@@ -8,31 +8,32 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --dark-bg: #1a1a1a;
-            --darker-bg: #121212;
-            --card-bg: #242424;
-            --text-primary: #e0e0e0;
-            --text-secondary: #b0b0b0;
-            --accent-color: #c5a267;
-            --border-color: #333333;
+            --soft-beige: #D4B996;
+            --muted-green: #58674e;
+            --light-bg: #f8f5f2;
+            --border-color: #e0d8cc;
+            --offer-red: #e63946;
+            --dark-text: #2c1810;
+            --darker-text: #1a0f0a;
+            --card-bg: #ffffff;
             --success-color: #4caf50;
             --error-color: #f44336;
         }
 
         body {
             font-family: 'Jost', sans-serif;
-            background-color: var(--dark-bg);
+            background-color: #f0e9e0;
             margin: 0;
             padding: 0;
             min-height: 100vh;
-            color: var(--text-primary);
+            color: var(--dark-text);
             display: flex;
             flex-direction: column;
         }
 
         /* Navbar styles */
         .navbar {
-            background: var(--darker-bg);
+            background: white;
             border-bottom: 1px solid var(--border-color);
             padding: 1rem 2rem;
             display: flex;
@@ -51,13 +52,13 @@
             font-size: 1.5rem;
             letter-spacing: 1.5px;
             text-transform: uppercase;
-            color: var(--text-primary);
+            color: var(--darker-text);
             cursor: pointer;
             transition: color 0.3s ease;
         }
 
         .brand:hover {
-            color: var(--accent-color);
+            color: var(--muted-green);
         }
 
         .nav-links {
@@ -70,7 +71,7 @@
         }
 
         .nav-link {
-            color: var(--text-primary);
+            color: var(--darker-text);
             font-family: 'Jost', sans-serif;
             font-size: 0.9rem;
             text-decoration: none;
@@ -79,8 +80,8 @@
         }
 
         .nav-link:hover {
-            color: var(--accent-color);
-            transform: translateY(-2px);
+            color: var(--muted-green);
+            font-weight: 500;
         }
 
         .icon-links {
@@ -92,15 +93,14 @@
         }
 
         .icon-link {
-            color: var(--text-primary);
+            color: var(--darker-text);
             font-size: 1.1rem;
             padding: 0.5rem;
             transition: all 0.3s ease;
         }
 
         .icon-link:hover {
-            color: var(--accent-color);
-            transform: translateY(-2px);
+            color: var(--muted-green);
         }
 
         .search-container {
@@ -115,14 +115,14 @@
             padding: 0.5rem 1rem;
             padding-right: 2.5rem;
             width: 200px;
-            background-color: var(--card-bg);
-            color: var(--text-primary);
+            background-color: var(--light-bg);
+            color: var(--dark-text);
             transition: all 0.3s ease;
         }
 
         .search-input:focus {
             width: 250px;
-            border-color: var(--accent-color);
+            border-color: var(--soft-beige);
             box-shadow: none;
             outline: none;
         }
@@ -132,7 +132,7 @@
             right: 10px;
             background: none;
             border: none;
-            color: var(--text-secondary);
+            color: var(--dark-text);
             cursor: pointer;
         }
 
@@ -146,9 +146,9 @@
             display: none;
             position: absolute;
             right: 0;
-            background-color: var(--card-bg);
+            background-color: white;
             min-width: 160px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
             z-index: 1000;
             border-radius: 4px;
             padding: 0.5rem 0;
@@ -160,7 +160,7 @@
         }
 
         .profile-dropdown-content a {
-            color: var(--text-primary);
+            color: var(--dark-text);
             padding: 0.75rem 1rem;
             text-decoration: none;
             display: block;
@@ -169,8 +169,8 @@
         }
 
         .profile-dropdown-content a:hover {
-            background-color: var(--darker-bg);
-            color: var(--accent-color);
+            background-color: var(--light-bg);
+            color: var(--muted-green);
         }
 
         .profile-dropdown-content a i {
@@ -186,20 +186,75 @@
             margin-top: 70px;
         }
 
-        /* Elegant Dark Sidebar */
+        /* Elegant Sidebar */
         .sidebar {
             width: 280px;
-            background-color: var(--darker-bg);
+            background-color: white;
             padding: 2rem 1.5rem;
             border-right: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
+            position: fixed;
+            top: 70px;
+            left: 0;
+            height: calc(100vh - 70px);
+            z-index: 1200;
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.07);
+            overflow-y: auto;
+        }
+        .sidebar.open {
+            transform: translateX(0);
+        }
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: transparent;
+            z-index: 1199;
+        }
+        .sidebar-overlay.active {
+            display: block;
+        }
+        .sidebar-toggle {
+            display: flex;
+            align-items: center;
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: var(--muted-green);
+            cursor: pointer;
+            margin-right: 1.2rem;
+            padding: 0;
+            height: 2.2rem;
+            position: static;
+        }
+        @media (max-width: 1024px) {
+            .sidebar {
+                top: 0;
+                height: 100vh;
+                padding-top: 4rem;
+            }
+            .main-container {
+                margin-top: 70px;
+            }
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 80vw;
+                min-width: 220px;
+                max-width: 320px;
+            }
         }
 
         .sidebar-title {
             font-family: 'Aboreto', cursive;
             font-size: 1.5rem;
-            color: var(--accent-color);
+            color: var(--muted-green);
             margin-bottom: 2rem;
             padding-bottom: 1rem;
             border-bottom: 1px solid var(--border-color);
@@ -214,7 +269,7 @@
         }
 
         .sidebar-nav a {
-            color: var(--text-primary);
+            color: var(--dark-text);
             text-decoration: none;
             padding: 0.75rem 1rem;
             border-radius: 4px;
@@ -228,20 +283,20 @@
         .sidebar-nav a i {
             width: 20px;
             text-align: center;
-            color: var(--accent-color);
+            color: var(--muted-green);
         }
 
         .sidebar-nav a:hover {
-            background-color: rgba(197, 162, 103, 0.1);
-            color: var(--accent-color);
+            background-color: rgba(169, 186, 157, 0.1);
+            color: var(--muted-green);
             transform: translateX(4px);
         }
 
         .sidebar-nav a.active {
-            background-color: rgba(197, 162, 103, 0.2);
-            color: var(--accent-color);
+            background-color: rgba(169, 186, 157, 0.2);
+            color: var(--muted-green);
             font-weight: 500;
-            border-left: 3px solid var(--accent-color);
+            border-left: 3px solid var(--muted-green);
         }
 
         .sidebar-actions {
@@ -268,14 +323,14 @@
         }
 
         .logout-btn {
-            background-color: rgba(197, 162, 103, 0.1);
-            color: var(--text-primary);
+            background-color: rgba(169, 186, 157, 0.1);
+            color: var(--dark-text);
             border: 1px solid var(--border-color);
         }
 
         .logout-btn:hover {
-            background-color: rgba(197, 162, 103, 0.2);
-            border-color: var(--accent-color);
+            background-color: rgba(169, 186, 157, 0.2);
+            border-color: var(--muted-green);
         }
 
         .delete-btn {
@@ -304,7 +359,7 @@
         .page-title {
             font-family: 'Aboreto', cursive;
             font-size: 2rem;
-            color: var(--accent-color);
+            color: var(--muted-green);
             margin: 0;
         }
 
@@ -312,16 +367,16 @@
         .orders-table {
             width: 100%;
             border-collapse: collapse;
-            background-color: var(--card-bg);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-            border-radius: 5px;
+            background-color: transparent;
+            box-shadow: none;
+            border-radius: 0;
             overflow: hidden;
-            border: 1px solid var(--border-color);
+            border: none;
         }
 
         .orders-table th {
-            background-color: var(--darker-bg);
-            color: var(--text-primary);
+            background-color: var(--light-bg);
+            color: var(--dark-text);
             padding: 1rem;
             text-align: left;
             font-family: 'Jost', sans-serif;
@@ -333,7 +388,7 @@
             padding: 1rem;
             border-bottom: 1px solid var(--border-color);
             font-size: 0.9rem;
-            color: var(--text-secondary);
+            color: #666;
         }
 
         .orders-table tr:last-child td {
@@ -341,7 +396,7 @@
         }
 
         .orders-table tr:hover {
-            background-color: var(--darker-bg);
+            background-color: var(--light-bg);
         }
 
         .status {
@@ -373,23 +428,23 @@
         }
 
         .view-icon, .return-icon {
-            color: var(--accent-color);
+            color: var(--muted-green);
             font-size: 1.1rem;
             cursor: pointer;
             transition: all 0.3s ease;
         }
 
         .view-icon:hover, .return-icon:hover {
-            color: #d4b47c;
+            color: var(--soft-beige);
             transform: scale(1.1);
         }
 
         .return-status {
-            background-color: var(--darker-bg);
+            background-color: var(--light-bg);
             padding: 4px 8px;
             border-radius: 4px;
             margin-top: 4px;
-            color: var(--text-secondary);
+            color: #666;
         }
 
         /* Pagination styles */
@@ -408,60 +463,60 @@
         .pagination a {
             display: inline-block;
             padding: 0.5rem 1rem;
-            background-color: var(--card-bg);
+            background-color: white;
             border: 1px solid var(--border-color);
             border-radius: 4px;
             text-decoration: none;
-            color: var(--text-primary);
+            color: var(--dark-text);
             transition: all 0.3s ease;
         }
 
         .pagination a.active {
-            background-color: var(--accent-color);
-            color: var(--dark-bg);
-            border-color: var(--accent-color);
+            background-color: var(--muted-green);
+            color: white;
+            border-color: var(--muted-green);
         }
 
         .pagination a:hover:not(.active) {
-            background-color: var(--darker-bg);
-            color: var(--accent-color);
+            background-color: var(--light-bg);
+            color: var(--muted-green);
         }
 
         .pagination a.disabled {
-            color: var(--text-secondary);
+            color: #999;
             cursor: not-allowed;
             pointer-events: none;
         }
 
         .pagination a.disabled:hover {
-            background-color: var(--card-bg);
-            color: var(--text-secondary);
+            background-color: white;
+            color: #999;
         }
 
         .no-orders {
             text-align: center;
             padding: 3rem;
-            background: var(--card-bg);
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            background: transparent;
+            border-radius: 0;
+            border: none;
+            box-shadow: none;
         }
 
         .no-orders h2 {
-            color: var(--text-primary);
+            color: var(--dark-text);
             margin-bottom: 1rem;
         }
 
         .no-orders p {
-            color: var(--text-secondary);
+            color: #666;
             margin-bottom: 1.5rem;
         }
 
         .shop-now-btn, .login-btn {
-            background-color: var(--accent-color);
-            color: var(--dark-bg);
+            background-color: var(--muted-green);
+            color: white;
             padding: 0.75rem 1.5rem;
-            border-radius: 6px;
+            border-radius: 4px;
             font-size: 1rem;
             font-weight: 500;
             border: none;
@@ -473,48 +528,15 @@
         }
 
         .shop-now-btn:hover, .login-btn:hover {
-            background-color: #d4b47c;
+            background-color: var(--soft-beige);
             transform: translateY(-2px);
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .main-container {
-                flex-direction: column;
-            }
-
-            .sidebar {
-                width: 100%;
-                padding: 1rem;
-                height: auto;
-                border-right: none;
-                border-bottom: 1px solid var(--border-color);
-            }
-
-            .content-area {
-                padding: 1.5rem;
-            }
-
-            .orders-table {
-                display: block;
-                overflow-x: auto;
-            }
-
-            .page-header {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .nav-links {
-                display: none;
-            }
-        }
-
         .btn-try-again {
-            background: linear-gradient(120deg, #ff6b81 60%, #fff0 100%), #ff6b81;
-            color: #fff !important;
+            background: linear-gradient(120deg, var(--muted-green) 60%, #fff0 100%), var(--muted-green);
+            color: white !important;
             font-weight: 700;
-            box-shadow: 0 4px 16px rgba(255, 107, 129, 0.25), 0 0 8px 2px #fff3;
+            box-shadow: 0 4px 16px rgba(169, 186, 157, 0.25), 0 0 8px 2px rgba(255,255,255,0.3);
             border: none;
             border-radius: 20px;
             letter-spacing: 1px;
@@ -523,6 +545,8 @@
             display: inline-block;
             position: relative;
             overflow: hidden;
+            text-decoration: none;
+            font-size: 0.85rem;
         }
         .btn-try-again::after {
             content: '';
@@ -535,20 +559,78 @@
             opacity: 1;
         }
         .btn-try-again:hover, .btn-try-again:focus {
-            background: linear-gradient(120deg, #ff8fa3 60%, #fff0 100%), #ff6b81;
-            color: #fff !important;
-            box-shadow: 0 8px 32px 4px #ffb3c6, 0 0 16px 4px #fff6;
+            background: linear-gradient(120deg, var(--soft-beige) 60%, #fff0 100%), var(--muted-green);
+            color: white !important;
+            box-shadow: 0 8px 32px 4px rgba(212, 185, 150, 0.5), 0 0 16px 4px rgba(255,255,255,0.6);
             transform: translateY(-3px) scale(1.06);
             text-decoration: none;
         }
         .btn-try-again:hover::after, .btn-try-again:focus::after {
             opacity: 0.85;
         }
+
+        /* Footer */
+        footer {
+            background-color: var(--soft-beige);
+            color: white;
+            padding: 40px 0;
+            font-family: 'Jost', sans-serif;
+            line-height: 1.6;
+        }
+
+        .footer-container {
+            display: flex;
+            justify-content: center;
+            gap: 120px;
+            padding: 0 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-column h3 {
+            font-family: 'Aboreto', cursive;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .footer-column ul {
+            list-style: none;
+            padding: 0;
+            font-size: 0.9rem;
+        }
+
+        .footer-column li {
+            margin-bottom: 8px;
+        }
+
+        .footer-column a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-column a:hover {
+            color: var(--light-bg);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            font-size: 0.8rem;
+            padding-top: 30px;
+            margin-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.7);
+        }
     </style>
 </head>
 <body>
     <!-- Navbar -->
     <nav class="navbar">
+        <button class="sidebar-toggle" id="sidebarToggle" aria-label="Open sidebar">
+            <i class="fas fa-bars"></i>
+        </button>
         <div class="brand">LUME</div>
         <ul class="nav-links">
             <li><a href="/" class="nav-link">Home</a></li>
@@ -586,10 +668,12 @@
         </ul>
     </nav>
 
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
     <% if (locals.user) { %>
         <div class="main-container">
-            <!-- Elegant Dark Sidebar -->
-            <div class="sidebar">
+            <!-- Sidebar -->
+            <div class="sidebar" id="sidebar">
                 <div class="sidebar-title">My Account</div>
                 <div class="sidebar-nav">
                     <a href="/profile" class="nav-link"><i class="fas fa-user"></i> Profile</a>
@@ -620,7 +704,7 @@
                 </div>
 
                 <% if (orders && orders.length > 0) { %>
-                    <div class="d-flex justify-content-between align-items-center mb-4" style="color: var(--text-secondary);">
+                    <div class="d-flex justify-content-between align-items-center mb-4" style="color: #666;">
                         <span>Showing <%= orders.length %> of <%= totalOrders %> orders</span>
                     </div>
                     <table class="orders-table">
@@ -643,14 +727,14 @@
                                         <% if (order.items && order.items.length > 0) { %>
                                             <div style="display: flex; flex-direction: column; align-items: center;">
                                                 <img src="/uploads/product/<%= order.items[0].image %>" alt="<%= order.items[0].name %>" width="80" height="80" style="object-fit: cover;">
-                                                <span style="margin-top: 8px; font-size: 0.85rem; color: var(--text-secondary); text-align: center; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                                <span style="margin-top: 8px; font-size: 0.85rem; color: #666; text-align: center; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                                     <%= order.items[0].name %>
                                                 </span>
                                             </div>
                                         <% } else { %>
                                             <div style="display: flex; flex-direction: column; align-items: center;">
                                                 <img src="/images/placeholder.png" alt="No image" width="80" height="80" style="object-fit: cover;">
-                                                <span style="margin-top: 8px; font-size: 0.85rem; color: var(--text-secondary);">Product not found</span>
+                                                <span style="margin-top: 8px; font-size: 0.85rem; color: #666;">Product not found</span>
                                             </div>
                                         <% } %>
                                     </td>
@@ -682,17 +766,17 @@
                                                         <% } %>
                                                     </div>
                                                 <% } %>
-                                                <div style="font-size: 0.75rem; margin-top: 2px; color: var(--text-secondary);">
+                                                <div style="font-size: 0.75rem; margin-top: 2px; color: #666;">
                                                     Requested on: <%= new Date(order.returnRequest.requestedAt).toLocaleDateString() %>
                                                 </div>
                                                 <% if (order.returnRequest.respondedAt) { %>
-                                                    <div style="font-size: 0.75rem; margin-top: 2px; color: var(--text-secondary);">
+                                                    <div style="font-size: 0.75rem; margin-top: 2px; color: #666;">
                                                         Responded on: <%= new Date(order.returnRequest.respondedAt).toLocaleDateString() %>
                                                     </div>
                                                 <% } %>
                                             </div>
                                         <% } else { %>
-                                            <span style="color: var(--text-secondary);">No return request</span>
+                                            <span style="color: #666;">No return request</span>
                                         <% } %>
                                     </td>
                                     <td>
@@ -705,8 +789,8 @@
                                             </button>
                                         <% } %>
                                         <% if (order.status === 'Failed') { %>
-                                            <a href="/proceed-payment?orderId=<%= order._id %>" class="btn btn-try-again btn-sm ms-2" style="text-decoration: none;">
-                                                <i class="fas fa-redo-alt me-1"></i> Try Again
+                                            <a href="/proceed-payment?orderId=<%= order._id %>" class="btn-try-again" style="margin-left: 10px;">
+                                                <i class="fas fa-redo-alt"></i> Try Again
                                             </a>
                                         <% } %>
                                     </td>
@@ -746,46 +830,40 @@
     <% } %>
 
     <!-- Footer -->
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
-    <footer style="background-color: #121212; color: #b0b0b0; padding: 40px 0; font-family: 'Cinzel', serif; line-height: 1.6; border-top: 1px solid #333;">
-        <div style="display: flex; justify-content: center; gap: 120px; padding: 0 20px; max-width: 1200px; margin: 0 auto;">
-            <div>
-                <h3 style="font-size: 18px; margin-bottom: 15px; letter-spacing: 1px; text-transform: uppercase; color: #c5a267;">Company</h3>
-                <ul style="list-style: none; padding: 0; font-size: 14px;">
-                    <li style="margin-bottom: 8px;"><a href="/about-us" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">About Us</a></li>
-                    <li style="margin-bottom: 8px;"><a href="/careers" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Careers</a></li>
-                    <li style="margin-bottom: 8px;"><a href="/contact" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Contact</a></li>
-                    <li style="margin-bottom: 8px;"><a href="/privacy-policy" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Privacy Policy</a></li>
+    <footer>
+        <div class="footer-container">
+            <div class="footer-column">
+                <h3>Company</h3>
+                <ul>
+                    <li><a href="/about-us">About Us</a></li>
+                    <li><a href="/careers">Careers</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                    <li><a href="/privacy-policy">Privacy Policy</a></li>
                 </ul>
             </div>
-            <div>
-                <h3 style="font-size: 18px; margin-bottom: 15px; letter-spacing: 1px; text-transform: uppercase; color: #c5a267;">Shop</h3>
-                <ul style="list-style: none; padding: 0; font-size: 14px;">
-                    <li style="margin-bottom: 8px;"><a href="/rings" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Rings</a></li>
-                    <li style="margin-bottom: 8px;"><a href="/necklaces" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Necklaces</a></li>
-                    <li style="margin-bottom: 8px;"><a href="/earrings" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Earrings</a></li>
-                    <li style="margin-bottom: 8px;"><a href="/bracelets" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Bracelets</a></li>
+            <div class="footer-column">
+                <h3>Shop</h3>
+                <ul>
+                    <li><a href="/rings">Rings</a></li>
+                    <li><a href="/necklaces">Necklaces</a></li>
+                    <li><a href="/earrings">Earrings</a></li>
+                    <li><a href="/bracelets">Bracelets</a></li>
                 </ul>
             </div>
-            <div>
-                <h3 style="font-size: 18px; margin-bottom: 15px; letter-spacing: 1px; text-transform: uppercase; color: #c5a267;">Connect With Us</h3>
-                <ul style="list-style: none; padding: 0; font-size: 14px;">
-                    <li style="margin-bottom: 8px;"><a href="https://instagram.com" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Instagram</a></li>
-                    <li style="margin-bottom: 8px;"><a href="https://facebook.com" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Facebook</a></li>
-                    <li style="margin-bottom: 8px;"><a href="https://pinterest.com" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Pinterest</a></li>
-                    <li style="margin-bottom: 8px;"><a href="https://twitter.com" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Twitter</a></li>
+            <div class="footer-column">
+                <h3>Connect With Us</h3>
+                <ul>
+                    <li><a href="https://instagram.com">Instagram</a></li>
+                    <li><a href="https://facebook.com">Facebook</a></li>
+                    <li><a href="https://pinterest.com">Pinterest</a></li>
+                    <li><a href="https://twitter.com">Twitter</a></li>
                 </ul>
             </div>
         </div>
-        <div style="text-align: center; font-size: 12px; padding-top: 30px; margin-top: 30px; border-top: 1px solid #333; color: #666;">
+        <div class="footer-bottom">
             © 2024 Lume Jewelry. All Rights Reserved.
         </div>
     </footer>
-    <style>
-        footer a:hover {
-            color: #c5a267;
-        }
-    </style>
 
     <script>
         // Sidebar button functionality
@@ -845,6 +923,32 @@
                     e.preventDefault();
                 }
             });
+        });
+
+        // Sidebar toggle logic (with double-click to close)
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        function openSidebar() {
+            sidebar.classList.add('open');
+            sidebarOverlay.classList.add('active');
+        }
+        function closeSidebar() {
+            sidebar.classList.remove('open');
+            sidebarOverlay.classList.remove('active');
+        }
+        sidebarToggle.addEventListener('click', function() {
+            if (sidebar.classList.contains('open')) {
+                closeSidebar();
+            } else {
+                openSidebar();
+            }
+        });
+        sidebarToggle.addEventListener('dblclick', closeSidebar);
+        sidebarOverlay.addEventListener('click', closeSidebar);
+        // Optional: close sidebar on ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeSidebar();
         });
     </script>
 </body>

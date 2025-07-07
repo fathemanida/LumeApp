@@ -120,7 +120,7 @@ const processReturnRefund = async (req, res) => {
       });
     }
 
-    const refundAmount = order.finalAmount;
+    const refundAmount = order.totalAmount;
 
     const transaction = {
       type: 'CREDIT',
@@ -248,7 +248,6 @@ const addRefund = async (req) => {
     return { success: false, message: 'Wallet refund failed', error };
   }
 };
-
 
 
 

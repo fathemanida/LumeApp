@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Refund Policy - LUME</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Jost&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    body {
+      background: #f8f5f2;
+      color: #2c1810;
+      font-family: 'Jost', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .refund-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 3.5rem 1.5rem 2.5rem 1.5rem;
+    }
+    .refund-title {
+      font-family: 'Aboreto', cursive;
+      font-size: 2.5rem;
+      color: #3a2414;
+      margin-bottom: 2.5rem;
+      letter-spacing: 1.5px;
+      text-align: center;
+    }
+    .refund-section {
+      margin-bottom: 2.2rem;
+    }
+    .refund-section h2, .refund-section h3 {
+      font-family: 'Aboreto', cursive;
+      color: #3a2414;
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+      margin-top: 2rem;
+    }
+    .refund-section p, .refund-section ul {
+      font-size: 1.08rem;
+      color: #2c1810;
+      line-height: 1.7;
+      margin-bottom: 1.2rem;
+    }
+    .refund-section ul {
+      padding-left: 1.5rem;
+    }
+    @media (max-width: 900px) {
+      .refund-container {
+        padding: 2rem 0.5rem 1.5rem 0.5rem;
+      }
+      .refund-title {
+        font-size: 2rem;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <%- include("../partials/user/header") %>
+  <div class="refund-container">
+    <div class="refund-title">Refund Policy</div>
+    <div class="refund-section">
+      <h3>Returns and Exchange</h3>
+      <p>
+        At LUME, we take pride in the quality and craftsmanship of our jewelry. Each piece is carefully inspected before shipping. If you have received a product with a manufacturing defect or an incorrect item, we are here to help.
+      </p>
+      <ul>
+        <li>Returns are accepted only after delivery and only for products with a manufacturing defect or if you received the wrong item.</li>
+        <li>Return requests must be made within 2 days of delivery by contacting our customer service at <a href="mailto:lume.elegence@gmail.com" style="color: #3a2414; text-decoration: underline;">info@lume.elegence.com</a> with your order details.</li>
+        <li>Returned items must be unused, unworn, and in their original packaging.</li>
+        <li>Customized or made-to-order items are not eligible for return unless there is a manufacturing defect.</li>
+        <li>Each order is eligible for a ONE TIME return/exchange only.</li>
+      </ul>
+    </div>
+    <div class="refund-section">
+      <h3>Order Cancellation</h3>
+      <ul>
+        <li>Orders can be cancelled only before they are shipped. Once shipped, the order cannot be cancelled.</li>
+        <li>To cancel your order, please contact us as soon as possible at <a href="mailto:lume.elegence@gmail.com" style="color: #3a2414; text-decoration: underline;">lume.elegence@gmail.com</a> with your order number.</li>
+      </ul>
+    </div>
+    <div class="refund-section">
+      <h3>Refunds</h3>
+      <ul>
+        <li>If you paid by online payment and your order is cancelled before shipping, your refund will be credited to your LUME wallet only. No refunds will be made to your original payment method.</li>
+        <li>For returns (after delivery), if approved, you will be issued a credit note or wallet refund. No cash or bank refunds are provided.</li>
+        <li>There will be no refunds in any case, without any exceptions, except as stated above.</li>
+      </ul>
+    </div>
+    <div class="refund-section">
+      <h3>How to Request a Return or Cancellation</h3>
+      <p>
+        To request a return or cancellation, please email us at <a href="mailto:lume.elegence@gmail.com" style="color: #3a2414; text-decoration: underline;">lume.elegence@gmail.com</a> within 2 days of delivery (for returns) or before shipping (for cancellations) with the following information:
+      </p>
+      <ul>
+        <li>Order number</li>
+        <li>Reason for return/cancellation</li>
+        <li>Photos of the product (if defective or incorrect)</li>
+      </ul>
+      <p>Our team will review your request and respond with the next steps.</p>
+    </div>
+    <div class="refund-section">
+      <h3>Contact Us</h3>
+      <p>
+        For any questions regarding our refund, return, or cancellation policy, please email us at <a href="mailto:lume.elegence@gmail.com" style="color: #3a2414; text-decoration: underline;">lume.elegence@gmail.com</a>.
+      </p>
+    </div>
+  </div>
+  <%- include("../partials/user/fooret.ejs") %>
+</body>
+</html> 

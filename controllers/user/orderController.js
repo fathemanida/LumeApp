@@ -225,7 +225,7 @@ const orderDetails = async (req, res) => {
         price: basePrice,
         quantity: quantity,
         total: finalPrice,
-        discount: 0, // If you store per-item discount, use it here
+        discount: 0, 
         image: product?.productImage?.[0] || '/images/no-image.png',
         productId: product?._id || null
       };
@@ -352,7 +352,6 @@ const returnOrder = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Order is already returned' });
         }
 
-         const walletController = require('./walletController');
         await walletController.addRefund(req, res);
 
         order.status = 'RETURNED';
@@ -399,8 +398,12 @@ const returnRequest = async (req, res) => {
             });
         }
 
-        const orderItems = order.items.map(item => item.productId.toString());
-        const invalidItems = items.filter(itemId => !orderItems.includes(itemId));
+        const orderItems = order.items.map(
+          item => item.productId.toString()
+        );
+        const invalidItems = items.filter(itemId =>
+           !orderItems.includes(itemId)
+          );
         
         if (invalidItems.length > 0) {
             return res.status(400).json({
@@ -543,8 +546,8 @@ const downloadInvoice = async (req, res) => {
     order.items.forEach(item => {
       doc.text(item._productName, col1, y, { width: 230 });
       doc.text(item.quantity.toString(), col2, y, { width: 60, align: 'right' });
-      doc.text(`₹${item._finalUnitPrice.toFixed(2)}`, col3, y, { width: 60, align: 'right' });
-      doc.text(`₹${item._total.toFixed(2)}`, col4, y, { width: 70, align: 'right' });
+      doc.text(`Rs.${item._finalUnitPrice.toFixed(2)}`, col3, y, { width: 60, align: 'right' });
+      doc.text(`Rs.${item._total.toFixed(2)}`, col4, y, { width: 70, align: 'right' });
       y += 25;
       doc.moveTo(col1 - 5, y - 5).lineTo(col1 - 5 + 515, y - 5).lineWidth(0.5).strokeColor('#e0e0e0').stroke();
     });
@@ -553,18 +556,18 @@ const downloadInvoice = async (req, res) => {
     const summaryY = y + 10;
     const lineGap = 10;
     doc.text('Subtotal:', col4 - 70, summaryY, { width: 80, align: 'left' });
-    doc.text(`₹${subtotal.toFixed(2)}`, col5 - 50, summaryY, { width: 60, align: 'right' });
+    doc.text(`Rs.${subtotal.toFixed(2)}`, col5 - 50, summaryY, { width: 60, align: 'right' });
     doc.text('Offer Discount:', col4 - 70, summaryY + 20, { width: 80, align: 'left' });
-    doc.text(`-₹${offerDiscount.toFixed(2)}`, col5 - 50, summaryY + 20, { width: 60, align: 'right' });
+    doc.text(`-Rs.${offerDiscount.toFixed(2)}`, col5 - 50, summaryY + 20, { width: 60, align: 'right' });
     doc.text('Coupon Discount:', col4 - 70, summaryY + 40, { width: 80, align: 'left' });
-    doc.text(`-₹${couponDiscount.toFixed(2)}`, col5 - 50, summaryY + 40, { width: 60, align: 'right' });
+    doc.text(`-Rs.${couponDiscount.toFixed(2)}`, col5 - 50, summaryY + 40, { width: 60, align: 'right' });
     doc.text('Shipping:', col4 - 70, summaryY + 60 + lineGap, { width: 80, align: 'left' });
-    doc.text(`₹${shipping.toFixed(2)}`, col5 - 50, summaryY + 60 + lineGap, { width: 60, align: 'right' });
+    doc.text(`Rs.${shipping.toFixed(2)}`, col5 - 50, summaryY + 60 + lineGap, { width: 60, align: 'right' });
 
     doc.moveTo(col4 - 75, summaryY + 80 + lineGap).lineTo(col5 + 10, summaryY + 80 + lineGap).lineWidth(1).strokeColor('#555').stroke();
     doc.font('Helvetica-Bold').fontSize(12).fillColor('#333');
     doc.text('Total:', col4 - 70, summaryY + 85 + lineGap, { width: 80, align: 'left' });
-    doc.fillColor('#c5a267').text(`₹${finalAmount.toFixed(2)}`, col5 - 50, summaryY + 85 + lineGap, { width: 60, align: 'right' });
+    doc.fillColor('#c5a267').text(`Rs.${finalAmount.toFixed(2)}`, col5 - 50, summaryY + 85 + lineGap, { width: 65, align: 'right' });
 
     doc.font('Helvetica').fontSize(10).fillColor('#888').text('Thank you for shopping with us!', col1, pageBottom - 20, { align: 'center' });
 
@@ -608,7 +611,56 @@ const cancelOrderItem = async (req, res) => {
       if (!wallet) {
         wallet = new Wallet({ userId, balance: 0, transactions: [] });
       }
-      const refundAmount = item.price * item.quantity;
+      // Calculate offer price for the item
+      const product = item.productId;
+      const quantity = item.quantity;
+      const basePrice = product.salePrice && product.salePrice < product.regularPrice ? product.salePrice : product.regularPrice;
+      const originalPrice = basePrice * quantity;
+      let productOfferDiscount = 0;
+      if (product.offer && product.offer.isActive) {
+        productOfferDiscount = product.offer.discountType === 'percentage'
+          ? (originalPrice * product.offer.discountValue) / 100
+          : product.offer.discountValue * quantity;
+      }
+      let categoryOfferDiscount = 0;
+      if (product.category && product.category.categoryOffer && product.category.categoryOffer.active) {
+        categoryOfferDiscount = product.category.categoryOffer.discountType === 'percentage'
+          ? (originalPrice * product.category.categoryOffer.discountValue) / 100
+          : product.category.categoryOffer.discountValue * quantity;
+      }
+      const bestOfferDiscount = Math.max(productOfferDiscount, categoryOfferDiscount);
+      const offerPrice = originalPrice - bestOfferDiscount;
+      // Proportional coupon refund logic
+      // Calculate total offer price for all non-cancelled items
+      const totalOrderOfferPrice = order.items.reduce((sum, i) => {
+        if (i.status !== 'Cancelled') {
+          const prod = i.productId;
+          const qty = i.quantity;
+          const base = prod.salePrice && prod.salePrice < prod.regularPrice ? prod.salePrice : prod.regularPrice;
+          const orig = base * qty;
+          let prodOffer = 0;
+          if (prod.offer && prod.offer.isActive) {
+            prodOffer = prod.offer.discountType === 'percentage'
+              ? (orig * prod.offer.discountValue) / 100
+              : prod.offer.discountValue * qty;
+          }
+          let catOffer = 0;
+          if (prod.category && prod.category.categoryOffer && prod.category.categoryOffer.active) {
+            catOffer = prod.category.categoryOffer.discountType === 'percentage'
+              ? (orig * prod.category.categoryOffer.discountValue) / 100
+              : prod.category.categoryOffer.discountValue * qty;
+          }
+          const best = Math.max(prodOffer, catOffer);
+          return sum + (orig - best);
+        }
+        return sum;
+      }, 0);
+      const couponDiscount = order.couponDiscount || 0;
+      let proportionalCoupon = 0;
+      if (couponDiscount > 0 && totalOrderOfferPrice > 0) {
+        proportionalCoupon = (offerPrice / totalOrderOfferPrice) * couponDiscount;
+      }
+      const refundAmount = offerPrice - proportionalCoupon;
       wallet.balance += refundAmount;
       wallet.transactions.push({
         type: 'CREDIT',
