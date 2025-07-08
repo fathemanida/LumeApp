@@ -1572,26 +1572,34 @@
     const searchToggle = document.getElementById('searchToggle');
     const searchContainer = document.getElementById('searchContainer');
 
-    sidebarToggle.addEventListener('click', () => {
-      sidebar.classList.toggle('open');
-      overlay.classList.toggle('active');
-    });
+    if (sidebarToggle) {
+      sidebarToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('active');
+      });
+    }
 
-    overlay.addEventListener('click', () => {
-      sidebar.classList.remove('open');
-      overlay.classList.remove('active');
-    });
+    if (overlay) {
+      overlay.addEventListener('click', () => {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('active');
+      });
+    }
 
-    searchToggle.addEventListener('click', (e) => {
-      e.preventDefault();
-      searchContainer.classList.toggle('active');
-      if (searchContainer.classList.contains('active')) {
-        searchContainer.querySelector('input').focus();
-      }
-    });
+    if (searchToggle) {
+      searchToggle.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (searchContainer) {
+          searchContainer.classList.toggle('active');
+          if (searchContainer.classList.contains('active')) {
+            searchContainer.querySelector('input').focus();
+          }
+        }
+      });
+    }
 
     document.addEventListener('click', (e) => {
-      if (!searchContainer.contains(e.target) && e.target !== searchToggle) {
+      if (searchContainer && !searchContainer.contains(e.target) && e.target !== searchToggle) {
         searchContainer.classList.remove('active');
       }
     });
