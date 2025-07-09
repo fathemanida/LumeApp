@@ -8,14 +8,9 @@ const passport = require("./config/passport");
 const db = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
 const adminRouters = require("./routes/adminRoutes");
-const cartRoutes = require('./routes/user/cartRoutes');
-//const { adminNoCache, userNoCache } = require("./middleware/auth");
 const nocache = require("nocache");
-const { allowedNodeEnvironmentFlags } = require("process");
 
-//const adminRoutes = require('./routes/admin'); 
 
-//const userRoutes = require('./routes/user/userRoutes');
 
 
 db();
@@ -55,7 +50,6 @@ app.use(passport.session());
 
 app.use('/', userRoutes);     
 app.use('/admin', adminRouters); 
-app.use('/cart', cartRoutes);
 
 
 const port = process.env.PORT || 3000;
