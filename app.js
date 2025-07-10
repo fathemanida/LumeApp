@@ -49,9 +49,7 @@ app.use(passport.session());
 
 
 app.use('/', userRoutes);     
-app.use('/admin', adminRouters); 
-
-
+app.use('/admin', adminRouters);
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
