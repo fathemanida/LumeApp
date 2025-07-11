@@ -790,9 +790,6 @@
         width: 50% !important;
         max-width: 50% !important;
         flex: 0 0 50% !important;
-        display: flex !important;
-        flex-direction: column;
-        align-items: stretch;
         padding-left: 4px !important;
         padding-right: 4px !important;
       }
@@ -800,6 +797,14 @@
         width: 100% !important;
         margin: 0 !important;
         box-sizing: border-box;
+      }
+      .product-image-container,
+      .product-img,
+      .product-img-secondary {
+        width: 100% !important;
+        height: auto !important;
+        object-fit: cover;
+        display: block;
       }
       .product-card .btn {
         width: 100% !important;
