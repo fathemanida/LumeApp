@@ -27,7 +27,7 @@ passport.use(
           req.session.user=user
           return done(null, user);
         }
-       } catch (error) {
+     } catch (error) {
   if (error.response && error.response.data) {
     console.error('🔥 Google OAuth Error Response:', error.response.data);
   } else {
@@ -36,7 +36,7 @@ passport.use(
   return done(error, null);
 }
 
-    
+    }
   )
 );
 
