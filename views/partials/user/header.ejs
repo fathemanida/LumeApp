@@ -20,14 +20,17 @@
 
   <!-- Right side - Icons -->
   <div class="nav-icons">
-                <i class="fas fa-leaf brand-icon"></i>
-
     <div class="icon-links">
       <a href="#" class="search-toggle" id="searchToggle">
         <i class="fas fa-search"></i>
       </a>
       <div class="search-container" id="searchContainer">
-        <input type="text" placeholder="Search..." class="search-input">
+        <form action="/shopAll" method="get" style="display: flex; align-items: center;">
+          <input type="text" name="search" placeholder="Search..." class="search-input">
+          <button type="submit" class="search-button" style="background: none; border: none; margin-left: 0.5rem;">
+            <i class="fas fa-search"></i>
+          </button>
+        </form>
       </div>
       <a href="/wishlist" class="icon-link"><i class="far fa-heart"></i></a>
       <a href="/cart" class="icon-link"><i class="fas fa-shopping-cart"></i></a>
@@ -64,8 +67,12 @@
       <a href="/cart" class="mobile-link"><i class="fas fa-shopping-cart"></i> Cart</a>
       <a href="/profile" class="mobile-link"><i class="fas fa-user"></i> Profile</a>
       <div class="mobile-search">
-        <input type="text" placeholder="Search..." class="search-input">
-        <button class="search-button"><i class="fas fa-search"></i></button>
+        <form action="/shopAll" method="get" style="display: flex; width: 100%;">
+          <input type="text" name="search" placeholder="Search..." class="search-input" style="flex-grow: 1;">
+          <button type="submit" class="search-button" style="background: none; border: none; margin-left: 0.5rem;">
+            <i class="fas fa-search"></i>
+          </button>
+        </form>
       </div>
     </div>
   </div>
