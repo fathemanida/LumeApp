@@ -658,6 +658,7 @@
     .main-content-container {
       padding-left: 5.5rem;
       padding-right: 5.5rem;
+      margin-top: 80px; /* Adjust if your header is taller/shorter */
     }
 
     @media (min-width: 768px) {
@@ -828,6 +829,28 @@
         opacity: 0;
       }
     }
+    /* Mobile (2 columns) */
+@media (max-width: 767px) {
+  #productsGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+}
+
+/* Tablet (3 columns) */
+@media (min-width: 768px) and (max-width: 991px) {
+  #productsGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Desktop (4 columns) */
+@media (min-width: 992px) {
+  #productsGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
   </style>
 </head>
 <body>
@@ -911,8 +934,8 @@
         <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
           
         </div>
-<div class="row row-cols-2 row-cols-lg-4 g-3" id="productsGrid">
-           <% if (products && products.length > 0) { %>
+<div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3" id="productsGrid">
+             <% if (products && products.length > 0) { %>
             <% products.forEach(product => { %>
             <div class="col product-item" data-name="<%= product.productName.toLowerCase() %>" data-category="<%= product.category?.name?.toLowerCase() || '' %>">
               <div class="product-card card text-center h-100 position-relative overflow-hidden">
