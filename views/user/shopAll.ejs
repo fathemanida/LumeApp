@@ -790,13 +790,21 @@
         width: 50% !important;
         max-width: 50% !important;
         flex: 0 0 50% !important;
-        display: block !important;
+        display: flex !important;
+        flex-direction: column;
+        align-items: stretch;
+        padding-left: 4px !important;
+        padding-right: 4px !important;
       }
       .product-card {
-        padding: 0.25rem;
-        font-size: 0.85rem;
-        max-width: 98vw;
-        min-width: 0;
+        width: 100% !important;
+        margin: 0 !important;
+        box-sizing: border-box;
+      }
+      .product-card .btn {
+        width: 100% !important;
+        margin: 0.5rem 0 0.5rem 0 !important;
+        box-sizing: border-box;
       }
       .product-title {
         font-size: 0.92rem;
@@ -845,6 +853,15 @@
       .product-price .strike-price,
       .product-price .regular-price {
         font-size: 0.85rem !important;
+      }
+    }
+    @media (max-width: 768px) {
+      .nav-icons {
+        gap: 0.7rem !important;
+      }
+      .icon-link, .profile-icon {
+        font-size: 1.1rem !important;
+        margin: 0 0.3rem !important;
       }
     }
   </style>
