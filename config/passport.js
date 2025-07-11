@@ -27,12 +27,16 @@ passport.use(
           req.session.user=user
           return done(null, user);
         }
-      } catch (error) {
-          console.error('Google OAuth Error:', error); 
+       } catch (error) {
+  if (error.response && error.response.data) {
+    console.error('🔥 Google OAuth Error Response:', error.response.data);
+  } else {
+    console.error('🔥 Google OAuth Error:', error);
+  }
+  return done(error, null);
+}
 
-        return done(error, null);
-      }
-    }
+    
   )
 );
 

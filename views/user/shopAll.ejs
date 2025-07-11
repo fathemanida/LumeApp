@@ -30,43 +30,6 @@
       color: var(--dark-text);
     }
 
-    .navbar {
-      background: white;
-      border-bottom: 1px solid var(--border-color);
-      position: relative;
-    }
-
-    .brand {
-      font-family: 'Aboreto', cursive;
-      font-size: 1.5rem;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: var(--darker-text);
-      cursor: pointer;
-    }
-
-    .nav-link {
-      color: var(--darker-text);
-      font-family: 'Jost', sans-serif;
-      font-size: 0.9rem;
-      transition: color 0.3s ease;
-    }
-
-    .nav-link:hover {
-      color: var(--muted-green);
-      font-weight: 500;
-    }
-
-    .icon-link {
-      color: var(--darker-text);
-      transition: color 0.3s ease;
-      font-size: 1.1rem;
-    }
-
-    .icon-link:hover {
-      color: var(--muted-green);
-    }
-
     .search-container {
       position: relative;
       display: none;
@@ -714,48 +677,86 @@
       }
     }
 
-    /* Make product cards smaller and show two per row on all devices */
+    /* Match shopAll product card style to home.ejs featured section */
+    .product-card,
+    .product-img,
+    .product-img-secondary,
+    .product-image-container {
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      background: transparent !important;
+    }
     .product-card {
-      max-width: 260px;
+      border: none !important;
+      padding: 0 !important;
+      font-size: 1rem;
+      max-width: 320px;
       margin-left: auto;
       margin-right: auto;
-      font-size: 0.92rem;
     }
     .product-image-container {
-      width: 100%;
       aspect-ratio: 1/1;
-      max-width: 220px;
+      width: 100%;
+      max-width: 320px;
       margin-left: auto;
       margin-right: auto;
+      background: transparent !important;
     }
     .product-img, .product-img-secondary {
       width: 100%;
-      height: 180px;
+      height: 220px;
       object-fit: cover;
-      border-radius: 8px;
+      border-radius: 0 !important;
+      background: transparent !important;
     }
     .product-title.card-title, .product-title {
-      font-size: 1rem;
+      font-size: 1.1rem;
       margin-bottom: 0.2rem;
+      font-family: 'Aboreto', cursive;
+      color: #1a0f0a;
+      font-weight: 500;
+      line-height: 1.4;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      text-align: center;
     }
     .product-category {
-      font-size: 0.8rem;
+      font-size: 0.85rem;
+      color: #A9BA9D;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      opacity: 0.9;
+      text-align: center;
     }
     .product-price, .product-price .discounted-price, .product-price .strike-price, .product-price .regular-price {
-      font-size: 0.95rem;
+      font-size: 1.1rem;
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      justify-content: center;
+      font-weight: 500;
+      margin-bottom: 1rem;
     }
     .product-card .btn {
-      font-size: 0.92rem;
-      padding: 0.35rem 0.5rem;
-      border-radius: 6px;
+      font-size: 1rem;
+      padding: 0.4rem 0;
+      border-radius: 0 !important;
       min-height: 32px;
       width: 100%;
       margin: 0.5rem 0 0.5rem 0;
       box-sizing: border-box;
+      background: #181818;
+      color: #fff;
+      font-family: 'Jost', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
     .wishlist-icon, .offer-badge, .new-badge {
       font-size: 0.8rem;
       padding: 0.18rem 0.5rem;
+      border-radius: 0 !important;
+      background: rgba(255,255,255,0.9);
     }
 
     .unlisted-overlay {
