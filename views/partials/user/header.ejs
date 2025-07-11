@@ -33,30 +33,29 @@
         </form>
       </div>
       <a href="/cart" class="icon-link"><i class="fas fa-shopping-cart"></i></a>
-      <div class="profile-dropdown-content desktop-profile">
-        <% if (locals.user) { %>
-          <a href="/profile"><i class="fas fa-user"></i> My Profile</a>
-          <a href="/orders"><i class="fas fa-box"></i> My Orders</a>
-          <a href="/wishlist"><i class="fas fa-heart"></i> Wishlist</a>
-          <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
-        <% } else { %>
-          <a href="/login"><i class="fas fa-sign-in-alt"></i> Login</a>
-          <a href="/signup"><i class="fas fa-user-plus"></i> Sign Up</a>
-        <% } %>
-      </div>
+      <a href="/profile" class="icon-link profile-icon profile-dropdown">
+        <i class="fas fa-user"></i>
+        <div class="profile-dropdown-content">
+          <% if (locals.user) { %>
+            <a href="/profile"><i class="fas fa-user"></i> My Profile</a>
+            <a href="/orders"><i class="fas fa-box"></i> My Orders</a>
+            <a href="/wallet"><i class="fas fa-wallet"></i> Wallet</a>
+            <a href="/cart"><i class="fas fa-shopping-cart"></i> Cart</a>
+            <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+          <% } else { %>
+            <a href="/login"><i class="fas fa-sign-in-alt"></i> Login</a>
+            <a href="/signup"><i class="fas fa-user-plus"></i> Sign Up</a>
+          <% } %>
+        </div>
+      </a>
     </div>
 
-    <!-- Profile icon and toggle button for mobile -->
-    <div class="mobile-profile-toggle">
-      <a href="/profile" class="icon-link mobile-profile-icon">
-        <i class="fas fa-user"></i>
-      </a>
-      <button id="mobileToggle" class="mobile-toggle-btn">
-        <span class="toggle-line"></span>
-        <span class="toggle-line"></span>
-        <span class="toggle-line"></span>
-      </button>
-    </div>
+    <!-- Mobile Toggle Button -->
+    <button id="mobileToggle" class="mobile-toggle-btn">
+      <span class="toggle-line"></span>
+      <span class="toggle-line"></span>
+      <span class="toggle-line"></span>
+    </button>
   </div>
 
   <!-- Mobile Menu (Hidden by default) -->
@@ -248,6 +247,39 @@ body, html {
   display: block;
 }
 
+/* Profile dropdown on hover for profile icon */
+.profile-dropdown {
+  position: relative;
+}
+.profile-dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 120%;
+  background-color: white;
+  min-width: 170px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  z-index: 1001;
+  border-radius: 4px;
+  padding: 0.5rem 0;
+}
+.profile-dropdown-content a {
+  color: #1a0f0a;
+  padding: 0.75rem 1rem;
+  text-decoration: none;
+  display: block;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.95rem;
+  transition: background 0.2s, color 0.2s;
+}
+.profile-dropdown-content a:hover {
+  background-color: #f8f8f8;
+  color: #A9BA9D;
+}
+.profile-dropdown:hover .profile-dropdown-content {
+  display: block;
+}
+
 /* Mobile Toggle Button */
 .mobile-toggle-btn {
   background: none;
@@ -346,6 +378,12 @@ body, html {
   .mobile-menu {
     padding: 1rem;
   }
+  .profile-dropdown-content {
+    right: 0;
+    left: auto;
+    min-width: 150px;
+    top: 120%;
+  }
 }
 
 @media (max-width: 480px) {
@@ -387,6 +425,25 @@ body, html {
 }
 @media (min-width: 769px) {
   .mobile-profile-toggle {
+    display: none !important;
+  }
+}
+
+/* Profile icon consistent size and spacing */
+.icon-link.profile-icon {
+  font-size: 1.1rem;
+  margin-left: 1rem;
+  margin-right: 0.2rem;
+  display: inline-flex;
+  align-items: center;
+}
+@media (max-width: 768px) {
+  .icon-link.profile-icon {
+    font-size: 1.1rem;
+    margin-left: 1rem;
+    margin-right: 0.2rem;
+  }
+  .desktop-profile {
     display: none !important;
   }
 }
