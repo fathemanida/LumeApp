@@ -1023,20 +1023,253 @@
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
   <script src="/js/cart.js"></script>
   <script src="/js/userSidebar.js"></script>
+ <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const searchToggle = document.getElementById('searchToggle');
+    const searchContainer = document.getElementById('searchContainer');
+
+    // Debug: Log elements to ensure they are found
+    console.log('Sidebar:', sidebar);
+    console.log('Overlay:', overlay);
+    console.log('SidebarToggle:', sidebarToggle);
+
+    if (sidebarToggle && sidebar && overlay) {
+      sidebarToggle.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('active');
+        console.log('Sidebar toggled:', sidebar.classList.contains('open'));
+      });
+    } else {
+      console.error('Sidebar toggle elements not found:', {
+        sidebar: !!sidebar,
+        overlay: !!overlay,
+        sidebarToggle: !!sidebarToggle
+      });
+    }
+
+    if (overlay) {
+      overlay.addEventListener('click', () => {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('active');
+      });
+    }
+
+    if (searchToggle && searchContainer) {
+      searchToggle.addEventListener('click', (e) => {
+        e.preventDefault();
+        searchContainer.classList.toggle('active');
+        if (searchContainer.classList.contains('active')) {
+          searchContainer.querySelector('input').focus();
+        }
+      });
+    }
+
+    document.addEventListener('click', (e) => {
+      if (searchContainer && !searchContainer.contains(e.target) && e.target !== searchToggle) {
+        searchContainer.classList.remove('active');
+      }
+    });
+
+    function toggleCategory(element) {
+      const items = element.nextElementSibling;
+      const icon = element.querySelector('i');
+      items.classList.toggle('open');
+      icon.classList.toggle('fa-chevron-down', !items.classList.contains('open'));
+      icon.classList.toggle('fa-chevron-up', items.classList.contains('open'));
+    }
+
+    document.querySelectorAll('.sidebar-item').forEach(item => {
+      item.addEventListener('click', () => {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('active');
+      });
+    });
+
+    async function toggleWishlist(iconElement, productId) {
+      try {
+        const response = await fetch('/wishlist/add', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ productId })
+        });
+        const data = await response.json();
+        if (data.success) {
+          iconElement.classList.toggle('far');
+          iconElement.classList.toggle('fas');
+          iconElement.classList.toggle('text-danger');
+          Toastify({
+            text: iconElement.classList.contains('fas') ? "Added to Wishlist 💖" : "Removed from Wishlist ❌",
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            backgroundColor: iconElement.classList.contains('fas') ? "#4CAF50" : "#f44336",
+            stopOnFocus: true
+          }).showToast();
+        } else {
+          Toastify({
+            text: data.message || "Something went wrong",
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#f44336"
+          }).showToast();
+        }
+      } catch (err) {
+        console.error('Wishlist error:', err);
+        Toastify({
+          text: "Server error. Try again later.",
+          duration: 3000,
+          gravity: "top",
+          position: "right",
+          backgroundColor: "#f44336"
+        }).showToast();
+      }
+    }
+
+    const headerSearch = document.getElementById('headerSearch');
+    const sidebarSearch = document.getElementById('sidebarSearch');
+    const productItems = document.querySelectorAll('.product-item');
+
+    function performSearch(searchTerm) {
+      searchTerm = searchTerm.trim().toLowerCase();
+      productItems.forEach(item => {
+        const productName = item.dataset.name;
+        const productCategory = item.dataset.category;
+        item.style.display = (searchTerm === '' || productName.includes(searchTerm) || productCategory.includes(searchTerm)) ? '' : 'none';
+      });
+      const visibleProducts = document.querySelectorAll('.product-item[style=""]').length;
+      const totalProducts = productItems.length;
+      const countElement = document.querySelector('.d-flex.align-items-center span');
+      if (countElement) {
+        countElement.textContent = `Showing ${visibleProducts} of ${totalProducts} products`;
+      }
+    }
+
+    if (headerSearch) {
+      headerSearch.addEventListener('input', () => performSearch(headerSearch.value));
+    }
+
+    if (sidebarSearch) {
+      sidebarSearch.addEventListener('input', () => performSearch(sidebarSearch.value));
+      document.getElementById('sidebarSearchForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        performSearch(sidebarSearch.value);
+      });
+      document.getElementById('sidebarSearchBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        performSearch(sidebarSearch.value);
+      });
+    }
+
+    if (searchToggle && searchContainer) {
+      searchToggle.addEventListener('click', (e) => {
+        e.preventDefault();
+        searchContainer.classList.toggle('active');
+        if (searchContainer.classList.contains('active')) {
+          headerSearch.focus();
+        } else {
+          headerSearch.value = '';
+          performSearch('');
+        }
+      });
+      document.addEventListener('click', (e) => {
+        if (!searchContainer.contains(e.target) && e.target !== searchToggle) {
+          searchContainer.classList.remove('active');
+          headerSearch.value = '';
+          performSearch('');
+        }
+      });
+    }
+  });
+
   <% if (locals.user && locals.user.isBlocked) { %>
-  <script>
-    Toastify({
-      text: "Your account has been blocked by the administrator. Please contact support for assistance.",
-      duration: 4000,
-      gravity: "top",
-      position: "center",
-      backgroundColor: "#e63946",
-      stopOnFocus: true
-    }).showToast();
-    setTimeout(function() {
-      window.location.href = '/logout';
-    }, 4000);
-  </script>
+    Swal.fire({
+      title: 'Account Blocked',
+      text: 'Your account has been blocked by the administrator. Please contact support for assistance.',
+      icon: 'error',
+      confirmButtonColor: '#291d0e',
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      allowEnterKey: false,
+      showCloseButton: false,
+      showCancelButton: false,
+      showDenyButton: false,
+      confirmButtonText: 'Ok',
+      willClose: () => {
+        window.location.href = '/logout';
+      }
+    });
   <% } %>
+
+  function addToCart(productId, productName, regularPrice, salePrice, image) {
+    fetch('/check-auth')
+      .then(response => response.json())
+      .then(data => {
+        if (!data.isAuthenticated) {
+          Swal.fire({
+            icon: 'info',
+            title: 'Login Required',
+            text: 'Please login or signup to add items to cart',
+            showCancelButton: true,
+            confirmButtonText: 'Login',
+            cancelButtonText: 'Signup',
+            confirmButtonColor: '#291d0e',
+            cancelButtonColor: '#314216'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              window.location.href = '/login';
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+              window.location.href = '/signup';
+            }
+          });
+          return;
+        }
+        fetch('/cart/add', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({ productId, quantity: 1 })
+        })
+          .then(response => response.ok ? response.json() : response.json().then(err => Promise.reject(err)))
+          .then(data => {
+            if (data.success) {
+              Swal.fire({
+                icon: 'success',
+                title: 'Added to Cart',
+                text: data.message,
+                showConfirmButton: false,
+                timer: 1500
+              });
+            } else {
+              throw new Error(data.message || 'Failed to add to cart');
+            }
+          })
+          .catch(error => {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: error.message || 'Failed to add item to cart',
+              confirmButtonColor: '#291d0e'
+            });
+          });
+      })
+      .catch(error => {
+        console.error('Auth check error:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Failed to check authentication status',
+          confirmButtonColor: '#291d0e'
+        });
+      });
+  }
+</script>
 </body>
 </html>

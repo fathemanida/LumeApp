@@ -5,111 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payment Failed | LUME</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Jost&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
-<body>
-    <nav class="navbar">
-        <!-- Left side - Brand -->
-        <div class="brand" id="sidebarToggle">
-            <i class="fas fa-leaf brand-icon"></i>
-            <span class="brand-text">LUME</span>
-        </div>
-        <!-- Center - Navigation Links -->
-        <ul class="nav-links">
-            <li class="mx-2"><a href="/" class="nav-link">Home</a></li>
-            <li class="mx-2"><a href="/shopAll" class="nav-link">Shop All</a></li>
-            <li class="mx-2"><a href="/featured" class="nav-link">Featured</a></li>
-            <li class="mx-2"><a href="/new-arrivals" class="nav-link">New Arrivals</a></li>
-        </ul>
-        <!-- Right side - Icons -->
-        <ul class="icon-links">
-            <li class="mx-2">
-                <form action="/shopAll" method="GET" class="search-form">
-                    <div class="search-container">
-                        <input type="text" name="search" placeholder="Search products..." class="search-input">
-                        <button type="submit" class="search-button">
-                            <i class="fas fa-search search-icon"></i>
-                        </button>
-                    </div>
-                </form>
-            </li>
-            <li class="mx-2"><a href="/wishlist" class="icon-link"><i class="fas fa-heart wishlist-icon"></i></a></li>
-            <li class="mx-2"><a href="/cart" class="icon-link"><i class="fas fa-shopping-cart cart-icon"></i></a></li>
-            <li class="mx-2">
-                <div class="profile-dropdown">
-                    <a href="#" class="icon-link"><i class="far fa-user profile-icon"></i></a>
-                    <div class="profile-dropdown-content">
-                        <% if (locals.user) { %>
-                            <a href="/profile"><i class="fas fa-user"></i> My Profile</a>
-                            <a href="/orders"><i class="fas fa-box"></i> My Orders</a>
-                            <a href="/wishlist"><i class="fas fa-heart"></i> Wishlist</a>
-                            <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
-                        <% } else { %>
-                            <a href="/login"><i class="fas fa-sign-in-alt"></i> Login</a>
-                            <a href="/signup"><i class="fas fa-user-plus"></i> Sign Up</a>
-                        <% } %>
-                    </div>
-                </div>
-            </li>
-        </ul>
-    </nav>
-
-    <div class="container-fluid main-content-container" style="background:#f0e9e0;min-height:70vh;padding:3rem 0;">
-      <div class="d-flex flex-column align-items-center justify-content-center" style="min-height:60vh;">
-        <div class="mb-4">
-          <i class="fas fa-times-circle" style="font-size:4rem;color:#e63946;"></i>
-        </div>
-        <h2 class="mb-3" style="font-family:'Aboreto',cursive;color:var(--darker-text);font-size:2.2rem;">Payment Failed</h2>
-        <div class="mb-3" style="font-size:3rem;">
-        </div>
-        <div class="mb-3" style="max-width:420px;text-align:center;color:#7a6c5d;font-size:1.08rem;">
-          <strong>Need help?</strong> Our support team is here for you 24/7. If you have questions or need assistance, <a href="/contact" class="support-link" style="color:var(--muted-green);font-weight:500;">contact us</a> and we'll get you back on track!
-        </div>
-        <p class="mb-3" style="color:#6c757d;font-size:1.1rem;max-width:400px;text-align:center;">
-          We're sorry, but your payment could not be processed at this time.<br>
-          This could be due to various reasons such as:
-        </p>
-        <ul class="mb-4" style="color:#888;max-width:400px;text-align:left;font-size:1rem;">
-          <li>Insufficient funds in your account</li>
-          <li>Bank declined the transaction</li>
-          <li>Network connectivity issues</li>
-          <li>Session timeout</li>
-        </ul>
-        <hr style="border: none; border-top: 1px solid #e0d8cc; width: 100px; margin: 2rem auto;">
-        <div class="mb-3" style="max-width:420px;text-align:center;color:#7a6c5d;font-size:1.08rem;">
-          <strong>Oops! Something went wrong.</strong> Don't worry, your cart is safe and you can try again anytime.<br>
-        </div>
-        <% if (orderId) { %>
-          <div class="mb-2" style="color:#888;font-size:0.98rem;">
-            <strong>Order Reference:</strong> <%= orderId %>
-          </div>
-        <% } %>
-        <div class="mb-3" style="font-size:1rem;">
-          <a href="/faq" class="support-link">Payment FAQs</a> |
-          <a href="/refund-policy" class="support-link">Refund Policy</a>
-        </div>
-        <a href="https://wa.me/18001234567" class="continue-shopping-btn" style="background:#465121;color:white;padding:0.8rem 1.5rem;font-size:1.05rem;text-transform:uppercase;letter-spacing:0.5px;border:none;border-radius:0;display:inline-flex;align-items:center;gap:0.6rem;margin-bottom:1.2rem;">
-          <i class="fab fa-whatsapp"></i> Chat on WhatsApp
-        </a>
-        <div class="d-flex flex-wrap justify-content-center gap-2" style="margin-top:0.5rem;">
-          <a href="/cart" class="continue-shopping-btn" style="background:var(--darker-text);color:white;padding:0.7rem 1.3rem;font-size:1rem;text-transform:uppercase;letter-spacing:0.5px;border:none;border-radius:0;display:inline-flex;align-items:center;gap:0.6rem;min-height:unset;">
-            <i class="fas fa-shopping-cart"></i>Back to Cart
-          </a>
-          <a href="/proceed-payment<%= orderId ? ('?orderId=' + orderId) : '' %>" class="continue-shopping-btn" style="background:var(--muted-green);color:white;padding:0.7rem 1.3rem;font-size:1rem;text-transform:uppercase;letter-spacing:0.5px;border:none;border-radius:0;display:inline-flex;align-items:center;gap:0.6rem;min-height:unset;">
-            <i class="fas fa-credit-card"></i>Try Again
-          </a>
-          <a href="/orders" class="continue-shopping-btn" style="background:#6c757d;color:white;padding:0.7rem 1.3rem;font-size:1rem;text-transform:uppercase;letter-spacing:0.5px;border:none;border-radius:0;display:inline-flex;align-items:center;gap:0.6rem;min-height:unset;">
-            <i class="fas fa-list"></i>View Orders
-          </a>
-        </div>
-      </div>
-    </div>
-<%- include('../partials/user/fooret.ejs')  %>
     <style>
         :root {
             --soft-beige: #D4B996;
-            --muted-green: #5e5a25;
+            --muted-green: #A9BA9D;
             --light-bg: #f8f5f2;
             --border-color: #e0d8cc;
             --offer-red: #e63946;
@@ -119,104 +20,55 @@
             --primary-dark: #79896d;
         }
 
-        body {
+        html, body {
+            font-family: 'Jost', sans-serif;
             background-color: #f0e9e0;
-            font-family: 'Jost', sans-serif;
             color: var(--dark-text);
+            min-height: 100vh;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
         }
 
-        .card {
-            border: none;
-            border-radius: 15px;
-            background: linear-gradient(145deg, #ffffff, #f8f5f2);
-            box-shadow: 0 4px 20px rgba(212, 185, 150, 0.15);
-        }
-
-        .text-danger {
-            color: var(--offer-red) !important;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            font-family: 'Jost', sans-serif;
-        }
-
-        .btn-primary {
-            background: linear-gradient(145deg, var(--muted-green), var(--primary-dark));
-            border: none;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: linear-gradient(145deg, var(--primary-dark), var(--muted-green));
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(121, 137, 109, 0.3);
-            color: white;
-        }
-
-        .btn-outline-primary {
-            color: var(--muted-green);
-            border: 2px solid var(--muted-green);
-            background: transparent;
-        }
-
-        .btn-outline-primary:hover {
-            background: var(--muted-green);
-            color: white;
-            border-color: var(--muted-green);
-        }
-
-        .btn-secondary {
-            background: linear-gradient(145deg, #6c757d, #5a6268);
-            border: none;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: linear-gradient(145deg, #5a6268, #6c757d);
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        /* Navbar styles (same as before) */
         .navbar {
             background: white;
             border-bottom: 1px solid var(--border-color);
-            padding: 1rem 2rem;
+            padding: clamp(0.5rem, 2vw, 1rem);
             display: flex;
+            flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
-            flex-wrap: nowrap;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
 
         .brand {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: clamp(0.5rem, 2vw, 0.75rem);
             cursor: pointer;
         }
+
         .brand-text {
             font-family: 'Aboreto', cursive;
-            font-size: 1.8rem;
-            letter-spacing: 3px;
+            font-size: clamp(1.4rem, 4vw, 1.8rem);
+            letter-spacing: 1.5px;
             text-transform: uppercase;
             color: var(--darker-text);
             transition: color 0.3s ease;
             font-weight: 400;
-            line-height: 1;
         }
+
         .brand-icon {
-            font-size: 1.4rem;
+            font-size: clamp(1.2rem, 3vw, 1.4rem);
             color: var(--muted-green);
             transition: transform 0.3s ease;
         }
+
         .brand:hover .brand-text {
             color: var(--muted-green);
         }
+
         .brand:hover .brand-icon {
             transform: rotate(-15deg);
         }
@@ -226,18 +78,21 @@
             list-style: none;
             margin: 0;
             padding: 0;
-            flex: 1;
+            flex-wrap: wrap;
+            gap: clamp(0.5rem, 2vw, 1rem);
             justify-content: center;
         }
+
         .nav-link {
             color: var(--darker-text);
             font-family: 'Jost', sans-serif;
-            font-size: 0.9rem;
+            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
             text-decoration: none;
-            padding: 0.5rem 1rem;
+            padding: clamp(0.3rem, 1vw, 0.5rem) clamp(0.5rem, 1.5vw, 0.75rem);
             transition: all 0.3s ease;
             letter-spacing: 0.5px;
         }
+
         .nav-link:hover {
             color: var(--muted-green);
             transform: translateY(-2px);
@@ -249,13 +104,16 @@
             list-style: none;
             margin: 0;
             padding: 0;
+            gap: clamp(0.5rem, 2vw, 1rem);
         }
+
         .icon-link {
             color: var(--darker-text);
-            font-size: 1.1rem;
-            padding: 0.5rem;
+            font-size: clamp(1rem, 3vw, 1.1rem);
+            padding: clamp(0.3rem, 1vw, 0.5rem);
             transition: all 0.3s ease;
         }
+
         .icon-link:hover {
             color: var(--muted-green);
             transform: translateY(-2px);
@@ -263,129 +121,376 @@
 
         .search-container {
             position: relative;
-            display: flex;
-            align-items: center;
+            width: 100%;
+            max-width: clamp(120px, 40vw, 200px);
         }
+
         .search-input {
             border: 1px solid var(--border-color);
             border-radius: 20px;
-            padding: 0.5rem 1rem;
-            padding-right: 2.5rem;
+            padding: clamp(0.4rem, 1.5vw, 0.5rem) clamp(0.75rem, 2vw, 1rem);
+            padding-right: clamp(2rem, 5vw, 2.5rem);
             font-family: 'Jost', sans-serif;
-            width: 200px;
+            width: 100%;
+            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
             transition: all 0.3s ease;
         }
+
         .search-input:focus {
             outline: none;
             border-color: var(--darker-text);
             box-shadow: 0 0 0 2px rgba(44, 30, 15, 0.1);
         }
+
         .search-button {
             position: absolute;
             right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
             background: none;
             border: none;
             cursor: pointer;
         }
+
         .search-icon {
             color: var(--darker-text);
         }
+
         .search-icon:hover {
             color: var(--muted-green);
         }
 
         .profile-dropdown {
             position: relative;
-            display: inline-block;
         }
+
         .profile-dropdown-content {
             display: none;
             position: absolute;
             right: 0;
             background-color: white;
-            min-width: 160px;
+            min-width: clamp(120px, 40vw, 160px);
             box-shadow: 0 8px 16px rgba(0,0,0,0.1);
             z-index: 1000;
             border-radius: 4px;
-            padding: 0.5rem 0;
+            padding: clamp(0.5rem, 2vw, 0.75rem) 0;
         }
+
         .profile-dropdown:hover .profile-dropdown-content {
             display: block;
         }
+
         .profile-dropdown-content a {
             color: var(--darker-text);
-            padding: 0.75rem 1rem;
+            padding: clamp(0.5rem, 2vw, 0.75rem) clamp(0.75rem, 2vw, 1rem);
             text-decoration: none;
             display: block;
-            font-size: 0.9rem;
+            font-size: clamp(0.75rem, 2vw, 0.9rem);
             transition: background-color 0.3s ease;
         }
+
         .profile-dropdown-content a:hover {
             background-color: var(--light-bg);
             color: var(--muted-green);
         }
+
         .profile-dropdown-content a i {
             margin-right: 0.5rem;
             width: 20px;
             text-align: center;
         }
 
-        @media (max-width: 768px) {
-            .navbar {
-                flex-direction: column;
-                padding: 1rem;
-            }
-            .brand {
-                margin-bottom: 1rem;
-            }
-            .nav-links {
-                margin: 1rem 0;
-                flex-wrap: wrap;
-            }
-            .search-input {
-                width: 180px;
-            }
-            .d-flex {
-                flex-direction: column;
-                gap: 10px;
-            }
-            .btn {
-                width: 100%;
-            }
+        .main-content-container {
+            background: #f0e9e0;
+            min-height: 70vh;
+            padding: clamp(1.5rem, 4vw, 3rem) clamp(1rem, 3vw, 2rem);
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        .btn-try-again {
-            background: linear-gradient(90deg, #e63946 0%, #A9BA9D 100%);
-            color: #fff;
-            font-weight: 700;
-            box-shadow: 0 4px 16px rgba(230, 57, 70, 0.15);
-            border: none;
-            letter-spacing: 1px;
-            transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
-        }
-        .btn-try-again:hover, .btn-try-again:focus {
-            background: linear-gradient(90deg, #A9BA9D 0%, #e63946 100%);
-            color: #fff;
-            transform: translateY(-3px) scale(1.04);
-            box-shadow: 0 8px 24px rgba(230, 57, 70, 0.25);
+        .content-inner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            max-width: clamp(300px, 90vw, 500px);
+            width: 100%;
         }
 
-        .continue-shopping-btn, .continue-shopping-btn:visited, .continue-shopping-btn:active, .continue-shopping-btn:hover {
-            text-decoration: none !important;
-        }
-        a, a:visited, a:active, a:hover {
-            text-decoration: none !important;
+        .failure-icon {
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            color: var(--offer-red);
+            margin-bottom: clamp(1rem, 3vw, 1.5rem);
         }
 
-        .support-link, .support-link:visited, .support-link:active, .support-link:hover {
-            text-decoration: none !important;
+        .payment-failed-title {
+            font-family: 'Aboreto', cursive;
+            font-size: clamp(1.5rem, 5vw, 2.2rem);
+            color: var(--darker-text);
+            margin-bottom: clamp(0.75rem, 2vw, 1rem);
+        }
+
+        .support-text {
+            max-width: clamp(300px, 80vw, 420px);
+            color: #7a6c5d;
+            font-size: clamp(0.9rem, 2.5vw, 1.08rem);
+            margin-bottom: clamp(0.75rem, 2vw, 1rem);
+        }
+
+        .support-link {
             color: var(--muted-green);
             font-weight: 500;
+            text-decoration: none;
             transition: color 0.2s;
         }
+
         .support-link:hover {
             color: var(--darker-text);
         }
+
+        .error-message {
+            color: #6c757d;
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            max-width: clamp(300px, 80vw, 400px);
+            margin-bottom: clamp(0.75rem, 2vw, 1rem);
+        }
+
+        .error-reasons {
+            color: #888;
+            font-size: clamp(0.85rem, 2vw, 1rem);
+            max-width: clamp(300px, 80vw, 400px);
+            text-align: left;
+            margin-bottom: clamp(1rem, 3vw, 1.5rem);
+            padding-left: 1.5rem;
+        }
+
+        .error-reasons li {
+            margin-bottom: clamp(0.3rem, 1vw, 0.5rem);
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px solid var(--border-color);
+            width: clamp(80px, 20vw, 100px);
+            margin: clamp(1rem, 3vw, 2rem) auto;
+        }
+
+        .retry-message {
+            max-width: clamp(300px, 80vw, 420px);
+            color: #7a6c5d;
+            font-size: clamp(0.9rem, 2.5vw, 1.08rem);
+            margin-bottom: clamp(0.75rem, 2vw, 1rem);
+        }
+
+        .order-reference {
+            color: #888;
+            font-size: clamp(0.85rem, 2vw, 0.98rem);
+            margin-bottom: clamp(0.5rem, 2vw, 0.75rem);
+        }
+
+        .faq-links {
+            font-size: clamp(0.85rem, 2vw, 1rem);
+            margin-bottom: clamp(0.75rem, 2vw, 1rem);
+        }
+
+        .continue-shopping-btn {
+            padding: clamp(0.5rem, 2vw, 0.8rem) clamp(1rem, 3vw, 1.5rem);
+            font-size: clamp(0.85rem, 2.5vw, 1rem);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: none;
+            border-radius: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: clamp(0.4rem, 1vw, 0.6rem);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            min-width: clamp(120px, 30vw, 150px);
+        }
+
+        .whatsapp-btn {
+            background: #465121;
+            color: white;
+        }
+
+        .whatsapp-btn:hover {
+            background: var(--muted-green);
+            transform: translateY(-2px);
+        }
+
+        .cart-btn {
+            background: var(--darker-text);
+            color: white;
+        }
+
+        .cart-btn:hover {
+            background: var(--muted-green);
+            transform: translateY(-2px);
+        }
+
+        .try-again-btn {
+            background: rgb(194, 194, 227);
+            color: white;
+            font-weight: 700;
+        }
+
+        .try-again-btn:hover {
+            background: rgb(27, 27, 59);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(230, 57, 70, 0.25);
+        }
+
+        .orders-btn {
+            background: #6c757d;
+            color: white;
+        }
+
+        .orders-btn:hover {
+            background: var(--muted-green);
+            transform: translateY(-2px);
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: clamp(0.5rem, 2vw, 1rem);
+            margin-top: clamp(0.5rem, 2vw, 0.75rem);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 767px) {
+            .navbar {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: clamp(0.5rem, 2vw, 1rem);
+            }
+
+            .brand {
+                margin-bottom: clamp(0.5rem, 2vw, 0.75rem);
+            }
+
+            .nav-links {
+                flex-direction: column;
+                align-items: flex-start;
+                width: 100%;
+                margin: clamp(0.5rem, 2vw, 0.75rem) 0;
+            }
+
+            .icon-links {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .search-container {
+                max-width: 100%;
+            }
+
+            .main-content-container {
+                padding: clamp(1rem, 3vw, 1.5rem) clamp(0.75rem, 2vw, 1rem);
+            }
+
+            .content-inner {
+                max-width: 100%;
+                padding: 0 clamp(0.5rem, 2vw, 1rem);
+            }
+
+            .continue-shopping-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .payment-failed-title {
+                font-size: clamp(1.2rem, 4vw, 1.8rem);
+            }
+
+            .failure-icon {
+                font-size: clamp(2rem, 6vw, 3rem);
+            }
+
+            .support-text, .error-message, .retry-message {
+                font-size: clamp(0.8rem, 2vw, 0.95rem);
+            }
+
+            .error-reasons {
+                font-size: clamp(0.75rem, 2vw, 0.9rem);
+            }
+
+            .order-reference, .faq-links {
+                font-size: clamp(0.75rem, 2vw, 0.9rem);
+            }
+
+            .continue-shopping-btn {
+                font-size: clamp(0.75rem, 2vw, 0.9rem);
+                padding: clamp(0.4rem, 1.5vw, 0.6rem) clamp(0.75rem, 2vw, 1rem);
+            }
+        }
+
+        @media (min-width: 768px) {
+            .navbar {
+                flex-wrap: nowrap;
+            }
+
+            .nav-links {
+                flex-wrap: nowrap;
+            }
+        }
     </style>
+</head>
+<body>
+<%- include('../partials/user/header.ejs') %>
+
+    <div class="container-fluid main-content-container">
+        <div class="content-inner">
+            <i class="fas fa-times-circle failure-icon"></i>
+            <h2 class="payment-failed-title">Payment Failed</h2>
+            <div class="support-text">
+                <strong>Need help?</strong> Our support team is here for you 24/7. If you have questions or need assistance, <a href="/contact" class="support-link">contact us</a> and we'll get you back on track!
+            </div>
+            <p class="error-message">
+                We're sorry, but your payment could not be processed at this time.<br>
+                This could be due to various reasons such as:
+            </p>
+            <ul class="error-reasons">
+                <li>Insufficient funds in your account</li>
+                <li>Bank declined the transaction</li>
+                <li>Network connectivity issues</li>
+                <li>Session timeout</li>
+            </ul>
+            <hr class="divider">
+            <div class="retry-message">
+                <strong>Oops! Something went wrong.</strong> Don't worry, your cart is safe and you can try again anytime.
+            </div>
+            <% if (orderId) { %>
+                <div class="order-reference">
+                    <strong>Order Reference:</strong> <%= orderId %>
+                </div>
+            <% } %>
+            <div class="faq-links">
+                <a href="/faq" class="support-link">Payment FAQs</a> |
+                <a href="/refund-policy" class="support-link">Refund Policy</a>
+            </div>
+            <a href="https://wa.me/18001234567" class="continue-shopping-btn whatsapp-btn">
+                <i class="fab fa-whatsapp"></i> Chat on WhatsApp
+            </a>
+            <div class="button-group">
+                <a href="/cart" class="continue-shopping-btn cart-btn">
+                    <i class="fas fa-shopping-cart"></i> Back to Cart
+                </a>
+                <a href="/proceed-payment<%= orderId ? ('?orderId=' + orderId) : '' %>" class="continue-shopping-btn try-again-btn">
+                    <i class="fas fa-credit-card"></i> Try Again
+                </a>
+                <a href="/orders" class="continue-shopping-btn orders-btn">
+                    <i class="fas fa-list"></i> View Orders
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <%- include('../partials/user/fooret.ejs') %>
 </body>
 </html>

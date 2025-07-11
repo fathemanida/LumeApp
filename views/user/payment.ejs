@@ -11,568 +11,590 @@
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <style>
-    :root {
-      --soft-beige: #D4B996;
-      --muted-green: #A9BA9D;
-      --light-bg: #f8f5f2;
-      --border-color: #e0d8cc;
-      --offer-red: #e63946;
-      --dark-text: #2c1810;
-      --darker-text: #1a0f0a;
-    }
-
-    body {
-        font-family: 'Jost', sans-serif;
-        background-color: #f0e9e0;
-        color: var(--dark-text);
-        min-height: 100vh;
-        line-height: 1.6;
-    }
-
-    .navbar {
-        background: white;
-        border-bottom: 1px solid var(--border-color);
-        padding: 1rem 2rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex-wrap: nowrap;
-    }
-
-    .brand {
-        font-family: 'Aboreto', cursive;
-        font-size: 1.5rem;
-        letter-spacing: 1.5px;
-        text-transform: uppercase;
-        color: var(--darker-text);
-        cursor: pointer;
-        transition: color 0.3s ease;
-    }
-
-    .brand:hover {
-        color: var(--muted-green);
-    }
-
-    .nav-links {
-        display: flex;
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        flex: 1;
-        justify-content: center;
-    }
-
-    .nav-link {
-        color: var(--darker-text);
-        font-family: 'Jost', sans-serif;
-        font-size: 0.9rem;
-        text-decoration: none;
-        padding: 0.5rem 1rem;
-        transition: all 0.3s ease;
-    }
-
-    .nav-link:hover {
-        color: var(--muted-green);
-        transform: translateY(-2px);
-    }
-
-    .icon-links {
-        display: flex;
-        align-items: center;
-        list-style: none;
-        margin: 0;
-        padding: 0;
-    }
-
-    .icon-link {
-        color: var(--darker-text);
-        font-size: 1.1rem;
-        padding: 0.5rem;
-        transition: all 0.3s ease;
-    }
-
-    .icon-link:hover {
-        color: var(--muted-green);
-        transform: translateY(-2px);
-    }
-
-    .search-container {
-        position: relative;
-        display: flex;
-        align-items: center;
-    }
-
-    .search-input {
-        border: 1px solid var(--border-color);
-        border-radius: 20px;
-        padding: 0.5rem 1rem;
-        padding-right: 2.5rem;
-        font-family: 'Jost', sans-serif;
-        width: 200px;
-        transition: all 0.3s ease;
-    }
-
-    .search-input:focus {
-        outline: none;
-        border-color: var(--soft-beige);
-        width: 250px;
-        box-shadow: 0 0 0 2px rgba(212, 185, 150, 0.1);
-    }
-
-    .search-button {
-        position: absolute;
-        right: 10px;
-        background: none;
-        border: none;
-        color: var(--darker-text);
-        cursor: pointer;
-    }
-
-    .search-button:hover {
-        color: var(--muted-green);
-    }
-
-    .profile-dropdown {
-        position: relative;
-        display: inline-block;
-    }
-
-    .profile-dropdown-content {
-        display: none;
-        position: absolute;
-        right: 0;
-        background-color: white;
-        min-width: 160px;
-        box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-        z-index: 1000;
-        border-radius: 0;
-        padding: 0.5rem 0;
-    }
-
-    .profile-dropdown:hover .profile-dropdown-content {
-        display: block;
-    }
-
-    .profile-dropdown-content a {
-        color: var(--dark-text);
-        padding: 0.75rem 1rem;
-        text-decoration: none;
-        display: block;
-        font-size: 0.9rem;
-        transition: background-color 0.3s ease;
-    }
-
-    .profile-dropdown-content a:hover {
-        background-color: var(--light-bg);
-        color: var(--muted-green);
-    }
-
-    .profile-dropdown-content a i {
-        margin-right: 0.5rem;
-        width: 20px;
-        text-align: center;
-    }
-
-    .payment-container {
-        max-width: 1100px;
-        margin: 3rem auto;
-        padding: 2rem;
-        background: #f0e9e0;
-        border-radius: 0;
-        box-shadow: none;
-    }
-
-    .payment-title {
-        font-family: 'Aboreto', cursive;
-        font-size: 2.5rem;
-        margin-bottom: 2.5rem;
-        color: var(--darker-text);
-        text-align: center;
-        letter-spacing: 1px;
-    }
-
-    .payment-section {
-        display: grid;
-        grid-template-columns: 2fr 1fr;
-        gap: 2rem;
-        margin-bottom: 2rem;
-    }
-
-    .payment-form-section {
-        padding: 2rem;
-        background: transparent;
-        border-radius: 0;
-        border: 1px solid var(--border-color);
-    }
-
-    .payment-form-title {
-        font-family: 'Aboreto', cursive;
-        font-size: 1.8rem;
-        color: var(--darker-text);
-        margin-bottom: 1.5rem;
-    }
-
-    .security-notice {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 0.9rem;
-        color: var(--dark-text);
-        margin-bottom: 1rem;
-    }
-
-    .security-notice i {
-        color: var(--muted-green);
-    }
-
-    .payment-methods {
-        margin-bottom: 1.5rem;
-    }
-
-    .payment-methods label {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 1rem;
-        color: var(--darker-text);
-        margin-bottom: 0.75rem;
-        cursor: pointer;
-    }
-
-    .payment-form {
-        display: none;
-    }
-
-    .payment-form.active {
-        display: block;
-    }
-
-    .form-group {
-        margin-bottom: 1rem;
-    }
-
-    .form-group label {
-        display: block;
-        margin-bottom: 0.5rem;
-        color: var(--darker-text);
-        font-weight: 500;
-        font-size: 0.9rem;
-    }
-
-    .form-group input {
-        width: 100%;
-        padding: 0.75rem;
-        border: 1px solid var(--border-color);
-        border-radius: 0;
-        font-size: 0.9rem;
-        background-color: var(--light-bg);
-    }
-
-    .form-group input:focus {
-        outline: none;
-        border-color: var(--soft-beige);
-    }
-
-    .card-details {
-        display: grid;
-        grid-template-columns: 2fr 1fr 1fr;
-        gap: 1rem;
-    }
-
-    .cod-message {
-        font-size: 0.9rem;
-        color: var(--dark-text);
-        margin-bottom: 1rem;
-    }
-
-    .order-summary {
-        padding: 1.5rem;
-        background: transparent;
-        border-radius: 0;
-        border: 1px solid var(--border-color);
-    }
-
-    .order-summary h3 {
-        font-family: 'Aboreto', cursive;
-        font-size: 1.3rem;
-        color: var(--darker-text);
-        margin-bottom: 1rem;
-    }
-
-    .summary-row {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 0.75rem;
-        font-size: 0.9rem;
-        font-weight: 400;
-        color: var(--dark-text);
-    }
-
-    .summary-row.expected-delivery {
-        color: var(--dark-text);
-        font-size: 0.85rem;
-    }
-
-    .summary-row:last-child {
-        border-top: 1px solid var(--border-color);
-        padding-top: 0.75rem;
-        margin-top: 0.75rem;
-        font-weight: 600;
-        font-size: 1rem;
-        color: var(--darker-text);
-    }
-
-    .pay-now-btn {
-        background: var(--darker-text);
-        border: none;
-        color: white;
-        padding: 1rem 2rem;
-        border-radius: 0;
-        width: 100%;
-        font-size: 1.1rem;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-
-    .pay-now-btn:hover:not(:disabled) {
-        background: var(--muted-green);
-        color: white;
-        transform: translateY(-2px);
-    }
-
-    .pay-now-btn:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-
-    .back-btn {
-        background: transparent;
-        border: 2px solid var(--darker-text);
-        color: var(--darker-text);
-        padding: 0.75rem 2rem;
-        border-radius: 0;
-        font-size: 1rem;
-        font-weight: 500;
-        text-decoration: none;
-        text-align: center;
-        transition: all 0.3s ease;
-        margin-top: 1rem;
-        display: block;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-
-    .back-btn:hover {
-        background: var(--muted-green);
-        color: white;
-        border-color: var(--muted-green);
-        transform: translateY(-2px);
-    }
-
-    .test-card-info {
-        color: #666;
-        font-size: 0.8em;
-        margin-top: 4px;
-    }
-
-    .test-mode-notice {
-        background-color: #fff3cd;
-        color: #856404;
-        padding: 10px;
-        border-radius: 0;
-        margin-top: 15px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .payment-info {
-        background-color: var(--light-bg);
-        padding: 20px;
-        border-radius: 0;
-        margin-bottom: 20px;
-    }
-
-    .payment-info p {
-        color: var(--dark-text);
-        font-size: 0.95rem;
-        line-height: 1.5;
-        margin-bottom: 15px;
-    }
-
-    .loading-overlay {
-        display: none;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(255, 255, 255, 0.9);
-        z-index: 9999;
-    }
-
-    .loading-spinner {
-        border: 4px solid var(--border-color);
-        border-top: 4px solid var(--darker-text);
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        animation: spin 1s linear infinite;
-        margin-bottom: 1rem;
-    }
-
-    .loading-text {
-        font-family: 'Aboreto', cursive;
-        font-size: 1.5rem;
-        color: var(--darker-text);
-    }
-
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-
-    /* Footer */
-    .footer {
-        background-color: var(--soft-beige);
-        color: white;
-        padding: 3rem 0;
-        margin-top: 3rem;
-    }
-
-    .footer-heading {
-        font-family: 'Aboreto', cursive;
-        font-size: 1rem;
-        letter-spacing: 1px;
-        margin-bottom: 1.25rem;
-        color: white;
-    }
-
-    .footer-link {
-        color: white;
-        font-family: 'Jost', sans-serif;
-        font-size: 0.9rem;
-        transition: all 0.3s ease;
-        display: block;
-        margin-bottom: 0.5rem;
-        text-decoration: none;
-    }
-
-    .footer-link:hover {
-        color: var(--light-bg);
-        transform: translateX(3px);
-        text-decoration: none;
-    }
-
-    .footer-link i {
-        margin-right: 0.5rem;
-        width: 20px;
-        text-align: center;
-    }
-
-    .border-secondary {
-        border-color: rgba(255, 255, 255, 0.1) !important;
-    }
-
-    .text-light {
-        color: rgba(255, 255, 255, 0.7) !important;
-    }
-
-    /* Responsive Design */
-    @media (max-width: 768px) {
-        .payment-section {
-            grid-template-columns: 1fr;
+        :root {
+            --soft-beige: #D4B996;
+            --muted-green: #A9BA9D;
+            --light-bg: #f8f5f2;
+            --border-color: #e0d8cc;
+            --offer-red: #e63946;
+            --dark-text: #2c1810;
+            --darker-text: #1a0f0a;
+        }
+
+        html, body {
+            font-family: 'Jost', sans-serif;
+            background-color: #f0e9e0;
+            color: var(--dark-text);
+            min-height: 100vh;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            padding: clamp(0.5rem, 2vw, 1rem);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            font-family: 'Aboreto', cursive;
+            font-size: clamp(1.2rem, 4vw, 1.5rem);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--darker-text);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .brand:hover {
+            color: var(--muted-green);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            flex-wrap: wrap;
+            gap: clamp(0.5rem, 2vw, 1rem);
+            justify-content: center;
+        }
+
+        .nav-link {
+            color: var(--darker-text);
+            font-family: 'Jost', sans-serif;
+            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+            text-decoration: none;
+            padding: clamp(0.3rem, 1vw, 0.5rem) clamp(0.5rem, 1.5vw, 0.75rem);
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--muted-green);
+            transform: translateY(-2px);
+        }
+
+        .icon-links {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            gap: clamp(0.5rem, 2vw, 1rem);
+            align-items: center;
+        }
+
+        .icon-link {
+            color: var(--darker-text);
+            font-size: clamp(1rem, 3vw, 1.1rem);
+            padding: clamp(0.3rem, 1vw, 0.5rem);
+            transition: all 0.3s ease;
+        }
+
+        .icon-link:hover {
+            color: var(--muted-green);
+            transform: translateY(-2px);
+        }
+
+        .search-container {
+            position: relative;
+            width: 100%;
+            max-width: clamp(120px, 40vw, 200px);
+        }
+
+        .search-input {
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: clamp(0.4rem, 1.5vw, 0.5rem) clamp(0.75rem, 2vw, 1rem);
+            padding-right: clamp(2rem, 5vw, 2.5rem);
+            font-family: 'Jost', sans-serif;
+            width: 100%;
+            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--soft-beige);
+            box-shadow: 0 0 0 2px rgba(212, 185, 150, 0.1);
+            width: 100%;
+        }
+
+        .search-button {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--darker-text);
+            cursor: pointer;
+        }
+
+        .search-button:hover {
+            color: var(--muted-green);
+        }
+
+        .profile-dropdown {
+            position: relative;
+        }
+
+        .profile-dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: white;
+            min-width: clamp(120px, 40vw, 160px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            z-index: 1000;
+            border-radius: 0;
+            padding: clamp(0.5rem, 2vw, 0.75rem) 0;
+        }
+
+        .profile-dropdown:hover .profile-dropdown-content {
+            display: block;
+        }
+
+        .profile-dropdown-content a {
+            color: var(--dark-text);
+            padding: clamp(0.5rem, 2vw, 0.75rem) clamp(0.75rem, 2vw, 1rem);
+            text-decoration: none;
+            display: block;
+            font-size: clamp(0.75rem, 2vw, 0.85rem);
+            transition: background-color 0.3s ease;
+        }
+
+        .profile-dropdown-content a:hover {
+            background-color: var(--light-bg);
+            color: var(--muted-green);
+        }
+
+        .profile-dropdown-content a i {
+            margin-right: 0.5rem;
+            width: 20px;
+            text-align: center;
         }
 
         .payment-container {
-            margin: 1.5rem;
-            padding: 1.5rem;
+            max-width: 1200px;
+            margin: clamp(1.5rem, 4vw, 3rem) auto;
+            padding: clamp(1rem, 3vw, 2rem);
+            background: #f0e9e0;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        .payment-title {
+            font-family: 'Aboreto', cursive;
+            font-size: clamp(1.8rem, 5vw, 2.5rem);
+            margin-bottom: clamp(1.5rem, 4vw, 2.5rem);
+            color: var(--darker-text);
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        .payment-section {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(1rem, 3vw, 1.5rem);
         }
 
         .payment-form-section {
-            padding: 1.5rem;
-        }
-
-        .order-summary {
-            padding: 1rem;
-        }
-
-        .pay-now-btn {
-            font-size: 1rem;
-            padding: 0.75rem 1.5rem;
-        }
-
-        .back-btn {
-            font-size: 0.9rem;
-            padding: 0.5rem 1.5rem;
-        }
-    }
-
-    @media (max-width: 576px) {
-        .payment-title {
-            font-size: 2rem;
+            padding: clamp(1rem, 3vw, 2rem);
+            background: transparent;
+            border-radius: 0;
+            border: 1px solid var(--border-color);
         }
 
         .payment-form-title {
-            font-size: 1.5rem;
+            font-family: 'Aboreto', cursive;
+            font-size: clamp(1.2rem, 4vw, 1.8rem);
+            color: var(--darker-text);
+            margin-bottom: clamp(1rem, 3vw, 1.5rem);
         }
 
-        .card-details {
-            grid-template-columns: 1fr;
+        .security-notice {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+            color: var(--dark-text);
+            margin-bottom: 1rem;
+        }
+
+        .security-notice i {
+            color: var(--muted-green);
+        }
+
+        .payment-methods {
+            margin-bottom: clamp(1rem, 3vw, 1.5rem);
+        }
+
+        .payment-methods label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: clamp(0.85rem, 2.5vw, 1rem);
+            color: var(--darker-text);
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+        }
+
+        .payment-form {
+            display: none;
+        }
+
+        .payment-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: clamp(0.75rem, 2vw, 1rem);
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--darker-text);
+            font-weight: 500;
+            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
         }
 
         .form-group input {
-            font-size: 0.85rem;
+            width: 100%;
+            padding: clamp(0.5rem, 2vw, 0.75rem);
+            border: 1px solid var(--border-color);
+            border-radius: 0;
+            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+            background-color: var(--light-bg);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--soft-beige);
+        }
+
+        .card-details {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: clamp(0.75rem, 2vw, 1rem);
+        }
+
+        .cod-message {
+            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+            color: var(--dark-text);
+            margin-bottom: 1rem;
+        }
+
+        .order-summary {
+            padding: clamp(1rem, 3vw, 1.5rem);
+            background: transparent;
+            border-radius: 0;
+            border: 1px solid var(--border-color);
         }
 
         .order-summary h3 {
-            font-size: 1.2rem;
+            font-family: 'Aboreto', cursive;
+            font-size: clamp(1.1rem, 3vw, 1.3rem);
+            color: var(--darker-text);
+            margin-bottom: clamp(0.75rem, 2vw, 1rem);
         }
 
         .summary-row {
-            font-size: 0.85rem;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: clamp(0.5rem, 2vw, 0.75rem);
+            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+            font-weight: 400;
+            color: var(--dark-text);
         }
-    }
 
-    @media (max-width: 768px) {
-        .navbar {
+        .summary-row.expected-delivery {
+            color: var(--dark-text);
+            font-size: clamp(0.75rem, 2vw, 0.85rem);
+        }
+
+        .summary-row:last-child {
+            border-top: 1px solid var(--border-color);
+            padding-top: clamp(0.5rem, 2vw, 0.75rem);
+            margin-top: clamp(0.5rem, 2vw, 0.75rem);
+            font-weight: 600;
+            font-size: clamp(0.85rem, 2.5vw, 1rem);
+            color: var(--darker-text);
+        }
+
+        .pay-now-btn {
+            background: var(--darker-text);
+            border: none;
+            color: white;
+            padding: clamp(0.75rem, 2vw, 1rem) clamp(1.5rem, 4vw, 2rem);
+            border-radius: 0;
+            width: 100%;
+            font-size: clamp(0.85rem, 2.5vw, 1.1rem);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .pay-now-btn:hover:not(:disabled) {
+            background: var(--muted-green);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .pay-now-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .back-btn {
+            background: transparent;
+            border: 2px solid var(--darker-text);
+            color: var(--darker-text);
+            padding: clamp(0.5rem, 2vw, 0.75rem) clamp(1rem, 3vw, 1.5rem);
+            border-radius: 0;
+            font-size: clamp(0.8rem, 2.5vw, 1rem);
+            font-weight: 500;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s ease;
+            margin-top: clamp(0.75rem, 2vw, 1rem);
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .back-btn:hover {
+            background: var(--muted-green);
+            color: white;
+            border-color: var(--muted-green);
+            transform: translateY(-2px);
+        }
+
+        .test-card-info {
+            color: #666;
+            font-size: clamp(0.7rem, 2vw, 0.8rem);
+            margin-top: 4px;
+        }
+
+        .test-mode-notice {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: clamp(0.5rem, 2vw, 0.75rem);
+            border-radius: 0;
+            margin-top: clamp(0.75rem, 2vw, 1rem);
+            display: flex;
+            align-items: center;
+            gap: clamp(0.5rem, 2vw, 0.75rem);
+            font-size: clamp(0.75rem, 2vw, 0.85rem);
+        }
+
+        .payment-info {
+            background-color: var(--light-bg);
+            padding: clamp(0.75rem, 2vw, 1rem);
+            border-radius: 0;
+            margin-bottom: clamp(0.75rem, 2vw, 1rem);
+        }
+
+        .payment-info p {
+            color: var(--dark-text);
+            font-size: clamp(0.8rem, 2.5vw, 0.95rem);
+            line-height: 1.5;
+            margin-bottom: clamp(0.5rem, 2vw, 0.75rem);
+        }
+
+        .loading-overlay {
+            display: none;
+            justify-content: center;
+            align-items: center;
             flex-direction: column;
-            padding: 1rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            z-index: 9999;
         }
-        .brand {
-            margin-bottom: 1rem;
+
+        .loading-spinner {
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--darker-text);
+            border-radius: 50%;
+            width: clamp(40px, 10vw, 50px);
+            height: clamp(40px, 10vw, 50px);
+            animation: spin 1s linear infinite;
+            margin-bottom: clamp(0.75rem, 2vw, 1rem);
         }
-        .nav-links {
-            margin: 1rem 0;
-            flex-wrap: wrap;
+
+        .loading-text {
+            font-family: 'Aboreto', cursive;
+            font-size: clamp(1.2rem, 4vw, 1.5rem);
+            color: var(--darker-text);
         }
-        .search-input {
-            width: 180px;
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
-    }
+
+        .footer {
+            background-color: var(--soft-beige);
+            color: white;
+            padding: clamp(1.5rem, 4vw, 3rem) 0;
+            margin-top: clamp(1.5rem, 4vw, 3rem);
+        }
+
+        .footer-heading {
+            font-family: 'Aboreto', cursive;
+            font-size: clamp(0.9rem, 3vw, 1rem);
+            letter-spacing: 1px;
+            margin-bottom: clamp(0.75rem, 2vw, 1.25rem);
+            color: white;
+        }
+
+        .footer-link {
+            color: white;
+            font-family: 'Jost', sans-serif;
+            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+            transition: all 0.3s ease;
+            display: block;
+            margin-bottom: 0.5rem;
+            text-decoration: none;
+        }
+
+        .footer-link:hover {
+            color: var(--light-bg);
+            transform: translateX(3px);
+            text-decoration: none;
+        }
+
+        .footer-link i {
+            margin-right: 0.5rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .border-secondary {
+            border-color: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        .text-light {
+            color: rgba(255, 255, 255, 0.7) !important;
+        }
+
+        /* Responsive Design */
+        @media (min-width: 768px) {
+            .payment-section {
+                display: grid;
+                grid-template-columns: 2fr 1fr;
+            }
+
+            .card-details {
+                grid-template-columns: 2fr 1fr 1fr;
+            }
+
+            .order-summary {
+                position: sticky;
+                top: clamp(1rem, 3vw, 1.5rem);
+            }
+        }
+
+        @media (max-width: 767px) {
+            .navbar {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: clamp(0.5rem, 2vw, 1rem);
+            }
+
+            .brand {
+                margin-bottom: clamp(0.5rem, 2vw, 0.75rem);
+            }
+
+            .nav-links {
+                flex-direction: column;
+                align-items: flex-start;
+                width: 100%;
+                margin: clamp(0.5rem, 2vw, 0.75rem) 0;
+            }
+
+            .icon-links {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .search-container {
+                max-width: 100%;
+            }
+
+            .payment-container {
+                margin: clamp(1rem, 3vw, 1.5rem);
+                padding: clamp(0.75rem, 2vw, 1rem);
+            }
+
+            .payment-form-section {
+                padding: clamp(0.75rem, 2vw, 1rem);
+            }
+
+            .order-summary {
+                padding: clamp(0.75rem, 2vw, 1rem);
+            }
+
+            .pay-now-btn {
+                font-size: clamp(0.8rem, 2vw, 1rem);
+                padding: clamp(0.5rem, 2vw, 0.75rem) clamp(1rem, 3vw, 1.5rem);
+            }
+
+            .back-btn {
+                font-size: clamp(0.75rem, 2vw, 0.9rem);
+                padding: clamp(0.4rem, 1.5vw, 0.5rem) clamp(0.75rem, 2vw, 1rem);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .payment-title {
+                font-size: clamp(1.5rem, 4vw, 2rem);
+            }
+
+            .payment-form-title {
+                font-size: clamp(1rem, 3vw, 1.5rem);
+            }
+
+            .form-group input {
+                font-size: clamp(0.75rem, 2vw, 0.85rem);
+            }
+
+            .order-summary h3 {
+                font-size: clamp(1rem, 3vw, 1.2rem);
+            }
+
+            .summary-row {
+                font-size: clamp(0.75rem, 2vw, 0.85rem);
+            }
+
+            .payment-methods label {
+                font-size: clamp(0.75rem, 2vw, 0.9rem);
+            }
+        }
     </style>
 </head>
 <body>
-        <nav class="navbar">
-        <!-- Left side - Brand -->
+    <nav class="navbar">
         <div class="brand" id="sidebarToggle">LUME</div>
-
-        <!-- Center - Navigation Links -->
         <ul class="nav-links">
-            <li class="mx-2"><a href="/" class="nav-link">Home</a></li>
-            <li class="mx-2"><a href="/shopAll" class="nav-link">Shop All</a></li>
-            <li class="mx-2"><a href="/featured" class="nav-link">Featured</a></li>
-            <li class="mx-2"><a href="/new-arrivals" class="nav-link">New Arrivals</a></li>
+            <li><a href="/" class="nav-link">Home</a></li>
+            <li><a href="/shopAll" class="nav-link">Shop All</a></li>
+            <li><a href="/featured" class="nav-link">Featured</a></li>
+            <li><a href="/new-arrivals" class="nav-link">New Arrivals</a></li>
         </ul>
-
-        <!-- Right side - Icons -->
         <ul class="icon-links">
-            <li class="mx-2">
+            <li>
                 <form action="/shopAll" method="GET" class="d-flex align-items-center">
                     <div class="search-container">
                         <input type="text" name="search" placeholder="Search products..." class="search-input form-control">
@@ -582,9 +604,9 @@
                     </div>
                 </form>
             </li>
-            <li class="mx-2"><a href="/wishlist" class="icon-link"><i class="fas fa-heart"></i></a></li>
-            <li class="mx-2"><a href="/cart" class="icon-link"><i class="fas fa-shopping-cart"></i></a></li>
-            <li class="mx-2">
+            <li><a href="/wishlist" class="icon-link"><i class="fas fa-heart"></i></a></li>
+            <li><a href="/cart" class="icon-link"><i class="fas fa-shopping-cart"></i></a></li>
+            <li>
                 <div class="profile-dropdown">
                     <a href="#" class="icon-link"><i class="far fa-user"></i></a>
                     <div class="profile-dropdown-content">
@@ -610,17 +632,13 @@
 
     <div class="payment-container" data-total-amount="<%= cart ? cart.totalPrice : 0 %>">
         <h1 class="payment-title">Secure Payment</h1>
-
         <div class="payment-section">
-            <!-- Payment Form Section -->
             <div class="payment-form-section">
                 <h2 class="payment-form-title">Payment Details</h2>
                 <div class="security-notice">
                     <i class="fas fa-lock"></i>
                     <span>Payments are secure and encrypted</span>
                 </div>
-
-                <!-- Payment Method Selection -->
                 <div class="payment-methods">
                     <label>
                         <input type="radio" name="paymentMethod" value="cod" checked onclick="showPaymentForm('cod')">
@@ -639,15 +657,10 @@
                         Wallet
                     </label>
                 </div>
-
-                <!-- Payment Forms -->
                 <div id="paymentForms">
-                    <!-- Cash on Delivery -->
                     <div class="payment-form active" id="codForm">
-                        <p class="cod-message">You will pay ₹<%= cart ? (cart.subtotal + cart.shipping  - (cart.discount || 0)).toFixed(2) : '0.00' %> in cash upon delivery.</p>
+                        <p class="cod-message">You will pay ₹<%= cart ? (cart.subtotal + cart.shipping - (cart.discount || 0)).toFixed(2) : '0.00' %> in cash upon delivery.</p>
                     </div>
-
-                    <!-- Razorpay Form -->
                     <div class="payment-form" id="razorpayForm">
                         <div class="payment-info">
                             <p>You will be redirected to Razorpay's secure payment gateway to complete your payment.</p>
@@ -657,16 +670,12 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- UPI Form -->
                     <div class="payment-form" id="upiForm">
                         <div class="form-group">
                             <label for="upiId">UPI ID</label>
                             <input type="text" id="upiId" placeholder="yourname@upi" required>
                         </div>
                     </div>
-
-                    <!-- Wallet Form -->
                     <div class="payment-form" id="walletForm">
                         <div class="form-group">
                             <label for="walletId">Wallet ID/Phone Number</label>
@@ -674,21 +683,17 @@
                         </div>
                     </div>
                 </div>
-
                 <button type="button" class="pay-now-btn" id="payNowBtn" onclick="processPayment()">Pay Now</button>
                 <a href="/checkout" class="back-btn">Back to Checkout</a>
             </div>
-
-            <!-- Order Summary -->
             <div class="order-summary">
                 <h3>Order Summary</h3>
                 <% if (cart && cart.items && cart.items.length > 0) { %>
-                  
                     <div class="summary-row">
                         <span>Subtotal</span>
                         <span>₹<%= cart.subtotal.toFixed(2) %></span>
                     </div>
-                      <% if (cart.offerDiscount > 0) { %>
+                    <% if (cart.offerDiscount > 0) { %>
                         <div class="summary-row">
                             <span>Offer Discount</span>
                             <span>-₹<%= cart.offerDiscount.toFixed(2) %></span>
@@ -704,7 +709,6 @@
                         <span>Shipping</span>
                         <span>₹<%= cart.shipping.toFixed(2) %></span>
                     </div>
-                  
                     <div class="summary-row total">
                         <span>Total</span>
                         <span>₹<%= cart.totalPrice.toFixed(2) %></span>
@@ -718,165 +722,165 @@
         </div>
     </div>
 
-<%- include('../partials/user/fooret.ejs')  %>
+    <%- include('../partials/user/fooret.ejs') %>
 
-   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('DOM loaded');
-        const payNowBtn = document.getElementById('payNowBtn');
-        if (payNowBtn) {
-            console.log('Pay Now button found');
-        } else {
-            console.log('Pay Now button not found');
-        }
-    });
-
-    function showPaymentForm(method) {
-        console.log('Showing payment form for method:', method);
-        document.querySelectorAll('.payment-form').forEach(form => {
-            form.classList.remove('active');
-        });
-        document.getElementById(`${method}Form`).classList.add('active');
-
-        const payNowBtn = document.getElementById('payNowBtn');
-        if (method === 'cod') {
-            payNowBtn.disabled = false;
-        } else {
-            validateForm(method);
-        }
-    }
-
-    function validateForm(method) {
-        console.log('Validating form for method:', method);
-        const payNowBtn = document.getElementById('payNowBtn');
-        if (method === 'razorpay') {
-            payNowBtn.disabled = false;
-        } else if (method === 'upi') {
-            const upiId = document.getElementById('upiId').value;
-            payNowBtn.disabled = !upiId;
-        }
-    }
-
-    var isRetry = '<%= orderId ? 'true' : 'false' %>';
-
-    let paymentInProgress = false;
-    async function processPayment() {
-        if (paymentInProgress) return;
-        paymentInProgress = true;
-        const payBtn = document.getElementById('payNowBtn');
-        if (payBtn) {
-            payBtn.disabled = true;
-            payBtn.textContent = 'Processing...';
-        }
-        const method = document.querySelector('input[name="paymentMethod"]:checked').value;
-        const addressId = '<%= address._id %>';
-        const loadingOverlay = document.getElementById('loadingOverlay');
-        if (loadingOverlay) loadingOverlay.style.display = 'flex';
-        try {
-            const payload = { method, addressId };
-            if (method === 'upi') {
-                payload.upiId = document.getElementById('upiId').value;
-            } else if (method === 'wallet') {
-                payload.walletId = document.getElementById('walletId').value;
-            }
-            if (isRetry === 'true') {
-                payload.orderId = '<%= orderId %>';
-            }
-            const res = await fetch('/payment/process', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            if (!res.ok) {
-                const errorData = await res.json();
-                throw new Error(errorData.message || `HTTP error! status: ${res.status}`);
-            }
-            const data = await res.json();
-            if (data.razorpayOrderId) {
-                // Razorpay flow
-                const options = {
-                    key: "<%= RAZORPAY_KEY_ID %>",
-                    amount: data.amount,
-                    currency: data.currency,
-                    name: "Lume",
-                    description: "Order Payment",
-                    order_id: data.razorpayOrderId,
-                    handler: async function (response) {
-                        try {
-                            const verifyRes = await fetch('/verify-payment', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                    razorpay_payment_id: response.razorpay_payment_id,
-                                    razorpay_order_id: response.razorpay_order_id,
-                                    razorpay_signature: response.razorpay_signature,
-                                    orderId: data.orderId,
-                                    addressId: addressId
-                                })
-                            });
-                            if (!verifyRes.ok) {
-                                const errorData = await verifyRes.json();
-                                throw new Error(errorData.message || `HTTP error! status: ${verifyRes.status}`);
-                            }
-                            const verifyData = await verifyRes.json();
-                            if (verifyData.redirect) {
-                                window.location.href = verifyData.redirect;
-                            }
-                        } catch (error) {
-                            window.location.href = `/payment-failed?orderId=${data.orderId}&error=${encodeURIComponent(error.message)}`;
-                        }
-                    },
-                    prefill: {
-                        name: "<%= user.name %>",
-                        email: "<%= user.email %>",
-                        contact: "<%= user.phone %>"
-                    },
-                    theme: { color: "#D4B996" },
-                    modal: {
-                        ondismiss: function() {
-                            window.location.href = `/payment-failed?orderId=${data.orderId}&error=Payment cancelled by user`;
-                        }
-                    }
-                };
-                const rzp = new Razorpay(options);
-                rzp.on('payment.failed', function (response) {
-                    window.location.href = `/payment-failed?orderId=${data.orderId}&error=${encodeURIComponent(response.error.description || 'Payment failed')}`;
-                });
-                rzp.open();
-            } else if (data.redirect) {
-                window.location.href = data.redirect;
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded');
+            const payNowBtn = document.getElementById('payNowBtn');
+            if (payNowBtn) {
+                console.log('Pay Now button found');
             } else {
-                let errorMessage = data.message || "Payment failed";
+                console.log('Pay Now button not found');
+            }
+        });
+
+        function showPaymentForm(method) {
+            console.log('Showing payment form for method:', method);
+            document.querySelectorAll('.payment-form').forEach(form => {
+                form.classList.remove('active');
+            });
+            document.getElementById(`${method}Form`).classList.add('active');
+
+            const payNowBtn = document.getElementById('payNowBtn');
+            if (method === 'cod') {
+                payNowBtn.disabled = false;
+            } else {
+                validateForm(method);
+            }
+        }
+
+        function validateForm(method) {
+            console.log('Validating form for method:', method);
+            const payNowBtn = document.getElementById('payNowBtn');
+            if (method === 'razorpay') {
+                payNowBtn.disabled = false;
+            } else if (method === 'upi') {
+                const upiId = document.getElementById('upiId').value;
+                payNowBtn.disabled = !upiId;
+            } else if (method === 'wallet') {
+                const walletId = document.getElementById('walletId').value;
+                payNowBtn.disabled = !walletId;
+            }
+        }
+
+        var isRetry = '<%= orderId ? 'true' : 'false' %>';
+
+        let paymentInProgress = false;
+        async function processPayment() {
+            if (paymentInProgress) return;
+            paymentInProgress = true;
+            const payBtn = document.getElementById('payNowBtn');
+            if (payBtn) {
+                payBtn.disabled = true;
+                payBtn.textContent = 'Processing...';
+            }
+            const method = document.querySelector('input[name="paymentMethod"]:checked').value;
+            const addressId = '<%= address._id %>';
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            if (loadingOverlay) loadingOverlay.style.display = 'flex';
+            try {
+                const payload = { method, addressId };
+                if (method === 'upi') {
+                    payload.upiId = document.getElementById('upiId').value;
+                } else if (method === 'wallet') {
+                    payload.walletId = document.getElementById('walletId').value;
+                }
+                if (isRetry === 'true') {
+                    payload.orderId = '<%= orderId %>';
+                }
+                const res = await fetch('/payment/process', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    throw new Error(errorData.message || `HTTP error! status: ${res.status}`);
+                }
+                const data = await res.json();
+                if (data.razorpayOrderId) {
+                    const options = {
+                        key: "<%= RAZORPAY_KEY_ID %>",
+                        amount: data.amount,
+                        currency: data.currency,
+                        name: "Lume",
+                        description: "Order Payment",
+                        order_id: data.razorpayOrderId,
+                        handler: async function (response) {
+                            try {
+                                const verifyRes = await fetch('/verify-payment', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        razorpay_payment_id: response.razorpay_payment_id,
+                                        razorpay_order_id: response.razorpay_order_id,
+                                        razorpay_signature: response.razorpay_signature,
+                                        orderId: data.orderId,
+                                        addressId: addressId
+                                    })
+                                });
+                                if (!verifyRes.ok) {
+                                    const errorData = await verifyRes.json();
+                                    throw new Error(errorData.message || `HTTP error! status: ${verifyRes.status}`);
+                                }
+                                const verifyData = await verifyRes.json();
+                                if (verifyData.redirect) {
+                                    window.location.href = verifyData.redirect;
+                                }
+                            } catch (error) {
+                                window.location.href = `/payment-failed?orderId=${data.orderId}&error=${encodeURIComponent(error.message)}`;
+                            }
+                        },
+                        prefill: {
+                            name: "<%= user.name %>",
+                            email: "<%= user.email %>",
+                            contact: "<%= user.phone %>"
+                        },
+                        theme: { color: "#D4B996" },
+                        modal: {
+                            ondismiss: function() {
+                                window.location.href = `/payment-failed?orderId=${data.orderId}&error=Payment cancelled by user`;
+                            }
+                        }
+                    };
+                    const rzp = new Razorpay(options);
+                    rzp.on('payment.failed', function (response) {
+                        window.location.href = `/payment-failed?orderId=${data.orderId}&error=${encodeURIComponent(response.error.description || 'Payment failed')}`;
+                    });
+                    rzp.open();
+                } else if (data.redirect) {
+                    window.location.href = data.redirect;
+                } else {
+                    let errorMessage = data.message || "Payment failed";
+                    Swal.fire({
+                        title: "Payment Failed",
+                        text: errorMessage,
+                        icon: "error",
+                        confirmButtonColor: "#2c1810"
+                    });
+                }
+            } catch (error) {
+                if (loadingOverlay) loadingOverlay.style.display = 'none';
+                if (payBtn) {
+                    payBtn.disabled = false;
+                    payBtn.textContent = 'Pay Now';
+                }
+                paymentInProgress = false;
                 Swal.fire({
                     title: "Payment Failed",
-                    text: errorMessage,
+                    text: error.message,
                     icon: "error",
                     confirmButtonColor: "#2c1810"
                 });
             }
-        } catch (error) {
-            if (loadingOverlay) loadingOverlay.style.display = 'none';
-            if (payBtn) {
-                payBtn.disabled = false;
-                payBtn.textContent = 'Pay Now';
-            }
-            paymentInProgress = false;
-            Swal.fire({
-                title: "Payment Failed",
-                text: error.message,
-                icon: "error",
-                confirmButtonColor: "#2c1810"
-            });
         }
-    }
 
-    // Event listeners
-    document.getElementById('upiId')?.addEventListener('input', () => validateForm('upi'));
-    document.getElementById('walletId')?.addEventListener('input', () => validateForm('wallet'));
-    document.getElementById('payNowBtn')?.addEventListener('click', processPayment);
+        document.getElementById('upiId')?.addEventListener('input', () => validateForm('upi'));
+        document.getElementById('walletId')?.addEventListener('input', () => validateForm('wallet'));
+        document.getElementById('payNowBtn')?.addEventListener('click', processPayment);
 
-    // Initialize with COD form
-    showPaymentForm('cod');
-</script>
+        showPaymentForm('cod');
+    </script>
 </body>
 </html>
