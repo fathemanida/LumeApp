@@ -43,6 +43,7 @@ const securePassword = async (passsword) => {
 function generateOtp() {
   return Math.floor(10000 + Math.random() * 900000).toString();
 }
+
 async function sendVerificationEmail(email, otp) {
   try {
     const transport = nodemailer.createTransport({
@@ -57,27 +58,31 @@ async function sendVerificationEmail(email, otp) {
     });
 
     const mailOptions = {
-      from: process.env.NODEMAILER_EMAIL,
+      from: `"Lume Elegence" <${process.env.NODEMAILER_EMAIL}>`,
       to: email,
-      subject: "Your OTP for Password rest",
-      text: `Your OTP is ${otp}`,
-      html: `<b4><h4>Your OTP:${otp}</h4></b4>`,
+      subject: "Your OTP for Password Reset",
+      text: `Hi there,\n\nYour OTP for password reset is: ${otp}\n\nIf you didn’t request this, please ignore the email.`,
+      html: `
+        <div style="font-family: Arial, sans-serif;">
+          <h3>Password Reset OTP</h3>
+          <p>Your OTP is:</p>
+          <h2 style="color:#333;">${otp}</h2>
+          <p>If you did not request this, please ignore this email.</p>
+        </div>
+      `,
     };
 
-    const info = await transport.sendMail({
-      from: process.env.NODEMAILER_EMAIL,
-      to: email,
-      subject: "Verify your Account",
-      text: `Thank you for signing up. Please verify your email address by entering the given OTP: ${otp}`,
-      html: `<b>Your OTP: ${otp}</b>`,
-    });
-    console.log(email);
+    const info = await transport.sendMail(mailOptions);
+    console.log(`OTP email sent to: ${email}`);
     return info.accepted.length > 0;
   } catch (error) {
-    console.log("error in sending email", error);
+    console.log("Error in sending email:", error);
     return false;
   }
 }
+
+module.exports = sendVerificationEmail;
+
 
 const getForgotPasspage = async (req, res) => {
   try {

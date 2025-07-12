@@ -3,1667 +3,1123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LUME - Cart</title>
+    <title>Checkout - LUME</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Jost&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
- <style>
-:root {
-  --soft-beige: #D4B996;
-  --muted-green: #657858;
-  --light-bg: #f8f5f2;
-  --border-color: #e0d8cc;
-  --offer-red: #e63946;
-  --dark-text: #2c1810;
-  --darker-text: #1a0f0a;
-}
-
-html, body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  background-color: #f0e9e0;
-  font-family: 'Jost', sans-serif;
-  color: var(--dark-text);
-}
-
-.navbar {
-  background: white;
-  border-bottom: 1px solid var(--border-color);
-  position: relative;
-  padding: 1.5rem;
-}
-
-.brand {
-  font-family: 'Aboreto', cursive;
-  font-size: clamp(1.5rem, 4vw, 2rem);
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--darker-text);
-  cursor: pointer;
-}
-
-.nav-link {
-  color: var(--darker-text);
-  font-family: 'Jost', sans-serif;
-  font-size: clamp(1rem, 2.5vw, 1.1rem);
-  transition: color 0.3s ease;
-}
-
-.nav-link:hover {
-  color: var(--muted-green);
-  font-weight: 500;
-}
-
-.icon-link {
-  color: var(--darker-text);
-  transition: color 0.3s ease;
-  font-size: clamp(1.2rem, 3vw, 1.3rem);
-}
-
-.icon-link:hover {
-  color: var(--muted-green);
-}
-
-.search-container {
-  position: relative;
-  display: none;
-}
-
-.search-container.active {
-  display: block;
-}
-
-.search-input {
-  border: 1px solid var(--border-color);
-  border-radius: 20px;
-  padding: 0.75rem 1.5rem;
-  padding-right: 3rem;
-  font-family: 'Jost', sans-serif;
-  width: clamp(200px, 50vw, 300px);
-  transition: all 0.3s ease;
-  color: var(--dark-text);
-}
-
-.search-input:focus {
-  outline: none;
-  border-color: var(--soft-beige);
-  width: clamp(250px, 60vw, 350px);
-  box-shadow: 0 0 0 2px rgba(212, 185, 150, 0.1);
-  color: var(--darker-text);
-}
-
-.search-button {
-  position: absolute;
-  right: 15px;
-  background: none;
-  border: none;
-  color: var(--dark-text);
-  cursor: pointer;
-}
-
-.search-button:hover {
-  color: var(--muted-green);
-}
-
-.sidebar {
-  position: fixed;
-  top: 0;
-  left: -100%;
-  width: clamp(300px, 80vw, 350px);
-  height: 100%;
-  background: white;
-  z-index: 1000;
-  transition: left 0.3s ease;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-  overflow-y: auto;
-}
-
-.sidebar.open {
-  left: 0;
-}
-
-.sidebar-header {
-  padding: 1.5rem;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.sidebar-menu {
-  padding: 1.5rem;
-}
-
-.sidebar-category {
-  margin-bottom: 1.5rem;
-}
-
-.sidebar-title {
-  font-family: 'Aboreto', cursive;
-  font-size: clamp(1rem, 3vw, 1.2rem);
-  margin-bottom: 0.75rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  color: var(--darker-text);
-}
-
-.sidebar-items {
-  padding-left: 1.5rem;
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease;
-}
-
-.sidebar-items.open {
-  max-height: 500px;
-}
-
-.sidebar-item {
-  padding: 0.75rem 0;
-  cursor: pointer;
-}
-
-.sidebar-item:hover {
-  color: var(--muted-green);
-}
-
-.sidebar-item a {
-  color: var(--dark-text);
-  text-decoration: none;
-  display: block;
-  transition: color 0.3s ease;
-}
-
-.sidebar-item a:hover {
-  color: var(--muted-green);
-}
-
-.sidebar-item a.active {
-  color: var(--muted-green);
-  font-weight: 500;
-}
-
-.sidebar-item a.active::before {
-  content: "•";
-  margin-right: 5px;
-}
-
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.3);
-  z-index: 999;
-  display: none;
-}
-
-.overlay.active {
-  display: block;
-}
-
-.hero-section {
-  display: flex;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-}
-
-.hero-img {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  width: 100%;
-  height: clamp(400px, 50vw, 600px);
-  object-fit: cover;
-}
-
-.hero-img:hover {
-  transform: scale(1.02);
-  box-shadow: 0 5px 15px rgba(212, 185, 150, 0.1);
-}
-
-.section-heading {
-  font-family: 'Aboreto', cursive;
-  color: var(--darker-text);
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  font-weight: 400;
-}
-
-.section-subtext {
-  font-family: 'Jost', sans-serif;
-  color: var(--dark-text);
-  font-size: clamp(0.9rem, 2.5vw, 1rem);
-}
-
-.product-card {
-  background: transparent;
-  border: none;
-  overflow: hidden;
-  position: relative;
-  box-shadow: none;
-  border-radius: 0 0 12px 12px;
-}
-
-.product-image-container {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 1;
-  overflow: hidden;
-}
-
-.product-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: opacity 0.3s ease;
-}
-
-.product-img-secondary {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.product-image-container:hover .product-img {
-  opacity: 0;
-}
-
-.product-image-container:hover .product-img-secondary {
-  opacity: 1;
-}
-
-.product-info {
-  padding: 1rem 0;
-  text-align: center;
-  background: transparent;
-}
-
-.product-title {
-  font-family: 'Aboreto', cursive;
-  font-size: clamp(1rem, 3vw, 1.2rem);
-  color: var(--darker-text);
-  margin-bottom: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-}
-
-.product-category {
-  color: var(--muted-green);
-  font-size: clamp(0.8rem, 2vw, 0.9rem);
-  margin-bottom: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.product-price {
-  font-weight: 500;
-  margin-bottom: 0.75rem;
-  display: flex;
-  gap: 0.75rem;
-  align-items: center;
-  justify-content: center;
-}
-
-.product-price .regular-price {
-  color: #666;
-  text-decoration: line-through;
-  font-size: clamp(0.9rem, 2.5vw, 1rem);
-}
-
-.product-price .discounted-price {
-  color: var(--offer-red);
-  font-weight: 600;
-  font-size: clamp(1rem, 3vw, 1.2rem);
-}
-
-.product-price .strike-price {
-  color: #666;
-  text-decoration: line-through;
-  font-size: clamp(0.9rem, 2.5vw, 1rem);
-}
-
-.wishlist-icon {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  color: var(--darker-text);
-  font-size: clamp(1.2rem, 3vw, 1.3rem);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  z-index: 3;
-  background: rgba(255, 255, 255, 0.8);
-  border-radius: 50%;
-  padding: 0.4rem;
-}
-
-.wishlist-icon:hover {
-  color: #ff6b6b;
-  transform: scale(1.1);
-}
-
-.new-badge {
-  position: absolute;
-  top: 15px;
-  left: 15px;
-  background-color: var(--muted-green);
-  color: white;
-  font-family: 'Jost', sans-serif;
-  font-size: clamp(0.7rem, 2vw, 0.8rem);
-  padding: 0.4rem 0.8rem;
-  border-radius: 0;
-  text-transform: uppercase;
-  z-index: 2;
-}
-
-.offer-badge {
-  position: absolute;
-  bottom: 15px;
-  right: 15px;
-  background-color: #603a10;
-  color: white;
-  font-family: 'Jost', sans-serif;
-  font-size: clamp(0.7rem, 2vw, 0.8rem);
-  padding: 0.4rem 0.8rem;
-  border-radius: 0;
-  text-transform: uppercase;
-  z-index: 2;
-}
-
-.product-card .btn {
-  background-color: var(--darker-text);
-  color: white;
-  border: none;
-  padding: 0.8rem 1.5rem;
-  width: 100%;
-  margin-top: 0.75rem;
-  border-radius: 0;
-  transition: all 0.3s ease;
-  font-family: 'Jost', sans-serif;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  font-size: clamp(0.85rem, 2.5vw, 0.95rem);
-}
-
-.product-card .btn:hover:not(:disabled) {
-  background-color: var(--muted-green);
-  color: white;
-}
-
-.product-card .btn:disabled {
-  background-color: var(--darker-text);
-  color: white;
-  opacity: 0.7;
-  cursor: not-allowed;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  font-size: clamp(0.85rem, 2.5vw, 0.95rem);
-  border-radius: 0;
-  width: 100%;
-  padding: 0.8rem 1.5rem;
-  margin-top: 0.75rem;
-}
-
-.unlisted-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(255, 255, 255, 0.7);
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.unlisted-badge {
-  background: #5b0a0a;
-  color: white;
-  padding: 6px 12px;
-  border-radius: 0;
-  font-weight: lighter;
-  font-family: 'Jost', sans-serif;
-  font-size: clamp(0.9rem, 2.5vw, 1rem);
-}
-
-.unlisted-img {
-  opacity: 0.7;
-}
-
-.out-of-stock-overlay {
-  position: absolute;
-  top: 15px;
-  left: 15px;
-  background-color: #dc3545;
-  color: white;
-  padding: 0.4rem 0.8rem;
-  border-radius: 0;
-  font-size: clamp(0.7rem, 2vw, 0.8rem);
-  font-weight: bold;
-  z-index: 2;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.sparkle-banner {
-  background-color: var(--soft-beige);
-  color: white;
-  font-family: 'Aboreto', cursive;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  transition: background-color 0.3s ease;
-}
-
-.sparkle-banner:hover {
-  background-color: var(--muted-green);
-}
-
-.signup-input {
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  padding: 0.75rem 1.5rem;
-  font-family: 'Jost', sans-serif;
-  transition: border-color 0.3s ease;
-}
-
-.signup-input:focus {
-  outline: none;
-  border-color: var(--soft-beige);
-}
-
-.signup-btn {
-  background-color: var(--soft-beige);
-  color: white;
-  font-family: 'Jost', sans-serif;
-  font-weight: 500;
-  border-radius: 4px;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-}
-
-.signup-btn:hover {
-  background-color: var(--muted-green);
-  transform: translateY(-2px);
-}
-
-.footer {
-  background-color: var(--soft-beige);
-}
-
-.footer-heading {
-  font-family: 'Aboreto', cursive;
-  color: white;
-  font-size: clamp(1rem, 3vw, 1.2rem);
-  letter-spacing: 1px;
-}
-
-.footer-link {
-  color: white;
-  font-family: 'Jost', sans-serif;
-  font-size: clamp(0.9rem, 2.5vw, 1rem);
-  transition: color 0.3s ease;
-}
-
-.footer-link:hover {
-  color: var(--light-bg);
-}
-
-.profile-dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-.profile-dropdown-content {
-  display: none;
-  position: absolute;
-  right: 0;
-  background-color: white;
-  min-width: clamp(160px, 40vw, 180px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  border-radius: 4px;
-  padding: 0.75rem 0;
-}
-
-.profile-dropdown:hover .profile-dropdown-content {
-  display: block;
-}
-
-.profile-dropdown-content a {
-  color: var(--dark-text);
-  padding: 0.75rem 1.5rem;
-  text-decoration: none;
-  display: block;
-  font-size: clamp(0.9rem, 2.5vw, 1rem);
-  transition: background-color 0.3s ease;
-}
-
-.profile-dropdown-content a:hover {
-  background-color: var(--light-bg);
-  color: var(--muted-green);
-}
-
-.profile-dropdown-content a i {
-  margin-right: 0.75rem;
-  width: 24px;
-  text-align: center;
-}
-
-.pagination {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.75rem;
-  margin-top: 2rem;
-  align-items: center;
-}
-
-.page-btn {
-  width: clamp(36px, 8vw, 40px);
-  height: clamp(36px, 8vw, 40px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  border: none;
-  background-color: #e0e0e0;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  color: var(--dark-text);
-  text-decoration: none;
-}
-
-.page-btn:hover:not(.active):not(:disabled) {
-  background-color: var(--muted-green);
-  color: white;
-}
-
-.page-btn.active {
-  background-color: var(--soft-beige);
-  color: var(--darker-text);
-}
-
-.page-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.main-content-container {
-  padding: clamp(2rem, 5vw, 4rem);
-}
-
-/* Cart Specific Styles */
-.cart-title {
-  font-family: 'Aboreto', cursive;
-  color: var(--darker-text);
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  font-weight: 400;
-  margin-bottom: 2.5rem;
-  font-size: clamp(2.5rem, 5vw, 3rem);
-}
-
-.cart-item {
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  margin-bottom: 2rem;
-  padding: 2rem;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.product-image {
-  width: clamp(160px, 20vw, 200px);
-  height: clamp(160px, 20vw, 200px);
-  object-fit: cover;
-  border-radius: 0;
-}
-
-.product-details {
-  padding: 0 clamp(1.5rem, 3vw, 2rem);
-}
-
-.product-name {
-  font-family: 'Aboreto', cursive;
-  color: var(--darker-text);
-  font-size: clamp(1.4rem, 3.5vw, 1.6rem);
-  margin-bottom: 1rem;
-  letter-spacing: 0.5px;
-}
-
-.product-price {
-  color: var(--dark-text);
-  font-weight: 500;
-  margin-bottom: 1rem;
-  font-size: clamp(1.2rem, 3vw, 1.4rem);
-}
-
-.discount-badge .badge {
-  font-size: clamp(0.9rem, 2.5vw, 1rem);
-  padding: 0.6rem 1rem;
-  font-weight: 500;
-  border-radius: 0;
-}
-
-.discount-badge .badge.bg-success {
-  background: var(--muted-green) !important;
-}
-
-.discount-badge .badge.bg-primary {
-  background: var(--soft-beige) !important;
-  color: var(--darker-text);
-}
-
-.text-decoration-line-through {
-  text-decoration: line-through;
-  opacity: 0.7;
-}
-
-.text-success {
-  color: var(--muted-green) !important;
-}
-
-.quantity-control {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.quantity-btn {
-  background: var(--darker-text);
-  border: none;
-  color: white;
-  width: clamp(40px, 8vw, 48px);
-  height: clamp(40px, 8vw, 48px);
-  border-radius: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.quantity-btn:hover:not(:disabled) {
-  background: var(--muted-green);
-  transform: translateY(-1px);
-}
-
-.quantity-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  background: #ccc;
-  transform: none;
-}
-
-.quantity-input {
-  width: clamp(60px, 12vw, 70px);
-  text-align: center;
-  border: 1px solid var(--border-color);
-  border-radius: 0;
-  padding: 0.75rem;
-  font-family: 'Jost', sans-serif;
-  background-color: var(--light-bg);
-  font-size: clamp(1rem, 2.5vw, 1.1rem);
-}
-
-.quantity-input:disabled {
-  background-color: #f8f5f2;
-  cursor: not-allowed;
-}
-
-.remove-btn {
-  background: none;
-  border: none;
-  color: var(--offer-red);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  padding: 1rem;
-  font-size: clamp(1.2rem, 3vw, 1.3rem);
-}
-
-.remove-btn:hover {
-  transform: scale(1.1);
-}
-
-.cart-summary {
-  background: transparent;
-  border: 1px solid var(--border-color);
-  border-radius: 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  padding: 2.5rem;
-  position: sticky;
-  top: 2rem;
-}
-
-.summary-title {
-  font-family: 'Aboreto', cursive;
-  color: var(--darker-text);
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  font-weight: 400;
-  margin-bottom: 2rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid var(--border-color);
-  font-size: clamp(1.4rem, 3.5vw, 1.6rem);
-}
-
-.summary-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 1.5rem;
-  color: var(--dark-text);
-  font-size: clamp(1rem, 2.5vw, 1.1rem);
-}
-
-.summary-total {
-  font-weight: 600;
-  font-size: clamp(1.4rem, 3.5vw, 1.6rem);
-  color: var(--darker-text);
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--border-color);
-}
-
-.checkout-btn {
-  background: var(--darker-text);
-  border: none;
-  color: white;
-  font-family: 'Jost', sans-serif;
-  font-size: clamp(1.1rem, 2.5vw, 1.3rem);
-  padding: 1.2rem;
-  border-radius: 0;
-  width: 100%;
-  margin-top: 2rem;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.checkout-btn:hover:not(:disabled) {
-  background: var(--muted-green);
-  transform: translateY(-2px);
-}
-
-.checkout-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  background: #ccc;
-}
-
-.coupon-section {
-  margin-top: 2.5rem;
-  padding-top: 2.5rem;
-  border-top: 1px solid var(--border-color);
-}
-
-.coupon-title {
-  font-family: 'Aboreto', cursive;
-  color: var(--darker-text);
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  font-weight: 400;
-  margin-bottom: 1.5rem;
-  font-size: clamp(1.2rem, 3vw, 1.4rem);
-}
-
-.coupon-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.coupon-item {
-  background: var(--light-bg);
-  border: 2px dashed var(--soft-beige);
-  border-radius: 0;
-  padding: 1.5rem;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-}
-
-.coupon-item:hover:not(.applied):not(.used) {
-  transform: translateY(-2px);
-  border-color: var(--muted-green);
-}
-
-.coupon-code {
-  font-family: 'Aboreto', cursive;
-  color: var(--darker-text);
-  font-size: clamp(1.2rem, 3vw, 1.4rem);
-  margin-bottom: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.coupon-code i {
-  color: var(--soft-beige);
-}
-
-.coupon-details {
-  color: var(--dark-text);
-  font-size: clamp(1rem, 2.5vw, 1.1rem);
-}
-
-.coupon-discount {
-  color: var(--offer-red);
-  font-weight: 600;
-}
-
-.coupon-min-order {
-  color: var(--soft-beige);
-  font-size: clamp(0.9rem, 2vw, 1rem);
-  margin-top: 0.75rem;
-}
-
-.coupon-expiry {
-  color: #666;
-  font-size: clamp(0.9rem, 2vw, 1rem);
-  margin-top: 0.75rem;
-}
-
-.copy-coupon-btn {
-  background: var(--darker-text);
-  border: none;
-  color: white;
-  width: clamp(40px, 8vw, 48px);
-  height: clamp(40px, 8vw, 48px);
-  border-radius: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.copy-coupon-btn:hover {
-  background: var(--muted-green);
-  transform: translateY(-1px);
-}
-
-.apply-coupon-btn {
-  background: var(--darker-text);
-  border: none;
-  color: white;
-  width: clamp(48px, 10vw, 56px);
-  height: clamp(48px, 10vw, 56px);
-  border-radius: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.apply-coupon-btn:hover:not(:disabled) {
-  background: var(--muted-green);
-  transform: translateY(-1px);
-}
-
-.apply-coupon-btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-  background: #ccc;
-}
-
-.empty-cart {
-  text-align: center;
-  padding: clamp(4rem, 10vw, 5rem);
-  background: transparent;
-  border-radius: 0;
-}
-
-.empty-cart-icon {
-  font-size: clamp(5rem, 12vw, 6rem);
-  color: var(--soft-beige);
-  margin-bottom: 2rem;
-}
-
-.empty-cart-text {
-  font-family: 'Aboreto', cursive;
-  color: var(--darker-text);
-  font-size: clamp(1.8rem, 5vw, 2rem);
-  margin-bottom: 1.5rem;
-}
-
-.empty-cart-subtext {
-  color: var(--dark-text);
-  margin-bottom: 2.5rem;
-  font-size: clamp(1.1rem, 3vw, 1.3rem);
-}
-
-.continue-shopping-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: clamp(1.2rem, 3vw, 1.4rem) clamp(2.5rem, 5vw, 3rem);
-  background: var(--darker-text);
-  color: white;
-  border: none;
-  border-radius: 0;
-  font-family: 'Jost', sans-serif;
-  font-size: clamp(1.1rem, 3vw, 1.3rem);
-  font-weight: 500;
-  text-decoration: none;
-  transition: all 0.3s ease;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.continue-shopping-btn:hover {
-  background: var(--muted-green);
-  transform: translateY(-2px);
-}
-
-.coupon-input-group {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.coupon-input {
-  flex: 1;
-  border: 1px solid var(--border-color);
-  border-radius: 0;
-  padding: 1rem 1.5rem;
-  font-family: 'Jost', sans-serif;
-  font-size: clamp(1rem, 2.5vw, 1.1rem);
-  transition: all 0.3s ease;
-  background: var(--light-bg);
-}
-
-.coupon-input:focus {
-  outline: none;
-  border-color: var(--soft-beige);
-}
-
-.delivery-info {
-  margin: 2rem 0;
-  padding: 1.5rem;
-  background: var(--light-bg);
-  border-radius: 0;
-  border: 1px solid var(--border-color);
-}
-
-.delivery-title {
-  font-family: 'Aboreto', cursive;
-  color: var(--darker-text);
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  font-weight: 400;
-  font-size: clamp(1.2rem, 3vw, 1.4rem);
-  margin-bottom: 1rem;
-}
-
-.delivery-date {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  color: var(--dark-text);
-  font-size: clamp(1rem, 2.5vw, 1.1rem);
-}
-
-.delivery-date i {
-  color: var(--soft-beige);
-  font-size: clamp(1.3rem, 3vw, 1.4rem);
-}
-
-.available-coupons {
-  margin-top: 2rem;
-  padding-top: 2rem;
-  border-top: 1px solid var(--border-color);
-}
-
-.show-coupons-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 1rem 2rem;
-  background: var(--light-bg);
-  border: 2px solid var(--soft-beige);
-  border-radius: 0;
-  color: var(--soft-beige);
-  font-family: 'Jost', sans-serif;
-  font-size: clamp(1rem, 2.5vw, 1.1rem);
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.show-coupons-btn:hover {
-  background: var(--soft-beige);
-  color: white;
-  transform: translateY(-1px);
-}
-
-.show-coupons-btn i {
-  transition: transform 0.3s ease;
-  font-size: clamp(1rem, 2.5vw, 1.1rem);
-}
-
-.show-coupons-btn.active {
-  background: var(--soft-beige);
-  color: white;
-}
-
-.show-coupons-btn.active i {
-  transform: rotate(180deg);
-}
-
-.applied-coupon {
-  background: rgba(212, 185, 150, 0.1);
-  border: 1px solid rgba(212, 185, 150, 0.2);
-  border-radius: 0;
-  padding: 1rem 1.5rem;
-  margin: 1rem 0;
-}
-
-.applied-coupon .coupon-code {
-  background: rgba(212, 185, 150, 0.2);
-  color: var(--soft-beige);
-  padding: 0.75rem 1rem;
-  border-radius: 0;
-  font-weight: 500;
-  font-size: clamp(1rem, 2.5vw, 1.1rem);
-}
-
-.applied-coupon .coupon-code i {
-  color: var(--soft-beige);
-}
-
-.remove-coupon-btn {
-  background: none;
-  border: none;
-  color: #6c757d;
-  padding: 0.75rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  width: clamp(28px, 6vw, 32px);
-  height: clamp(28px, 6vw, 32px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0;
-}
-
-.remove-coupon-btn:hover {
-  color: var(--offer-red);
-  background: rgba(220, 53, 69, 0.1);
-  transform: scale(1.1);
-}
-
-.discount-amount {
-  color: var(--muted-green);
-  font-weight: 600;
-  font-size: clamp(1.1rem, 3vw, 1.3rem);
-}
-
-.coupon-item.applied {
-  background: rgba(212, 185, 150, 0.15);
-  border: 2px solid var(--soft-beige);
-  cursor: default;
-}
-
-.coupon-item.applied:hover {
-  transform: none;
-}
-
-.coupon-item.used {
-  opacity: 0.7;
-  cursor: not-allowed;
-  background: #f8f8f8;
-  border: 2px dashed #ccc;
-}
-
-.coupon-item.used:hover {
-  transform: none;
-}
-
-.coupon-item.used .coupon-code {
-  color: #666;
-}
-
-.coupon-item.used .coupon-details {
-  color: #666;
-}
-
-.coupon-item.used .coupon-min-order,
-.coupon-item.used .coupon-expiry {
-  color: #999;
-}
-
-.coupon-input:disabled,
-.apply-coupon-btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-.stock-info {
-  margin-top: 1rem;
-  font-size: clamp(0.9rem, 2vw, 1rem);
-}
-
-.stock-info small {
-  color: var(--soft-beige);
-  font-style: italic;
-}
-
-.stock-info small.text-warning {
-  color: var(--offer-red);
-}
-
-.nav-links {
-  display: flex;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  flex: 1;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.icon-links {
-  display: flex;
-  align-items: center;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.bg-cream {
-  background-color: #f5e6d39f;
-}
-
-.pulse-ring {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: #ead5b990;
-  position: absolute;
-  animation: pulse 1.5s ease-out infinite;
-  opacity: 0.75;
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-    opacity: 0.8;
-  }
-  50% {
-    transform: scale(2.5);
-    opacity: 0.4;
-  }
-  100% {
-    transform: scale(3);
-    opacity: 0;
-  }
-}
-
-/* Responsive Adjustments */
-@media (max-width: 992px) {
-  .main-content-container {
-    padding: clamp(1rem, 4vw, 1.5rem);
-  }
-
-  .cart-item {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 1rem;
-    margin-bottom: 1.5rem;
-    box-shadow: none;
-  }
-
-  .product-image {
-    width: 100%;
-    height: auto;
-    max-height: 120px;
-  }
-
-  .product-details {
-    width: 100%;
-    padding: 0.5rem 0;
-  }
-
-  .product-name {
-    font-size: clamp(0.9rem, 2.5vw, 1rem);
-  }
-
-  .product-price {
-    font-size: clamp(0.8rem, 2vw, 0.9rem);
-  }
-
-  .quantity-control {
-    justify-content: center;
-    width: 100%;
-    margin-top: 0.5rem;
-    gap: 0.5rem;
-  }
-
-  .quantity-btn {
-    width: clamp(28px, 6vw, 32px);
-    height: clamp(28px, 6vw, 32px);
-  }
-
-  .quantity-input {
-    width: clamp(40px, 10vw, 48px);
-    font-size: clamp(0.8rem, 2vw, 0.9rem);
-  }
-
-  .remove-btn {
-    padding: 0.5rem;
-    font-size: clamp(0.9rem, 2.5vw, 1rem);
-  }
-
-  .cart-summary {
-    position: static;
-    margin-top: 1.5rem;
-    padding: 1.5rem;
-    border: none;
-  }
-
-  .summary-title {
-    font-size: clamp(1.1rem, 3vw, 1.2rem);
-  }
-
-  .summary-row {
-    font-size: clamp(0.8rem, 2vw, 0.9rem);
-  }
-
-  .summary-total {
-    font-size: clamp(1.1rem, 3vw, 1.2rem);
-  }
-
-  .checkout-btn {
-    font-size: clamp(0.9rem, 2vw, 1rem);
-    padding: 0.8rem;
-    margin-top: 1rem;
-  }
-
-  .coupon-section {
-    margin-top: 1.5rem;
-    padding-top: 1.5rem;
-  }
-
-  .coupon-title {
-    font-size: clamp(0.9rem, 2.5vw, 1rem);
-  }
-
-  .coupon-input-group {
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-  }
-
-  .coupon-input {
-    width: 100%;
-    padding: 0.5rem 1rem;
-    font-size: clamp(0.8rem, 2vw, 0.9rem);
-  }
-
-  .apply-coupon-btn {
-    width: 100%;
-    height: clamp(36px, 10vw, 42px);
-  }
-
-  .coupon-list {
-    gap: 1rem;
-  }
-
-  .coupon-item {
-    padding: 1rem;
-  }
-
-  .coupon-code {
-    font-size: clamp(0.9rem, 2.5vw, 1rem);
-  }
-
-  .coupon-details {
-    font-size: clamp(0.8rem, 2vw, 0.9rem);
-  }
-
-  .coupon-min-order,
-  .coupon-expiry {
-    font-size: clamp(0.7rem, 1.8vw, 0.8rem);
-  }
-
-  .copy-coupon-btn {
-    width: clamp(28px, 6vw, 32px);
-    height: clamp(28px, 6vw, 32px);
-  }
-
-  .delivery-info {
-    margin: 1rem 0;
-    padding: 1rem;
-  }
-
-  .delivery-title {
-    font-size: clamp(0.9rem, 2.5vw, 1rem);
-  }
-
-  .delivery-date {
-    font-size: clamp(0.8rem, 2vw, 0.9rem);
-  }
-
-  .delivery-date i {
-    font-size: clamp(1rem, 2.5vw, 1.1rem);
-  }
-
-  .show-coupons-btn {
-    padding: 0.5rem 1rem;
-    font-size: clamp(0.8rem, 2vw, 0.9rem);
-  }
-
-  .show-coupons-btn i {
-    font-size: clamp(0.8rem, 2vw, 0.9rem);
-  }
-
-  .applied-coupon {
-    padding: 0.75rem;
-  }
-
-  .applied-coupon .coupon-code {
-    font-size: clamp(0.8rem, 2vw, 0.9rem);
-  }
-
-  .remove-coupon-btn {
-    width: clamp(24px, 5vw, 28px);
-    height: clamp(24px, 5vw, 28px);
-  }
-
-  .discount-amount {
-    font-size: clamp(0.9rem, 2vw, 1rem);
-  }
-
-  .empty-cart {
-    padding: clamp(2rem, 6vw, 3rem);
-  }
-
-  .empty-cart-icon {
-    font-size: clamp(3rem, 8vw, 4rem);
-  }
-
-  .empty-cart-text {
-    font-size: clamp(1.2rem, 4vw, 1.4rem);
-  }
-
-  .empty-cart-subtext {
-    font-size: clamp(0.9rem, 2.5vw, 1rem);
-  }
-
-  .continue-shopping-btn {
-    padding: clamp(0.8rem, 2vw, 1rem) clamp(1.5rem, 4vw, 2rem);
-    font-size: clamp(0.9rem, 2.5vw, 1rem);
-  }
-
-  .stock-info {
-    font-size: clamp(0.7rem, 1.8vw, 0.8rem);
-  }
-
-  .col-lg-8, .col-lg-4 {
-    flex: 0 0 100%;
-    max-width: 100%;
-  }
-}
-
-@media (max-width: 768px) {
-  .navbar {
-    flex-direction: column;
-    padding: 0.75rem;
-  }
-
-  .brand {
-    margin-bottom: 0.75rem;
-    font-size: clamp(1.2rem, 4vw, 1.5rem);
-  }
-
-  .nav-links {
-    margin: 0.75rem 0;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .nav-link {
-    padding: 0.5rem 0;
-    font-size: clamp(0.8rem, 2.5vw, 0.9rem);
-  }
-
-  .search-input {
-    width: clamp(120px, 40vw, 180px);
-  }
-
-  .search-input:focus {
-    width: clamp(150px, 50vw, 200px);
-  }
-
-  .cart-title {
-    font-size: clamp(1.5rem, 4vw, 1.8rem);
-  }
-
-  .cart-item {
-    padding: 0.75rem;
-  }
-
-  .product-name {
-    font-size: clamp(0.9rem, 2.5vw, 1rem);
-  }
-
-  .quantity-control {
-    gap: 0.25rem;
-  }
-
-  .quantity-btn {
-    width: clamp(24px, 6vw, 28px);
-    height: clamp(24px, 6vw, 28px);
-  }
-
-  .quantity-input {
-    width: clamp(36px, 10vw, 40px);
-  }
-
-  .coupon-input-group {
-    flex-direction: column;
-  }
-
-  .coupon-input {
-    width: 100%;
-  }
-
-  .apply-coupon-btn {
-    width: 100%;
-    height: clamp(36px, 10vw, 42px);
-  }
-
-  .delivery-info {
-    padding: 0.5rem;
-  }
-
-  .continue-shopping-btn {
-    padding: clamp(0.5rem, 2vw, 0.75rem) clamp(1rem, 4vw, 1.5rem);
-  }
-}
-
-@media (max-width: 576px) {
-  .product-image {
-    max-height: 100px;
-  }
-
-  .product-price {
-    font-size: clamp(0.8rem, 2vw, 0.9rem);
-  }
-
-  .stock-info {
-    font-size: clamp(0.7rem, 1.8vw, 0.75rem);
-  }
-
-  .coupon-item {
-    padding: 0.5rem;
-  }
-
-  .coupon-code {
-    font-size: clamp(0.8rem, 2.5vw, 0.9rem);
-  }
-
-  .coupon-details {
-    font-size: clamp(0.7rem, 2vw, 0.8rem);
-  }
-
-  .empty-cart {
-    padding: clamp(1.5rem, 6vw, 2rem);
-  }
-
-  .empty-cart-icon {
-    font-size: clamp(2.5rem, 8vw, 3rem);
-  }
-
-  .empty-cart-text {
-    font-size: clamp(1rem, 3.5vw, 1.2rem);
-  }
-
-  .continue-shopping-btn {
-    font-size: clamp(0.8rem, 2.5vw, 0.9rem);
-  }
-}
-
-@media (max-width: 400px) {
-  .cart-item {
-    padding: 0.5rem;
-  }
-
-  .product-name {
-    font-size: clamp(0.8rem, 2vw, 0.9rem);
-  }
-
-  .product-price {
-    font-size: clamp(0.7rem, 1.8vw, 0.8rem);
-  }
-
-  .quantity-btn {
-    width: clamp(20px, 5vw, 24px);
-    height: clamp(20px, 5vw, 24px);
-  }
-
-  .quantity-input {
-    width: clamp(32px, 8vw, 36px);
-  }
-
-  .coupon-title {
-    font-size: clamp(0.8rem, 2.5vw, 0.9rem);
-  }
-
-  .checkout-btn {
-    font-size: clamp(0.8rem, 2.5vw, 0.9rem);
-  }
-}
-</style>
+    <style>
+        :root {
+            --soft-beige: #D4B996;
+            --muted-green: #657858;
+            --light-bg: #f8f5f2;
+            --border-color: #e0d8cc;
+            --offer-red: #e63946;
+            --dark-text: #2c1810;
+            --darker-text: #1a0f0a;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background-color: #f0e9e0;
+            font-family: 'Jost', sans-serif;
+            color: var(--dark-text);
+        }
+
+        .navbar {
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .brand {
+            font-family: 'Aboreto', cursive;
+            font-size: 1.5rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--darker-text);
+            cursor: pointer;
+        }
+
+        .nav-link {
+            color: var(--darker-text);
+            font-family: 'Jost', sans-serif;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--muted-green);
+            font-weight: 500;
+        }
+
+        .icon-link {
+            color: var(--darker-text);
+            transition: color 0.3s ease;
+            font-size: 1.1rem;
+        }
+
+        .icon-link:hover {
+            color: var(--muted-green);
+        }
+
+        .search-container {
+            position: relative;
+            display: none;
+        }
+
+        .search-container.active {
+            display: block;
+        }
+
+        .search-input {
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            padding-right: 2.5rem;
+            font-family: 'Jost', sans-serif;
+            width: 200px;
+            transition: all 0.3s ease;
+            color: var(--dark-text);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--soft-beige);
+            width: 250px;
+            box-shadow: 0 0 0 2px rgba(212, 185, 150, 0.1);
+            color: var(--darker-text);
+        }
+
+        .search-button {
+            position: absolute;
+            right: 10px;
+            background: none;
+            border: none;
+            color: var(--dark-text);
+            cursor: pointer;
+        }
+
+        .search-button:hover {
+            color: var(--muted-green);
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100%;
+            background: white;
+            z-index: 1000;
+            transition: left 0.3s ease;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-menu {
+            padding: 1rem;
+        }
+
+        .sidebar-category {
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar-title {
+            font-family: 'Aboreto', cursive;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            color: var(--darker-text);
+        }
+
+        .sidebar-items {
+            padding-left: 1rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .sidebar-items.open {
+            max-height: 500px;
+        }
+
+        .sidebar-item {
+            padding: 0.5rem 0;
+            cursor: pointer;
+        }
+
+        .sidebar-item:hover {
+            color: var(--muted-green);
+        }
+
+        .sidebar-item a {
+            color: var(--dark-text);
+            text-decoration: none;
+            display: block;
+            transition: color 0.3s ease;
+        }
+
+        .sidebar-item a:hover {
+            color: var(--muted-green);
+        }
+
+        .sidebar-item a.active {
+            color: var(--muted-green);
+            font-weight: 500;
+        }
+
+        .sidebar-item a.active::before {
+            content: "•";
+            margin-right: 5px;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 999;
+            display: none;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        /* Checkout Specific Styles */
+        .checkout-title {
+            font-family: 'Aboreto', cursive;
+            color: var(--darker-text);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-weight: 400;
+            margin-bottom: 2rem;
+            font-size: 1.8rem;
+        }
+
+        .checkout-grid {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
+        }
+
+        @media (max-width: 992px) {
+            .checkout-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .checkout-section {
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            box-shadow: none;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .section-title {
+            font-family: 'Aboreto', cursive;
+            color: var(--darker-text);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-weight: 400;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .address-details {
+            font-size: 0.9rem;
+            color: var(--dark-text);
+            margin-bottom: 1rem;
+            padding: 1.5rem;
+            background: var(--light-bg);
+            border-radius: 0;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .address-details:hover {
+            transform: translateY(-2px);
+        }
+
+        .default-address {
+            border: 2px solid var(--muted-green);
+            background: rgba(169, 186, 157, 0.1);
+        }
+
+        .default-badge {
+            background: var(--muted-green);
+            color: white;
+            padding: 0.3rem 0.6rem;
+            border-radius: 0;
+            font-size: 0.7rem;
+            margin-bottom: 0.75rem;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .other-addresses-title {
+            font-family: 'Aboreto', cursive;
+            font-size: 1.2rem;
+            margin: 1.5rem 0 1rem;
+            color: var(--darker-text);
+            letter-spacing: 1px;
+        }
+
+        .address-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .address-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--light-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0;
+            color: var(--darker-text);
+            font-family: 'Jost', sans-serif;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .address-btn:hover {
+            background: var(--darker-text);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .address-btn i {
+            font-size: 0.9rem;
+        }
+
+        .set-default-btn {
+            background: var(--darker-text);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0;
+            font-family: 'Jost', sans-serif;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .set-default-btn:hover {
+            background: var(--muted-green);
+            transform: translateY(-1px);
+        }
+
+        .delivery-info {
+            font-size: 0.9rem;
+            color: var(--dark-text);
+            margin-bottom: 1rem;
+            padding: 1.5rem;
+            background: var(--light-bg);
+            border-radius: 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .delivery-info i {
+            color: var(--soft-beige);
+            margin-right: 0.5rem;
+        }
+
+        .order-item {
+            display: flex;
+            align-items: center;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            background: transparent;
+            border-radius: 0;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .order-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .order-item-img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 0;
+            margin-right: 1.5rem;
+        }
+
+        .order-item-details {
+            flex: 1;
+        }
+
+        .order-item-name {
+            font-family: 'Aboreto', cursive;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--darker-text);
+        }
+
+        .order-item-info {
+            color: var(--dark-text);
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .order-item-price {
+            font-weight: 500;
+            color: var(--darker-text);
+            font-size: 0.95rem;
+        }
+
+        .discount-badge {
+            margin-top: 0.5rem;
+        }
+
+        .discount-badge .badge {
+            font-size: 0.8rem;
+            padding: 0.35rem 0.65rem;
+            font-weight: 500;
+            border-radius: 0;
+        }
+
+        .discount-badge .badge.bg-success {
+            background: var(--muted-green) !important;
+        }
+
+        .discount-badge .badge.bg-primary {
+            background: var(--soft-beige) !important;
+            color: var(--darker-text);
+        }
+
+        .text-decoration-line-through {
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        .text-success {
+            color: var(--muted-green) !important;
+        }
+
+        .coupon-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .coupon-title {
+            font-family: 'Aboreto', cursive;
+            color: var(--darker-text);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-weight: 400;
+            margin-bottom: 1rem;
+        }
+
+        .coupon-input-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .coupon-input {
+            flex: 1;
+            border: 1px solid var(--border-color);
+            border-radius: 0;
+            padding: 0.75rem 1rem;
+            font-family: 'Jost', sans-serif;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            background: var(--light-bg);
+        }
+
+        .coupon-input:focus {
+            outline: none;
+            border-color: var(--soft-beige);
+        }
+
+        .apply-coupon-btn {
+            background: var(--darker-text);
+            border: none;
+            color: white;
+            width: 42px;
+            height: 42px;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .apply-coupon-btn:hover:not(:disabled) {
+            background: var(--muted-green);
+            transform: translateY(-1px);
+        }
+
+        .apply-coupon-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            background: #ccc;
+        }
+
+        .coupon-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .coupon-item {
+            background: var(--light-bg);
+            border: 2px dashed var(--soft-beige);
+            border-radius: 0;
+            padding: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .coupon-item:hover:not(.applied):not(.used) {
+            transform: translateY(-2px);
+            border-color: var(--muted-green);
+        }
+
+        .coupon-code {
+            font-family: 'Aboreto', cursive;
+            color: var(--darker-text);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .coupon-code i {
+            color: var(--soft-beige);
+        }
+
+        .coupon-details {
+            color: var(--dark-text);
+            font-size: 0.9rem;
+        }
+
+        .coupon-discount {
+            color: var(--offer-red);
+            font-weight: 600;
+        }
+
+        .coupon-min-order {
+            color: var(--soft-beige);
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+
+        .coupon-expiry {
+            color: #666;
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+
+        .copy-coupon-btn {
+            background: var(--darker-text);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .copy-coupon-btn:hover {
+            background: var(--muted-green);
+            transform: translateY(-1px);
+        }
+
+        .applied-coupon {
+            background: rgba(212, 185, 150, 0.1);
+            border: 1px solid rgba(212, 185, 150, 0.2);
+            border-radius: 0;
+            padding: 0.75rem 1rem;
+            margin: 0.5rem 0;
+        }
+
+        .applied-coupon .coupon-code {
+            background: rgba(212, 185, 150, 0.2);
+            color: var(--soft-beige);
+            padding: 0.25rem 0.75rem;
+            border-radius: 0;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .applied-coupon .coupon-code i {
+            color: var(--soft-beige);
+        }
+
+        .remove-coupon-btn {
+            background: none;
+            border: none;
+            color: #6c757d;
+            padding: 0.25rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0;
+        }
+
+        .remove-coupon-btn:hover {
+            color: var(--offer-red);
+            background: rgba(220, 53, 69, 0.1);
+            transform: scale(1.1);
+        }
+
+        .discount-amount {
+            color: var(--muted-green);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .coupon-item.applied {
+            background: rgba(212, 185, 150, 0.15);
+            border: 2px solid var(--soft-beige);
+            cursor: default;
+        }
+
+        .coupon-item.applied:hover {
+            transform: none;
+        }
+
+        .coupon-item.used {
+            opacity: 0.7;
+            cursor: not-allowed;
+            background: #f8f8f8;
+            border: 2px dashed #ccc;
+        }
+
+        .coupon-item.used:hover {
+            transform: none;
+        }
+
+        .coupon-item.used .coupon-code {
+            color: #666;
+        }
+
+        .coupon-item.used .coupon-details {
+            color: #666;
+        }
+
+        .coupon-item.used .coupon-min-order,
+        .coupon-item.used .coupon-expiry {
+            color: #999;
+        }
+
+        .coupon-input:disabled,
+        .apply-coupon-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .order-summary {
+            position: sticky;
+            top: 2rem;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            color: var(--dark-text);
+        }
+
+        .summary-total {
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: var(--darker-text);
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .checkout-btn {
+            background: var(--darker-text);
+            border: none;
+            color: white;
+            font-family: 'Jost', sans-serif;
+            font-size: 1rem;
+            padding: 1rem;
+            border-radius: 0;
+            width: 100%;
+            margin-top: 1.5rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .checkout-btn:hover:not(:disabled) {
+            background: var(--muted-green);
+            transform: translateY(-2px);
+        }
+
+        .checkout-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #ccc;
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 3rem;
+            background: transparent;
+            border-radius: 0;
+        }
+
+        .empty-cart-icon {
+            font-size: 4rem;
+            color: var(--soft-beige);
+            margin-bottom: 1.5rem;
+        }
+
+        .empty-cart-text {
+            font-family: 'Aboreto', cursive;
+            color: var(--darker-text);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-cart-subtext {
+            color: var(--dark-text);
+            margin-bottom: 2rem;
+        }
+
+        .continue-shopping-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 2rem;
+            background: var(--darker-text);
+            color: white;
+            border: none;
+            border-radius: 0;
+            font-family: 'Jost', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .continue-shopping-btn:hover {
+            background: var(--muted-green);
+            transform: translateY(-2px);
+        }
+
+        .main-content-container {
+            padding-left: 5.5rem;
+            padding-right: 5.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .main-content-container {
+                padding-left: 4rem;
+                padding-right: 4rem;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .main-content-container {
+                padding-left: 6rem;
+                padding-right: 6rem;
+                max-width: 1400px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+        }
+
+        .show-addresses-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.2rem;
+            background: var(--light-bg);
+            border: 2px solid var(--soft-beige);
+            border-radius: 0;
+            color: var(--soft-beige);
+            font-family: 'Jost', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .show-addresses-btn:hover {
+            background: var(--soft-beige);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .show-addresses-btn i {
+            transition: transform 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .show-addresses-btn.active {
+            background: var(--soft-beige);
+            color: white;
+        }
+
+        .show-addresses-btn.active i {
+            transform: rotate(180deg);
+        }
+
+        .available-coupons {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .show-coupons-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.2rem;
+            background: var(--light-bg);
+            border: 2px solid var(--soft-beige);
+            border-radius: 0;
+            color: var(--soft-beige);
+            font-family: 'Jost', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .show-coupons-btn:hover {
+            background: var(--soft-beige);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .show-coupons-btn i {
+            transition: transform 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .show-coupons-btn.active {
+            background: var(--soft-beige);
+            color: white;
+        }
+
+        .show-coupons-btn.active i {
+            transform: rotate(180deg);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .icon-links {
+            display: flex;
+            align-items: center;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .profile-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .profile-dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background: white;
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            border-radius: 0;
+            padding: 0.5rem 0;
+        }
+
+        .profile-dropdown:hover .profile-dropdown-content {
+            display: block;
+        }
+
+        .profile-dropdown-content a {
+            color: var(--dark-text);
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            display: block;
+            font-size: 0.9rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .profile-dropdown-content a:hover {
+            background-color: var(--light-bg);
+            color: var(--muted-green);
+        }
+
+        .profile-dropdown-content a i {
+            margin-right: 0.5rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                padding: 1rem;
+            }
+            .brand {
+                margin-bottom: 1rem;
+            }
+            .nav-links {
+                margin: 1rem 0;
+                flex-wrap: wrap;
+            }
+            .search-input {
+                width: 180px;
+            }
+        }
+
+        .badge.bg-secondary {
+            background-color: #6c757d !important;
+            font-size: 0.75rem;
+            padding: 0.25em 0.6em;
+        }
+
+        .nav-links, .icon-links {
+            list-style: none;
+            padding-left: 0;
+            margin-bottom: 0;
+        }
+    </style>
 </head>
 <body>
-<%- include('../partials/user/header.ejs') %>
-    <div class="container-fluid py-3 main-content-container">
-        <h2 class="cart-title">Shopping Cart</h2>
-        <div class="row">
-            <div class="col-lg-8">
-                <% if (items && items.length > 0) { %>
-                    <% items.forEach(item => { %>
-                        <div class="cart-item" data-id="<%= item._id %>">
-                            <div class="row align-items-center">
-                                <div class="col-auto">
-                                    <img src="/Uploads/product/<%= item.productId.productImage[0] %>" alt="<%= item.productId.productName %>" class="product-image">
-                                </div>
-                                <div class="col">
-                                    <div class="product-details">
-                                        <h5 class="product-name"><%= item.productId.productName %></h5>
-                                        <div class="product-price">
-                                            <% if (item.offerDiscount > 0) { %>
-                                                <span class="text-decoration-line-through text-muted">₹<%= (item.originalPrice).toLocaleString() %></span>
-                                                <span class="text-success ms-2">₹<%= (item.originalPrice - item.offerDiscount).toLocaleString() %></span>
-                                            <% } else { %>
-                                                <span>₹<%= ((item.price || 0) * (item.quantity || 1)).toLocaleString() %></span>
-                                            <% } %>
-                                        </div>
+    <nav class="navbar">
+        <div class="brand" id="sidebarToggle">
+            <i class="fas fa-leaf brand-icon"></i>
+            <span class="brand-text">LUME</span>
+        </div>
+        <ul class="nav-links">
+            <li class="mx-2"><a href="/" class="nav-link">Home</a></li>
+            <li class="mx-2"><a href="/shopAll" class="nav-link">Shop All</a></li>
+            <li class="mx-2"><a href="/featured" class="nav-link">Featured</a></li>
+            <li class="mx-2"><a href="/new-arrivals" class="nav-link">New Arrivals</a></li>
+        </ul>
+        <ul class="icon-links">
+            <li class="mx-2">
+                <form action="/shopAll" method="GET" class="d-flex align-items-center">
+                    <div class="search-container">
+                        <input type="text" name="search" placeholder="Search products..." class="search-input form-control">
+                        <button type="submit" class="search-button">
+                            <i class="fas fa-search search-icon"></i>
+                        </button>
+                    </div>
+                </form>
+            </li>
+            <li class="mx-2"><a href="/wishlist" class="icon-link"><i class="fas fa-heart"></i></a></li>
+            <li class="mx-2"><a href="/cart" class="icon-link"><i class="fas fa-shopping-cart"></i></a></li>
+            <li class="mx-2">
+                <div class="profile-dropdown">
+                    <a href="#" class="icon-link"><i class="far fa-user"></i></a>
+                    <div class="profile-dropdown-content">
+                        <% if (locals.user) { %>
+                            <a href="/profile"><i class="fas fa-user"></i> My Profile</a>
+                            <a href="/orders"><i class="fas fa-box"></i> My Orders</a>
+                            <a href="/wishlist"><i class="fas fa-heart"></i> Wishlist</a>
+                            <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        <% } else { %>
+                            <a href="/login"><i class="fas fa-sign-in-alt"></i> Login</a>
+                            <a href="/signup"><i class="fas fa-user-plus"></i> Sign Up</a>
+                        <% } %>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </nav>
+    <div class="container-fluid main-content-container">
+        <h1 class="checkout-title">Checkout</h1>
+        <div class="checkout-grid">
+            <div class="checkout-main">
+                <!-- Order Section -->
+                <div class="checkout-section">
+                    <h2 class="section-title">Your Order</h2>
+                    <% if (items && items.length > 0) { %>
+                        <% items.forEach(item => { %>
+                            <div class="order-item">
+                                <img src="/uploads/product/<%= item.productId.productImage[0] %>" alt="<%= item.productId.productName %>" class="order-item-img">
+                                <div class="order-item-details">
+                                    <h3 class="order-item-name"><%= item.productId.productName %></h3>
+                                    <p class="order-item-info">Size: <%= item.size || 'Default' %></p>
+                                    <p class="order-item-info">Quantity: <%= item.quantity %></p>
+                                    <div class="order-item-price">
                                         <% if (item.offerDiscount > 0) { %>
+                                            <span class="text-decoration-line-through text-muted">₹<%= (item.originalPrice).toLocaleString() %></span>
+                                            <span class="text-success ms-2">₹<%= (item.originalPrice - item.offerDiscount).toLocaleString() %></span>
                                             <div style="font-size:0.95em;color:#888;margin-top:2px;">
                                             </div>
+                                        <% } else { %>
+                                            <span>₹<%= item.totalPrice.toLocaleString() %></span>
                                         <% } %>
-                                        <div class="quantity-control">
-                                            <button class="quantity-btn" onclick="updateQuantity('<%= item._id %>', 'decrease')" <%= item.quantity <= 1 ? 'disabled' : '' %>>
-                                                <i class="fas fa-minus"></i>
-                                            </button>
-                                            <input type="number" class="quantity-input" value="<%= item.quantity %>" min="1" max="<%= Math.min(item.productId.quantity || item.productId.productStock || 6, 6) %>" readonly>
-                                            <button class="quantity-btn" onclick="updateQuantity('<%= item._id %>', 'increase')" <%= item.quantity >= Math.min(item.productId.quantity || item.productId.productStock || 6, 6) ? 'disabled' : '' %>>
-                                                <i class="fas fa-plus"></i>
-                                            </button>
-                                        </div>
-                                        <p class="stock-info">
-                                            <small class="<%= (item.productId.quantity || item.productId.productStock || 0) <= 6 ? 'text-warning' : 'text-muted' %>">
-                                                <% if ((item.productId.quantity || item.productId.productStock || 0) <= 6) { %>
-                                                    Only <%= item.productId.quantity || item.productId.productStock || 0 %> items available
-                                                <% } else { %>
-                                                    Maximum 6 items allowed per product
-                                                <% } %>
-                                            </small>
-                                        </p>
                                     </div>
                                 </div>
-                                <div class="col-auto">
-                                    <button class="remove-btn" onclick="removeItem('<%= item._id %>')">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </div>
+                            </div>
+                        <% }) %>
+                    <% } else { %>
+                        <div class="empty-cart">
+                            <i class="fas fa-shopping-cart empty-cart-icon"></i>
+                            <h3 class="empty-cart-text">Your cart is empty</h3>
+                            <p class="empty-cart-subtext">Looks like you haven't added any items to your cart yet.</p>
+                            <a href="/shopAll" class="continue-shopping-btn">
+                                <i class="fas fa-shopping-cart"></i> Continue Shopping
+                            </a>
+                        </div>
+                    <% } %>
+                </div>
+                <!-- Address Section -->
+                <div class="checkout-section">
+                    <h2 class="section-title">Select Address</h2>
+                    <% if (typeof addresses !== 'undefined' && addresses.length > 0) { %>
+                        <% const defaultAddress = addresses.find(addr => addr.isDefault) || addresses[0]; %>
+                        <% const otherAddresses = addresses.filter(addr => addr._id.toString() !== defaultAddress._id.toString()); %>
+                        <!-- Default Address -->
+                        <div class="address-details default-address" data-address-id="<%= defaultAddress._id %>">
+                            <div class="default-badge">Default Address</div>
+                            <p><strong><%= defaultAddress.name %></strong></p>
+                            <p><%= defaultAddress.houseNo || '' %>, <%= defaultAddress.roadArea || '' %></p>
+                            <p><%= defaultAddress.city %>, <%= defaultAddress.state %> - <%= defaultAddress.pincode %></p>
+                            <p>Phone: <%= defaultAddress.phone %></p>
+                            <div class="address-actions">
+                                <a href="/update/address/<%= defaultAddress._id %>?from=checkout" class="address-btn">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                                <button class="address-btn remove-btn">
+                                    <i class="fas fa-trash"></i> Remove
+                                </button>
                             </div>
                         </div>
-                    <% }) %>
-                    <div class="delivery-info mt-3">
-                        <h4 class="delivery-title">Estimated Delivery</h4>
-                        <div class="delivery-date">
-                            <i class="fas fa-truck"></i>
-                            <span><%= new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }) %> - <%= new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }) %></span>
+                        <!-- Other Addresses -->
+                        <% if (otherAddresses.length > 0) { %>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h3 class="other-addresses-title mb-0">Other Addresses</h3>
+                                <button class="show-addresses-btn" onclick="toggleAddresses()">
+                                    <span class="show-text">Show All</span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                            </div>
+                            <div class="address-list" id="addressList" style="display: none;">
+                                <% otherAddresses.forEach(address => { %>
+                                    <div class="address-details" data-address-id="<%= address._id %>">
+                                        <p><strong><%= address.name %></strong></p>
+                                        <p><%= address.houseNo || '' %>, <%= address.roadArea || '' %></p>
+                                        <p><%= address.city %>, <%= address.state %> - <%= address.pincode %></p>
+                                        <p>Phone: <%= address.phone %></p>
+                                        <div class="address-actions">
+                                            <button class="set-default-btn" onclick="setDefaultAddress('<%= address._id %>')">
+                                                Set as Default
+                                            </button>
+                                            <a href="/update/address/<%= address._id %>?from=checkout" class="address-btn">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </a>
+                                            <button class="address-btn remove-btn" onclick="removeAddress('<%= address._id %>')">
+                                                <i class="fas fa-trash"></i> Remove
+                                            </button>
+                                        </div>
+                                    </div>
+                                <% }) %>
+                            </div>
+                        <% } %>
+                    <% } else { %>
+                        <div class="address-details">
+                            <p>No address provided</p>
                         </div>
-                    </div>
-                    <div class="text-center mt-3 mb-3">
-                        <a href="/shopAll" class="continue-shopping-btn">
-                            <i class="fas fa-shopping-cart"></i> Continue Shopping
+                    <% } %>
+                    <div class="address-actions">
+                        <a href="/add-address?from=checkout" class="address-btn">
+                            <i class="fas fa-plus"></i> Add New Address
                         </a>
                     </div>
-                <% } else { %>
-                    <div class="empty-cart">
-                        <i class="fas fa-shopping-cart empty-cart-icon"></i>
-                        <h3 class="empty-cart-text">Your cart is empty</h3>
-                        <p class="empty-cart-subtext">Looks like you haven't added any items to your cart yet.</p>
-                        <a href="/shopAll" class="continue-shopping-btn">Continue Shopping</a>
+                </div>
+                <!-- Delivery Information Section -->
+                <div class="checkout-section">
+                    <h2 class="section-title">Delivery Information</h2>
+                    <div class="delivery-info">
+                        <p><i class="fas fa-truck"></i> Estimated Delivery: <%= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) %></p>
+                        <p><i class="fas fa-shipping-fast"></i> Shipping Method: Standard Shipping</p>
+                        <p><i class="fas fa-map-marker-alt"></i> Tracking: Available upon dispatch</p>
                     </div>
-                <% } %>
+                </div>
             </div>
-            <div class="col-lg-4">
-                <div class="cart-summary">
-                    <h3 class="summary-title">Order Summary</h3>
-                    <div class="summary-row">
-                        <span>Subtotal</span>
-                        <span id="subtotal">₹<%= totalPrice.toLocaleString() %></span>
-                    </div>
-                    <div class="summary-row text-success" id="offer-discount-row" style="display: <%= totalOfferDiscount > 0 ? 'flex' : 'none' %>;">
-                        <span>Offer Discount</span>
-                        <span id="offer-discount">-₹<%= totalOfferDiscount.toLocaleString() %></span>
-                    </div>
-                    <div class="summary-row text-success" id="coupon-discount-row" style="display: <%= totalCouponDiscount > 0 ? 'flex' : 'none' %>;">
-                        <span>Coupon Discount</span>
-                        <span id="coupon-discount">-₹<%= totalCouponDiscount.toLocaleString() %></span>
-                    </div>
-                    <div class="summary-row">
-                        <span>Shipping</span>
-                        <span id="shipping"><%= shipping === 0 ? 'Free' : '₹' + shipping.toLocaleString() %></span>
-                    </div>
-                    <div class="summary-row summary-total">
-                        <span>Total</span>
-                        <span id="finalPrice">₹<%= finalPrice.toLocaleString() %></span>
-                    </div>
-                    <div class="coupon-section">
+            <!-- Order Summary Sidebar -->
+            <div class="order-summary">
+                <div class="checkout-section">
+                    <h2 class="section-title">Order Summary</h2>
+                    <% if (items && items.length > 0) { %>
+                        <div class="summary-row">
+                            <span>Subtotal</span>
+                            <span id="subtotal">₹<%= totalPrice.toLocaleString() %></span>
+                        </div>
+                        <div class="summary-row text-success" id="offer-discount-row" style="display: <%= totalOfferDiscount > 0 ? 'flex' : 'none' %>;">
+                            <span>Offer Discount</span>
+                            <span id="offer-discount">-₹<%= totalOfferDiscount.toLocaleString() %></span>
+                        </div>
+                        <div class="summary-row text-success" id="coupon-discount-row" style="display: <%= totalCouponDiscount > 0 ? 'flex' : 'none' %>;">
+                            <span>Coupon Discount</span>
+                            <span id="coupon-discount">-₹<%= totalCouponDiscount.toLocaleString() %></span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Shipping</span>
+                            <span id="shipping"><%= shipping === 0 ? 'Free' : '₹' + shipping.toLocaleString() %></span>
+                        </div>
+                        <div class="summary-row summary-total">
+                            <span>Total</span>
+                            <span id="finalPrice">₹<%= finalPrice.toLocaleString() %></span>
+                        </div>
+                        <div class="coupon-section">
+                           <div class="coupon-section">
                         <h4 class="coupon-title">Apply Coupon</h4>
                         <div class="coupon-input-group">
                             <input type="text" class="coupon-input" id="couponCode" placeholder="Enter coupon code" <%= appliedCoupon ? 'disabled' : '' %>>
@@ -1692,7 +1148,7 @@ html, body {
                         <% } %>
                     </div>
                     <div class="available-coupons">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
                             <h4 class="coupon-title mb-0">Available Coupons</h4>
                             <button class="show-coupons-btn" onclick="toggleCoupons()">
                                 <span class="show-text">Show All</span>
@@ -1751,9 +1207,26 @@ html, body {
                             <% } %>
                         </div>
                     </div>
-                    <button class="checkout-btn" onclick="proceedToCheckout()" <%= items.length === 0 ? 'disabled' : '' %>>
-                        Proceed to Checkout
-                    </button>
+                        <button class="checkout-btn" onclick="proceedToPayment()" <%= items.length === 0 ? 'disabled' : '' %>>
+                            <i class="fas fa-lock"></i> Proceed to Payment
+                        </button>
+                    <% } else { %>
+                        <div class="summary-row">
+                            <span>Subtotal</span>
+                            <span>₹0</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Shipping</span>
+                            <span>Free</span>
+                        </div>
+                        <div class="summary-row summary-total">
+                            <span>Total</span>
+                            <span>₹0</span>
+                        </div>
+                        <button class="checkout-btn" disabled>
+                            <i class="fas fa-lock"></i> Proceed to Payment
+                        </button>
+                    <% } %>
                 </div>
             </div>
         </div>
@@ -1766,144 +1239,163 @@ html, body {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script>
-        async function updateQuantity(itemId, action) {
-            try {
-                if (!itemId || !['increase', 'decrease'].includes(action)) {
-                    showNotification('Invalid item or action', 'error');
-                    return;
+        console.log('Checkout page script loaded');
+
+        function setDefaultAddress(addressId) {
+            console.log('setDefaultAddress called with ID:', addressId);
+            Swal.fire({
+                title: 'Set as Default?',
+                text: 'Do you want to set this address as your default address?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3e4c22',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, set as default'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    console.log('User confirmed setting default address');
+                    fetch('/set-default-address', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ addressId })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.text().then(text => {
+                                throw new Error(`Failed to set default address (Status: ${response.status}, Response: ${text})`);
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Server response:', data);
+                        if (data.success) {
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'success',
+                                title: 'Default address updated successfully',
+                                showConfirmButton: false,
+                                timer: 3000,
+                                timerProgressBar: true
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            throw new Error(data.message || 'Failed to set default address');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error in setDefaultAddress:', error);
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'error',
+                            title: error.message || 'An error occurred while setting default address',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true
+                        });
+                    });
                 }
-                const cartItem = document.querySelector(`.cart-item[data-id="${itemId}"]`);
-                if (!cartItem) {
-                    showNotification('Cart item not found', 'error');
-                    return;
+            });
+        }
+
+        function removeAddress(addressId) {
+            console.log('removeAddress called with ID:', addressId);
+            Swal.fire({
+                title: 'Remove Address?',
+                text: 'Are you sure you want to remove this address?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3e4c22',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, remove it'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    console.log('User confirmed removing address');
+                    fetch('/remove-address', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ addressId })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.text().then(text => {
+                                throw new Error(`Failed to remove address (Status: ${response.status}, Response: ${text})`);
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Server response:', data);
+                        if (data.success) {
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'success',
+                                title: 'Address has been removed successfully',
+                                showConfirmButton: false,
+                                timer: 3000,
+                                timerProgressBar: true
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            throw new Error(data.message || 'Failed to remove address');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error in removeAddress:', error);
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'error',
+                            title: error.message || 'An error occurred while removing the address',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true
+                        });
+                    });
                 }
-                const quantityInput = cartItem.querySelector('.quantity-input');
-                if (!quantityInput) {
-                    showNotification('Quantity input not found', 'error');
-                    return;
-                }
-                const currentQuantity = parseInt(quantityInput.value, 10);
-                const maxAllowed = parseInt(quantityInput.max, 10) || 6;
-                if (action === 'decrease' && currentQuantity <= 1) {
-                    showNotification('Minimum quantity reached', 'error');
-                    return;
-                }
-                if (action === 'increase' && currentQuantity >= maxAllowed) {
-                    if (maxAllowed <= 6) {
-                        showNotification(`Only ${maxAllowed} items available in stock`, 'error');
-                    } else {
-                        showNotification('Maximum quantity limit reached (6 items per product)', 'error');
-                    }
-                    return;
-                }
-                const buttons = cartItem.querySelectorAll('.quantity-btn');
-                buttons.forEach(btn => btn.disabled = true);
-                const response = await fetch('/cart/update-quantity', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ itemId, action })
-                });
-                const data = await response.json();
-                if (!data.success) {
-                    showNotification(data.message || 'Failed to update quantity', 'error');
-                    buttons.forEach(btn => btn.disabled = false);
-                    return;
-                }
-                quantityInput.value = data.quantity;
-                quantityInput.max = Math.min(data.stock, 6);
-                const totalElement = cartItem.querySelector('.product-price');
-                if (totalElement) {
-                    totalElement.innerHTML = data.offerDiscount || data.couponDiscount
-                        ? `<span class="text-decoration-line-through text-muted">₹${(data.originalPrice * data.quantity).toLocaleString()}</span> <span class="text-success ms-2">₹${data.totalPrice.toLocaleString()}</span>`
-                        : `₹${data.totalPrice.toLocaleString()}`;
-                }
-                const discountBadge = cartItem.querySelector('.discount-badge');
-                if (discountBadge) {
-                    let badgeHTML = '';
-                    if (data.offerDiscount > 0) {
-                        badgeHTML += `<span class="badge bg-success me-2">${data.appliedOffer === 'product' ? 'Product Offer' : 'Category Offer'}: -₹${data.offerDiscount.toLocaleString()}</span>`;
-                    }
-                    if (data.couponDiscount > 0) {
-                        badgeHTML += `<span class="badge bg-primary">Coupon: -₹${data.couponDiscount.toLocaleString()}</span>`;
-                    }
-                    discountBadge.innerHTML = badgeHTML;
-                }
-                const stockInfo = cartItem.querySelector('.stock-info small');
-                if (stockInfo) {
-                    if (data.stock <= 6) {
-                        stockInfo.textContent = `Only ${data.stock} items available`;
-                        stockInfo.className = 'text-warning';
-                    } else {
-                        stockInfo.textContent = 'Maximum 6 items allowed per product';
-                        stockInfo.className = 'text-muted';
-                    }
-                }
-                const increaseBtn = cartItem.querySelector('.quantity-btn[onclick*="increase"]');
-                const decreaseBtn = cartItem.querySelector('.quantity-btn[onclick*="decrease"]');
-                if (increaseBtn && decreaseBtn) {
-                    const maxAllowed = Math.min(data.stock, 6);
-                    increaseBtn.disabled = data.quantity >= maxAllowed;
-                    decreaseBtn.disabled = data.quantity <= 1;
-                }
-                document.getElementById('subtotal').textContent = `₹${data.cartTotal.toLocaleString()}`;
-                document.getElementById('shipping').textContent = data.shipping === 0 ? 'Free' : `₹${data.shipping.toLocaleString()}`;
-                document.getElementById('finalPrice').textContent = `₹${data.finalPrice.toLocaleString()}`;
-                updateSummaryDiscounts(data.totals.offerDiscount, data.totals.couponDiscount);
-                showNotification('Quantity updated successfully', 'success');
-            } catch (error) {
-                console.log('An error occurred while updating quantity', error);
-            } finally {
-                const cartItem = document.querySelector(`.cart-item[data-id="${itemId}"]`);
-                if (cartItem) {
-                    const buttons = cartItem.querySelectorAll('.quantity-btn');
-                    buttons.forEach(btn => btn.disabled = false);
-                }
+            });
+        }
+
+        function toggleAddresses() {
+            const addressList = document.getElementById('addressList');
+            const showBtn = document.querySelector('.show-addresses-btn');
+            const showText = showBtn.querySelector('.show-text');
+            if (addressList.style.display === 'none') {
+                addressList.style.display = 'block';
+                showText.textContent = 'Hide';
+                showBtn.classList.add('active');
+            } else {
+                addressList.style.display = 'none';
+                showText.textContent = 'Show All';
+                showBtn.classList.remove('active');
             }
         }
 
-        async function removeItem(itemId) {
-            try {
-                const result = await Swal.fire({
-                    title: 'Remove Item',
-                    text: 'Are you sure you want to remove this item from your cart?',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3e4c22',
-                    cancelButtonColor: '#c82333',
-                    confirmButtonText: 'Yes, remove it!'
-                });
-                if (!result.isConfirmed) return;
-                const response = await fetch('/cart/remove/' + itemId, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ itemId })
-                });
-                const data = await response.json();
-                if (data.success) {
-                    const cartItem = document.querySelector(`.cart-item[data-id="${itemId}"]`);
-                    if (cartItem) cartItem.remove();
-                    document.getElementById('subtotal').textContent = `₹${data.totals.subtotal.toLocaleString()}`;
-                    document.getElementById('shipping').textContent = data.totals.shipping === 0 ? 'Free' : `₹${data.totals.shipping.toLocaleString()}`;
-                    document.getElementById('finalPrice').textContent = `₹${data.totals.finalPrice.toLocaleString()}`;
-                    updateSummaryDiscounts(data.totals.offerDiscount, data.totals.couponDiscount);
-                    const remainingItems = document.querySelectorAll('.cart-item');
-                    if (remainingItems.length === 0) {
-                        document.querySelector('.col-lg-8').innerHTML = `
-                            <div class="empty-cart">
-                                <i class="fas fa-shopping-cart empty-cart-icon"></i>
-                                <h3 class="empty-cart-text">Your cart is empty</h3>
-                                <p class="empty-cart-subtext">Looks like you haven't added any items to your cart yet.</p>
-                                <a href="/shopAll" class="continue-shopping-btn">Continue Shopping</a>
-                            </div>
-                        `;
-                        document.querySelector('.checkout-btn').disabled = true;
-                    }
-                    showNotification(data.message, 'success');
-                } else {
-                    showNotification(data.message || 'Failed to remove item', 'error');
-                }
-            } catch (error) {
-                console.log('An error occurred while removing item', error);
+        function updateSummaryDiscounts(offerDiscount, couponDiscount) {
+            const offerDiscountRow = document.getElementById('offer-discount-row');
+            const couponDiscountRow = document.getElementById('coupon-discount-row');
+            if (offerDiscount > 0) {
+                offerDiscountRow.style.display = 'flex';
+                document.getElementById('offer-discount').textContent = `-₹${offerDiscount.toLocaleString()}`;
+            } else {
+                offerDiscountRow.style.display = 'none';
+            }
+            if (couponDiscount > 0) {
+                couponDiscountRow.style.display = 'flex';
+                document.getElementById('coupon-discount').textContent = `-₹${couponDiscount.toLocaleString()}`;
+            } else {
+                couponDiscountRow.style.display = 'none';
             }
         }
 
@@ -1932,26 +1424,10 @@ html, body {
             event.stopPropagation();
             try {
                 await navigator.clipboard.writeText(code);
-                showNotification('Coupon code copied to clipboard!', 'success');
+                showNotification('Coupon code copied to clipboard', 'success');
             } catch (error) {
+                console.error('Error copying coupon code:', error);
                 showNotification('Failed to copy coupon code', 'error');
-            }
-        }
-
-        function updateSummaryDiscounts(offerDiscount, couponDiscount) {
-            const offerDiscountRow = document.getElementById('offer-discount-row');
-            const couponDiscountRow = document.getElementById('coupon-discount-row');
-            if (offerDiscount > 0) {
-                offerDiscountRow.style.display = 'flex';
-                document.getElementById('offer-discount').textContent = `-₹${offerDiscount.toLocaleString()}`;
-            } else {
-                offerDiscountRow.style.display = 'none';
-            }
-            if (couponDiscount > 0) {
-                couponDiscountRow.style.display = 'flex';
-                document.getElementById('coupon-discount').textContent = `-₹${couponDiscount.toLocaleString()}`;
-            } else {
-                couponDiscountRow.style.display = 'none';
             }
         }
 
@@ -1959,12 +1435,50 @@ html, body {
             try {
                 const response = await fetch('/apply-coupon', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
                     body: JSON.stringify({ code })
                 });
-                const data = await response.json();
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error(`Apply Coupon Failed - Status: ${response.status}, Response: ${errorText}`);
+                    let errorMessage = `Failed to apply coupon (Status: ${response.status})`;
+                    if (response.status === 401) {
+                        errorMessage = 'Please log in to apply coupon';
+                    } else if (response.status === 400) {
+                        try {
+                            const errorData = JSON.parse(errorText);
+                            errorMessage = errorData.message || 'Invalid coupon code';
+                        } catch (e) {
+                            errorMessage = 'Invalid request';
+                        }
+                    } else if (response.status === 500) {
+                        errorMessage = 'Server error occurred';
+                    }
+                    showNotification(errorMessage, 'error');
+                    return;
+                }
+
+                let data;
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    console.error('Error parsing JSON response:', e);
+                    showNotification('Invalid server response format', 'error');
+                    return;
+                }
+
+                if (!data || typeof data !== 'object') {
+                    console.error('Invalid response structure:', data);
+                    showNotification('Unexpected server response', 'error');
+                    return;
+                }
+
                 if (data.success) {
-                    showNotification(data.message, 'success');
+                    showNotification(data.message || 'Successfully applied', 'success');
                     document.getElementById('subtotal').textContent = `₹${data.totals.subtotal.toLocaleString()}`;
                     document.getElementById('shipping').textContent = data.totals.shipping === 0 ? 'Free' : `₹${data.totals.shipping.toLocaleString()}`;
                     document.getElementById('finalPrice').textContent = `₹${data.totals.finalPrice.toLocaleString()}`;
@@ -1977,7 +1491,7 @@ html, body {
                     }
                     const discountText = data.coupon.discountType === 'percentage' 
                         ? `${data.coupon.discountValue}% off` 
-                        : `₹${data.coupon.discountValue} off`;
+                        : `₹${data.coupon.discountValue.toLocaleString()} off`;
                     couponSection.innerHTML = `
                         <div class="d-flex align-items-center justify-content-between">
                             <div class="d-flex align-items-center gap-2">
@@ -2004,34 +1518,39 @@ html, body {
                             item.onclick = null;
                         }
                     });
-                    data.items.forEach(item => {
-                        const cartItem = document.querySelector(`.cart-item[data-id="${item._id}"]`);
-                        if (cartItem) {
-                            const priceElement = cartItem.querySelector('.product-price');
+                    if (Array.isArray(data.items)) {
+                        data.items.forEach(item => {
+                            const orderItem = document.querySelector(`.order-item[data-id="${item._id}"]`) || document.createElement('div');
+                            orderItem.setAttribute('data-id', item._id);
+                            const priceElement = orderItem.querySelector('.order-item-price');
                             if (priceElement) {
                                 priceElement.innerHTML = item.offerDiscount || item.couponDiscount
                                     ? `<span class="text-decoration-line-through text-muted">₹${(item.originalPrice * item.quantity).toLocaleString()}</span> <span class="text-success ms-2">₹${item.totalPrice.toLocaleString()}</span>`
                                     : `₹${item.totalPrice.toLocaleString()}`;
                             }
-                            const discountBadge = cartItem.querySelector('.discount-badge');
+                            const discountBadge = orderItem.querySelector('.discount-badge');
                             if (discountBadge) {
                                 let badgeHTML = '';
                                 if (item.offerDiscount > 0) {
-                                    badgeHTML += `<span class="badge bg-success me-2">${item.appliedOffer === 'product' ? 'Product Offer' : 'Category Offer'}: -₹${item.offerDiscount.toLocaleString()}</span>`;
+                                    badgeHTML += `<span class="badge bg-success me-2">Offer: -₹${item.offerDiscount.toLocaleString()}</span>`;
                                 }
                                 if (item.couponDiscount > 0) {
                                     badgeHTML += `<span class="badge bg-primary">Coupon: -₹${item.couponDiscount.toLocaleString()}</span>`;
                                 }
                                 discountBadge.innerHTML = badgeHTML;
                             }
-                        }
-                    });
+                        });
+                    } else {
+                        console.warn('No items array in response:', data);
+                    }
                     location.reload();
                 } else {
-                    showNotification(data.message, 'error');
+                    console.warn('Coupon application failed:', data.message);
+                    showNotification(data.message || 'Failed to apply coupon', 'error');
                 }
             } catch (error) {
-                console.log('Error occurred while applying coupon', error);
+                console.error('Error in applyCouponCode:', error);
+                showNotification(`Error applying coupon: ${error.message || 'Unknown error'}`, 'error');
             }
         }
 
@@ -2043,15 +1562,54 @@ html, body {
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#3e4c22',
-                    cancelButtonColor: '#c82333',
+                    cancelButtonColor: '#d33',
                     confirmButtonText: 'Yes, remove it!'
                 });
                 if (!result.isConfirmed) return;
+
                 const response = await fetch('/remove-coupon', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
                 });
-                const data = await response.json();
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error(`Remove Coupon Failed - Status: ${response.status}, Response: ${errorText}`);
+                    let errorMessage = `Failed to remove coupon (Status: ${response.status})`;
+                    if (response.status === 401) {
+                        errorMessage = 'Please log in to remove coupon';
+                    } else if (response.status === 400) {
+                        try {
+                            const errorData = JSON.parse(errorText);
+                            errorMessage = errorData.message || 'Invalid request';
+                        } catch (e) {
+                            errorMessage = 'Invalid request';
+                        }
+                    } else if (response.status === 500) {
+                        errorMessage = 'Server error occurred';
+                    }
+                    showNotification(errorMessage, 'error');
+                    return;
+                }
+
+                let data;
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    console.error('Error parsing JSON response:', e);
+                    showNotification('Invalid server response format', 'error');
+                    return;
+                }
+
+                if (!data || typeof data !== 'object') {
+                    console.error('Invalid response structure:', data);
+                    showNotification('Unexpected server response', 'error');
+                    return;
+                }
+
                 if (data.success) {
                     const couponSection = document.querySelector('.applied-coupon');
                     if (couponSection) couponSection.remove();
@@ -2069,40 +1627,92 @@ html, body {
                             item.onclick = () => selectCoupon(code);
                         }
                     });
-                    data.items.forEach(item => {
-                        const cartItem = document.querySelector(`.cart-item[data-id="${item._id}"]`);
-                        if (cartItem) {
-                            const priceElement = cartItem.querySelector('.product-price');
+                    if (Array.isArray(data.items)) {
+                        data.items.forEach(item => {
+                            const orderItem = document.querySelector(`.order-item[data-id="${item._id}"]`) || document.createElement('div');
+                            orderItem.setAttribute('data-id', item._id);
+                            const priceElement = orderItem.querySelector('.order-item-price');
                             if (priceElement) {
                                 priceElement.innerHTML = item.offerDiscount || item.couponDiscount
                                     ? `<span class="text-decoration-line-through text-muted">₹${(item.originalPrice * item.quantity).toLocaleString()}</span> <span class="text-success ms-2">₹${item.totalPrice.toLocaleString()}</span>`
                                     : `₹${item.totalPrice.toLocaleString()}`;
                             }
-                            const discountBadge = cartItem.querySelector('.discount-badge');
+                            const discountBadge = orderItem.querySelector('.discount-badge');
                             if (discountBadge) {
                                 let badgeHTML = '';
                                 if (item.offerDiscount > 0) {
-                                    badgeHTML += `<span class="badge bg-success me-2">${item.appliedOffer === 'product' ? 'Product Offer' : 'Category Offer'}: -₹${item.offerDiscount.toLocaleString()}</span>`;
+                                    badgeHTML += `<span class="badge bg-success me-2">Offer: -₹${item.offerDiscount.toLocaleString()}</span>`;
                                 }
                                 if (item.couponDiscount > 0) {
                                     badgeHTML += `<span class="badge bg-primary">Coupon: -₹${item.couponDiscount.toLocaleString()}</span>`;
                                 }
                                 discountBadge.innerHTML = badgeHTML;
                             }
-                        }
-                    });
-                    showNotification(data.message, 'success');
+                        });
+                    } else {
+                        console.warn('No items array in response:', data);
+                    }
+                    showNotification(data.message || 'Coupon removed successfully', 'success');
                     location.reload();
                 } else {
+                    console.warn('Coupon removal failed:', data.message);
                     showNotification(data.message || 'Failed to remove coupon', 'error');
                 }
             } catch (error) {
-                console.log('An error occurred while removing coupon', error);
+                console.error('Error in removeCoupon:', error);
+                showNotification(`Error removing coupon: ${error.message || 'Unknown error'}`, 'error');
             }
         }
 
-        function proceedToCheckout() {
-            window.location.href = '/checkout';
+        function proceedToPayment() {
+            if (!<%= addresses && addresses.length > 0 ? 'true' : 'false' %>) {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'warning',
+                    title: 'Please add a shipping address before proceeding',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+                return;
+            }
+
+            const defaultAddress = document.querySelector('.default-address');
+            if (!defaultAddress) {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'error',
+                    title: 'No default address found',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+                return;
+            }
+
+            const addressId = defaultAddress.getAttribute('data-address-id');
+            if (!addressId) {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'error',
+                    title: 'Invalid address selection',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+                return;
+            }
+
+            const payNowBtn = document.querySelector('.checkout-btn');
+            if (payNowBtn) {
+                payNowBtn.disabled = true;
+                payNowBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            }
+
+            window.location.href = `/proceed-payment?addressId=${addressId}`;
         }
 
         function showNotification(message, type) {
@@ -2137,6 +1747,43 @@ html, body {
                 showBtn.classList.remove('active');
             }
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, adding event listeners');
+            document.querySelectorAll('.set-default-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const addressContainer = this.closest('.address-details');
+                    if (!addressContainer) {
+                        console.error('Could not find address container');
+                        return;
+                    }
+                    const addressId = addressContainer.dataset.addressId;
+                    if (!addressId) {
+                        console.error('No address ID found');
+                        return;
+                    }
+                    console.log('Set default button clicked for address:', addressId);
+                    setDefaultAddress(addressId);
+                });
+            });
+
+            document.querySelectorAll('.remove-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const addressContainer = this.closest('.address-details');
+                    if (!addressContainer) {
+                        console.error('Could not find address container');
+                        return;
+                    }
+                    const addressId = addressContainer.dataset.addressId;
+                    if (!addressId) {
+                        console.error('No address ID found');
+                        return;
+                    }
+                    console.log('Remove button clicked for address:', addressId);
+                    removeAddress(addressId);
+                });
+            });
+        });
     </script>
 </body>
 </html>

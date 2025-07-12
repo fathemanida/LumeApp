@@ -76,33 +76,46 @@ function generateOtp() {
   return Math.floor(10000 + Math.random() * 900000).toString();
 }
 
-async function sendVerificationEmail(email, otp) {
+
+
+const sendVerificationEmail = async (email, otp) => {
   try {
-    const transport = nodemailer.createTransport({
-      service: "gmail",
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
       port: 587,
       secure: false,
-      requireTLS: true,
       auth: {
         user: process.env.NODEMAILER_EMAIL,
-        pass: process.env.NODEMAILER_PASSWORD,
-      },
+        pass: process.env.NODEMAILER_PASSWORD, 
     });
-    console.log("heloooooooooo");
-    const info = await transport.sendMail({
-      from: process.env.NODEMAILER_EMAIL,
+
+    const mailOptions = {
+      from: `"Lume Elegence" <${process.env.NODEMAILER_EMAIL}>`,
       to: email,
-      subject: "Verify your Account",
-      text: `Thank you for signing up. Please verify your email address by entering the given OTP: ${otp}`,
-      html: `<b>Your OTP: ${otp}</b>`,
-    });
-    console.log(email);
+      subject: 'Verify Your Email - Lume Elegence',
+      text: `Hi there,\n\nThanks for signing up on Lume Elegence.\nYour OTP is: ${otp}\n\nEnter this OTP to verify your email.\n\nIf you did not request this, you can ignore this message.`,
+      html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+          <h2>Welcome to Lume Elegence!</h2>
+          <p>Thank you for signing up. Please verify your email using the OTP below:</p>
+          <h3 style="color:#333;">Your OTP: <strong>${otp}</strong></h3>
+          <p>If you did not request this, you can safely ignore this email.</p>
+        </div>
+      `,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+
+    console.log(`Verification email sent to ${email}: ${info.messageId}`);
     return info.accepted.length > 0;
   } catch (error) {
-    console.log("error in sending email", error);
+    console.error('Error sending verification email:', error);
     return false;
   }
-}
+};
+
+module.exports = sendVerificationEmail;
+
 const securePassword = async (passsword) => {
   const passwordHash = await bcrypt.hash(passsword, 10);
   return passwordHash;
