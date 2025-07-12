@@ -311,18 +311,14 @@ const verifyOtp = async (req, res) => {
 const profile = async (req, res) => {
   try {
    
-  if (!req.session.user) {
-  return res.json({message:'login required'})
-}
+
 
 const userId = req.session.user.id;
 const userData = await User.findById(userId).lean();
 
 console.log('user====',  userData);
 
-if (!userData) {
-  return res.redirect("/login");
-}
+
 
     res.render("profile", {
       users: userData,

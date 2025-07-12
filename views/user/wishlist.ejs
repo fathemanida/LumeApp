@@ -4,514 +4,592 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Wishlist - Lume</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Aboreto&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <style>
-        :root {
-            --dark-bg: #1a1a1a;
-            --darker-bg: #121212;
-            --card-bg: #242424;
-            --text-primary: #e0e0e0;
-            --text-secondary: #b0b0b0;
-            --accent-color: #c5a267;
-            --border-color: #333333;
-            --success-color: #4caf50;
-            --error-color: #f44336;
-        }
-
-        body {
-            font-family: 'Jost', sans-serif;
-            background-color: var(--dark-bg);
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            color: var(--text-primary);
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Navbar styles */
-        .navbar {
-            background: var(--darker-bg);
-            border-bottom: 1px solid var(--border-color);
-            padding: 1rem 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: nowrap;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-        }
-
-        .brand {
-            font-family: 'Aboreto', cursive;
-            font-size: 1.5rem;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            color: var(--text-primary);
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
-
-        .brand:hover {
-            color: var(--accent-color);
-        }
-
-        .nav-links {
-            display: flex;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            flex: 1;
-            justify-content: center;
-        }
-
-        .nav-link {
-            color: var(--text-primary);
-            font-family: 'Jost', sans-serif;
-            font-size: 0.9rem;
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .nav-link:hover {
-            color: var(--accent-color);
-            transform: translateY(-2px);
-        }
-
-        .icon-links {
-            display: flex;
-            align-items: center;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-
-        .icon-link {
-            color: var(--text-primary);
-            font-size: 1.1rem;
-            padding: 0.5rem;
-            transition: all 0.3s ease;
-        }
-
-        .icon-link:hover {
-            color: var(--accent-color);
-            transform: translateY(-2px);
-        }
-
-        .search-container {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .search-input {
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            padding: 0.5rem 1rem;
-            padding-right: 2.5rem;
-            width: 200px;
-            background-color: var(--card-bg);
-            color: var(--text-primary);
-            transition: all 0.3s ease;
-        }
-
-        .search-input:focus {
-            width: 250px;
-            border-color: var(--accent-color);
-            box-shadow: none;
-            outline: none;
-        }
-
-        .search-button {
-            position: absolute;
-            right: 10px;
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-        }
-
-        /* Profile Dropdown */
-        .profile-dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
-        .profile-dropdown-content {
-            display: none;
-            position: absolute;
-            right: 0;
-            background-color: var(--card-bg);
-            min-width: 160px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-            z-index: 1000;
-            border-radius: 4px;
-            padding: 0.5rem 0;
-            border: 1px solid var(--border-color);
-        }
-
-        .profile-dropdown:hover .profile-dropdown-content {
-            display: block;
-        }
-
-        .profile-dropdown-content a {
-            color: var(--text-primary);
-            padding: 0.75rem 1rem;
-            text-decoration: none;
-            display: block;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-        }
-
-        .profile-dropdown-content a:hover {
-            background-color: var(--darker-bg);
-            color: var(--accent-color);
-        }
-
-        .profile-dropdown-content a i {
-            margin-right: 0.5rem;
-            width: 20px;
-            text-align: center;
-        }
-
-        /* Main Container */
-        .main-container {
-            display: flex;
-            flex: 1;
-            margin-top: 70px;
-        }
-
-        /* Elegant Dark Sidebar */
-        .sidebar {
-            width: 280px;
-            background-color: var(--darker-bg);
-            padding: 2rem 1.5rem;
-            border-right: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .sidebar-title {
-            font-family: 'Aboreto', cursive;
-            font-size: 1.5rem;
-            color: var(--accent-color);
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border-color);
-            letter-spacing: 1px;
-        }
-
-        .sidebar-nav {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            flex: 1;
-        }
-
-        .sidebar-nav a {
-            color: var(--text-primary);
-            text-decoration: none;
-            padding: 0.75rem 1rem;
-            border-radius: 4px;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            font-size: 0.95rem;
-        }
-
-        .sidebar-nav a i {
-            width: 20px;
-            text-align: center;
-            color: var(--accent-color);
-        }
-
-        .sidebar-nav a:hover {
-            background-color: rgba(197, 162, 103, 0.1);
-            color: var(--accent-color);
-            transform: translateX(4px);
-        }
-
-        .sidebar-nav a.active {
-            background-color: rgba(197, 162, 103, 0.2);
-            color: var(--accent-color);
-            font-weight: 500;
-            border-left: 3px solid var(--accent-color);
-        }
-
-        .sidebar-actions {
-            margin-top: auto;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .sidebar-actions button {
-            padding: 0.75rem;
-            border-radius: 4px;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Jost', sans-serif;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .logout-btn {
-            background-color: rgba(197, 162, 103, 0.1);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-        }
-
-        .logout-btn:hover {
-            background-color: rgba(197, 162, 103, 0.2);
-            border-color: var(--accent-color);
-        }
-
-        .delete-btn {
-            background-color: transparent;
-            color: #ff6b6b;
-            border: 1px solid #ff6b6b;
-        }
-
-        .delete-btn:hover {
-            background-color: rgba(255, 107, 107, 0.1);
-        }
-
-        /* Content Area */
-        .content-area {
-            flex: 1;
-            padding: 2rem 3rem;
-        }
-
-        /* Wishlist Page Header */
-        .wishlist-page-header {
-            background: linear-gradient(to right, var(--darker-bg), var(--dark-bg));
-            padding: 3rem 0;
-            margin-bottom: 2rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .wishlist-page-header h1 {
-            font-family: 'Aboreto', cursive;
-            font-size: 2.5rem;
-            font-weight: 600;
-            color: var(--accent-color);
-            margin-bottom: 1rem;
-        }
-
-        .wishlist-page-header p {
-            color: var(--text-secondary);
-            font-size: 1.1rem;
-        }
-
-        .wishlist-item {
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            transition: all 0.3s ease;
-            background: var(--card-bg);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .wishlist-item:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-            transform: translateY(-2px);
-        }
-
-        .wishlist-image {
-            width: 180px;
-            height: 180px;
-            object-fit: cover;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .wishlist-details {
-            padding: 0 2rem;
-        }
-
-        .wishlist-title {
-            font-size: 1.4rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: var(--text-primary);
-        }
-
-        .wishlist-price {
-            font-size: 1.2rem;
-            margin-bottom: 1rem;
-            color: var(--text-primary);
-        }
-
-        .wishlist-price strike {
-            color: var(--text-secondary);
-            margin-right: 0.5rem;
-        }
-
-        .wishlist-price .text-danger {
-            font-weight: 600;
-            color: var(--error-color);
-        }
-
-        .size-selection {
-            margin: 1rem 0;
-        }
-
-        .size-btn {
-            padding: 0.5rem 1.2rem;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            background: var(--card-bg);
-            color: var(--text-primary);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.9rem;
-            margin-right: 0.5rem;
-        }
-
-        .size-btn.active {
-            background: var(--accent-color);
-            color: var(--dark-bg);
-            border-color: var(--accent-color);
-        }
-
-        .size-btn:hover:not(.active) {
-            background: var(--darker-bg);
-            border-color: var(--accent-color);
-        }
-
-        .wishlist-actions {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        .wishlist-actions .btn {
-            padding: 0.6rem 1.5rem;
-            font-weight: 500;
-            border-radius: 6px;
-            transition: all 0.3s ease;
-        }
-
-        .wishlist-actions .btn-primary {
-            background: var(--accent-color);
-            border-color: var(--accent-color);
-            color: var(--dark-bg);
-        }
-
-        .wishlist-actions .btn-primary:hover {
-            background: #d4b47c;
-            border-color: #d4b47c;
-            transform: translateY(-1px);
-        }
-
-        .wishlist-actions .btn-outline-danger {
-            border-color: var(--error-color);
-            color: var(--error-color);
-            background: transparent;
-        }
-
-        .wishlist-actions .btn-outline-danger:hover {
-            background: var(--error-color);
-            color: var(--text-primary);
-            transform: translateY(-1px);
-        }
-
-        .empty-wishlist {
-            text-align: center;
-            padding: 4rem 2rem;
-            background: var(--card-bg);
-            border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .empty-wishlist i {
-            font-size: 5rem;
-            color: var(--text-secondary);
-            margin-bottom: 1.5rem;
-        }
-
-        .empty-wishlist h3 {
-            color: var(--text-primary);
-            font-size: 1.8rem;
-            margin-bottom: 1rem;
-        }
-
-        .empty-wishlist p {
-            color: var(--text-secondary);
-            font-size: 1.1rem;
-            margin-bottom: 2rem;
-        }
-
-        .empty-wishlist .btn {
-            padding: 0.8rem 2rem;
-            font-size: 1.1rem;
-            border-radius: 6px;
-            background: var(--accent-color);
-            border-color: var(--accent-color);
-            color: var(--dark-bg);
-        }
-
-        .empty-wishlist .btn:hover {
-            background: #d4b47c;
-            transform: translateY(-1px);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .main-container {
-                flex-direction: column;
-            }
-            
-            .sidebar {
-                width: 100%;
-                padding: 1rem;
-            }
-            
-            .content-area {
-                padding: 1.5rem;
-            }
-            
-            .wishlist-item {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .wishlist-image {
-                width: 100%;
-                height: auto;
-                margin-bottom: 1.5rem;
-            }
-
-            .wishlist-details {
-                padding: 0;
-            }
-
-            .wishlist-actions {
-                justify-content: center;
-            }
-
-            .size-selection {
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 0.5rem;
-            }
-        }
+    :root {
+      --theme-title-font: 'Aboreto', sans-serif;
+      --theme-body-font: 'Aboreto', sans-serif;
+      --theme-black: #111;
+      --theme-gray: #888;
+      --theme-highlight: #95951581;
+      --theme-border: #e0e0e0;
+      --dark-brown: #3a2c1a;
+      --olive-green: #334411;
+      --light-bg: #f9f5f0;
+    }
+
+    /* Base Styles */
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background-color: #f0e9e0;
+      font-family: 'Aboreto', sans-serif;
+      color: var(--dark-brown);
+    }
+
+    /* Navbar */
+    .navbar {
+      background: white;
+      border-bottom: 1px solid var(--theme-border);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: nowrap;
+    }
+
+    .brand {
+      font-family: 'Aboreto', cursive;
+      font-size: 1.5rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--dark-brown);
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .brand:hover {
+      color: var(--olive-green);
+    }
+
+    .nav-links {
+      display: flex;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      flex: 1;
+      justify-content: center;
+    }
+
+    .nav-link {
+      color: var(--dark-brown);
+      font-family: 'Aboreto', sans-serif;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      padding: 0.5rem 1rem;
+      text-decoration: none;
+    }
+
+    .nav-link:hover {
+      color: var(--olive-green);
+      transform: translateY(-2px);
+    }
+
+    .icon-links {
+      display: flex;
+      align-items: center;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .icon-link {
+      color: var(--dark-brown);
+      transition: all 0.3s ease;
+      font-size: 1.1rem;
+      padding: 0.5rem;
+      text-decoration: none;
+    }
+
+    .icon-link:hover {
+      color: var(--olive-green);
+      transform: translateY(-2px);
+    }
+
+    .search-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-input {
+      border: 1px solid var(--theme-border);
+      border-radius: 0;
+      padding: 0.5rem 1rem;
+      padding-right: 2.5rem;
+      width: 200px;
+      background-color: white;
+      color: var(--dark-brown);
+      transition: all 0.3s ease;
+      font-family: 'Aboreto', sans-serif;
+    }
+
+    .search-input:focus {
+      width: 250px;
+      border-color: var(--olive-green);
+      box-shadow: none;
+      outline: none;
+    }
+
+    .search-button {
+      position: absolute;
+      right: 10px;
+      background: none;
+      border: none;
+      color: var(--theme-gray);
+      cursor: pointer;
+    }
+
+    /* Profile Dropdown */
+    .profile-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .profile-dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: white;
+      min-width: 160px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      z-index: 1000;
+      border-radius: 0;
+      padding: 0.5rem 0;
+    }
+
+    .profile-dropdown:hover .profile-dropdown-content {
+      display: block;
+    }
+
+    .profile-dropdown-content a {
+      color: var(--dark-brown);
+      padding: 0.75rem 1rem;
+      text-decoration: none;
+      display: block;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+
+    .profile-dropdown-content a:hover {
+      background-color: var(--light-bg);
+      color: var(--olive-green);
+      transform: translateX(3px);
+    }
+
+    .profile-dropdown-content a i {
+      margin-right: 0.5rem;
+      width: 20px;
+      text-align: center;
+    }
+
+    /* Main Container */
+    .main-container {
+      display: flex;
+      flex: 1;
+      background-color: #f0e9e0;
+      margin-top: 70px;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      background-color: white;
+      padding: 2rem 1.5rem;
+      border-right: 1px solid var(--theme-border);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-title {
+      font-family: 'Aboreto', cursive;
+      font-size: 1.5rem;
+      color: var(--dark-brown);
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--theme-border);
+      letter-spacing: 1px;
+    }
+
+    .sidebar-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      flex: 1;
+    }
+
+    .sidebar-nav a {
+      color: var(--dark-brown);
+      text-decoration: none;
+      padding: 0.75rem 1rem;
+      border-radius: 0;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.95rem;
+    }
+
+    .sidebar-nav a i {
+      width: 20px;
+      text-align: center;
+      color: var(--olive-green);
+    }
+
+    .sidebar-nav a:hover {
+      background-color: rgba(107, 142, 35, 0.1);
+      color: var(--olive-green);
+      transform: translateX(4px);
+    }
+
+    .sidebar-nav a.active {
+      background-color: rgba(107, 142, 35, 0.2);
+      color: var(--olive-green);
+      font-weight: 500;
+      border-left: 3px solid var(--olive-green);
+    }
+
+    .sidebar-actions {
+      margin-top: auto;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--theme-border);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .sidebar-actions button {
+      padding: 0.75rem;
+      border-radius: 0;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Aboreto', sans-serif;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .logout-btn {
+      background-color: rgba(107, 142, 35, 0.1);
+      color: var(--dark-brown);
+      border: 1px solid var(--theme-border);
+    }
+
+    .logout-btn:hover {
+      background-color: rgba(107, 142, 35, 0.2);
+      border-color: var(--olive-green);
+    }
+
+    .delete-btn {
+      background-color: transparent;
+      color: #ff6b6b;
+      border: 1px solid #ff6b6b;
+    }
+
+    .delete-btn:hover {
+      background-color: rgba(255, 107, 107, 0.1);
+    }
+
+    /* Content Area */
+    .content-area {
+      flex: 1;
+      padding: 2rem 3rem;
+      background-color: #f0e9e0;
+    }
+
+    /* Wishlist Page Header */
+    .wishlist-page-header {
+      background: white;
+      padding: 3rem 0;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--theme-border);
+    }
+
+    .wishlist-page-header h1 {
+      font-family: 'Aboreto', cursive;
+      font-size: 2.5rem;
+      font-weight: 600;
+      color: var(--dark-brown);
+      margin-bottom: 1rem;
+    }
+
+    .wishlist-page-header p {
+      color: var(--theme-gray);
+      font-size: 1.1rem;
+    }
+
+    /* Wishlist Items */
+    .wishlist-item {
+      border: 1px solid var(--theme-border);
+      border-radius: 0;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      transition: all 0.3s ease;
+      background: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .wishlist-item:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transform: translateY(-2px);
+    }
+
+    .wishlist-image {
+      width: 180px;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .wishlist-details {
+      padding: 0 2rem;
+    }
+
+    .wishlist-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--dark-brown);
+    }
+
+    .wishlist-price {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      color: var(--dark-brown);
+    }
+
+    .wishlist-price strike {
+      color: var(--theme-gray);
+      margin-right: 0.5rem;
+    }
+
+    .wishlist-price .text-danger {
+      font-weight: 600;
+      color: #ff6b6b;
+    }
+
+    .size-selection {
+      margin: 1rem 0;
+    }
+
+    .size-btn {
+      padding: 0.5rem 1.2rem;
+      border: 1px solid var(--theme-border);
+      border-radius: 0;
+      background: white;
+      color: var(--dark-brown);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+      margin-right: 0.5rem;
+      font-family: 'Aboreto', sans-serif;
+    }
+
+    .size-btn.active {
+      background: var(--olive-green);
+      color: white;
+      border-color: var(--olive-green);
+    }
+
+    .size-btn:hover:not(.active) {
+      background: var(--light-bg);
+      border-color: var(--olive-green);
+    }
+
+    .wishlist-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .wishlist-actions .btn {
+      padding: 0.6rem 1.5rem;
+      font-weight: 500;
+      border-radius: 0;
+      transition: all 0.3s ease;
+      font-family: 'Aboreto', sans-serif;
+    }
+
+    .wishlist-actions .btn-primary {
+      background: var(--dark-brown);
+      border-color: var(--dark-brown);
+      color: white;
+    }
+
+    .wishlist-actions .btn-primary:hover {
+      background: var(--olive-green);
+      border-color: var(--olive-green);
+      transform: translateY(-1px);
+    }
+
+    .wishlist-actions .btn-outline-danger {
+      border-color: #ff6b6b;
+      color: #ff6b6b;
+      background: transparent;
+    }
+
+    .wishlist-actions .btn-outline-danger:hover {
+      background: #ff6b6b;
+      color: white;
+      transform: translateY(-1px);
+    }
+
+    .empty-wishlist {
+      text-align: center;
+      padding: 4rem 2rem;
+      background: white;
+      border-radius: 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .empty-wishlist i {
+      font-size: 5rem;
+      color: var(--theme-gray);
+      margin-bottom: 1.5rem;
+    }
+
+    .empty-wishlist h3 {
+      color: var(--dark-brown);
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+    }
+
+    .empty-wishlist p {
+      color: var(--theme-gray);
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+    }
+
+    .empty-wishlist .btn {
+      padding: 0.8rem 2rem;
+      font-size: 1.1rem;
+      border-radius: 0;
+      background: var(--dark-brown);
+      border-color: var(--dark-brown);
+      color: white;
+      font-family: 'Aboreto', sans-serif;
+    }
+
+    .empty-wishlist .btn:hover {
+      background: var(--olive-green);
+      transform: translateY(-1px);
+    }
+
+    /* Footer */
+    .footer {
+      background-color: var(--dark-brown);
+      color: white;
+      padding: 3rem 0;
+      margin-top: 3rem;
+    }
+
+    .footer-heading {
+      font-family: 'Aboreto', cursive;
+      font-size: 1rem;
+      letter-spacing: 1px;
+      margin-bottom: 1.25rem;
+    }
+
+    .footer-link {
+      color: white;
+      font-family: 'Aboreto', sans-serif;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      display: block;
+      margin-bottom: 0.5rem;
+      text-decoration: none;
+    }
+
+    .footer-link:hover {
+      color: var(--light-bg);
+      transform: translateX(3px);
+    }
+
+    .footer-link i {
+      margin-right: 0.5rem;
+      width: 20px;
+      text-align: center;
+    }
+
+    .border-secondary {
+      border-color: rgba(255, 255, 255, 0.1) !important;
+    }
+
+    .text-light {
+      color: rgba(255, 255, 255, 0.7) !important;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .main-container {
+        flex-direction: column;
+      }
+      
+      .sidebar {
+        width: 100%;
+        padding: 1rem;
+      }
+      
+      .content-area {
+        padding: 1.5rem;
+      }
+      
+      .wishlist-item {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .wishlist-image {
+        width: 100%;
+        height: auto;
+        margin-bottom: 1.5rem;
+      }
+
+      .wishlist-details {
+        padding: 0;
+      }
+
+      .wishlist-actions {
+        justify-content: center;
+      }
+
+      .size-selection {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5rem;
+      }
+    }
+
+    /* Toastify Custom Styles */
+    .custom-toast {
+      background: white !important;
+      color: var(--dark-brown) !important;
+      border: 1px solid var(--theme-border) !important;
+      border-radius: 0 !important;
+      padding: 12px 20px !important;
+      font-family: 'Aboreto', sans-serif !important;
+    }
+
+    .custom-toast.success {
+      border-left: 4px solid var(--olive-green) !important;
+    }
+
+    .custom-toast.error {
+      border-left: 4px solid #ff6b6b !important;
+    }
+
+    .custom-toast .toast-close {
+      color: var(--dark-brown) !important;
+      opacity: 0.7;
+    }
+
+    .custom-toast .toast-close:hover {
+      opacity: 1;
+    }
     </style>
 </head>
 <body>
@@ -566,7 +644,7 @@
 
     <% if (locals.user) { %>
         <div class="main-container">
-            <!-- Elegant Dark Sidebar -->
+            <!-- Sidebar -->
             <div class="sidebar">
                 <div class="sidebar-title">My Account</div>
                 <div class="sidebar-nav">
@@ -701,49 +779,42 @@
     <% } %>
 
     <!-- Footer -->
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
-    <footer style="background-color: #121212; color: #b0b0b0; padding: 40px 0; font-family: 'Cinzel', serif; line-height: 1.6; border-top: 1px solid #333;">
+    <footer class="footer">
       <div style="display: flex; justify-content: center; gap: 120px; padding: 0 20px; max-width: 1200px; margin: 0 auto;">
         <div>
-          <h3 style="font-size: 18px; margin-bottom: 15px; letter-spacing: 1px; text-transform: uppercase; color: #c5a267;">Company</h3>
-          <ul style="list-style: none; padding: 0; font-size: 14px;">
-            <li style="margin-bottom: 8px;"><a href="/about-us" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">About Us</a></li>
-            <li style="margin-bottom: 8px;"><a href="/careers" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Careers</a></li>
-            <li style="margin-bottom: 8px;"><a href="/contact" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Contact</a></li>
-            <li style="margin-bottom: 8px;"><a href="/privacy-policy" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Privacy Policy</a></li>
+          <h3 class="footer-heading">Company</h3>
+          <ul style="list-style: none; padding: 0;">
+            <li><a href="/about-us" class="footer-link">About Us</a></li>
+            <li><a href="/careers" class="footer-link">Careers</a></li>
+            <li><a href="/contact" class="footer-link">Contact</a></li>
+            <li><a href="/privacy-policy" class="footer-link">Privacy Policy</a></li>
           </ul>
         </div>
         <div>
-          <h3 style="font-size: 18px; margin-bottom: 15px; letter-spacing: 1px; text-transform: uppercase; color: #c5a267;">Shop</h3>
-          <ul style="list-style: none; padding: 0; font-size: 14px;">
-            <li style="margin-bottom: 8px;"><a href="/rings" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Rings</a></li>
-            <li style="margin-bottom: 8px;"><a href="/necklaces" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Necklaces</a></li>
-            <li style="margin-bottom: 8px;"><a href="/earrings" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Earrings</a></li>
-            <li style="margin-bottom: 8px;"><a href="/bracelets" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Bracelets</a></li>
+          <h3 class="footer-heading">Shop</h3>
+          <ul style="list-style: none; padding: 0;">
+            <li><a href="/rings" class="footer-link">Rings</a></li>
+            <li><a href="/necklaces" class="footer-link">Necklaces</a></li>
+            <li><a href="/earrings" class="footer-link">Earrings</a></li>
+            <li><a href="/bracelets" class="footer-link">Bracelets</a></li>
           </ul>
         </div>
         <div>
-          <h3 style="font-size: 18px; margin-bottom: 15px; letter-spacing: 1px; text-transform: uppercase; color: #c5a267;">Connect With Us</h3>
-          <ul style="list-style: none; padding: 0; font-size: 14px;">
-            <li style="margin-bottom: 8px;"><a href="https://instagram.com" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Instagram</a></li>
-            <li style="margin-bottom: 8px;"><a href="https://facebook.com" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Facebook</a></li>
-            <li style="margin-bottom: 8px;"><a href="https://pinterest.com" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Pinterest</a></li>
-            <li style="margin-bottom: 8px;"><a href="https://twitter.com" style="color: #b0b0b0; text-decoration: none; transition: color 0.3s ease;">Twitter</a></li>
+          <h3 class="footer-heading">Connect With Us</h3>
+          <ul style="list-style: none; padding: 0;">
+            <li><a href="https://instagram.com" class="footer-link"><i class="fab fa-instagram"></i> Instagram</a></li>
+            <li><a href="https://facebook.com" class="footer-link"><i class="fab fa-facebook-f"></i> Facebook</a></li>
+            <li><a href="https://pinterest.com" class="footer-link"><i class="fab fa-pinterest-p"></i> Pinterest</a></li>
+            <li><a href="https://twitter.com" class="footer-link"><i class="fab fa-twitter"></i> Twitter</a></li>
           </ul>
         </div>
       </div>
-      <div style="text-align: center; font-size: 12px; padding-top: 30px; margin-top: 30px; border-top: 1px solid #333; color: #666;">
+      <div style="text-align: center; font-size: 12px; padding-top: 30px; margin-top: 30px; border-top: 1px solid rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.7);">
         © 2024 Lume Jewelry. All Rights Reserved.
       </div>
     </footer>
-    <style>
-      footer a:hover {
-        color: #c5a267;
-      }
-    </style>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script>
         // Sidebar button functionality
         document.querySelector('.logout-btn').addEventListener('click', function() {
@@ -792,7 +863,7 @@
                         duration: 3000,
                         gravity: "top",
                         position: "right",
-                        backgroundColor: "#2ecc71"
+                        className: "custom-toast success"
                     }).showToast();
                 } else {
                     throw new Error(data.message || 'Failed to add to cart');
@@ -803,7 +874,7 @@
                     duration: 3000,
                     gravity: "top",
                     position: "right",
-                    backgroundColor: "#e74c3c"
+                    className: "custom-toast error"
                 }).showToast();
             }
         }
@@ -834,7 +905,7 @@
                             duration: 3000,
                             gravity: "top",
                             position: "right",
-                            backgroundColor: "#2ecc71"
+                            className: "custom-toast success"
                         }).showToast();
                     }
                 } else {
@@ -847,7 +918,7 @@
                         duration: 3000,
                         gravity: "top",
                         position: "right",
-                        backgroundColor: "#e74c3c"
+                        className: "custom-toast error"
                     }).showToast();
                 }
             }

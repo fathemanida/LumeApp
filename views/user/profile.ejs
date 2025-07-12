@@ -7,452 +7,464 @@
     <link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root {
-            --dark-bg: #1a1a1a;
-            --darker-bg: #121212;
-            --card-bg: #242424;
-            --text-primary: #e0e0e0;
-            --text-secondary: #b0b0b0;
-            --accent-color: #c5a267;
-            --border-color: #333333;
-            --success-color: #4caf50;
-            --error-color: #f44336;
-        }
+    :root {
+      --theme-title-font: 'Aboreto', sans-serif;
+      --theme-body-font: 'Aboreto', sans-serif;
+      --theme-black: #111;
+      --theme-gray: #888;
+      --theme-highlight: #95951581;
+      --theme-border: #e0e0e0;
+      --dark-brown: #3a2c1a;
+      --olive-green: #334411;
+      --light-bg: #f9f5f0;
+    }
 
-        body {
-            font-family: 'Jost', sans-serif;
-            background-color: var(--dark-bg);
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            color: var(--text-primary);
-            display: flex;
-            flex-direction: column;
-        }
+    /* Base Styles */
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background-color: #f0e9e0;
+      font-family: 'Aboreto', sans-serif;
+      color: var(--dark-brown);
+    }
 
-        /* Navbar styles */
-        .navbar {
-            background: var(--darker-bg);
-            border-bottom: 1px solid var(--border-color);
-            padding: 1rem 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: nowrap;
-        }
+    /* Navbar */
+    .navbar {
+      background: white;
+      border-bottom: 1px solid var(--theme-border);
+      position: relative;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: nowrap;
+    }
 
-        .brand {
-            font-family: 'Aboreto', cursive;
-            font-size: 1.5rem;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            color: var(--text-primary);
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
+    .brand {
+      font-family: 'Aboreto', cursive;
+      font-size: 1.5rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--dark-brown);
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
 
-        .brand:hover {
-            color: var(--accent-color);
-        }
+    .brand:hover {
+      color: var(--olive-green);
+    }
 
-        .nav-links {
-            display: flex;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            flex: 1;
-            justify-content: center;
-        }
+    .nav-links {
+      display: flex;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      flex: 1;
+      justify-content: center;
+    }
 
-        .nav-link {
-            color: var(--text-primary);
-            font-family: 'Jost', sans-serif;
-            font-size: 0.9rem;
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            transition: all 0.3s ease;
-        }
+    .nav-link {
+      color: var(--dark-brown);
+      font-family: 'Aboreto', sans-serif;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      padding: 0.5rem 1rem;
+      text-decoration: none;
+    }
 
-        .nav-link:hover {
-            color: var(--accent-color);
-            transform: translateY(-2px);
-        }
+    .nav-link:hover {
+      color: var(--olive-green);
+      transform: translateY(-2px);
+    }
 
-        .icon-links {
-            display: flex;
-            align-items: center;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
+    .icon-links {
+      display: flex;
+      align-items: center;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
 
-        .icon-link {
-            color: var(--text-primary);
-            font-size: 1.1rem;
-            padding: 0.5rem;
-            transition: all 0.3s ease;
-        }
+    .icon-link {
+      color: var(--dark-brown);
+      transition: all 0.3s ease;
+      font-size: 1.1rem;
+      padding: 0.5rem;
+      text-decoration: none;
+    }
 
-        .icon-link:hover {
-            color: var(--accent-color);
-            transform: translateY(-2px);
-        }
+    .icon-link:hover {
+      color: var(--olive-green);
+      transform: translateY(-2px);
+    }
 
-        /* Profile Dropdown */
-        .profile-dropdown {
-            position: relative;
-            display: inline-block;
-        }
+    /* Profile Dropdown */
+    .profile-dropdown {
+      position: relative;
+      display: inline-block;
+    }
 
-        .profile-dropdown-content {
-            display: none;
-            position: absolute;
-            right: 0;
-            background-color: var(--card-bg);
-            min-width: 160px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-            z-index: 1000;
-            border-radius: 4px;
-            padding: 0.5rem 0;
-            border: 1px solid var(--border-color);
-        }
+    .profile-dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: white;
+      min-width: 160px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      z-index: 1000;
+      border-radius: 0;
+      padding: 0.5rem 0;
+    }
 
-        .profile-dropdown:hover .profile-dropdown-content {
-            display: block;
-        }
+    .profile-dropdown:hover .profile-dropdown-content {
+      display: block;
+    }
 
-        .profile-dropdown-content a {
-            color: var(--text-primary);
-            padding: 0.75rem 1rem;
-            text-decoration: none;
-            display: block;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-        }
+    .profile-dropdown-content a {
+      color: var(--dark-brown);
+      padding: 0.75rem 1rem;
+      text-decoration: none;
+      display: block;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
 
-        .profile-dropdown-content a:hover {
-            background-color: var(--darker-bg);
-            color: var(--accent-color);
-        }
+    .profile-dropdown-content a:hover {
+      background-color: var(--light-bg);
+      color: var(--olive-green);
+      transform: translateX(3px);
+    }
 
-        .profile-dropdown-content a i {
-            margin-right: 0.5rem;
-            width: 20px;
-            text-align: center;
-        }
+    .profile-dropdown-content a i {
+      margin-right: 0.5rem;
+      width: 20px;
+      text-align: center;
+    }
 
-        /* Main Container */
-        .main-container {
-            display: flex;
-            flex: 1;
-        }
+    /* Main Container */
+    .main-container {
+      display: flex;
+      flex: 1;
+      background-color: #f0e9e0;
+    }
 
-        /* Elegant Dark Sidebar */
-        .sidebar {
-            width: 280px;
-            background-color: var(--darker-bg);
-            padding: 2rem 1.5rem;
-            border-right: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-        }
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      background-color: white;
+      padding: 2rem 1.5rem;
+      border-right: 1px solid var(--theme-border);
+      display: flex;
+      flex-direction: column;
+    }
 
-        .sidebar-title {
-            font-family: 'Aboreto', cursive;
-            font-size: 1.5rem;
-            color: var(--accent-color);
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border-color);
-            letter-spacing: 1px;
-        }
+    .sidebar-title {
+      font-family: 'Aboreto', cursive;
+      font-size: 1.5rem;
+      color: var(--dark-brown);
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--theme-border);
+      letter-spacing: 1px;
+    }
 
-        .sidebar-nav {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            flex: 1;
-        }
+    .sidebar-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      flex: 1;
+    }
 
-        .sidebar-nav a {
-            color: var(--text-primary);
-            text-decoration: none;
-            padding: 0.75rem 1rem;
-            border-radius: 4px;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            font-size: 0.95rem;
-        }
+    .sidebar-nav a {
+      color: var(--dark-brown);
+      text-decoration: none;
+      padding: 0.75rem 1rem;
+      border-radius: 0;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.95rem;
+    }
 
-        .sidebar-nav a i {
-            width: 20px;
-            text-align: center;
-            color: var(--accent-color);
-        }
+    .sidebar-nav a i {
+      width: 20px;
+      text-align: center;
+      color: var(--olive-green);
+    }
 
-        .sidebar-nav a:hover {
-            background-color: rgba(197, 162, 103, 0.1);
-            color: var(--accent-color);
-            transform: translateX(4px);
-        }
+    .sidebar-nav a:hover {
+      background-color: rgba(107, 142, 35, 0.1);
+      color: var(--olive-green);
+      transform: translateX(4px);
+    }
 
-        .sidebar-nav a.active {
-            background-color: rgba(197, 162, 103, 0.2);
-            color: var(--accent-color);
-            font-weight: 500;
-            border-left: 3px solid var(--accent-color);
-        }
+    .sidebar-nav a.active {
+      background-color: rgba(107, 142, 35, 0.2);
+      color: var(--olive-green);
+      font-weight: 500;
+      border-left: 3px solid var(--olive-green);
+    }
 
-        .sidebar-actions {
-            margin-top: auto;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
+    .sidebar-actions {
+      margin-top: auto;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--theme-border);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
 
-        .sidebar-actions button {
-            padding: 0.75rem;
-            border-radius: 4px;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Jost', sans-serif;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
+    .sidebar-actions button {
+      padding: 0.75rem;
+      border-radius: 0;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Aboreto', sans-serif;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
 
-        .logout-btn {
-            background-color: rgba(197, 162, 103, 0.1);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-        }
+    .logout-btn {
+      background-color: rgba(107, 142, 35, 0.1);
+      color: var(--dark-brown);
+      border: 1px solid var(--theme-border);
+    }
 
-        .logout-btn:hover {
-            background-color: rgba(197, 162, 103, 0.2);
-            border-color: var(--accent-color);
-        }
+    .logout-btn:hover {
+      background-color: rgba(107, 142, 35, 0.2);
+      border-color: var(--olive-green);
+    }
 
-        .delete-btn {
-            background-color: transparent;
-            color: #ff6b6b;
-            border: 1px solid #ff6b6b;
-        }
+    .delete-btn {
+      background-color: transparent;
+      color: #ff6b6b;
+      border: 1px solid #ff6b6b;
+    }
 
-        .delete-btn:hover {
-            background-color: rgba(255, 107, 107, 0.1);
-        }
+    .delete-btn:hover {
+      background-color: rgba(255, 107, 107, 0.1);
+    }
 
-        /* Content Area */
-        .content-area {
-            flex: 1;
-            padding: 2rem 3rem;
-        }
+    /* Content Area */
+    .content-area {
+      flex: 1;
+      padding: 2rem 3rem;
+      background-color: #f0e9e0;
+    }
 
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
 
-        .page-title {
-            font-family: 'Aboreto', cursive;
-            font-size: 2rem;
-            color: var(--accent-color);
-            margin: 0;
-        }
+    .page-title {
+      font-family: 'Aboreto', cursive;
+      font-size: 2rem;
+      color: var(--dark-brown);
+      margin: 0;
+    }
 
-        .edit-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1.25rem;
-            background-color: var(--accent-color);
-            color: #121212;
-            border-radius: 4px;
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-            font-weight: 500;
-        }
+    .edit-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.25rem;
+      background-color: var(--dark-brown);
+      color: white;
+      border-radius: 0;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
 
-        .edit-btn:hover {
-            background-color: #d4b47c;
-            transform: translateY(-2px);
-        }
+    .edit-btn:hover {
+      background-color: var(--olive-green);
+      transform: translateY(-2px);
+    }
 
-        /* Profile Content Styles */
-     .profile-header {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-    margin-bottom: 2rem;
-    padding: 2rem;
-    border-bottom: 1px solid var(--border-color);
-    border-radius: 12px;
-    background-color: var(--card-bg); /* You can also use #1e1e1e or custom color */
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    will-change: transform;
-}
+    /* Profile Content Styles */
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      margin-bottom: 2rem;
+      padding: 2rem;
+      background-color: white;
+      border-radius: 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      transition: all 0.3s ease;
+    }
 
-.profile-header:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-}
+    .profile-header:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    }
 
-/* Shine effect */
-.profile-header::after {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.15), transparent);
-    transform: rotate(25deg);
-    opacity: 0;
-    transition: opacity 0.4s ease, transform 0.8s ease;
-    pointer-events: none;
-    z-index: 1;
-}
+    .profile-image {
+      width: 120px;
+      height: 120px;
+      border-radius: 0;
+      overflow: hidden;
+      background-color: var(--light-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-.profile-header:hover::after {
-    opacity: 1;
-    transform: translateX(100%) rotate(25deg);
-}
+    .profile-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
 
-/* Dot-circle effect */
-.profile-header::before {
-    content: '';
-    position: absolute;
-    top: -20px;
-    right: -20px;
-    width: 80px;
-    height: 80px;
-    background-color: var(--accent-color);
-    opacity: 0.1;
-    border-radius: 50%;
-    z-index: 0;
-}
+    .profile-info h2 {
+      font-family: 'Aboreto', cursive;
+      font-size: 1.75rem;
+      margin: 0 0 0.5rem 0;
+      color: var(--dark-brown);
+    }
 
-        .profile-image {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            overflow: hidden;
-            background-color: var(--card-bg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+    .profile-info p {
+      color: var(--theme-gray);
+      margin: 0;
+    }
 
-        .profile-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+    /* Referral Section */
+    .referral-section {
+      background: white;
+      padding: 2rem;
+      border-radius: 0;
+      margin-top: 2rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
 
-        .profile-info h2 {
-            font-family: 'Aboreto', cursive;
-            font-size: 1.75rem;
-            margin: 0 0 0.5rem 0;
-            color: var(--text-primary);
-        }
+    .referral-section h3 {
+      color: var(--dark-brown);
+      font-family: 'Aboreto', cursive;
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+    }
 
-        .profile-info p {
-            color: var(--text-secondary);
-            margin: 0;
-        }
+    .referral-code-container {
+      background: var(--light-bg);
+      padding: 1.5rem;
+      border-radius: 0;
+      border: 1px solid var(--theme-border);
+    }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .main-container {
-                flex-direction: column;
-            }
-            
-            .sidebar {
-                width: 100%;
-                padding: 1rem;
-            }
-            
-            .content-area {
-                padding: 1.5rem;
-            }
-        }
+    .referral-code {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
 
-        /* Add these styles to your existing CSS */
-        .referral-section {
-            background: var(--card-bg);
-            padding: 2rem;
-            border-radius: 8px;
-            margin-top: 2rem;
-            border: 1px solid var(--border-color);
-        }
+    .referral-code span {
+      font-family: monospace;
+      font-size: 1.25rem;
+      color: var(--dark-brown);
+      letter-spacing: 1px;
+      padding: 0.5rem 1rem;
+      background: white;
+      border-radius: 0;
+      border: 1px solid var(--theme-border);
+    }
 
-        .referral-section h3 {
-            color: var(--accent-color);
-            font-size: 1.25rem;
-            margin-bottom: 1rem;
-        }
+    .copy-btn {
+      background: var(--dark-brown);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      font-family: 'Aboreto', sans-serif;
+    }
 
-        .referral-code-container {
-            background: var(--darker-bg);
-            padding: 1.5rem;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
-        }
+    .copy-btn:hover {
+      background: var(--olive-green);
+      transform: translateY(-2px);
+    }
 
-        .referral-code {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
+    .referral-info {
+      color: var(--theme-gray);
+      font-size: 0.9rem;
+      margin: 0;
+    }
 
-        .referral-code span {
-            font-family: monospace;
-            font-size: 1.25rem;
-            color: var(--text-primary);
-            letter-spacing: 1px;
-            padding: 0.5rem 1rem;
-            background: var(--bg-primary);
-            border-radius: 4px;
-            border: 1px solid var(--border-color);
-        }
+    /* Responsive */
+    @media (max-width: 768px) {
+      .main-container {
+        flex-direction: column;
+      }
+      
+      .sidebar {
+        width: 100%;
+        padding: 1rem;
+      }
+      
+      .content-area {
+        padding: 1.5rem;
+      }
+    }
 
-        .copy-btn {
-            background: var(--accent-color);
-            color: var(--darker-bg);
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
+    /* Footer */
+    .footer {
+      background-color: var(--dark-brown);
+      color: white;
+      padding: 3rem 0;
+      margin-top: 3rem;
+    }
 
-        .copy-btn:hover {
-            background: #d4b47c;
-            transform: translateY(-2px);
-        }
+    .footer-heading {
+      font-family: 'Aboreto', cursive;
+      font-size: 1rem;
+      letter-spacing: 1px;
+      margin-bottom: 1.25rem;
+    }
 
-        .referral-info {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin: 0;
-        }
+    .footer-link {
+      color: white;
+      font-family: 'Aboreto', sans-serif;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      display: block;
+      margin-bottom: 0.5rem;
+      text-decoration: none;
+    }
+
+    .footer-link:hover {
+      color: var(--light-bg);
+      transform: translateX(3px);
+    }
+
+    .footer-link i {
+      margin-right: 0.5rem;
+      width: 20px;
+      text-align: center;
+    }
+
+    .border-secondary {
+      border-color: rgba(255, 255, 255, 0.1) !important;
+    }
+
+    .text-light {
+      color: rgba(255, 255, 255, 0.7) !important;
+    }
     </style>
 </head>
 <body>
@@ -558,7 +570,7 @@
                         <% if(users && users.profileImage) { %>
                             <img src="/uploads/user/<%= users.profileImage %>" alt="Profile">
                         <% } else { %>
-                            <i class="fas fa-user fa-2x" style="color: var(--text-secondary);"></i>
+                            <i class="fas fa-user fa-2x" style="color: var(--theme-gray);"></i>
                         <% } %>
                     </div>
                     <div class="profile-info">
@@ -591,61 +603,55 @@
     <% } else { %>
         <div class="content-area">
             <div class="no-profile">
-                <h2 style="font-family: 'Aboreto', cursive; color: var(--accent-color);">Welcome to LUME</h2>
-                <p style="color: var(--text-secondary);">Please log in to view your profile.</p>
+                <h2 style="font-family: 'Aboreto', cursive; color: var(--dark-brown);">Welcome to LUME</h2>
+                <p style="color: var(--theme-gray);">Please log in to view your profile.</p>
                 <a href="/login" class="edit-btn">Login Now</a>
             </div>
         </div>
     <% } %>
 
     <!-- Footer -->
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
-    <footer style="background-color: var(--darker-bg); color: var(--text-secondary); padding: 40px 0; font-family: 'Cinzel', serif; line-height: 1.6; border-top: 1px solid var(--border-color);">
+    <footer class="footer">
       <div style="display: flex; justify-content: center; gap: 120px; padding: 0 20px; max-width: 1200px; margin: 0 auto;">
         <!-- Company Section -->
         <div>
-          <h3 style="font-size: 18px; margin-bottom: 15px; letter-spacing: 1px; text-transform: uppercase; color: var(--accent-color);">Company</h3>
-          <ul style="list-style: none; padding: 0; font-size: 14px;">
-            <li style="margin-bottom: 8px;"><a href="/about-us" style="color: var(--text-secondary); text-decoration: none; transition: color 0.3s ease;">About Us</a></li>
-            <li style="margin-bottom: 8px;"><a href="/careers" style="color: var(--text-secondary); text-decoration: none; transition: color 0.3s ease;">Careers</a></li>
-            <li style="margin-bottom: 8px;"><a href="/contact" style="color: var(--text-secondary); text-decoration: none; transition: color 0.3s ease;">Contact</a></li>
-            <li style="margin-bottom: 8px;"><a href="/privacy-policy" style="color: var(--text-secondary); text-decoration: none; transition: color 0.3s ease;">Privacy Policy</a></li>
+          <h3 class="footer-heading">Company</h3>
+          <ul style="list-style: none; padding: 0;">
+            <li><a href="/about-us" class="footer-link">About Us</a></li>
+            <li><a href="/careers" class="footer-link">Careers</a></li>
+            <li><a href="/contact" class="footer-link">Contact</a></li>
+            <li><a href="/privacy-policy" class="footer-link">Privacy Policy</a></li>
           </ul>
         </div>
 
         <!-- Shop Section -->
         <div>
-          <h3 style="font-size: 18px; margin-bottom: 15px; letter-spacing: 1px; text-transform: uppercase; color: var(--accent-color);">Shop</h3>
-          <ul style="list-style: none; padding: 0; font-size: 14px;">
-            <li style="margin-bottom: 8px;"><a href="/rings" style="color: var(--text-secondary); text-decoration: none; transition: color 0.3s ease;">Rings</a></li>
-            <li style="margin-bottom: 8px;"><a href="/necklaces" style="color: var(--text-secondary); text-decoration: none; transition: color 0.3s ease;">Necklaces</a></li>
-            <li style="margin-bottom: 8px;"><a href="/earrings" style="color: var(--text-secondary); text-decoration: none; transition: color 0.3s ease;">Earrings</a></li>
-            <li style="margin-bottom: 8px;"><a href="/bracelets" style="color: var(--text-secondary); text-decoration: none; transition: color 0.3s ease;">Bracelets</a></li>
+          <h3 class="footer-heading">Shop</h3>
+          <ul style="list-style: none; padding: 0;">
+            <li><a href="/rings" class="footer-link">Rings</a></li>
+            <li><a href="/necklaces" class="footer-link">Necklaces</a></li>
+            <li><a href="/earrings" class="footer-link">Earrings</a></li>
+            <li><a href="/bracelets" class="footer-link">Bracelets</a></li>
           </ul>
         </div>
 
         <!-- Connect With Us Section -->
         <div>
-          <h3 style="font-size: 18px; margin-bottom: 15px; letter-spacing: 1px; text-transform: uppercase; color: var(--accent-color);">Connect With Us</h3>
-          <ul style="list-style: none; padding: 0; font-size: 14px;">
-            <li style="margin-bottom: 8px;"><a href="https://instagram.com" style="color: var(--text-secondary); text-decoration: none; transition: color 0.3s ease;">Instagram</a></li>
-            <li style="margin-bottom: 8px;"><a href="https://facebook.com" style="color: var(--text-secondary); text-decoration: none; transition: color 0.3s ease;">Facebook</a></li>
-            <li style="margin-bottom: 8px;"><a href="https://pinterest.com" style="color: var(--text-secondary); text-decoration: none; transition: color 0.3s ease;">Pinterest</a></li>
-            <li style="margin-bottom: 8px;"><a href="https://twitter.com" style="color: var(--text-secondary); text-decoration: none; transition: color 0.3s ease;">Twitter</a></li>
+          <h3 class="footer-heading">Connect With Us</h3>
+          <ul style="list-style: none; padding: 0;">
+            <li><a href="https://instagram.com" class="footer-link"><i class="fab fa-instagram"></i> Instagram</a></li>
+            <li><a href="https://facebook.com" class="footer-link"><i class="fab fa-facebook-f"></i> Facebook</a></li>
+            <li><a href="https://pinterest.com" class="footer-link"><i class="fab fa-pinterest-p"></i> Pinterest</a></li>
+            <li><a href="https://twitter.com" class="footer-link"><i class="fab fa-twitter"></i> Twitter</a></li>
           </ul>
         </div>
       </div>
 
       <!-- Copyright Section -->
-      <div style="text-align: center; font-size: 12px; padding-top: 30px; margin-top: 30px; border-top: 1px solid var(--border-color); color: var(--text-secondary);">
+      <div style="text-align: center; font-size: 12px; padding-top: 30px; margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1);">
         © 2024 Lume Jewelry. All Rights Reserved.
       </div>
     </footer>
-    <style>
-      footer a:hover {
-        color: var(--accent-color);
-      }
-    </style>
 
     <script>
         document.querySelector('.logout-btn').addEventListener('click', function() {
@@ -664,11 +670,11 @@
                 const btn = document.querySelector('.copy-btn');
                 const originalText = btn.innerHTML;
                 btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-                btn.style.background = 'var(--success-color)';
+                btn.style.background = 'var(--olive-green)';
                 
                 setTimeout(() => {
                     btn.innerHTML = originalText;
-                    btn.style.background = 'var(--accent-color)';
+                    btn.style.background = 'var(--dark-brown)';
                 }, 2000);
             });
         }

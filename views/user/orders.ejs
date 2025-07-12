@@ -188,66 +188,48 @@
 
         /* Elegant Sidebar */
         .sidebar {
-            width: 280px;
+            width: 300px;
             background-color: white;
             padding: 2rem 1.5rem;
             border-right: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
+            min-height: calc(100vh - 70px - 81px); /* Navbar height (70px) + Footer height (approx 81px) */
             position: fixed;
             top: 70px;
-            left: 0;
-            height: calc(100vh - 70px);
-            z-index: 1200;
-            transform: translateX(-100%);
-            transition: transform 0.3s cubic-bezier(.4,0,.2,1);
-            box-shadow: 2px 0 10px rgba(0,0,0,0.07);
+            bottom: 0;
             overflow-y: auto;
         }
-        .sidebar.open {
-            transform: translateX(0);
-        }
-        .sidebar-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: transparent;
-            z-index: 1199;
-        }
-        .sidebar-overlay.active {
-            display: block;
-        }
-        .sidebar-toggle {
-            display: flex;
-            align-items: center;
-            background: none;
-            border: none;
-            font-size: 2rem;
-            color: var(--muted-green);
-            cursor: pointer;
-            margin-right: 1.2rem;
-            padding: 0;
-            height: 2.2rem;
-            position: static;
-        }
-        @media (max-width: 1024px) {
-            .sidebar {
-                top: 0;
-                height: 100vh;
-                padding-top: 4rem;
-            }
-            .main-container {
-                margin-top: 70px;
-            }
-        }
+
         @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+
             .sidebar {
-                width: 80vw;
-                min-width: 220px;
-                max-width: 320px;
+                width: 100%;
+                padding: 1rem;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                position: fixed;
+                top: 70px;
+                z-index: 900;
+                background-color: white;
+                margin: 0;
+            }
+
+            .content-area {
+                padding: 6rem 1rem 1rem; /* Increased top padding to account for fixed sidebar */
+            }
+
+            .orders-table-container {
+                overflow-x: auto;
+                margin-top: 0; /* Ensure table starts right below sidebar */
+            }
+
+            .orders-table {
+                width: 100%;
+                min-width: 600px; /* Ensure table is scrollable horizontally */
             }
         }
 
@@ -347,6 +329,9 @@
         .content-area {
             flex: 1;
             padding: 2rem 3rem;
+            margin-left: 300px; /* Match sidebar width */
+            overflow-y: auto;
+            min-height: calc(100vh - 70px - 81px); /* Match sidebar height */
         }
 
         .page-header {
@@ -364,6 +349,10 @@
         }
 
         /* Order table styles */
+        .orders-table-container {
+            overflow-x: auto;
+        }
+
         .orders-table {
             width: 100%;
             border-collapse: collapse;
@@ -628,9 +617,6 @@
 <body>
     <!-- Navbar -->
     <nav class="navbar">
-        <button class="sidebar-toggle" id="sidebarToggle" aria-label="Open sidebar">
-            <i class="fas fa-bars"></i>
-        </button>
         <div class="brand">LUME</div>
         <ul class="nav-links">
             <li><a href="/" class="nav-link">Home</a></li>
@@ -668,12 +654,10 @@
         </ul>
     </nav>
 
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
     <% if (locals.user) { %>
         <div class="main-container">
             <!-- Sidebar -->
-            <div class="sidebar" id="sidebar">
+            <div class="sidebar">
                 <div class="sidebar-title">My Account</div>
                 <div class="sidebar-nav">
                     <a href="/profile" class="nav-link"><i class="fas fa-user"></i> Profile</a>
@@ -707,107 +691,109 @@
                     <div class="d-flex justify-content-between align-items-center mb-4" style="color: #666;">
                         <span>Showing <%= orders.length %> of <%= totalOrders %> orders</span>
                     </div>
-                    <table class="orders-table">
-                        <thead>
-                            <tr>
-                                <th>Order ID</th>
-                                <th>Image</th>
-                                <th>Date</th>
-                                <th>Total</th>
-                                <th>Status</th>
-                                <th>Return Status</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% orders.forEach(order => { %>
+                    <div class="orders-table-container">
+                        <table class="orders-table">
+                            <thead>
                                 <tr>
-                                    <td>#<%= order.orderNumber %></td>
-                                    <td>
-                                        <% if (order.items && order.items.length > 0) { %>
-                                            <div style="display: flex; flex-direction: column; align-items: center;">
-                                                <img src="/uploads/product/<%= order.items[0].image %>" alt="<%= order.items[0].name %>" width="80" height="80" style="object-fit: cover;">
-                                                <span style="margin-top: 8px; font-size: 0.85rem; color: #666; text-align: center; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                                                    <%= order.items[0].name %>
-                                                </span>
-                                            </div>
-                                        <% } else { %>
-                                            <div style="display: flex; flex-direction: column; align-items: center;">
-                                                <img src="/images/placeholder.png" alt="No image" width="80" height="80" style="object-fit: cover;">
-                                                <span style="margin-top: 8px; font-size: 0.85rem; color: #666;">Product not found</span>
-                                            </div>
-                                        <% } %>
-                                    </td>
-                                    <td><%= order.date %></td>
-                                    <td>₹<%= (order.totalAmount || 0).toFixed(2) %></td>
-                                    <td>
-                                        <span class="status status-<%= order.status.toLowerCase() %>">
-                                            <%= order.status %>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <% if (order.returnRequest) { %>
-                                            <div class="return-status">
-                                                <% if (order.returnRequest.status === 'Pending') { %>
-                                                    <div style="color: #856404; background-color: #fff3cd; padding: 4px 8px; border-radius: 4px;">
-                                                        <i class="fas fa-clock"></i> Return Requested
-                                                    </div>
-                                                <% } else if (order.returnRequest.status === 'Accepted') { %>
-                                                    <div style="color: #155724; background-color: #d4edda; padding: 4px 8px; border-radius: 4px;">
-                                                        <i class="fas fa-check-circle"></i> Return Accepted
-                                                    </div>
-                                                <% } else if (order.returnRequest.status === 'Rejected') { %>
-                                                    <div style="color: #721c24; background-color: #f8d7da; padding: 4px 8px; border-radius: 4px;">
-                                                        <i class="fas fa-times-circle"></i> Return Rejected
-                                                        <% if (order.returnRequest.adminResponse) { %>
-                                                            <div style="font-size: 0.75rem; margin-top: 2px;">
-                                                                Reason: <%= order.returnRequest.adminResponse %>
-                                                            </div>
-                                                        <% } %>
-                                                    </div>
-                                                <% } %>
-                                                <div style="font-size: 0.75rem; margin-top: 2px; color: #666;">
-                                                    Requested on: <%= new Date(order.returnRequest.requestedAt).toLocaleDateString() %>
-                                                </div>
-                                                <% if (order.returnRequest.respondedAt) { %>
-                                                    <div style="font-size: 0.75rem; margin-top: 2px; color: #666;">
-                                                        Responded on: <%= new Date(order.returnRequest.respondedAt).toLocaleDateString() %>
-                                                    </div>
-                                                <% } %>
-                                            </div>
-                                        <% } else { %>
-                                            <span style="color: #666;">No return request</span>
-                                        <% } %>
-                                    </td>
-                                    <td>
-                                        <a href="/orders/<%= order._id %>" class="view-icon" title="View Order Details">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        <% if (order.status === 'Delivered' && !order.returnRequest) { %>
-                                            <button onclick="requestReturn('<%= order._id %>')" class="return-icon" title="Request Return" style="background: none; border: none; margin-left: 10px;">
-                                                <i class="fas fa-undo"></i>
-                                            </button>
-                                        <% } %>
-                                        <% if (order.status === 'Failed') { %>
-                                            <a href="/proceed-payment?orderId=<%= order._id %>" class="btn-try-again" style="margin-left: 10px;">
-                                                <i class="fas fa-redo-alt"></i> Try Again
-                                            </a>
-                                        <% } %>
-                                    </td>
+                                    <th>Order ID</th>
+                                    <th>Image</th>
+                                    <th>Date</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Return Status</th>
+                                    <th>Action</th>
                                 </tr>
-                            <% }); %>
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                <% orders.forEach(order => { %>
+                                    <tr>
+                                        <td>#<%= order.orderNumber %></td>
+                                        <td>
+                                            <% if (order.items && order.items.length > 0) { %>
+                                                <div style="display: flex; flex-direction: column; align-items: center;">
+                                                    <img src="/uploads/product/<%= order.items[0].image %>" alt="<%= order.items[0].name %>" width="80" height="80" style="object-fit: cover;">
+                                                    <span style="margin-top: 8px; font-size: 0.85rem; color: #666; text-align: center; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                                        <%= order.items[0].name %>
+                                                    </span>
+                                                </div>
+                                            <% } else { %>
+                                                <div style="display: flex; flex-direction: column; align-items: center;">
+                                                    <img src="/images/placeholder.png" alt="No image" width="80" height="80" style="object-fit: cover;">
+                                                    <span style="margin-top: 8px; font-size: 0.85rem; color: #666;">Product not found</span>
+                                                </div>
+                                            <% } %>
+                                        </td>
+                                        <td><%= order.date %></td>
+                                        <td>₹<%= (order.totalAmount || 0).toFixed(2) %></td>
+                                        <td>
+                                            <span class="status status-<%= order.status.toLowerCase() %>">
+                                                <%= order.status %>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <% if (order.returnRequest) { %>
+                                                <div class="return-status">
+                                                    <% if (order.returnRequest.status === 'Pending') { %>
+                                                        <div style="color: #856404; background-color: #fff3cd; padding: 4px 8px; border-radius: 4px;">
+                                                            <i class="fas fa-clock"></i> Return Requested
+                                                        </div>
+                                                    <% } else if (order.returnRequest.status === 'Accepted') { %>
+                                                        <div style="color: #155724; background-color: #d4edda; padding: 4px 8px; border-radius: 4px;">
+                                                            <i class="fas fa-check-circle"></i> Return Accepted
+                                                        </div>
+                                                    <% } else if (order.returnRequest.status === 'Rejected') { %>
+                                                        <div style="color: #721c24; background-color: #f8d7da; padding: 4px 8px; border-radius: 4px;">
+                                                            <i class="fas fa-times-circle"></i> Return Rejected
+                                                            <% if (order.returnRequest.adminResponse) { %>
+                                                                <div style="font-size: 0.75rem; margin-top: 2px;">
+                                                                    Reason: <%= order.returnRequest.adminResponse %>
+                                                                </div>
+                                                            <% } %>
+                                                        </div>
+                                                    <% } %>
+                                                    <div style="font-size: 0.75rem; margin-top: 2px; color: #666;">
+                                                        Requested on: <%= new Date(order.returnRequest.requestedAt).toLocaleDateString() %>
+                                                    </div>
+                                                    <% if (order.returnRequest.respondedAt) { %>
+                                                        <div style="font-size: 0.75rem; margin-top: 2px; color: #666;">
+                                                            Responded on: <%= new Date(order.returnRequest.respondedAt).toLocaleDateString() %>
+                                                        </div>
+                                                    <% } %>
+                                                </div>
+                                            <% } else { %>
+                                                <span style="color: #666;">No return request</span>
+                                            <% } %>
+                                        </td>
+                                        <td>
+                                            <a href="/orders/<%= order._id %>" class="view-icon" title="View Order Details">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <% if (order.status === 'Delivered' && !order.returnRequest) { %>
+                                                <button onclick="requestReturn('<%= order._id %>')" class="return-icon" title="Request Return" style="background: none; border: none; margin-left: 10px;">
+                                                    <i class="fas fa-undo"></i>
+                                                </button>
+                                            <% } %>
+                                            <% if (order.status === 'Failed') { %>
+                                                <a href="/proceed-payment?orderId=<%= order._id %>" class="btn-try-again" style="margin-left: 10px;">
+                                                    <i class="fas fa-redo-alt"></i> Try Again
+                                                </a>
+                                            <% } %>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
 
                     <div class="pagination">
                         <% if (currentPage > 1) { %>
-                            <li><a href="?page=<%= currentPage - 1 %><%= locals.searchQuery ? '&search=' + locals.searchQuery : '' %>" class="page-btn <%= currentPage === 1 ? 'disabled' : '' %>">&lt;</a></li>
+                            <li><a href="?page=<%= currentPage - 1 %><%= locals.searchQuery ? '&search=' + locals.searchQuery : '' %>" class="page-btn <%= currentPage === 1 ? 'disabled' : '' %>"><</a></li>
                         <% } %>
                         <% for(let i = 1; i <= totalPages; i++) { %>
                             <li><a href="?page=<%= i %><%= locals.searchQuery ? '&search=' + locals.searchQuery : '' %>" class="page-btn <%= currentPage === i ? 'active' : '' %>"><%= i %></a></li>
                         <% } %>
                         <% if (currentPage < totalPages) { %>
-                            <li><a href="?page=<%= currentPage + 1 %><%= locals.searchQuery ? '&search=' + locals.searchQuery : '' %>" class="page-btn <%= currentPage === totalPages ? 'disabled' : '' %>">&gt;</a></li>
+                            <li><a href="?page=<%= currentPage + 1 %><%= locals.searchQuery ? '&search=' + locals.searchQuery : '' %>" class="page-btn <%= currentPage === totalPages ? 'disabled' : '' %>">></a></li>
                         <% } %>
                     </div>
                 <% } else { %>
@@ -923,32 +909,6 @@
                     e.preventDefault();
                 }
             });
-        });
-
-        // Sidebar toggle logic (with double-click to close)
-        const sidebar = document.getElementById('sidebar');
-        const sidebarToggle = document.getElementById('sidebarToggle');
-        const sidebarOverlay = document.getElementById('sidebarOverlay');
-        function openSidebar() {
-            sidebar.classList.add('open');
-            sidebarOverlay.classList.add('active');
-        }
-        function closeSidebar() {
-            sidebar.classList.remove('open');
-            sidebarOverlay.classList.remove('active');
-        }
-        sidebarToggle.addEventListener('click', function() {
-            if (sidebar.classList.contains('open')) {
-                closeSidebar();
-            } else {
-                openSidebar();
-            }
-        });
-        sidebarToggle.addEventListener('dblclick', closeSidebar);
-        sidebarOverlay.addEventListener('click', closeSidebar);
-        // Optional: close sidebar on ESC key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') closeSidebar();
         });
     </script>
 </body>
