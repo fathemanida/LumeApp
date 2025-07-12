@@ -738,7 +738,7 @@ const getCheckout = async (req, res) => {
   } catch (error) {
     console.error('Error in getCheckout:', error);
     req.flash('error', 'Error loading checkout page');
-    res.redirect('/cart');
+    res.redirect('/home');
   }
 };
 
