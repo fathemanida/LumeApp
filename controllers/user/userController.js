@@ -80,14 +80,16 @@ function generateOtp() {
 
 const sendVerificationEmail = async (email, otp) => {
   try {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      port: 587,
-      secure: false,
-      auth: {
-        user: process.env.NODEMAILER_EMAIL,
-        pass: process.env.NODEMAILER_PASSWORD, 
-    });
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.NODEMAILER_EMAIL,
+    pass: process.env.NODEMAILER_PASSWORD,
+  }
+});
+
 
     const mailOptions = {
       from: `"Lume Elegence" <${process.env.NODEMAILER_EMAIL}>`,
