@@ -87,8 +87,7 @@ router.put('/coupons/:id/toggle-status', adminAuth, couponController.toggleStatu
 
 
 router.get('/banner',adminAuth,bannerController.getBanner);
-router.get('banner/add',adminAuth,bannerController.loadAddbanner);
-router.post('/banner/add/:id',adminAuth,bannerController.addBanner)
+router.get('/banner/add',adminAuth,bannerController.loadAddbanner);
 
 // Banner routes
 router.post('/banner/add', upload.array('images', 5), bannerController.addBanner);
