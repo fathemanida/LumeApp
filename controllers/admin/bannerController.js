@@ -17,7 +17,7 @@ const getBanner=async (req,res) => {
        .skip(skip)
        .limit(limit)
 
-    res.render('admin/banner',{
+    res.render('banner',{
         banners,
         totalBanners,
         totalPages,
@@ -38,9 +38,9 @@ const loadAddbanner=async (req,res) => {
         if(!req.session.admin){
             return res.render('admin/login');
         }
-        res.render('admin/add-banner');
+        res.render('add-banner');
     } catch (error) {
-        res.status(500).render('admin/pageError', { message: error.message || 'Error loading add banner page' });
+        res.status(500).render('pageError', { message: error.message || 'Error loading add banner page' });
     }
 }
 
@@ -96,7 +96,7 @@ const getEditBanner = async (req, res) => {
         if (!banner) {
             return res.status(404).render('admin/pageError', { message: 'Banner not found' });
         }
-        res.render('admin/edit-banner', { banner });
+        res.render('edit-banner', { banner });
     } catch (error) {
         console.error('Error loading edit banner:', error);
         res.status(500).render('admin/pageError', { message: error.message || 'Error loading banner for edit' });
