@@ -1,5 +1,6 @@
 const Banner=require('../../models/bannerSchema');
-
+const fs = require('fs');
+const path = require('path');
 
 
 const getBanner=async (req,res) => {
@@ -43,35 +44,119 @@ const loadAddbanner=async (req,res) => {
     }
 }
 
-const addBanner=async (req,res) => {
+const addBanner = async (req, res) => {
     try {
-       const {name,subtitle}=req.body;
-       if(!name||!subtitle||!req.file){
-        return res.status(404).json({
-            success:false,
-            message:'All fields are required'
-        })
-       }
-       const existinBanner=await Banner.findOne({name})
-       if(existinBanner){
-        if(req.file){
-            fs.unlinkSync(req.file.path)
+        const { name, subtitle } = req.body;
+        if (!name || !subtitle || !req.files || req.files.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'All fields and at least one image are required'
+            });
         }
-        return res.status(400).json({
-            success:false,
-        message:"A Banner with name already exists"
-        })
-       }
-
+        if (req.files.length > 5) {
+            // Remove uploaded files if more than 5
+            req.files.forEach(file => fs.unlinkSync(file.path));
+            return res.status(400).json({
+                success: false,
+                message: 'You can upload a maximum of 5 images'
+            });
+        }
+        const existingBanner = await Banner.findOne({ name });
+        if (existingBanner) {
+            req.files.forEach(file => fs.unlinkSync(file.path));
+            return res.status(400).json({
+                success: false,
+                message: 'A Banner with this name already exists'
+            });
+        }
+        const imageFilenames = req.files.map(file => file.filename);
+        const newBanner = new Banner({
+            name,
+            subtitle,
+            images: imageFilenames
+        });
+        await newBanner.save();
+        res.status(201).json({
+            success: true,
+            message: 'Banner added successfully',
+            banner: newBanner
+        });
     } catch (error) {
-        
+        console.error('Error adding banner:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Error adding banner'
+        });
     }
-}
+};
+
+const getEditBanner = async (req, res) => {
+    try {
+        const bannerId = req.params.id;
+        const banner = await Banner.findById(bannerId);
+        if (!banner) {
+            return res.status(404).render('admin/pageError', { message: 'Banner not found' });
+        }
+        res.render('admin/edit-banner', { banner });
+    } catch (error) {
+        console.error('Error loading edit banner:', error);
+        res.status(500).render('admin/pageError', { message: error.message || 'Error loading banner for edit' });
+    }
+};
+
+const postEditBanner = async (req, res) => {
+    try {
+        const bannerId = req.params.id;
+        const { name, subtitle } = req.body;
+        const banner = await Banner.findById(bannerId);
+        if (!banner) {
+            return res.status(404).json({
+                success: false,
+                message: 'Banner not found'
+            });
+        }
+        // If new images are uploaded, remove old images
+        if (req.files && req.files.length > 0) {
+            if (banner.images && banner.images.length > 0) {
+                banner.images.forEach(img => {
+                    const oldImagePath = path.join(__dirname, '../../public/uploads/banner/', img);
+                    if (fs.existsSync(oldImagePath)) {
+                        fs.unlinkSync(oldImagePath);
+                    }
+                });
+            }
+            if (req.files.length > 5) {
+                req.files.forEach(file => fs.unlinkSync(file.path));
+                return res.status(400).json({
+                    success: false,
+                    message: 'You can upload a maximum of 5 images'
+                });
+            }
+            banner.images = req.files.map(file => file.filename);
+        }
+        banner.name = name;
+        banner.subtitle = subtitle;
+        await banner.save();
+        res.status(200).json({
+            success: true,
+            message: 'Banner updated successfully',
+            banner
+        });
+    } catch (error) {
+        console.error('Error editing banner:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Error editing banner'
+        });
+    }
+};
 
 
 module.exports={
     getBanner,
     loadAddbanner,
     addBanner,
+    getEditBanner,
+    postEditBanner,
 
 }

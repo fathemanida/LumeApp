@@ -1010,7 +1010,7 @@
           <div class="thumbnail-images d-flex gap-2">
             <% product.productImage.forEach((image, index) => { %>
               <div class="thumbnail position-relative" onclick="changeMainImage('<%= image %>')">
-                <img src="/Uploads/product/<%= image %>"
+                <img src="/uploads/product/<%= image %>"
                      alt="<%= product.productName %> - Image <%= index + 1 %>"
                      class="img-thumbnail <%= !product.isListed ? 'unavailable-img' : (product.quantity <= 0 ? 'out-of-stock-img' : '') %>"
                      style="width: 80px; height: 80px; object-fit: cover;">

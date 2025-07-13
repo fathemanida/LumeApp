@@ -9,8 +9,9 @@ const bannerSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    image: {
-        type: String,
+    images: {
+        type: [String],
+        validate: [arr => arr.length > 0 && arr.length <= 5, 'You must provide between 1 and 5 images'],
         required: true
     },
     isActive: {

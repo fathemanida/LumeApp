@@ -218,8 +218,10 @@
             const fromDate = new Date(formData.get('fromDate'));
             const expiryDate = new Date(formData.get('expiryDate'));
             const today = new Date();
+            const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
-            if (fromDate < today) {
+
+            if (fromDate < todayStart) {
                 showError('fromDate', 'From Date cannot be in the past');
                 hasErrors = true;
             }

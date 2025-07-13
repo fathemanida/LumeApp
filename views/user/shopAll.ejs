@@ -9,7 +9,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Jost&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-  <link rel="stylesheet" href="/css/userSidebar.css">
   <style>
     :root {
       --soft-beige: #D4B996;
@@ -30,47 +29,7 @@
       color: var(--dark-text);
     }
 
-    .search-container {
-      position: relative;
-      display: none;
-    }
-
-    .search-container.active {
-      display: block;
-    }
-
-    .search-input {
-      border: 1px solid var(--border-color);
-      border-radius: 20px;
-      padding: 0.5rem 1rem;
-      padding-right: 2.5rem;
-      font-family: 'Jost', sans-serif;
-      width: 200px;
-      transition: all 0.3s ease;
-      color: var(--dark-text);
-    }
-
-    .search-input:focus {
-      outline: none;
-      border-color: var(--soft-beige);
-      width: 250px;
-      box-shadow: 0 0 0 2px rgba(212, 185, 150, 0.1);
-      color: var(--darker-text);
-    }
-
-    .search-button {
-      position: absolute;
-      right: 10px;
-      background: none;
-      border: none;
-      color: var(--dark-text);
-      cursor: pointer;
-    }
-
-    .search-button:hover {
-      color: var(--muted-green);
-    }
-
+    /* Sidebar Styles */
     .sidebar {
       position: fixed;
       top: 0;
@@ -168,54 +127,82 @@
       display: block;
     }
 
-    .hero-section {
-      display: flex;
+    /* Product Grid Layout */
+    #productsGrid {
+      display: grid;
+      gap: 20px;
       width: 100%;
-      margin: 0;
-      padding: 0;
     }
 
-    .hero-img {
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      width: 50%;
-      height: 500px;
-      object-fit: cover;
+    /* Mobile (2 columns) */
+    @media (max-width: 767px) {
+      #productsGrid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+      }
+      
+      .product-image-container {
+        height: 180px;
+      }
+      
+      /* Mobile sidebar - fixed at top */
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: auto;
+        max-height: 80vh;
+        z-index: 1000;
+        transform: none;
+        transition: none;
+        box-shadow: none;
+        border-bottom: 1px solid var(--border-color);
+        display: none;
+      }
+      
+      .sidebar.open {
+        display: block;
+      }
     }
 
-    .hero-img:hover {
-      transform: scale(1.02);
-      box-shadow: 0 5px 15px rgba(212, 185, 150, 0.1);
+    /* Tablet (3 columns) */
+    @media (min-width: 768px) and (max-width: 991px) {
+      #productsGrid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+      }
+      
+      .product-image-container {
+        height: 220px;
+      }
     }
 
-    .section-heading {
-      font-family: 'Aboreto', cursive;
-      color: var(--darker-text);
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      font-weight: 400;
+    /* Desktop (4 columns) */
+    @media (min-width: 992px) {
+      #productsGrid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+      }
+      
+      .product-image-container {
+        height: 250px;
+      }
     }
 
-    .section-subtext {
-      font-family: 'Jost', sans-serif;
-      color: var(--dark-text);
-      font-size: 0.9rem;
-    }
-
+    /* Product Card Styles */
     .product-card {
       background: transparent;
       border: none;
       overflow: hidden;
       position: relative;
-      box-shadow: none;
-      border-radius: 0 0 12px 12px;
     }
 
     .product-image-container {
       position: relative;
       width: 100%;
-      height: auto;
-      aspect-ratio: 1/1;
       overflow: hidden;
+      aspect-ratio: 1/1;
     }
 
     .product-img {
@@ -293,7 +280,6 @@
       text-decoration: line-through;
       font-size: 0.9rem;
     }
-    
 
     .wishlist-icon {
       position: absolute;
@@ -343,103 +329,6 @@
     }
 
     .product-card .btn {
-      background-color: var(--soft-beige);
-      color: white;
-      border: none;
-      padding: 0.5rem 1rem;
-      width: calc(100% - 2rem);
-      margin: 0 1rem 1rem;
-      border-radius: 4px;
-      transition: all 0.3s ease;
-    }
-
-    .product-card {
-      position: relative;
-    }
-
-    .product-info {
-      padding: 1rem 0 0 0;
-    }
-
-    .product-price {
-      margin-bottom: 0.5rem;
-    }
-
-    .product-card .btn:hover:not(:disabled) {
-      background-color: var(--muted-green);
-    }
-
-    .product-card .btn:disabled {
-      background-color: var(--darker-text);
-      color: white;
-      opacity: 0.7;
-      cursor: not-allowed;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-size: 0.8rem;
-      border-radius: 0 !important;
-      width: 100%;
-      padding: 0.6rem 1rem;
-      margin-top: 0.5rem;
-    }
-
-    @keyframes shimmer {
-      0% {
-        background-position: -100% 0;
-      }
-      100% {
-        background-position: 100% 0;
-      }
-    }
-
-    .wishlist-icon {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      color: var(--darker-text);
-      font-size: 1.1rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      z-index: 3;
-      background: rgba(255, 255, 255, 0.8);
-      border-radius: 50%;
-      padding: 0.3rem;
-    }
-
-    .wishlist-icon:hover {
-      color: #ff6b6b;
-      transform: scale(1.1);
-    }
-
-    .new-badge {
-      position: absolute;
-      top: 15px;
-      left: 15px;
-      background-color: var(--muted-green);
-      color: white;
-      font-family: 'Jost', sans-serif;
-      font-size: 0.65rem;
-      padding: 0.3rem 0.6rem;
-      border-radius: 0;
-      text-transform: uppercase;
-      z-index: 2;
-    }
-
-    .offer-badge {
-      position: absolute;
-      bottom: 10px;
-      right: 10px;
-      background-color: #603a10;
-      color: white;
-      font-family: 'Jost', sans-serif;
-      font-size: 0.65rem;
-      padding: 0.3rem 0.6rem;
-      border-radius: 0;
-      text-transform: uppercase;
-      z-index: 2;
-    }
-
-    .product-card .btn {
       background-color: var(--darker-text);
       color: white;
       border: none;
@@ -464,13 +353,6 @@
       color: white;
       opacity: 0.7;
       cursor: not-allowed;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-size: 0.8rem;
-      border-radius: 0;
-      width: 100%;
-      padding: 0.6rem 1rem;
-      margin-top: 0.5rem;
     }
 
     .unlisted-overlay {
@@ -515,107 +397,45 @@
       font-family: 'Jost', sans-serif;
     }
 
-    .sparkle-banner {
-      background-color: var(--soft-beige);
-      color: white;
-      font-family: 'Aboreto', cursive;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      transition: background-color 0.3s ease;
-    }
-
-    .sparkle-banner:hover {
-      background-color: var(--muted-green);
-    }
-
-    .signup-input {
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-      padding: 0.5rem 1rem;
-      font-family: 'Jost', sans-serif;
-      transition: border-color 0.3s ease;
-    }
-
-    .signup-input:focus {
-      outline: none;
-      border-color: var(--soft-beige);
-    }
-
-    .signup-btn {
-      background-color: var(--soft-beige);
-      color: white;
-      font-family: 'Jost', sans-serif;
-      font-weight: 500;
-      border-radius: 4px;
-      transition: background-color 0.3s ease, transform 0.3s ease;
-    }
-
-    .signup-btn:hover {
-      background-color: var(--muted-green);
-      transform: translateY(-2px);
-    }
-
-    .footer {
-      background-color: var(--soft-beige);
-    }
-
-    .footer-heading {
-      font-family: 'Aboreto', cursive;
-      color: white;
+    /* Filter Button */
+    .filter-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
       font-size: 1rem;
-      letter-spacing: 1px;
+      font-weight: 500;
+      border-radius: 6px;
+      padding: 0.4rem 1.2rem;
+      margin-bottom: 1rem;
     }
 
-    .footer-link {
-      color: white;
-      font-family: 'Jost', sans-serif;
-      font-size: 0.9rem;
-      transition: color 0.3s ease;
+    @media (min-width: 768px) {
+      .filter-btn {
+        display: none;
+      }
     }
 
-    .footer-link:hover {
-      color: var(--light-bg);
+    .main-content-container {
+      padding-left: 5.5rem;
+      padding-right: 5.5rem;
+      margin-top: 80px;
     }
 
-    .profile-dropdown {
-      position: relative;
-      display: inline-block;
+    @media (min-width: 768px) {
+      .main-content-container {
+        padding-left: 4rem;
+        padding-right: 4rem;
+      }
     }
 
-    .profile-dropdown-content {
-      display: none;
-      position: absolute;
-      right: 0;
-      background-color: white;
-      min-width: 160px;
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-      z-index: 1000;
-      border-radius: 4px;
-      padding: 0.5rem 0;
-    }
-
-    .profile-dropdown:hover .profile-dropdown-content {
-      display: block;
-    }
-
-    .profile-dropdown-content a {
-      color: var(--dark-text);
-      padding: 0.75rem 1rem;
-      text-decoration: none;
-      display: block;
-      font-size: 0.9rem;
-      transition: background-color 0.3s ease;
-    }
-
-    .profile-dropdown-content a:hover {
-      background-color: var(--light-bg);
-      color: var(--muted-green);
-    }
-
-    .profile-dropdown-content a i {
-      margin-right: 0.5rem;
-      width: 20px;
-      text-align: center;
+    @media (min-width: 1200px) {
+      .main-content-container {
+        padding-left: 6rem;
+        padding-right: 6rem;
+        max-width: 1400px;
+        margin-left: auto;
+        margin-right: auto;
+      }
     }
 
     .pagination {
@@ -655,276 +475,6 @@
       opacity: 0.5;
       cursor: not-allowed;
     }
-
-    .main-content-container {
-      padding-left: 5.5rem;
-      padding-right: 5.5rem;
-      margin-top: 80px; /* Adjust if your header is taller/shorter */
-    }
-
-    @media (min-width: 768px) {
-      .main-content-container {
-        padding-left: 4rem;
-        padding-right: 4rem;
-      }
-    }
-
-    @media (min-width: 1200px) {
-      .main-content-container {
-        padding-left: 6rem;
-        padding-right: 6rem;
-        max-width: 1400px;
-        margin-left: auto;
-        margin-right: auto;
-      }
-    }
-
-    /* Match shopAll product card style to home.ejs featured section */
-    .product-card,
-    .product-img,
-    .product-img-secondary,
-    .product-image-container {
-      border-radius: 0 !important;
-      box-shadow: none !important;
-      background: transparent !important;
-    }
-    .product-card {
-      border: none !important;
-      padding: 0 !important;
-      font-size: 1rem;
-      max-width: 320px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .product-image-container {
-      aspect-ratio: 1/1;
-      width: 100%;
-      max-width: 320px;
-      margin-left: auto;
-      margin-right: auto;
-      background: transparent !important;
-    }
-    .product-img, .product-img-secondary {
-      width: 100%;
-      object-fit: cover;
-      border-radius: 0 !important;
-      background: transparent !important;
-    }
-    .product-title.card-title, .product-title {
-      font-size: 1.1rem;
-      margin-bottom: 0.2rem;
-      font-family: 'Aboreto', cursive;
-      color: #1a0f0a;
-      font-weight: 500;
-      line-height: 1.4;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      text-align: center;
-    }
-    .product-category {
-      font-size: 0.85rem;
-      color: #A9BA9D;
-      margin-bottom: 0.5rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      opacity: 0.9;
-      text-align: center;
-    }
-    .product-price, .product-price .discounted-price, .product-price .strike-price, .product-price .regular-price {
-      font-size: 1.1rem;
-      display: flex;
-      gap: 0.5rem;
-      align-items: center;
-      justify-content: center;
-      font-weight: 500;
-      margin-bottom: 1rem;
-    }
-    .product-card .btn {
-      font-size: 1rem;
-      padding: 0.4rem 0;
-      border-radius: 0 !important;
-      min-height: 32px;
-      width: 100%;
-      margin: 0.5rem 0 0.5rem 0;
-      box-sizing: border-box;
-      background: #181818;
-      color: #fff;
-      font-family: 'Jost', sans-serif;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-    .wishlist-icon, .offer-badge, .new-badge {
-      font-size: 0.8rem;
-      padding: 0.18rem 0.5rem;
-      border-radius: 0 !important;
-      background: rgba(255,255,255,0.9);
-    }
-
-    .unlisted-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(255, 255, 255, 0.7);
-      z-index: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .unlisted-badge {
-      background: #5b0a0a;
-      color: white;
-      padding: 5px 10px;
-      border-radius: 4px;
-      font-weight: lighter;
-      font-family: 'Jost', sans-serif;
-      font-size: 0.9rem;
-    }
-
-    .unlisted-img {
-      opacity: 0.7;
-    }
-
-    .out-of-stock-overlay {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      background-color: #dc3545;
-      color: white;
-      padding: 5px 10px;
-      border-radius: 12px;
-      font-size: 0.65rem;
-      font-weight: bold;
-      z-index: 2;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .bg-cream {
-      background-color: #f5e6d39f;
-    }
-
-    .pulse-ring {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background-color: #ead5b990;
-      position: absolute;
-      animation: pulse 1.5s ease-out infinite;
-      opacity: 0.75;
-    }
-
-    @keyframes pulse {
-      0% {
-        transform: scale(1);
-        opacity: 0.8;
-      }
-      50% {
-        transform: scale(2.5);
-        opacity: 0.4;
-      }
-      100% {
-        transform: scale(3);
-        opacity: 0;
-      }
-    }
-    /* Mobile (2 columns) */
-/* Mobile (2 columns) */
-@media (max-width: 767px) {
-  #productsGrid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    width: 100%;
-    padding: 0 8px;
-  }
-  
-  .product-card {
-    width: 100%;
-    margin: 0;
-  }
-  
-  .product-image-container {
-    height: 160px; /* Fixed height for mobile */
-  }
-}
-
-/* Tablet (3 columns) */
-@media (min-width: 768px) and (max-width: 991px) {
-  #productsGrid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-  }
-  
-  .product-image-container {
-    height: 200px;
-  }
-}
-
-/* Desktop (4 columns) */
-@media (min-width: 992px) {
-  #productsGrid {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
-  }
-  
-  .product-image-container {
-    height: 220px;
-  }
-}
-  /* Responsive sidebar overlay from top on mobile */
-@media (max-width: 767px) {
-  .sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    width: 100vw;
-    height: auto;
-    max-height: 90vh;
-    z-index: 2000;
-    background: #fff;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.18);
-    transform: translateY(-120%);
-    transition: transform 0.3s ease;
-    border-radius: 0 0 16px 16px;
-    overflow-y: auto;
-  }
-  .sidebar.open {
-    transform: translateY(0);
-  }
-  .overlay.active {
-    display: block;
-    z-index: 1999;
-  }
-}
-.filter-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 1rem;
-  font-weight: 500;
-  border-radius: 6px;
-  padding: 0.4rem 1.2rem;
-  margin-bottom: 0.5rem;
-}
-@media (min-width: 768px) {
-  .filter-btn {
-    display: none;
-  }
-  .sidebar {
-    transform: none !important;
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 300px;
-    height: 100%;
-    border-radius: 0;
-    z-index: 1000;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-  }
-}
   </style>
 </head>
 <body>
@@ -1010,8 +560,8 @@
             <i class="fas fa-filter"></i> Filter
           </button>
         </div>
-<div id="productsGrid">
-             <% if (products && products.length > 0) { %>
+        <div id="productsGrid">
+          <% if (products && products.length > 0) { %>
             <% products.forEach(product => { %>
             <div class="col product-item" data-name="<%= product.productName.toLowerCase() %>" data-category="<%= product.category?.name?.toLowerCase() || '' %>">
               <div class="product-card card text-center h-100 position-relative overflow-hidden">
@@ -1117,7 +667,7 @@
     </div>
   </div>
 
-  <%- include("../../views/partials/user/fooret.ejs") %>
+  <%- include("../../views/partials/user/footer") %>
 
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
     integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
@@ -1127,255 +677,170 @@
     crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-  <script src="/js/cart.js"></script>
-  <script src="/js/userSidebar.js"></script>
- <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('overlay');
-    const sidebarToggle = document.getElementById('sidebarToggle');
-    const searchToggle = document.getElementById('searchToggle');
-    const searchContainer = document.getElementById('searchContainer');
-
-    // Debug: Log elements to ensure they are found
-    console.log('Sidebar:', sidebar);
-    console.log('Overlay:', overlay);
-    console.log('SidebarToggle:', sidebarToggle);
-
-    if (sidebarToggle && sidebar && overlay) {
-      sidebarToggle.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        sidebar.classList.toggle('open');
-        overlay.classList.toggle('active');
-        console.log('Sidebar toggled:', sidebar.classList.contains('open'));
-      });
-    } else {
-      console.error('Sidebar toggle elements not found:', {
-        sidebar: !!sidebar,
-        overlay: !!overlay,
-        sidebarToggle: !!sidebarToggle
-      });
-    }
-
-    if (overlay) {
-      overlay.addEventListener('click', () => {
-        sidebar.classList.remove('open');
-        overlay.classList.remove('active');
-      });
-    }
-
-    if (searchToggle && searchContainer) {
-      searchToggle.addEventListener('click', (e) => {
-        e.preventDefault();
-        searchContainer.classList.toggle('active');
-        if (searchContainer.classList.contains('active')) {
-          searchContainer.querySelector('input').focus();
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('overlay');
+      const filterToggleBtn = document.getElementById('filterToggleBtn');
+      
+      // Toggle sidebar on filter button click
+      filterToggleBtn.addEventListener('click', function() {
+        if (window.innerWidth >= 768) {
+          // Desktop/tablet - slide from left
+          sidebar.classList.toggle('open');
+          overlay.classList.toggle('active');
+        } else {
+          // Mobile - show/hide fixed at top
+          sidebar.classList.toggle('open');
+          overlay.classList.toggle('active');
         }
       });
-    }
-
-    document.addEventListener('click', (e) => {
-      if (searchContainer && !searchContainer.contains(e.target) && e.target !== searchToggle) {
-        searchContainer.classList.remove('active');
-      }
-    });
-
-    function toggleCategory(element) {
-      const items = element.nextElementSibling;
-      const icon = element.querySelector('i');
-      items.classList.toggle('open');
-      icon.classList.toggle('fa-chevron-down', !items.classList.contains('open'));
-      icon.classList.toggle('fa-chevron-up', items.classList.contains('open'));
-    }
-
-    document.querySelectorAll('.sidebar-item').forEach(item => {
-      item.addEventListener('click', () => {
+      
+      // Close sidebar when clicking outside
+      overlay.addEventListener('click', function() {
         sidebar.classList.remove('open');
         overlay.classList.remove('active');
       });
-    });
 
-    async function toggleWishlist(iconElement, productId) {
-      try {
-        const response = await fetch('/wishlist/add', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ productId })
+      function toggleCategory(element) {
+        const items = element.nextElementSibling;
+        const icon = element.querySelector('i');
+        items.classList.toggle('open');
+        icon.classList.toggle('fa-chevron-down');
+        icon.classList.toggle('fa-chevron-up');
+      }
+
+      document.querySelectorAll('.sidebar-title').forEach(title => {
+        title.addEventListener('click', function() {
+          toggleCategory(this);
         });
-        const data = await response.json();
-        if (data.success) {
-          iconElement.classList.toggle('far');
-          iconElement.classList.toggle('fas');
-          iconElement.classList.toggle('text-danger');
+      });
+
+      async function toggleWishlist(iconElement, productId) {
+        try {
+          const response = await fetch('/wishlist/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId })
+          });
+          const data = await response.json();
+          if (data.success) {
+            iconElement.classList.toggle('far');
+            iconElement.classList.toggle('fas');
+            iconElement.classList.toggle('text-danger');
+            Toastify({
+              text: iconElement.classList.contains('fas') ? "Added to Wishlist 💖" : "Removed from Wishlist ❌",
+              duration: 3000,
+              gravity: "top",
+              position: "right",
+              backgroundColor: iconElement.classList.contains('fas') ? "#4CAF50" : "#f44336",
+              stopOnFocus: true
+            }).showToast();
+          } else {
+            Toastify({
+              text: data.message || "Something went wrong",
+              duration: 3000,
+              gravity: "top",
+              position: "right",
+              backgroundColor: "#f44336"
+            }).showToast();
+          }
+        } catch (err) {
+          console.error('Wishlist error:', err);
           Toastify({
-            text: iconElement.classList.contains('fas') ? "Added to Wishlist 💖" : "Removed from Wishlist ❌",
-            duration: 3000,
-            gravity: "top",
-            position: "right",
-            backgroundColor: iconElement.classList.contains('fas') ? "#4CAF50" : "#f44336",
-            stopOnFocus: true
-          }).showToast();
-        } else {
-          Toastify({
-            text: data.message || "Something went wrong",
+            text: "Server error. Try again later.",
             duration: 3000,
             gravity: "top",
             position: "right",
             backgroundColor: "#f44336"
           }).showToast();
         }
-      } catch (err) {
-        console.error('Wishlist error:', err);
-        Toastify({
-          text: "Server error. Try again later.",
-          duration: 3000,
-          gravity: "top",
-          position: "right",
-          backgroundColor: "#f44336"
-        }).showToast();
       }
-    }
 
-    const headerSearch = document.getElementById('headerSearch');
-    const sidebarSearch = document.getElementById('sidebarSearch');
-    const productItems = document.querySelectorAll('.product-item');
-
-    function performSearch(searchTerm) {
-      searchTerm = searchTerm.trim().toLowerCase();
-      productItems.forEach(item => {
-        const productName = item.dataset.name;
-        const productCategory = item.dataset.category;
-        item.style.display = (searchTerm === '' || productName.includes(searchTerm) || productCategory.includes(searchTerm)) ? '' : 'none';
-      });
-      const visibleProducts = document.querySelectorAll('.product-item[style=""]').length;
-      const totalProducts = productItems.length;
-      const countElement = document.querySelector('.d-flex.align-items-center span');
-      if (countElement) {
-        countElement.textContent = `Showing ${visibleProducts} of ${totalProducts} products`;
-      }
-    }
-
-    if (headerSearch) {
-      headerSearch.addEventListener('input', () => performSearch(headerSearch.value));
-    }
-
-    if (sidebarSearch) {
-      sidebarSearch.addEventListener('input', () => performSearch(sidebarSearch.value));
-      document.getElementById('sidebarSearchForm').addEventListener('submit', (e) => {
-        e.preventDefault();
-        performSearch(sidebarSearch.value);
-      });
-      document.getElementById('sidebarSearchBtn').addEventListener('click', (e) => {
-        e.preventDefault();
-        performSearch(sidebarSearch.value);
-      });
-    }
-
-    if (searchToggle && searchContainer) {
-      searchToggle.addEventListener('click', (e) => {
-        e.preventDefault();
-        searchContainer.classList.toggle('active');
-        if (searchContainer.classList.contains('active')) {
-          headerSearch.focus();
-        } else {
-          headerSearch.value = '';
-          performSearch('');
-        }
-      });
-      document.addEventListener('click', (e) => {
-        if (!searchContainer.contains(e.target) && e.target !== searchToggle) {
-          searchContainer.classList.remove('active');
-          headerSearch.value = '';
-          performSearch('');
-        }
-      });
-    }
-  });
-
-  <% if (locals.user && locals.user.isBlocked) { %>
-    Swal.fire({
-      title: 'Account Blocked',
-      text: 'Your account has been blocked by the administrator. Please contact support for assistance.',
-      icon: 'error',
-      confirmButtonColor: '#291d0e',
-      allowOutsideClick: false,
-      allowEscapeKey: false,
-      allowEnterKey: false,
-      showCloseButton: false,
-      showCancelButton: false,
-      showDenyButton: false,
-      confirmButtonText: 'Ok',
-      willClose: () => {
-        window.location.href = '/logout';
-      }
-    });
-  <% } %>
-
-  function addToCart(productId, productName, regularPrice, salePrice, image) {
-    fetch('/check-auth')
-      .then(response => response.json())
-      .then(data => {
-        if (!data.isAuthenticated) {
-          Swal.fire({
-            icon: 'info',
-            title: 'Login Required',
-            text: 'Please login or signup to add items to cart',
-            showCancelButton: true,
-            confirmButtonText: 'Login',
-            cancelButtonText: 'Signup',
-            confirmButtonColor: '#291d0e',
-            cancelButtonColor: '#314216'
-          }).then((result) => {
-            if (result.isConfirmed) {
-              window.location.href = '/login';
-            } else if (result.dismiss === Swal.DismissReason.cancel) {
-              window.location.href = '/signup';
-            }
-          });
-          return;
-        }
-        fetch('/cart/add', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify({ productId, quantity: 1 })
-        })
-          .then(response => response.ok ? response.json() : response.json().then(err => Promise.reject(err)))
+      function addToCart(productId, productName, regularPrice, salePrice, image) {
+        fetch('/check-auth')
+          .then(response => response.json())
           .then(data => {
-            if (data.success) {
+            if (!data.isAuthenticated) {
               Swal.fire({
-                icon: 'success',
-                title: 'Added to Cart',
-                text: data.message,
-                showConfirmButton: false,
-                timer: 1500
+                icon: 'info',
+                title: 'Login Required',
+                text: 'Please login or signup to add items to cart',
+                showCancelButton: true,
+                confirmButtonText: 'Login',
+                cancelButtonText: 'Signup',
+                confirmButtonColor: '#291d0e',
+                cancelButtonColor: '#314216'
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  window.location.href = '/login';
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                  window.location.href = '/signup';
+                }
               });
-            } else {
-              throw new Error(data.message || 'Failed to add to cart');
+              return;
             }
+            fetch('/cart/add', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+              },
+              body: JSON.stringify({ productId, quantity: 1 })
+            })
+              .then(response => response.ok ? response.json() : response.json().then(err => Promise.reject(err)))
+              .then(data => {
+                if (data.success) {
+                  Swal.fire({
+                    icon: 'success',
+                    title: 'Added to Cart',
+                    text: data.message,
+                    showConfirmButton: false,
+                    timer: 1500
+                  });
+                } else {
+                  throw new Error(data.message || 'Failed to add to cart');
+                }
+              })
+              .catch(error => {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: error.message || 'Failed to add item to cart',
+                  confirmButtonColor: '#291d0e'
+                });
+              });
           })
           .catch(error => {
+            console.error('Auth check error:', error);
             Swal.fire({
               icon: 'error',
               title: 'Error',
-              text: error.message || 'Failed to add item to cart',
+              text: 'Failed to check authentication status',
               confirmButtonColor: '#291d0e'
             });
           });
-      })
-      .catch(error => {
-        console.error('Auth check error:', error);
+      }
+
+      <% if (locals.user && locals.user.isBlocked) { %>
         Swal.fire({
+          title: 'Account Blocked',
+          text: 'Your account has been blocked by the administrator. Please contact support for assistance.',
           icon: 'error',
-          title: 'Error',
-          text: 'Failed to check authentication status',
-          confirmButtonColor: '#291d0e'
+          confirmButtonColor: '#291d0e',
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          allowEnterKey: false,
+          showCloseButton: false,
+          showCancelButton: false,
+          showDenyButton: false,
+          confirmButtonText: 'Ok',
+          willClose: () => {
+            window.location.href = '/logout';
+          }
         });
-      });
-  }
-</script>
+      <% } %>
+    });
+  </script>
 </body>
 </html>

@@ -8,7 +8,185 @@
   <link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Jost&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/admin/product.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+  <style>
+    /* Responsive additions */
+    @media (max-width: 1200px) {
+      .table-container table {
+        width: 100%;
+        overflow-x: auto;
+        display: block;
+      }
+      
+      .table-container thead {
+        display: none;
+      }
+      
+      .table-container tr {
+        display: block;
+        margin-bottom: 1rem;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      }
+      
+      .table-container td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        border-bottom: 1px solid #eee;
+        text-align: right;
+      }
+      
+      .table-container td:before {
+        content: attr(data-label);
+        font-weight: bold;
+        margin-right: 1rem;
+        text-align: left;
+      }
+      
+      .table-container td:last-child {
+        border-bottom: none;
+      }
+      
+      .action-buttons {
+        justify-content: flex-end;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+        position: fixed;
+        z-index: 1000;
+        height: 100vh;
+        transition: transform 0.3s ease;
+      }
+      
+      .sidebar.active {
+        transform: translateX(0);
+      }
+      
+      .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0,0,0,0.5);
+        z-index: 999;
+      }
+      
+      .main-content {
+        margin-left: 0;
+      }
+      
+      .header-right {
+        flex-direction: row-reverse;
+      }
+      
+      .search-container {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        padding: 1rem;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        display: none;
+      }
+      
+      .search-container.active {
+        display: block;
+      }
+      
+      .mobile-search-btn {
+        display: block;
+      }
+      
+      .profile-dropdown-menu {
+        right: 0;
+        left: auto;
+      }
+      
+      .action-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+      
+      .add-product-btn {
+        width: 100%;
+      }
+      
+      .pagination {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+    }
+    
+    @media (max-width: 576px) {
+      .header-left h2 {
+        font-size: 1.2rem;
+      }
+      
+      .notification-btn, .profile-img {
+        margin-left: 0.5rem;
+      }
+      
+      .profile-name {
+        display: none;
+      }
+      
+      .table-container td {
+        font-size: 0.9rem;
+      }
+      
+      .action-btn {
+        padding: 0.3rem;
+      }
+    }
+    
+    /* Base styles that might need to be in your product.css */
+    .table-container {
+      overflow-x: auto;
+    }
+    
+    .table-container table {
+      min-width: 1000px;
+      width: 100%;
+    }
+    
+    .mobile-search-btn {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .action-btn {
+      padding: 0.5rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* Add these to your existing CSS */
+    [data-label]::before {
+      content: attr(data-label);
+      font-weight: bold;
+      margin-right: 1rem;
+    }
+  </style>
 </head>
 
 <body class="dashboard">
@@ -61,7 +239,10 @@
         <h2 class="page-title">PRODUCT</h2>
       </div>
       <div class="header-right">
-        <div class="search-container">
+        <button class="mobile-search-btn" id="mobileSearchBtn">
+          <i class="fas fa-search"></i>
+        </button>
+        <div class="search-container" id="searchContainer">
           <form id="searchForm" action="/admin/product" method="GET">
             <input type="text" class="search-bar" placeholder="Search products..." name="search"
               value="<%= typeof search !== 'undefined' ? search : '' %>">
@@ -116,16 +297,16 @@
           <tbody>
             <% for (let i = 0; i < data.length; i++) { %>
               <tr data-product-id="<%= data[i]._id %>">
-                <td>
+                <td data-label="Image">
                   <img src="/uploads/product/<%= data[i].productImage[0] %>" alt="Product Image" style="height: 54px;" />
                 </td>
-                <td>
+                <td data-label="Name">
                   <%= data[i].productName %>
                 </td>
-                <td>
+                <td data-label="Category">
                   <%= data[i].category ? data[i].category.name : 'No Category' %>
                 </td>
-                <td>
+                <td data-label="Price">
                   <% if (data[i].salePrice && data[i].salePrice < data[i].regularPrice) { %>
                     <span style="text-decoration: line-through; color: var(--text-secondary);">₹<%= data[i].regularPrice.toFixed(2) %></span>
                     <br>
@@ -134,7 +315,7 @@
                     ₹<%= data[i].regularPrice.toFixed(2) %>
                   <% } %>
                 </td>
-                <td>
+                <td data-label="Offer">
                   <% if (data[i] && data[i].productOffer && data[i].productOffer.active) { %>
                     <span class="badge badge-success">Active</span>
                   <% } else if (data[i] && data[i].offer && data[i].offer.isActive) { %>
@@ -143,7 +324,7 @@
                     <span class="badge badge-secondary">Inactive</span>
                   <% } %>
                 </td>
-                <td>
+                <td data-label="Discount">
                   <% if (data[i] && data[i].productOffer && data[i].productOffer.active) { %>
                     <% if (data[i].productOffer.discountType === 'percentage') { %>
                       <%= data[i].productOffer.discountValue %>%
@@ -160,7 +341,7 @@
                     -
                   <% } %>
                 </td>
-                <td>
+                <td data-label="Valid Until">
                   <% if (data[i] && data[i].productOffer && data[i].productOffer.active) { %>
                     <%= new Date(data[i].productOffer.endDate).toLocaleDateString() %>
                   <% } else if (data[i] && data[i].offer && data[i].offer.isActive) { %>
@@ -169,17 +350,17 @@
                     -
                   <% } %>
                 </td>
-                <td>
+                <td data-label="Stock">
                   <%= data[i].quantity || data[i].productStock || 0 %>
                 </td>
-                <td>
+                <td data-label="Status">
                   <% if (data[i].isListed) { %>
                     <span class="status-listed">Listed</span>
                   <% } else { %>
                     <span class="status-unlisted">Unlisted</span>
                   <% } %>
                 </td>
-                <td>
+                <td data-label="Actions">
                   <div class="action-buttons">
                     <a href="/admin/edit-product/<%= data[i]._id %>" class="action-btn edit-btn">
                       <i class="fas fa-edit"></i>
@@ -237,15 +418,22 @@
   <script>
     // Sidebar toggle functionality
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileSearchBtn = document.getElementById('mobileSearchBtn');
     const sidebar = document.querySelector('.sidebar');
     const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const searchContainer = document.getElementById('searchContainer');
 
     function toggleSidebar() {
       sidebar.classList.toggle('active');
       sidebarOverlay.style.display = sidebar.classList.contains('active') ? 'block' : 'none';
     }
 
+    function toggleSearch() {
+      searchContainer.classList.toggle('active');
+    }
+
     mobileMenuBtn.addEventListener('click', toggleSidebar);
+    mobileSearchBtn.addEventListener('click', toggleSearch);
 
     // Close sidebar when clicking outside
     sidebarOverlay.addEventListener('click', toggleSidebar);
@@ -312,7 +500,7 @@
         }
 
         // Update the status badge
-        const statusCell = row.querySelector('td:nth-last-child(2)');
+        const statusCell = row.querySelector('td[data-label="Status"]');
         if (statusCell) {
           const newStatus = document.createElement('span');
           newStatus.className = shouldList ? 'status-listed' : 'status-unlisted';
@@ -377,9 +565,24 @@
       if (window.innerWidth > 768) {
         sidebar.classList.remove('active');
         sidebarOverlay.style.display = 'none';
+        searchContainer.classList.remove('active');
       }
+    });
+    
+    // Add data-labels for responsive table
+    document.addEventListener('DOMContentLoaded', function() {
+      const headers = document.querySelectorAll('thead th');
+      const rows = document.querySelectorAll('tbody tr');
+      
+      rows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        cells.forEach((cell, index) => {
+          if (headers[index]) {
+            cell.setAttribute('data-label', headers[index].textContent);
+          }
+        });
+      });
     });
   </script>
 </body>
-
 </html>

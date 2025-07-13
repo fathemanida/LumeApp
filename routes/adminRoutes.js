@@ -11,6 +11,19 @@ const couponController=require('../controllers/admin/couponController')
 const offerController = require('../controllers/admin/offerController');
 const BannerController=require('../controllers/admin/bannerController');
 const bannerSchema = require('../models/bannerSchema');
+const multer = require('multer');
+const path = require('path');
+
+// Multer config for banner images
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, path.join(__dirname, '../public/uploads/banner'));
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + path.extname(file.originalname));
+    }
+});
+const upload = multer({ storage });
 
 // Admin authentication routes
 router.get('/pageError', adminController.pageError);
@@ -77,7 +90,10 @@ router.get('/banner',adminAuth,BannerController.getBanner);
 router.get('banners/add',adminAuth,BannerController.loadAddbanner);
 router.post('/banners/add/:id',adminAuth,BannerController.addBanner)
 
-
+// Banner routes
+router.post('/banner/add', upload.array('images', 5), bannerController.addBanner);
+router.get('/banner/edit/:id', bannerController.getEditBanner);
+router.post('/banner/edit/:id', upload.array('images', 5), bannerController.postEditBanner);
 
 
 module.exports = router;

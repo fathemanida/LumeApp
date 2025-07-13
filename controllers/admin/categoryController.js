@@ -52,7 +52,6 @@ const categoryInfo = async (req, res) => {
 
     const categoryName = await Category.find({
       name: { $regex: ".*" + search + ".*", $options: "i" },
-      isListed: true
     })
       .sort({ createdAt: -1 })
       .limit(limit)
@@ -60,7 +59,6 @@ const categoryInfo = async (req, res) => {
 
     const totalCategory = await Category.countDocuments({
       name: { $regex: ".*" + search + ".*", $options: "i" },
-      isListed: true
     });
     const totalPages = Math.ceil(totalCategory / limit);
     const offset = (page - 1) * limit;
@@ -184,7 +182,7 @@ const addCategory = async (req, res) => {
     const category = new Category({
       name,
       description,
-image: `uploads/category/${req.file.filename}`,
+image: req.file.filename,
       categoryOffer: parsedOffer
     });
 
