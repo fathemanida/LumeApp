@@ -93,6 +93,6 @@ router.get('/banner/add',adminAuth,bannerController.loadAddbanner);
 router.post('/banner/add', upload.array('images', 5), bannerController.addBanner);
 router.get('/banner/edit/:id', bannerController.getEditBanner);
 router.post('/banner/edit/:id', upload.array('images', 5), bannerController.postEditBanner);
-
+router.get('/test', (req, res) => res.send('Test route works!'));
 
 module.exports = router;
