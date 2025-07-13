@@ -36,11 +36,11 @@ const getBanner=async (req,res) => {
 const loadAddbanner=async (req,res) => {
     try {
         if(!req.session.admin){
-            res.render('admin/login')
+            return res.render('admin/login');
         }
-        res.render('admin/banner')
+        res.render('admin/add-banner');
     } catch (error) {
-        
+        res.status(500).render('admin/pageError', { message: error.message || 'Error loading add banner page' });
     }
 }
 
