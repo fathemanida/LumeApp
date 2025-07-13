@@ -54,7 +54,6 @@ const addBanner = async (req, res) => {
             });
         }
         if (req.files.length > 5) {
-            // Remove uploaded files if more than 5
             req.files.forEach(file => fs.unlinkSync(file.path));
             return res.status(400).json({
                 success: false,
@@ -115,7 +114,6 @@ const postEditBanner = async (req, res) => {
                 message: 'Banner not found'
             });
         }
-        // If new images are uploaded, remove old images
         if (req.files && req.files.length > 0) {
             if (banner.images && banner.images.length > 0) {
                 banner.images.forEach(img => {
