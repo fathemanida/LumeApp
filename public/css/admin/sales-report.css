@@ -638,3 +638,39 @@
         .download-btn i {
             font-size: 1.2rem;
         }
+
+.chart-container {
+  position: relative;
+  overflow: hidden;
+}
+#salesChart {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+  max-height: 100%;
+  object-fit: contain;
+}
+@media (max-width: 768px) {
+  .chart-container {
+    height: 300px !important;
+    min-height: 220px !important;
+    max-height: 350px !important;
+  }
+  #salesChart {
+    height: 100% !important;
+    min-height: 180px !important;
+    max-height: 320px !important;
+  }
+}
+@media (max-width: 480px) {
+  .chart-container {
+    height: 220px !important;
+    min-height: 120px !important;
+    max-height: 250px !important;
+  }
+  #salesChart {
+    height: 100% !important;
+    min-height: 100px !important;
+    max-height: 200px !important;
+  }
+}
