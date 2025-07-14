@@ -31,30 +31,7 @@
             overflow-x: hidden;
         }
 
-        .navbar {
-            background: white;
-            border-bottom: 1px solid var(--border-color);
-            padding: clamp(0.5rem, 2vw, 1rem);
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-
-        .brand {
-            font-family: 'Aboreto', cursive;
-            font-size: clamp(1.2rem, 4vw, 1.5rem);
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            color: var(--darker-text);
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
-
-        .brand:hover {
-            color: var(--muted-green);
-        }
+       
 
         .success-container {
             max-width: clamp(300px, 90vw, 800px);
@@ -179,19 +156,7 @@
             margin-right: clamp(0.3rem, 1vw, 0.5rem);
         }
 
-        footer {
-            background-color: var(--dark-brown);
-            color: white;
-            padding: clamp(1rem, 3vw, 2rem);
-            text-align: center;
-            margin-top: auto;
-        }
-
-        .footer-content {
-            max-width: clamp(300px, 90vw, 1200px);
-            margin: 0 auto;
-            font-size: clamp(0.8rem, 2vw, 0.9rem);
-        }
+      
 
         /* Responsive Adjustments */
         @media (max-width: 767px) {
@@ -251,16 +216,9 @@
                 padding: clamp(0.4rem, 1.5vw, 0.75rem) clamp(0.75rem, 2vw, 1rem);
             }
 
-            .footer-content {
-                font-size: clamp(0.7rem, 2vw, 0.85rem);
-            }
+            
         }
 
-        @media (min-width: 768px) {
-            .navbar {
-                flex-wrap: nowrap;
-            }
-        }
     </style>
 </head>
 <body>

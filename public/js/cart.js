@@ -39,4 +39,27 @@ window.addToCart = async function(productId, productName, regularPrice, salePric
       stopOnFocus: true
     }).showToast();
   }
-}; 
+};
+
+// Add this CSS for cart product images
+const style = document.createElement('style');
+style.innerHTML = `
+  .cart-product-image {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 8px;
+    display: block;
+  }
+  @media (max-width: 600px) {
+    .cart-product-image {
+      width: 48px;
+      height: 48px;
+      min-width: 48px;
+      min-height: 48px;
+      max-width: 48px;
+      max-height: 48px;
+    }
+  }
+`;
+document.head.appendChild(style); 

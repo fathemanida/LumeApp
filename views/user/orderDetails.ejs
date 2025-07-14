@@ -1386,125 +1386,99 @@
                 <!-- Ordered Items Table -->
                 <div class="order-details-container" style="margin-top:2rem;">
                     <h3 style="font-size:1.1rem; color:var(--muted-green); margin-bottom:1rem;">Ordered Items</h3>
-                        <table class="items-table">
-                            <thead>
-                                <tr>
-                                    <th>Product</th>
-                                <th>Size</th>
-                                    <th>Quantity</th>
-                                <th>Unit Price</th>
-                                    <th>Total</th>
-                                <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% order.items.forEach(item => { %>
-                                    <tr>
-                                        <td>
-                                            <div style="display: flex; align-items: center; gap: 1rem;">
-                                                <img src="/uploads/product/<%= item.image %>" alt="<%= item.name %>" class="item-image">
-                                                <span><%= item.name %></span>
-                                            </div>
-                                        </td>
-                                    <td><%= item.size || '-' %></td>
-                                        <td><%= item.quantity %></td>
-                                    <td>₹<%= item.price?.toFixed(2) %></td>
-                                        <td>₹<%= item.total?.toFixed(2) %></td>
-                                    <td>
-                                        <% if (item.status === 'Pending') { %>
-                                            <span class="badge badge-pending">Pending</span>
-                                        <% } else if (item.status === 'Cancelled') { %>
-                                            <span class="badge badge-cancelled">Cancelled</span>
-                                        <% } else { %>
-                                            <span class="badge badge-other"><%= item.status %></span>
-                                        <% } %>
-                                    </td>
-                                        <td>
-                                            <% if (item.status !== 'Cancelled' && !['Delivered','Cancelled','Returned'].includes(order.status)) { %>
-                                                <button class="cancel-btn" onclick="openItemCancelModal('<%= order._id %>','<%= item.productId %>')" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
-                                                <i class="fas fa-times"></i> Cancel Item
-                                                </button>
-                                            <% } %>
-                                        </td>
-                                    </tr>
-                                <% }) %>
-                                
-                            </tbody>
-                        </table>
-                    <!-- Order Summary, Address, and Status/Payment Details -->
-                    <div class="order-bottom-section" style="display:flex; justify-content:space-between; gap:2rem; margin-top:2rem;">
-                        <div class="order-address" style="flex:1;">
-                            <h3 style="font-size:1rem; color:var(--muted-green);">Shipping Address</h3>
-                            <% if (order.address) { %>
-                                <div style="color:#444; font-size:0.98rem;">
-                                    <%= order.address.name %><br>
-                                    <%= order.address.roadArea ? order.address.roadArea + ', ' : '' %><%= order.address.city %>, <%= order.address.state %><br>
-                                    <%= order.address.pincode %><br>
-                                    Mobile: <%= order.address.phone %><br>
-                                    <% if (order.address.altPhone) { %>Alternate Mobile: <%= order.address.altPhone %><% } %>
+                    <div class="table-responsive-order-items" style="width:100%;overflow-x:auto;">
+                      <table class="items-table">
+                          <thead>
+                              <tr>
+                                  <th>Product</th>
+                              <th>Size</th>
+                                  <th>Quantity</th>
+                              <th>Unit Price</th>
+                                  <th>Total</th>
+                              <th>Status</th>
+                                  <th>Action</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              <% order.items.forEach(item => { %>
+                                  <tr>
+                                      <td>
+                                          <div style="display: flex; align-items: center; gap: 1rem;">
+                                              <img src="/uploads/product/<%= item.image %>" alt="<%= item.name %>" class="item-image">
+                                              <span><%= item.name %></span>
+                                          </div>
+                                      </td>
+                                  <td><%= item.size || '-' %></td>
+                                      <td><%= item.quantity %></td>
+                                  <td>₹<%= item.price?.toFixed(2) %></td>
+                                      <td>₹<%= item.total?.toFixed(2) %></td>
+                                  <td>
+                                      <% if (item.status === 'Pending') { %>
+                                          <span class="badge badge-pending">Pending</span>
+                                      <% } else if (item.status === 'Cancelled') { %>
+                                          <span class="badge badge-cancelled">Cancelled</span>
+                                      <% } else { %>
+                                          <span class="badge badge-other"><%= item.status %></span>
+                                      <% } %>
+                                  </td>
+                                      <td>
+                                          <% if (item.status !== 'Cancelled' && !['Delivered','Cancelled','Returned'].includes(order.status)) { %>
+                                              <button class="cancel-btn" onclick="openItemCancelModal('<%= order._id %>','<%= item.productId %>')" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+                                              <i class="fas fa-times"></i> Cancel Item
+                                              </button>
+                                          <% } %>
+                                      </td>
+                                  </tr>
+                              <% }) %>
+                              
+                          </tbody>
+                      </table>
                     </div>
-                            <% } else { %>
-                                <div>Address not available</div>
-                        <% } %>
-                            </div>
-                        <div class="order-status-payment" style="flex:1;">
-                            <h3 style="font-size:1rem; color:var(--muted-green);">Order Status</h3>
-                            <div style="color:#444; font-size:0.98rem;">Current Status: <%= order.status %><br>Last Updated: <%= order.updatedAt ? order.updatedAt : order.createdOn %></div>
-                            <h3 style="font-size:1rem; color:var(--muted-green); margin-top:1.5rem;">Payment Details</h3>
-                            <div style="color:#444; font-size:0.98rem;">Payment Method: <%= order.paymentMethod %><br>Status: <%= order.paymentStatus || 'Paid' %><br>Paid At: <%= order.paidAt ? order.paidAt : order.createdOn %></div>
-                        </div>
-                        </div>
-                    <div class="order-total-amount" style="text-align:right; margin-top:1.5rem; font-size:1.15rem; font-weight:600; color:var(--dark-text);">
-                        <div style="font-weight:400; color:#666; font-size:1rem;">
-                            <div>Subtotal: ₹<%= order.subtotal?.toFixed(2) %></div>
-                            <% if (order.offerDiscount > 0) { %>
-                                <div>Offer Discount: -₹<%= order.offerDiscount?.toFixed(2) %></div>
-                            <% } %>
-                            <% if (order.couponDiscount > 0) { %>
-                                <div>Coupon Discount: -₹<%= order.couponDiscount?.toFixed(2) %></div>
-                            <% } %>
-                        </div>
-                        <div style="margin-top:0.5rem; font-weight:600; color:var(--dark-text); font-size:1.15rem;">
-                            Total Amount: ₹<%= order.totalAmount?.toFixed(2) %>
-                        </div>
+                <!-- Order Summary, Address, and Status/Payment Details -->
+                <div class="order-bottom-section" style="display:flex; justify-content:space-between; gap:2rem; margin-top:2rem;">
+                    <div class="order-address" style="flex:1;">
+                        <h3 style="font-size:1rem; color:var(--muted-green);">Shipping Address</h3>
+                        <% if (order.address) { %>
+                            <div style="color:#444; font-size:0.98rem;">
+                                <%= order.address.name %><br>
+                                <%= order.address.roadArea ? order.address.roadArea + ', ' : '' %><%= order.address.city %>, <%= order.address.state %><br>
+                                <%= order.address.pincode %><br>
+                                Mobile: <%= order.address.phone %><br>
+                                <% if (order.address.altPhone) { %>Alternate Mobile: <%= order.address.altPhone %><% } %>
                     </div>
-                    <!-- Action Buttons -->
-                    <div class="order-actions-bottom" style="display:flex; justify-content:center; align-items:center; gap:1rem; margin-top:2rem;">
-                        <% if (order.status === 'Pending' || order.status === 'Processing') { %>
-                            <button class="cancel-btn" onclick="openCancelModal()"> <i class="fas fa-times"></i> Cancel Order </button>
+                        <% } else { %>
+                            <div>Address not available</div>
+                    <% } %>
+                        </div>
+                    <div class="order-status-payment" style="flex:1;">
+                        <h3 style="font-size:1rem; color:var(--muted-green);">Order Status</h3>
+                        <div style="color:#444; font-size:0.98rem;">Current Status: <%= order.status %><br>Last Updated: <%= order.updatedAt ? order.updatedAt : order.createdOn %></div>
+                        <h3 style="font-size:1rem; color:var(--muted-green); margin-top:1.5rem;">Payment Details</h3>
+                        <div style="color:#444; font-size:0.98rem;">Payment Method: <%= order.paymentMethod %><br>Status: <%= order.paymentStatus || 'Paid' %><br>Paid At: <%= order.paidAt ? order.paidAt : order.createdOn %></div>
+                    </div>
+                    </div>
+                <div class="order-total-amount" style="text-align:right; margin-top:1.5rem; font-size:1.15rem; font-weight:600; color:var(--dark-text);">
+                    <div style="font-weight:400; color:#666; font-size:1rem;">
+                        <div>Subtotal: ₹<%= order.subtotal?.toFixed(2) %></div>
+                        <% if (order.offerDiscount > 0) { %>
+                            <div>Offer Discount: -₹<%= order.offerDiscount?.toFixed(2) %></div>
                         <% } %>
-                        <a href="/orders" class="back-btn">Back to Orders</a>
-                        <a href="/orders/<%= order._id %>/invoice" class="download-btn"> <i class="fas fa-file-invoice"></i> Download Invoice</a>
+                        <% if (order.couponDiscount > 0) { %>
+                            <div>Coupon Discount: -₹<%= order.couponDiscount?.toFixed(2) %></div>
+                        <% } %>
+                    </div>
+                    <div style="margin-top:0.5rem; font-weight:600; color:var(--dark-text); font-size:1.15rem;">
+                        Total Amount: ₹<%= order.totalAmount?.toFixed(2) %>
                     </div>
                 </div>
-                <style>
-                  .order-actions-bottom {
-                    display: flex;
-                    justify-content: center !important;
-                    align-items: center !important;
-                    gap: 1rem;
-                    margin-top: 2rem;
-                  }
-                  .order-actions-bottom .cancel-btn,
-                  .order-actions-bottom .back-btn,
-                  .order-actions-bottom .download-btn {
-                    margin: 0;
-                  }
-                  @media (max-width: 900px) {
-                    .order-actions-bottom {
-                      flex-direction: column;
-                      align-items: center !important;
-                      gap: 1rem;
-                    }
-                    .order-actions-bottom .cancel-btn,
-                    .order-actions-bottom .back-btn,
-                    .order-actions-bottom .download-btn {
-                      width: 100%;
-                      min-width: 180px;
-                    }
-                  }
-                </style>
+                <!-- Action Buttons -->
+                <div class="order-actions-bottom" style="display:flex; justify-content:center; align-items:center; gap:1rem; margin-top:2rem;">
+                    <% if (order.status === 'Pending' || order.status === 'Processing') { %>
+                        <button class="cancel-btn" onclick="openCancelModal()"> <i class="fas fa-times"></i> Cancel Order </button>
+                    <% } %>
+                    <a href="/orders" class="back-btn">Back to Orders</a>
+                    <a href="/orders/<%= order._id %>/invoice" class="download-btn"> <i class="fas fa-file-invoice"></i> Download Invoice</a>
+                </div>
             </div>
         </div>
     <% } else { %>

@@ -32,153 +32,7 @@ html, body {
     overflow-x: hidden;
 }
 
-.navbar {
-    background: white;
-    border-bottom: 1px solid var(--border-color);
-    padding: clamp(1rem, 2.5vw, 1.5rem);
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-}
 
-.brand {
-    font-family: 'Aboreto', cursive;
-    font-size: clamp(1.5rem, 4vw, 2rem);
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--darker-text);
-    cursor: pointer;
-    transition: color 0.3s ease;
-}
-
-.brand:hover {
-    color: var(--muted-green);
-}
-
-.nav-links {
-    display: flex;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    flex-wrap: wrap;
-    gap: clamp(1rem, 2.5vw, 1.5rem);
-    justify-content: center;
-}
-
-.nav-link {
-    color: var(--darker-text);
-    font-family: 'Jost', sans-serif;
-    font-size: clamp(1rem, 2.5vw, 1.1rem);
-    text-decoration: none;
-    padding: clamp(0.5rem, 1.5vw, 0.75rem) clamp(0.75rem, 2vw, 1rem);
-    transition: all 0.3s ease;
-}
-
-.nav-link:hover {
-    color: var(--muted-green);
-    transform: translateY(-2px);
-}
-
-.icon-links {
-    display: flex;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    gap: clamp(0.75rem, 2vw, 1rem);
-    align-items: center;
-}
-
-.icon-link {
-    color: var(--darker-text);
-    font-size: clamp(1.2rem, 3vw, 1.3rem);
-    padding: clamp(0.5rem, 1.5vw, 0.75rem);
-    transition: all 0.3s ease;
-}
-
-.icon-link:hover {
-    color: var(--muted-green);
-    transform: translateY(-2px);
-}
-
-.search-container {
-    position: relative;
-    width: 100%;
-    max-width: clamp(200px, 40vw, 300px);
-}
-
-.search-input {
-    border: 1px solid var(--border-color);
-    border-radius: 20px;
-    padding: clamp(0.5rem, 1.5vw, 0.75rem) clamp(1rem, 2.5vw, 1.5rem);
-    padding-right: clamp(2.5rem, 5vw, 3rem);
-    font-family: 'Jost', sans-serif;
-    width: 100%;
-    font-size: clamp(0.9rem, 2.5vw, 1rem);
-    transition: all 0.3s ease;
-}
-
-.search-input:focus {
-    outline: none;
-    border-color: var(--soft-beige);
-    box-shadow: 0 0 0 2px rgba(212, 185, 150, 0.1);
-    width: 100%;
-}
-
-.search-button {
-    position: absolute;
-    right: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    color: var(--darker-text);
-    cursor: pointer;
-}
-
-.search-button:hover {
-    color: var(--muted-green);
-}
-
-.profile-dropdown {
-    position: relative;
-}
-
-.profile-dropdown-content {
-    display: none;
-    position: absolute;
-    right: 0;
-    background-color: white;
-    min-width: clamp(160px, 40vw, 200px);
-    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-    z-index: 1000;
-    border-radius: 0;
-    padding: clamp(0.75rem, 2vw, 1rem) 0;
-}
-
-.profile-dropdown:hover .profile-dropdown-content {
-    display: block;
-}
-
-.profile-dropdown-content a {
-    color: var(--dark-text);
-    padding: clamp(0.75rem, 2vw, 1rem) clamp(1rem, 2.5vw, 1.5rem);
-    text-decoration: none;
-    display: block;
-    font-size: clamp(0.9rem, 2.5vw, 1rem);
-    transition: background-color 0.3s ease;
-}
-
-.profile-dropdown-content a:hover {
-    background-color: var(--light-bg);
-    color: var(--muted-green);
-}
-
-.profile-dropdown-content a i {
-    margin-right: 0.75rem;
-    width: 24px;
-    text-align: center;
-}
 
 .payment-container {
     max-width: 1400px;
@@ -447,30 +301,7 @@ html, body {
     100% { transform: rotate(360deg); }
 }
 
-.footer {
-    background-color: var(--soft-beige);
-    color: white;
-    padding: clamp(2rem, 5vw, 4rem) 0;
-    margin-top: clamp(2rem, 5vw, 4rem);
-}
 
-.footer-heading {
-    font-family: 'Aboreto', cursive;
-    font-size: clamp(1rem, 3vw, 1.2rem);
-    letter-spacing: 1px;
-    margin-bottom: clamp(1rem, 2.5vw, 1.5rem);
-    color: white;
-}
-
-.footer-link {
-    color: white;
-    font-family: 'Jost', sans-serif;
-    font-size: clamp(0.9rem, 2.5vw, 1rem);
-    transition: all 0.3s ease;
-    display: block;
-    margin-bottom: 0.75rem;
-    text-decoration: none;
-}
 
 .footer-link:hover {
     color: var(--light-bg);
@@ -511,59 +342,8 @@ html, body {
 }
 
 @media (max-width: 767px) {
-    .navbar {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: clamp(0.5rem, 2vw, 0.75rem);
-    }
+ 
 
-    .brand {
-        margin-bottom: clamp(0.75rem, 2vw, 1rem);
-        font-size: clamp(1.2rem, 4vw, 1.5rem);
-    }
-
-    .nav-links {
-        flex-direction: column;
-        align-items: flex-start;
-        width: 100%;
-        margin: clamp(0.75rem, 2vw, 1rem) 0;
-        gap: clamp(0.5rem, 2vw, 0.75rem);
-    }
-
-    .nav-link {
-        font-size: clamp(0.8rem, 2.5vw, 0.9rem);
-        padding: clamp(0.3rem, 1vw, 0.5rem);
-    }
-
-    .icon-links {
-        width: 100%;
-        justify-content: flex-start;
-        gap: clamp(0.5rem, 2vw, 0.75rem);
-    }
-
-    .icon-link {
-        font-size: clamp(1rem, 3vw, 1.1rem);
-        padding: clamp(0.3rem, 1vw, 0.5rem);
-    }
-
-    .search-container {
-        max-width: 100%;
-    }
-
-    .search-input {
-        font-size: clamp(0.8rem, 2.5vw, 0.9rem);
-        padding: clamp(0.4rem, 1.5vw, 0.5rem) clamp(0.75rem, 2vw, 1rem);
-        padding-right: clamp(2rem, 5vw, 2.5rem);
-    }
-
-    .profile-dropdown-content {
-        min-width: clamp(120px, 40vw, 160px);
-    }
-
-    .profile-dropdown-content a {
-        font-size: clamp(0.75rem, 2vw, 0.85rem);
-        padding: clamp(0.5rem, 2vw, 0.75rem) clamp(0.75rem, 2vw, 1rem);
-    }
 
     .payment-container {
         margin: clamp(1rem, 3vw, 1.5rem);
@@ -680,19 +460,7 @@ html, body {
         font-size: clamp(1rem, 3vw, 1.2rem);
     }
 
-    .footer {
-        padding: clamp(1rem, 3vw, 1.5rem) 0;
-        margin-top: clamp(1rem, 3vw, 1.5rem);
-    }
-
-    .footer-heading {
-        font-size: clamp(0.8rem, 2.5vw, 0.9rem);
-    }
-
-    .footer-link {
-        font-size: clamp(0.75rem, 2vw, 0.85rem);
-        margin-bottom: 0.5rem;
-    }
+   
 }
 
 @media (max-width: 576px) {
@@ -768,56 +536,11 @@ html, body {
         font-size: clamp(0.9rem, 3vw, 1rem);
     }
 
-    .footer-heading {
-        font-size: clamp(0.75rem, 2vw, 0.85rem);
-    }
-
-    .footer-link {
-        font-size: clamp(0.7rem, 2vw, 0.8rem);
-    }
 }
 </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="brand" id="sidebarToggle">LUME</div>
-        <ul class="nav-links">
-            <li><a href="/" class="nav-link">Home</a></li>
-            <li><a href="/shopAll" class="nav-link">Shop All</a></li>
-            <li><a href="/featured" class="nav-link">Featured</a></li>
-            <li><a href="/new-arrivals" class="nav-link">New Arrivals</a></li>
-        </ul>
-        <ul class="icon-links">
-            <li>
-                <form action="/shopAll" method="GET" class="d-flex align-items-center">
-                    <div class="search-container">
-                        <input type="text" name="search" placeholder="Search products..." class="search-input form-control">
-                        <button type="submit" class="search-button">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                </form>
-            </li>
-            <li><a href="/wishlist" class="icon-link"><i class="fas fa-heart"></i></a></li>
-            <li><a href="/cart" class="icon-link"><i class="fas fa-shopping-cart"></i></a></li>
-            <li>
-                <div class="profile-dropdown">
-                    <a href="#" class="icon-link"><i class="far fa-user"></i></a>
-                    <div class="profile-dropdown-content">
-                        <% if (locals.user) { %>
-                            <a href="/profile"><i class="fas fa-user"></i> My Profile</a>
-                            <a href="/orders"><i class="fas fa-box"></i> My Orders</a>
-                            <a href="/wishlist"><i class="fas fa-heart"></i> Wishlist</a>
-                            <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
-                        <% } else { %>
-                            <a href="/login"><i class="fas fa-sign-in-alt"></i> Login</a>
-                            <a href="/signup"><i class="fas fa-user-plus"></i> Sign Up</a>
-                        <% } %>
-                    </div>
-                </div>
-            </li>
-        </ul>
-    </nav>
+<%-include('../partials/user/header.ejs')  %>
 
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-spinner"></div>
