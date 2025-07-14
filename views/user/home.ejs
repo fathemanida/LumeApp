@@ -942,8 +942,8 @@
         <div class="ornament-slide-content">
           <h2>Timeless Elegance</h2>
           <p>"The beauty of ornaments lies in their ability to tell stories across generations."</p>
+    </div>
         </div>
-      </div>
       <!-- Slide 2 -->
       <div class="ornament-banner-slide">
         <img src="/uploads/banner/banner-2.png" alt="Porcelain Figurine">
@@ -959,17 +959,17 @@
           <h2>Craftsmanship Rediscovered</h2>
           <p>"In every delicate curve of an antique ornament, we find the patience of its maker."</p>
         </div>
-      </div>
+        </div>
       <!-- Clone of Slide 1 for seamless looping -->
       <div class="ornament-banner-slide">
         <img src="/uploads/banner/banner-4.webp" alt="Antique Vase">
         <div class="ornament-slide-content">
           <h2>Timeless Elegance</h2>
           <p>"The beauty of ornaments lies in their ability to tell stories across generations."</p>
+      </div>
+        </div>
         </div>
       </div>
-    </div>
-  </div>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       const slides = document.getElementById('ornamentSlides');
@@ -1135,15 +1135,15 @@
                   <img src="/uploads/product/<%= product.productImage[0] %>" alt="<%= product.productName %>"
                     class="product-img" style="width:100%;height:100%;object-fit:cover;border-radius:0;position:relative;z-index:1;">
                   <img src="/uploads/product/<%= product.productImage[1] ? product.productImage[1] : product.productImage[0] %>" class="product-img-secondary" alt="<%= product.productName %> - Secondary View" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:0;z-index:2;">
-                  <% if (product.offer) { %>
+              <% if (product.offer) { %>
                     <span class="offer-badge">
                       <% if (product.offer.discountType === 'percentage') { %>
-                        <%= product.offer.discountValue %>% OFF
-                      <% } else { %>
-                        ₹<%= product.offer.discountValue %> OFF
-                      <% } %>
-                    </span>
+                    <%= product.offer.discountValue %>% OFF
+                  <% } else { %>
+                    ₹<%= product.offer.discountValue %> OFF
                   <% } %>
+                </span>
+              <% } %>
                 </div>
                 <span class="new-badge" style="position:absolute;top:10px;left:10px;background:#A9BA9D;color:white;font-family:'Jost',sans-serif;font-size:0.65rem;padding:0.18rem 0.5rem;border-radius:0;text-transform:uppercase;z-index:2;">New</span>
                 <div class="product-info" style="background:transparent;padding:1.2rem 0 0 0;">
@@ -1238,15 +1238,15 @@
                   <img src="/uploads/product/<%= product.productImage[0] %>" alt="<%= product.productName %>"
                     class="product-img" style="width:100%;height:100%;object-fit:cover;border-radius:0;position:relative;z-index:1;">
                   <img src="/uploads/product/<%= product.productImage[1] ? product.productImage[1] : product.productImage[0] %>" class="product-img-secondary" alt="<%= product.productName %> - Secondary View" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:0;z-index:2;">
-                  <% if (product.offer) { %>
+              <% if (product.offer) { %>
                     <span class="offer-badge">
                       <% if (product.offer.discountType === 'percentage') { %>
-                        <%= product.offer.discountValue %>% OFF
-                      <% } else { %>
-                        ₹<%= product.offer.discountValue %> OFF
-                      <% } %>
-                    </span>
+                    <%= product.offer.discountValue %>% OFF
+                  <% } else { %>
+                    ₹<%= product.offer.discountValue %> OFF
                   <% } %>
+                </span>
+              <% } %>
                 </div>
                 <span class="new-badge" style="position:absolute;top:10px;left:10px;background:#A9BA9D;color:white;font-family:'Jost',sans-serif;font-size:0.65rem;padding:0.18rem 0.5rem;border-radius:0;text-transform:uppercase;z-index:2;">New</span>
                 <div class="product-info" style="background:transparent;padding:1.2rem 0 0 0;">

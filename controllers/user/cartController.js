@@ -995,8 +995,11 @@ function getBestOffer(product, offers, quantity = 1) {
       offer.products && offer.products.some(prod => prod.toString() === product._id.toString())
     ) applies = true;
     if (applies) {
+      let price = (product.salePrice && product.salePrice < product.regularPrice)
+        ? product.salePrice
+        : product.regularPrice;
       let discount = offer.discountType === 'percentage'
-        ? ((product.salePrice && product.salePrice < product.regularPrice ? product.salePrice : product.regularPrice) * offer.discountValue * quantity) / 100
+        ? (price * offer.discountValue / 100) * quantity
         : offer.discountValue * quantity;
       if (discount > maxDiscount) {
         maxDiscount = discount;
