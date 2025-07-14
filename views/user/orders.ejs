@@ -414,6 +414,92 @@
 
             
         }
+        @media (max-width: 1024px) {
+  html, body,
+  .main-container,
+  .sidebar,
+  .content-area,
+  .orders-table-container {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    min-width: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    box-sizing: border-box !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  .main-container,
+  .content-area {
+    overflow-x: auto !important;
+  }
+  .sidebar {
+    padding: 1rem 0.5rem !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--theme-border) !important;
+  }
+  .content-area {
+    padding: 1rem 0.5rem !important;
+  }
+  .orders-table-container {
+    overflow-x: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .orders-table {
+    min-width: 600px !important;
+    font-size: 0.95rem !important;
+  }
+  .page-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.5rem !important;
+    padding: 0 !important;
+  }
+}
+@media (max-width: 768px) {
+  html, body,
+  .main-container,
+  .sidebar,
+  .content-area,
+  .orders-table-container {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    min-width: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    box-sizing: border-box !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  .main-container,
+  .content-area {
+    overflow-x: auto !important;
+  }
+  .sidebar {
+    padding: 1rem 0.25rem !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--theme-border) !important;
+  }
+  .content-area {
+    padding: 0.5rem 0.25rem !important;
+  }
+  .orders-table-container {
+    overflow-x: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .orders-table {
+    min-width: 500px !important;
+    font-size: 0.9rem !important;
+  }
+  .page-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.25rem !important;
+    padding: 0 !important;
+  }
+}
     </style>
 </head>
 <body>

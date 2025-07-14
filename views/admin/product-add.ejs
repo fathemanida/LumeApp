@@ -120,36 +120,6 @@
             </div>
             <div id="new-error" class="error-message text-dark-brown text-sm mt-1"></div>
           </div>
-          <div class="flex flex-col">
-            <label class="block mb-1 font-jost text-dark-brown font-medium text-sm">
-              <input type="checkbox" id="enable-offer" class="mr-1 accent-dark-brown"> Enable Product Offer
-            </label>
-            <div id="offer-form" class="hidden mt-2 grid gap-2">
-              <div>
-                <label class="block mb-1 font-jost text-dark-brown font-medium text-sm">Discount Type:</label>
-                <select id="discount-type" class="w-full p-2 border-b border-border-color bg-white text-dark-brown font-jost focus:border-dark-brown outline-none">
-                  <option value="percentage">Percentage</option>
-                  <option value="flat">Flat</option>
-                </select>
-              </div>
-              <div>
-                <label class="block mb-1 font-jost text-dark-brown font-medium text-sm">Discount Value:</label>
-                <input type="number" id="discount-value" class="w-full p-2 border-b border-border-color bg-transparent text-dark-brown font-jost focus:border-dark-brown outline-none" min="0" step="0.01" placeholder="e.g., 10 for 10% or ₹10">
-                <div id="discount-value-error" class="error-message text-dark-brown text-sm mt-1"></div>
-              </div>
-              <div>
-                <label class="block mb-1 font-jost text-dark-brown font-medium text-sm">Start Date:</label>
-                <input type="date" id="start-date" class="w-full p-2 border-b border-border-color bg-transparent text-dark-brown font-jost focus:border-dark-brown outline-none">
-                <div id="start-date-error" class="error-message text-dark-brown text-sm mt-1"></div>
-              </div>
-              <div>
-                <label class="block mb-1 font-jost text-dark-brown font-medium text-sm">End Date:</label>
-                <input type="date" id="end-date" class="w-full p-2 border-b border-border-color bg-transparent text-dark-brown font-jost focus:border-dark-brown outline-none">
-                <div id="end-date-error" class="error-message text-dark-brown text-sm mt-1"></div>
-              </div>
-            </div>
-            <div id="offer-error" class="error-message text-dark-brown text-sm mt-1"></div>
-          </div>
         </div>
 
         <div class="md:col-span-2 flex justify-center">
@@ -169,7 +139,6 @@
     let currentImageIndex = 0;
     let selectedFiles = [];
     let selectedSizes = [];
-    let productOffer = { active: false };
     const imageInput = document.getElementById("imageInput");
     const previewImages = [
       document.getElementById("preview1"),
@@ -181,8 +150,6 @@
     const cropButton = document.getElementById("cropButton");
     const cancelCrop = document.getElementById("cancelCrop");
     const form = document.getElementById("addProductForm");
-    const enableOfferCheckbox = document.getElementById("enable-offer");
-    const offerForm = document.getElementById("offer-form");
     let isSubmitting = false;
 
     function handleImageUpload(event) {
@@ -481,17 +448,6 @@
       console.log("Total quantity updated:", totalQuantity);
     }
 
-    enableOfferCheckbox.addEventListener("change", function () {
-      console.log("Enable offer checkbox changed:", enableOfferCheckbox.checked);
-      if (enableOfferCheckbox.checked) {
-        offerForm.classList.remove("hidden");
-        productOffer.active = true;
-      } else {
-        offerForm.classList.add("hidden");
-        productOffer = { active: false };
-      }
-    });
-
     form.addEventListener("submit", async function (event) {
       event.preventDefault();
 
@@ -521,14 +477,6 @@
         formData.append("featured", document.querySelector('input[name="featured"]:checked').value);
         formData.append("new", document.querySelector('input[name="new"]:checked').value);
         formData.append("sizes", document.getElementById("sizes-input").value);
-
-        if (enableOfferCheckbox.checked) {
-          productOffer.discountType = document.getElementById("discount-type").value;
-          productOffer.discountValue = parseFloat(document.getElementById("discount-value").value);
-          productOffer.startDate = document.getElementById("start-date").value;
-          productOffer.endDate = document.getElementById("end-date").value;
-        }
-        formData.append("productOffer", JSON.stringify(productOffer));
 
         selectedFiles.forEach((file) => {
           formData.append("images", file);
@@ -585,11 +533,6 @@
       const quantity = document.getElementById("quantity").value.trim();
       const featuredSelected = document.querySelector('input[name="featured"]:checked');
       const newSelected = document.querySelector('input[name="new"]:checked');
-      const enableOffer = enableOfferCheckbox.checked;
-      const discountType = document.getElementById("discount-type")?.value;
-      const discountValue = document.getElementById("discount-value")?.value;
-      const startDate = document.getElementById("start-date")?.value;
-      const endDate = document.getElementById("end-date")?.value;
 
       let isValid = true;
 
@@ -664,40 +607,6 @@
         displayErrorMessage("new-error", "Please select new product status");
         isValid = false;
         console.log("Validation failed: Missing new status");
-      }
-
-      if (enableOffer) {
-        if (!discountType) {
-          displayErrorMessage("offer-error", "Please select a discount type");
-          isValid = false;
-          console.log("Validation failed: Missing discount type");
-        }
-
-        if (!discountValue || isNaN(discountValue) || parseFloat(discountValue) < 0) {
-          displayErrorMessage("discount-value-error", "Enter a valid discount value (0 or more)");
-          isValid = false;
-          console.log("Validation failed: Invalid discount value");
-        } else if (discountType === "percentage" && parseFloat(discountValue) > 100) {
-          displayErrorMessage("discount-value-error", "Percentage discount must be between 0 and 100");
-          isValid = false;
-          console.log("Validation failed: Invalid percentage discount");
-        }
-
-        if (!startDate) {
-          displayErrorMessage("start-date-error", "Please select a start date");
-          isValid = false;
-          console.log("Validation failed: Missing start date");
-        }
-
-        if (!endDate) {
-          displayErrorMessage("end-date-error", "Please select an end date");
-          isValid = false;
-          console.log("Validation failed: Missing end date");
-        } else if (startDate && endDate && new Date(startDate) >= new Date(endDate)) {
-          displayErrorMessage("end-date-error", "End date must be after start date");
-          isValid = false;
-          console.log("Validation failed: Invalid date range");
-        }
       }
 
       console.log("Form validation result:", isValid);
