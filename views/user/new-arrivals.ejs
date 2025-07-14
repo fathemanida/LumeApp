@@ -434,7 +434,7 @@
           iconElement.classList.toggle('fas');
           iconElement.classList.toggle('text-danger');
           Toastify({
-            text: iconElement.classList.contains('fas') ? "Added to Wishlist 💖" : "Removed from Wishlist ❌",
+            text: iconElement.classList.contains('fas') ? "Added to Wishlist " : "Removed from Wishlist ",
             duration: 3000,
             gravity: "top",
             position: "right",
@@ -484,45 +484,45 @@
             });
             return;
           }
-      fetch('/cart/add', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-            body: JSON.stringify({ productId, quantity: 1 })
+          fetch('/cart/add', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            body: JSON.stringify({ productId: productId, quantity: 1 })
           })
             .then(response => response.ok ? response.json() : response.json().then(err => Promise.reject(err)))
-      .then(data => {
-        if (data.success) {
-          Swal.fire({
-            icon: 'success',
-            title: 'Added to Cart',
-            text: data.message,
-            showConfirmButton: false,
-            timer: 1500
-          });
-        } else {
-          throw new Error(data.message || 'Failed to add to cart');
-        }
-      })
-      .catch(error => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: error.message || 'Failed to add item to cart',
-          confirmButtonColor: '#291d0e'
-        });
-      });
+            .then(data => {
+              if (data.success) {
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Added to Cart',
+                  text: data.message,
+                  showConfirmButton: false,
+                  timer: 1500
+                });
+              } else {
+                throw new Error(data.message || 'Failed to add to cart');
+              }
+            })
+            .catch(error => {
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message || 'Failed to add item to cart',
+                confirmButtonColor: '#291d0e'
+              });
+            });
         })
         .catch(error => {
           console.error('Auth check error:', error);
-        Swal.fire({
+          Swal.fire({
             icon: 'error',
             title: 'Error',
             text: 'Failed to check authentication status',
-          confirmButtonColor: '#291d0e'
-        });
+            confirmButtonColor: '#291d0e'
+          });
         });
     }
   </script>

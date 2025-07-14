@@ -817,50 +817,7 @@
   <!-- Overlay -->
   <div class="overlay" id="overlay"></div>
 
-  <!-- Sidebar -->
-  <div class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-      <div class="brand">LUME</div>
-    </div>
-    <div class="sidebar-menu">
-      <div class="sidebar-category">
-        <div class="sidebar-title" onclick="toggleCategory(this)">
-          Categories <i class="fas fa-chevron-down"></i>
-        </div>
-        <div class="sidebar-items">
-          <%for(let i=0;i<category.length;i++){%>
-            <div class="sidebar-item"><a href="/filter?category=<%=category[i]._id%>">
-                <%=category[i].name%>
-              </a></div>
-            <% } %>
-        </div>
-      </div>
 
-      <div class="sidebar-category">
-        <div class="sidebar-title" onclick="toggleCategory(this)">
-          Sort By <i class="fas fa-chevron-down"></i>
-        </div>
-        <div class="sidebar-items">
-          <div class="sidebar-item">Price: Low to High</div>
-          <div class="sidebar-item">Price: High to Low</div>
-          <div class="sidebar-item">A-Z</div>
-          <div class="sidebar-item">Z-A</div>
-          <div class="sidebar-item">Newest First</div>
-        </div>
-      </div>
-
-      <div class="sidebar-category">
-        <div class="sidebar-title" onclick="toggleCategory(this)">
-          Collections <i class="fas fa-chevron-down"></i>
-        </div>
-        <div class="sidebar-items">
-          <div class="sidebar-item">New Arrivals</div>
-          <div class="sidebar-item">Best Sellers</div>
-          <div class="sidebar-item">Limited Edition</div>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- Navbar -->
   <%- include("../../views/partials/user/header") %>
@@ -985,7 +942,7 @@
       </div>
       <!-- Slide 2 -->
       <div class="ornament-banner-slide">
-        <img src="https://source.unsplash.com/random/1200x500/?porcelain+figurine,2" alt="Porcelain Figurine">
+        <img src="/uploads/banner/banner-2.png" alt="Porcelain Figurine">
         <div class="ornament-slide-content">
           <h2>Artistry Preserved</h2>
           <p>"True ornaments are not just decorations, but fragments of history in our hands."</p>
@@ -993,7 +950,7 @@
       </div>
       <!-- Slide 3 -->
       <div class="ornament-banner-slide">
-        <img src="https://source.unsplash.com/random/1200x500/?brass+sculpture,3" alt="Brass Sculpture">
+        <img src="/uploads/banner/banner-3.png" alt="Brass Sculpture">
         <div class="ornament-slide-content">
           <h2>Craftsmanship Rediscovered</h2>
           <p>"In every delicate curve of an antique ornament, we find the patience of its maker."</p>
@@ -1657,34 +1614,45 @@
             })
             .then(data => {
               if (data.success) {
-                Swal.fire({
-                  icon: 'success',
-                  title: 'Added to Cart',
-                  text: data.message,
-                  showConfirmButton: false,
-                  timer: 1500
-                });
+                Toastify({
+                  text: data.message || 'Added to Cart',
+                  duration: 2000,
+                  gravity: "top",
+                  position: "right",
+                  backgroundColor: "#4CAF50",
+                  stopOnFocus: true
+                }).showToast();
               } else {
-                throw new Error(data.message || 'Failed to add to cart');
+                Toastify({
+                  text: data.message || 'Failed to add to cart',
+                  duration: 3000,
+                  gravity: "top",
+                  position: "right",
+                  backgroundColor: "#e63946",
+                  stopOnFocus: true
+                }).showToast();
               }
             })
             .catch(error => {
-              Swal.fire({
-                icon: 'error',
-                title: 'Error',
+              Toastify({
                 text: error.message || 'Failed to add item to cart',
-                confirmButtonColor: '#291d0e'
-              });
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#e63946",
+                stopOnFocus: true
+              }).showToast();
             });
         })
         .catch(error => {
-          console.error('Auth check error:', error);
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
+          Toastify({
             text: 'Failed to check authentication status',
-            confirmButtonColor: '#291d0e'
-          });
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#e63946",
+            stopOnFocus: true
+          }).showToast();
         });
     }
 

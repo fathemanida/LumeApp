@@ -775,7 +775,7 @@
                 duration: 3000,
                 gravity: "top",
                 position: "right",
-                backgroundColor: "#f44336",
+                backgroundColor: "#A9BA9D",
                 stopOnFocus: true
               }).showToast();
               return;
@@ -791,34 +791,45 @@
               .then(response => response.ok ? response.json() : response.json().then(err => Promise.reject(err)))
               .then(data => {
                 if (data.success) {
-                  Swal.fire({
-                    icon: 'success',
-                    title: 'Added to Cart',
-                    text: data.message,
-                    showConfirmButton: false,
-                    timer: 1500
-                  });
+                  Toastify({
+                    text: data.message || 'Added to Cart',
+                    duration: 2000,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "#4CAF50",
+                    stopOnFocus: true
+                  }).showToast();
                 } else {
-                  throw new Error(data.message || 'Failed to add to cart');
+                  Toastify({
+                    text: data.message || 'Failed to add to cart',
+                    duration: 3000,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "#e63946",
+                    stopOnFocus: true
+                  }).showToast();
                 }
               })
               .catch(error => {
-                Swal.fire({
-                  icon: 'error',
-                  title: 'Error',
+                Toastify({
                   text: error.message || 'Failed to add item to cart',
-                  confirmButtonColor: '#291d0e'
-                });
+                  duration: 3000,
+                  gravity: "top",
+                  position: "right",
+                  backgroundColor: "#e63946",
+                  stopOnFocus: true
+                }).showToast();
               });
           })
           .catch(error => {
-            console.error('Auth check error:', error);
-            Swal.fire({
-              icon: 'error',
-              title: 'Error',
+            Toastify({
               text: 'Failed to check authentication status',
-              confirmButtonColor: '#291d0e'
-            });
+              duration: 3000,
+              gravity: "top",
+              position: "right",
+              backgroundColor: "#e63946",
+              stopOnFocus: true
+            }).showToast();
           });
       }
 
