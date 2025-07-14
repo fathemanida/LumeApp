@@ -210,7 +210,8 @@ const cart = async (req, res) => {
     const offers = await Offer.find({
       isActive: true,
       startDate: { $lte: now },
-      endDate: { $gte: now }
+      endDate: { $gte: now },
+      applicableOn: { $in: ['all', 'categories', 'products'] }
     });
 
     if (!cart || cart.items.length === 0) {
@@ -1004,7 +1005,6 @@ const placeOrder = async (req, res) => {
   }
 };
 
-// Helper to get best offer for a product
 function getBestOffer(product, offers, quantity = 1) {
   let maxDiscount = 0;
   let bestOffer = null;
