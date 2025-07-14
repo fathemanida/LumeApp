@@ -9,6 +9,109 @@
   <link rel="stylesheet" href="/css/admin/product.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+  <style>
+    @media (max-width: 991px) {
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 240px;
+        height: 100vh;
+        z-index: 2000;
+        transform: translateX(-100%);
+        transition: transform 0.3s;
+      }
+      .sidebar.active {
+        transform: translateX(0);
+      }
+      .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0,0,0,0.2);
+        z-index: 1999;
+      }
+      .sidebar.active + .sidebar-overlay {
+        display: block;
+      }
+      .main-content {
+        margin-left: 0 !important;
+        padding: 1rem 0.5rem;
+      }
+      .main-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+        padding: 1rem 0.5rem;
+      }
+      .header-left, .header-right {
+        width: 100%;
+        justify-content: flex-start;
+      }
+      .action-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+        padding: 0.5rem 0;
+      }
+      .add-product-btn {
+        width: 100%;
+        font-size: 1rem;
+        padding: 0.7rem 0;
+      }
+      .table-container {
+        width: 100%;
+        overflow-x: auto;
+        margin: 0;
+        padding: 0;
+      }
+      table {
+        min-width: 700px;
+        font-size: 0.95rem;
+      }
+      th, td {
+        padding: 0.5rem 0.7rem;
+      }
+      .pagination {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
+        padding: 0.5rem 0;
+      }
+      .page-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
+      }
+      .profile-dropdown {
+        flex-direction: row;
+        align-items: center;
+      }
+      .profile-img {
+        width: 36px;
+        height: 36px;
+      }
+      .search-container {
+        width: 100%;
+        margin-bottom: 0.5rem;
+      }
+      .search-bar {
+        width: 100%;
+        font-size: 1rem;
+      }
+      .notification-btn {
+        font-size: 1.2rem;
+        padding: 0.5rem;
+      }
+      .summary-card, .section-title {
+        font-size: 1.1rem;
+      }
+    }
+  </style>
+
 </head>
 
 <body class="dashboard">
@@ -98,112 +201,107 @@
       </div>
 
       <div class="table-container">
-        <div class="scroll-cue" style="display:none; text-align:right; font-size:0.85rem; color:#aaa; margin-bottom:2px;">
-          <i class="fas fa-arrows-alt-h"></i> Swipe to see more
-        </div>
-        <div class="table-responsive-admin-product" style="width:100%;overflow-x:auto;">
-          <table>
-            <thead>
-              <tr>
-                <th>Image</th>
-                <th>Name</th>
-                <th>Category</th>
-                <th>Price</th>
-                <th>Offer</th>
-                <th>Discount</th>
-                <th>Valid Until</th>
-                <th>Stock</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <% for (let i = 0; i < data.length; i++) { %>
-                <tr data-product-id="<%= data[i]._id %>">
-                  <td>
-                    <img src="/uploads/product/<%= data[i].productImage[0] %>" alt="Product Image" style="height: 54px;" />
-                  </td>
-                  <td>
-                    <%= data[i].productName %>
-                  </td>
-                  <td>
-                    <%= data[i].category ? data[i].category.name : 'No Category' %>
-                  </td>
-                  <td>
-                    <% if (data[i].salePrice && data[i].salePrice < data[i].regularPrice) { %>
-                      <span style="text-decoration: line-through; color: var(--text-secondary);">₹<%= data[i].regularPrice.toFixed(2) %></span>
-                      <br>
-                      <span style="color: var(--accent-color);">₹<%= data[i].salePrice.toFixed(2) %></span>
+        <table>
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Name</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>Offer</th>
+              <th>Discount</th>
+              <th>Valid Until</th>
+              <th>Stock</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% for (let i = 0; i < data.length; i++) { %>
+              <tr data-product-id="<%= data[i]._id %>">
+                <td>
+                  <img src="/uploads/product/<%= data[i].productImage[0] %>" alt="Product Image" style="height: 54px;" />
+                </td>
+                <td>
+                  <%= data[i].productName %>
+                </td>
+                <td>
+                  <%= data[i].category ? data[i].category.name : 'No Category' %>
+                </td>
+                <td>
+                  <% if (data[i].salePrice && data[i].salePrice < data[i].regularPrice) { %>
+                    <span style="text-decoration: line-through; color: var(--text-secondary);">₹<%= data[i].regularPrice.toFixed(2) %></span>
+                    <br>
+                    <span style="color: var(--accent-color);">₹<%= data[i].salePrice.toFixed(2) %></span>
+                  <% } else { %>
+                    ₹<%= data[i].regularPrice.toFixed(2) %>
+                  <% } %>
+                </td>
+                <td>
+                  <% if (data[i] && data[i].productOffer && data[i].productOffer.active) { %>
+                    <span class="badge badge-success">Active</span>
+                  <% } else if (data[i] && data[i].offer && data[i].offer.isActive) { %>
+                    <span class="badge badge-success">Active</span>
+                  <% } else { %>
+                    <span class="badge badge-secondary">Inactive</span>
+                  <% } %>
+                </td>
+                <td>
+                  <% if (data[i] && data[i].productOffer && data[i].productOffer.active) { %>
+                    <% if (data[i].productOffer.discountType === 'percentage') { %>
+                      <%= data[i].productOffer.discountValue %>%
                     <% } else { %>
-                      ₹<%= data[i].regularPrice.toFixed(2) %>
+                      ₹<%= data[i].productOffer.discountValue.toFixed(2) %>
                     <% } %>
-                  </td>
-                  <td>
-                    <% if (data[i] && data[i].productOffer && data[i].productOffer.active) { %>
-                      <span class="badge badge-success">Active</span>
-                    <% } else if (data[i] && data[i].offer && data[i].offer.isActive) { %>
-                      <span class="badge badge-success">Active</span>
+                  <% } else if (data[i] && data[i].offer && data[i].offer.isActive) { %>
+                    <% if (data[i].offer.discountType === 'percentage') { %>
+                      <%= data[i].offer.discountValue %>%
                     <% } else { %>
-                      <span class="badge badge-secondary">Inactive</span>
+                      ₹<%= data[i].offer.discountValue.toFixed(2) %>
                     <% } %>
-                  </td>
-                  <td>
-                    <% if (data[i] && data[i].productOffer && data[i].productOffer.active) { %>
-                      <% if (data[i].productOffer.discountType === 'percentage') { %>
-                        <%= data[i].productOffer.discountValue %>%
-                      <% } else { %>
-                        ₹<%= data[i].productOffer.discountValue.toFixed(2) %>
-                      <% } %>
-                    <% } else if (data[i] && data[i].offer && data[i].offer.isActive) { %>
-                      <% if (data[i].offer.discountType === 'percentage') { %>
-                        <%= data[i].offer.discountValue %>%
-                      <% } else { %>
-                        ₹<%= data[i].offer.discountValue.toFixed(2) %>
-                      <% } %>
-                    <% } else { %>
-                      -
-                    <% } %>
-                  </td>
-                  <td>
-                    <% if (data[i] && data[i].productOffer && data[i].productOffer.active) { %>
-                      <%= new Date(data[i].productOffer.endDate).toLocaleDateString() %>
-                    <% } else if (data[i] && data[i].offer && data[i].offer.isActive) { %>
-                      <%= new Date(data[i].offer.endDate).toLocaleDateString() %>
-                    <% } else { %>
-                      -
-                    <% } %>
-                  </td>
-                  <td>
-                    <%= data[i].quantity || data[i].productStock || 0 %>
-                  </td>
-                  <td>
+                  <% } else { %>
+                    -
+                  <% } %>
+                </td>
+                <td>
+                  <% if (data[i] && data[i].productOffer && data[i].productOffer.active) { %>
+                    <%= new Date(data[i].productOffer.endDate).toLocaleDateString() %>
+                  <% } else if (data[i] && data[i].offer && data[i].offer.isActive) { %>
+                    <%= new Date(data[i].offer.endDate).toLocaleDateString() %>
+                  <% } else { %>
+                    -
+                  <% } %>
+                </td>
+                <td>
+                  <%= data[i].quantity || data[i].productStock || 0 %>
+                </td>
+                <td>
+                  <% if (data[i].isListed) { %>
+                    <span class="status-listed">Listed</span>
+                  <% } else { %>
+                    <span class="status-unlisted">Unlisted</span>
+                  <% } %>
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <a href="/admin/edit-product/<%= data[i]._id %>" class="action-btn edit-btn">
+                      <i class="fas fa-edit"></i>
+                    </a>
                     <% if (data[i].isListed) { %>
-                      <span class="status-listed">Listed</span>
+                      <button onclick="toggleListing('<%= data[i]._id %>', false)" class="action-btn unlist-btn">
+                        <i class="fas fa-eye-slash"></i>
+                      </button>
                     <% } else { %>
-                      <span class="status-unlisted">Unlisted</span>
+                      <button onclick="toggleListing('<%= data[i]._id %>', true)" class="action-btn list-btn">
+                        <i class="fas fa-eye"></i>
+                      </button>
                     <% } %>
-                  </td>
-                  <td>
-                    <div class="action-buttons">
-                      <a href="/admin/edit-product/<%= data[i]._id %>" class="action-btn edit-btn">
-                        <i class="fas fa-edit"></i>
-                      </a>
-                      <% if (data[i].isListed) { %>
-                        <button onclick="toggleListing('<%= data[i]._id %>', false)" class="action-btn unlist-btn">
-                          <i class="fas fa-eye-slash"></i>
-                        </button>
-                      <% } else { %>
-                        <button onclick="toggleListing('<%= data[i]._id %>', true)" class="action-btn list-btn">
-                          <i class="fas fa-eye"></i>
-                        </button>
-                      <% } %>
-                    </div>
-                  </td>
-                </tr>
-              <% } %>
-            </tbody>
-          </table>
-        </div>
+                  </div>
+                </td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
 
         <div class="pagination">
           <span style="margin-right: 1rem; align-self: center;">
@@ -401,67 +499,6 @@
       }
     });
   </script>
-  <style>
-    @media (max-width: 991px) {
-      .table-responsive-admin-product {
-        width: 100%;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        touch-action: pan-x;
-      }
-      .table-responsive-admin-product table {
-        min-width: 800px;
-      }
-      .scroll-cue {
-        display: block !important;
-      }
-      .action-bar {
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-        align-items: stretch;
-      }
-      .add-product-btn {
-        width: 100%;
-        margin-top: 0.5rem;
-      }
-      .search-container, .search-bar, .search-btn, .clear-search {
-        width: 100% !important;
-        box-sizing: border-box;
-      }
-      .main-header, .header-left, .header-right {
-        flex-direction: column !important;
-        align-items: stretch !important;
-        gap: 0.5rem !important;
-      }
-      .profile-dropdown {
-        margin-top: 0.5rem;
-      }
-      .pagination {
-        flex-wrap: wrap;
-        gap: 0.25rem;
-        font-size: 0.95rem;
-      }
-      .table-container {
-        padding: 0.5rem 0 !important;
-      }
-    }
-    @media (max-width: 600px) {
-      .action-bar {
-        gap: 0.5rem;
-      }
-      .add-product-btn {
-        font-size: 1rem;
-        padding: 0.5rem 0.75rem;
-      }
-      .section-title {
-        font-size: 1.1rem;
-      }
-      .table-responsive-admin-product table {
-        min-width: 600px;
-      }
-    }
-  </style>
 </body>
 
 </html>
