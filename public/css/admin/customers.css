@@ -497,7 +497,17 @@
             width: 100%;
         }
         .profile-name {
-            display: none;
+            display: none !important;
+        }
+        .profile-img {
+            display: block !important;
+            margin-right: 0 !important;
+            width: 36px !important;
+            height: 36px !important;
+        }
+        .profile-dropdown {
+            flex-direction: row !important;
+            align-items: center !important;
         }
     }
     .nav-menu ul {
