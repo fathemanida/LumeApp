@@ -154,7 +154,7 @@
           </div>
           <canvas id="salesChart"></canvas>
         </div>
-        <div style="display: flex; gap: 2rem; flex-wrap: wrap; width: 100%;">
+        <div class="dashboard-section-row" style="display: flex; gap: 2rem; flex-wrap: wrap; width: 100%;">
           <div class="top-list animate-fadeIn delay-2" style="flex: 1 1 300px; min-width: 300px;">
             <h3><i class="fas fa-crown"></i> Top 10 Best Selling Products</h3>
             <table class="top-table">
@@ -234,6 +234,10 @@
         right: 1rem;
         bottom: 1rem;
       }
+      .dashboard-section-row {
+        flex-direction: column !important;
+        gap: 1.5rem !important;
+      }
     }
     @media (min-width: 992px) {
       .dashboard-summary {
@@ -258,6 +262,10 @@
       }
       .summary-icon {
         font-size: 2.2rem !important;
+      }
+      .dashboard-section-row {
+        flex-direction: row !important;
+        gap: 2rem !important;
       }
     }
     /* Ensure sidebar overlays content on mobile */
