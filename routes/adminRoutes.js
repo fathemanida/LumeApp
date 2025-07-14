@@ -9,8 +9,6 @@ const {userAuth, adminAuth} = require("../middleware/auth");
 const walletController = require('../controllers/user/walletController');
 const couponController=require('../controllers/admin/couponController')
 const offerController = require('../controllers/admin/offerController');
-const bannerController=require('../controllers/admin/bannerController');
-const bannerSchema = require('../models/bannerSchema');
 const multer = require('multer');
 const path = require('path');
 
@@ -86,13 +84,7 @@ router.put('/coupons/:id/toggle-status', adminAuth, couponController.toggleStatu
 
 
 
-router.get('/banner',adminAuth,bannerController.getBanner);
-router.get('/banner/add',adminAuth,bannerController.loadAddbanner);
 
-// Banner routes
-router.post('/banner/add', upload.array('images', 5), bannerController.addBanner);
-router.get('/banner/edit/:id', bannerController.getEditBanner);
-router.post('/banner/edit/:id', upload.array('images', 5), bannerController.postEditBanner);
-router.get('/test', (req, res) => res.send('Test route works!'));
+
 
 module.exports = router;
