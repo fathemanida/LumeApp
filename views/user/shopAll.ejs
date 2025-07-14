@@ -565,10 +565,10 @@
         </div>
         <div class="sidebar-items">
           <div class="sidebar-item">
-            <a href="?filter=new" class="<%= (req.query.filter === 'new') ? 'active' : '' %>">New Arrivals</a>
+            <a href="?filter=new" class="<%= (filter === 'new') ? 'active' : '' %>">New Arrivals</a>
           </div>
           <div class="sidebar-item">
-            <a href="?filter=best" class="<%= (req.query.filter === 'best') ? 'active' : '' %>">Best Sellers</a>
+            <a href="?filter=best" class="<%= (filter === 'best') ? 'active' : '' %>">Best Sellers</a>
           </div>
           <div class="sidebar-item">Limited Edition</div>
         </div>
