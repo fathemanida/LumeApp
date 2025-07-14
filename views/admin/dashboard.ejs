@@ -206,10 +206,76 @@
     </div>
   </div>
 
+  <style>
+    @media (max-width: 991px) {
+      .dashboard-summary {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+      .summary-card {
+        width: 100%;
+        margin-bottom: 0;
+      }
+    }
+    @media (min-width: 992px) {
+      .dashboard-summary {
+        display: flex;
+        flex-direction: row;
+        gap: 2rem;
+      }
+      .summary-card {
+        flex: 1 1 0;
+        min-width: 0;
+      }
+    }
+    /* Ensure sidebar overlays content on mobile */
+    @media (max-width: 991px) {
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100vh;
+        z-index: 2000;
+        width: 250px;
+        transform: translateX(-100%);
+        transition: transform 0.3s;
+      }
+      .sidebar.active {
+        transform: translateX(0);
+      }
+      .main-content {
+        margin-left: 0 !important;
+      }
+      body.sidebar-open {
+        overflow: hidden;
+      }
+    }
+  </style>
+
   <script>
     // Mobile menu toggle
     document.getElementById('mobileMenuBtn').addEventListener('click', function() {
       document.querySelector('.sidebar').classList.toggle('active');
+      document.body.classList.toggle('sidebar-open');
+    });
+
+    // Close sidebar when clicking outside (on body)
+    document.body.addEventListener('click', function(e) {
+      const sidebar = document.querySelector('.sidebar');
+      const menuBtn = document.getElementById('mobileMenuBtn');
+      if (window.innerWidth <= 991 && sidebar.classList.contains('active')) {
+        // If click is outside sidebar and not on menu button
+        if (!sidebar.contains(e.target) && e.target !== menuBtn && !menuBtn.contains(e.target)) {
+          sidebar.classList.remove('active');
+          document.body.classList.remove('sidebar-open');
+        }
+      }
+    });
+
+    // Prevent sidebar click from closing itself
+    document.querySelector('.sidebar').addEventListener('click', function(e) {
+      e.stopPropagation();
     });
 
     // Show/hide custom date range
