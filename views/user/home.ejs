@@ -1076,6 +1076,221 @@
 
   <!-- Navbar -->
   <%- include("../../views/partials/user/header") %>
+
+  <!-- Ornament Banner Start -->
+  <style>
+    .ornament-banner-container {
+      position: relative;
+      width: 100vw;
+      left: 50%;
+      right: 50%;
+      margin-left: -50vw;
+      margin-right: -50vw;
+      height: 500px;
+      overflow: hidden;
+      font-family: 'Jost', sans-serif;
+      background: #222;
+      z-index: 1;
+    }
+    .ornament-banner-slides {
+      display: flex;
+      width: 400%;
+      height: 100%;
+      transition: transform 0.5s ease-in-out;
+    }
+    .ornament-banner-slide {
+      position: relative;
+      width: 25%;
+      height: 100%;
+      flex-shrink: 0;
+    }
+    .ornament-banner-slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .ornament-banner-slide::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.3);
+    }
+    .ornament-slide-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+      color: white;
+      text-align: center;
+      width: 80%;
+      max-width: 800px;
+    }
+    .ornament-slide-content h2 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      font-weight: 700;
+      font-family: 'Jost', sans-serif;
+    }
+    .ornament-slide-content p {
+      font-size: 1.2rem;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+      font-weight: 400;
+      font-family: 'Jost', sans-serif;
+    }
+    .ornament-nav-icon {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 3;
+      color: white;
+      font-size: 2rem;
+      cursor: pointer;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+      opacity: 0.7;
+      transition: opacity 0.3s;
+      background: rgba(0,0,0,0.3);
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+    .ornament-nav-icon:hover {
+      opacity: 1;
+      background: rgba(0,0,0,0.5);
+    }
+    .ornament-nav-left {
+      left: 20px;
+    }
+    .ornament-nav-right {
+      right: 20px;
+    }
+    @media (max-width: 900px) {
+      .ornament-banner-container { height: 320px; }
+      .ornament-slide-content h2 { font-size: 1.5rem; }
+      .ornament-slide-content p { font-size: 1rem; }
+    }
+    @media (max-width: 600px) {
+      .ornament-banner-container { height: 180px; }
+      .ornament-slide-content h2 { font-size: 1.1rem; }
+      .ornament-slide-content p { font-size: 0.8rem; }
+      .ornament-nav-icon { width: 36px; height: 36px; font-size: 1.2rem; }
+    }
+  </style>
+  <div class="ornament-banner-container">
+    <div class="ornament-nav-icon ornament-nav-left" id="ornamentPrevBtn"><i class="fas fa-chevron-left"></i></div>
+    <div class="ornament-nav-icon ornament-nav-right" id="ornamentNextBtn"><i class="fas fa-chevron-right"></i></div>
+    <div class="ornament-banner-slides" id="ornamentSlides">
+      <!-- Slide 1 -->
+      <div class="ornament-banner-slide">
+        <img src="https://source.unsplash.com/random/1200x500/?antique+vase,1" alt="Antique Vase">
+        <div class="ornament-slide-content">
+          <h2>Timeless Elegance</h2>
+          <p>"The beauty of ornaments lies in their ability to tell stories across generations."</p>
+        </div>
+      </div>
+      <!-- Slide 2 -->
+      <div class="ornament-banner-slide">
+        <img src="https://source.unsplash.com/random/1200x500/?porcelain+figurine,2" alt="Porcelain Figurine">
+        <div class="ornament-slide-content">
+          <h2>Artistry Preserved</h2>
+          <p>"True ornaments are not just decorations, but fragments of history in our hands."</p>
+        </div>
+      </div>
+      <!-- Slide 3 -->
+      <div class="ornament-banner-slide">
+        <img src="https://source.unsplash.com/random/1200x500/?brass+sculpture,3" alt="Brass Sculpture">
+        <div class="ornament-slide-content">
+          <h2>Craftsmanship Rediscovered</h2>
+          <p>"In every delicate curve of an antique ornament, we find the patience of its maker."</p>
+        </div>
+      </div>
+      <!-- Clone of Slide 1 for seamless looping -->
+      <div class="ornament-banner-slide">
+        <img src="https://source.unsplash.com/random/1200x500/?antique+vase,1" alt="Antique Vase">
+        <div class="ornament-slide-content">
+          <h2>Timeless Elegance</h2>
+          <p>"The beauty of ornaments lies in their ability to tell stories across generations."</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const slides = document.getElementById('ornamentSlides');
+      const prevBtn = document.getElementById('ornamentPrevBtn');
+      const nextBtn = document.getElementById('ornamentNextBtn');
+      let currentIndex = 0;
+      const slideCount = 3; // Original slides count (excluding clone)
+      let autoSlideInterval;
+      function goToSlide(index) {
+        if (index > slideCount) return;
+        if (index < 0) index = 0;
+        slides.style.transition = 'transform 0.5s ease-in-out';
+        slides.style.transform = `translateX(-${currentIndex * 100 / (slideCount + 1)}%)`;
+        currentIndex = index;
+      }
+      function startAutoSlide() {
+        autoSlideInterval = setInterval(() => {
+          let nextIndex = currentIndex + 1;
+          if (nextIndex > slideCount) {
+            slides.style.transition = 'none';
+            slides.style.transform = 'translateX(0)';
+            currentIndex = 0;
+            setTimeout(() => {
+              slides.style.transition = 'transform 0.5s ease-in-out';
+              goToSlide(1);
+            }, 20);
+          } else {
+            goToSlide(nextIndex);
+          }
+        }, 3000);
+      }
+      prevBtn.addEventListener('click', () => {
+        clearInterval(autoSlideInterval);
+        let prevIndex = currentIndex - 1;
+        if (prevIndex < 0) {
+          slides.style.transition = 'none';
+          slides.style.transform = `translateX(-${slideCount * 100 / (slideCount + 1)}%)`;
+          currentIndex = slideCount;
+          setTimeout(() => {
+            slides.style.transition = 'transform 0.5s ease-in-out';
+            goToSlide(slideCount - 1);
+          }, 20);
+        } else {
+          goToSlide(prevIndex);
+        }
+        startAutoSlide();
+      });
+      nextBtn.addEventListener('click', () => {
+        clearInterval(autoSlideInterval);
+        let nextIndex = currentIndex + 1;
+        if (nextIndex > slideCount) {
+          slides.style.transition = 'none';
+          slides.style.transform = 'translateX(0)';
+          currentIndex = 0;
+          setTimeout(() => {
+            slides.style.transition = 'transform 0.5s ease-in-out';
+            goToSlide(1);
+          }, 20);
+        } else {
+          goToSlide(nextIndex);
+        }
+        startAutoSlide();
+      });
+      slides.addEventListener('mouseenter', () => {
+        clearInterval(autoSlideInterval);
+      });
+      slides.addEventListener('mouseleave', startAutoSlide);
+      startAutoSlide();
+    });
+  </script>
   
   <!-- Spotlight Product Section -->
   <section class="py-5 main-content-container" style="background-color: #f9f7f5;">
