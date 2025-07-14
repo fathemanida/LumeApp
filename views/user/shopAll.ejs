@@ -645,7 +645,7 @@
 
                 <button class="btn w-100"
                         <%= !product.isListed || product.quantity <= 0 ? 'disabled' : '' %>
-                        onclick="event.stopPropagation(); addToCart('<%= product._id %>', '<%= product.productName.replace(/'/g, "\\'") %>', '<%= product.regularPrice %>', '<%= product.salePrice %>', '<%= product.productImage[0] %>')">
+                        onclick="event.stopPropagation(); addToCart('<%= product._id %>')">
                   <%= !product.isListed ? 'Not Available' : (product.quantity <= 0 ? 'Out of Stock' : 'Add to Cart') %>
                 </button>
               </div>
@@ -765,27 +765,19 @@
         }
       }
 
-      function addToCart(productId, productName, regularPrice, salePrice, image) {
+      function addToCart(productId) {
         fetch('/check-auth')
           .then(response => response.json())
           .then(data => {
             if (!data.isAuthenticated) {
-              Swal.fire({
-                icon: 'info',
-                title: 'Login Required',
-                text: 'Please login or signup to add items to cart',
-                showCancelButton: true,
-                confirmButtonText: 'Login',
-                cancelButtonText: 'Signup',
-                confirmButtonColor: '#291d0e',
-                cancelButtonColor: '#314216'
-              }).then((result) => {
-                if (result.isConfirmed) {
-                  window.location.href = '/login';
-                } else if (result.dismiss === Swal.DismissReason.cancel) {
-                  window.location.href = '/signup';
-                }
-              });
+              Toastify({
+                text: "Login required to add items to cart",
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#f44336",
+                stopOnFocus: true
+              }).showToast();
               return;
             }
             fetch('/cart/add', {
@@ -794,7 +786,7 @@
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
               },
-              body: JSON.stringify({ productId, quantity: 1 })
+              body: JSON.stringify({ productId: productId, quantity: 1 })
             })
               .then(response => response.ok ? response.json() : response.json().then(err => Promise.reject(err)))
               .then(data => {
