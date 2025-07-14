@@ -1206,43 +1206,7 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- Navbar -->
-    <nav class="navbar">
-        <div class="brand">LUME</div>
-        <ul class="nav-links">
-            <li><a href="/" class="nav-link">Home</a></li>
-            <li><a href="/shopAll" class="nav-link">Shop All</a></li>
-            <li><a href="/featured" class="nav-link">Featured</a></li>
-            <li><a href="/new-arrivals" class="nav-link">New Arrivals</a></li>
-        </ul>
-        <ul class="icon-links">
-            <li>
-                <form action="/shopAll" method="GET" class="search-container">
-                    <input type="text" name="search" placeholder="Search products..." class="search-input">
-                    <button type="submit" class="search-button">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </form>
-            </li>
-            <li><a href="/wishlist" class="icon-link"><i class="fas fa-heart"></i></a></li>
-            <li><a href="/cart" class="icon-link"><i class="fas fa-shopping-cart"></i></a></li>
-            <li>
-                <div class="profile-dropdown">
-                    <a href="#" class="icon-link"><i class="far fa-user"></i></a>
-                    <div class="profile-dropdown-content">
-                        <% if (locals.user) { %>
-                            <a href="/profile"><i class="fas fa-user"></i> My Profile</a>
-                            <a href="/orders"><i class="fas fa-box"></i> My Orders</a>
-                            <a href="/wishlist"><i class="fas fa-heart"></i> Wishlist</a>
-                            <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
-                        <% } else { %>
-                            <a href="/login"><i class="fas fa-sign-in-alt"></i> Login</a>
-                            <a href="/signup"><i class="fas fa-user-plus"></i> Sign Up</a>
-                        <% } %>
-                    </div>
-                </div>
-            </li>
-        </ul>
-    </nav>
+<%-include('../partials/user/header.ejs') %>
 
     <% if (locals.user) { %>
         <div class="main-container">
@@ -1256,28 +1220,63 @@
                 <!-- Order Tracking Stepper -->
                 <div class="order-tracking-stepper" style="margin-bottom:2.5rem;">
                   <div class="stepper-row">
-                    <% const statusList = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Returned', 'Return Requested', 'Return Rejected', 'Failed'];
-                       const statusIcons = {
-                         'Pending': 'fa-clock',
-                         'Processing': 'fa-cogs',
-                         'Shipped': 'fa-truck',
-                         'Delivered': 'fa-box-open',
-                         'Cancelled': 'fa-times-circle',
-                         'Returned': 'fa-undo',
-                         'Return Requested': 'fa-undo-alt',
-                         'Return Rejected': 'fa-ban',
-                         'Failed': 'fa-exclamation-triangle'
-                       };
-                       const currentIndex = statusList.indexOf(order.status);
+                    <% 
+                      // Define all possible statuses and their icons
+                      const allStatuses = [
+                        'Pending', 'Processing', 'Shipped', 'Delivered',
+                        'Cancelled', 'Returned', 'Return Requested', 'Return Rejected', 'Failed'
+                      ];
+                      const statusIcons = {
+                        'Pending': 'fa-clock',
+                        'Processing': 'fa-cogs',
+                        'Shipped': 'fa-truck',
+                        'Delivered': 'fa-box-open',
+                        'Cancelled': 'fa-times-circle',
+                        'Returned': 'fa-undo',
+                        'Return Requested': 'fa-undo-alt',
+                        'Return Rejected': 'fa-ban',
+                        'Failed': 'fa-exclamation-triangle'
+                      };
+                      // Build the dynamic status path
+                      let statusPath = [];
+                      if (order.status === 'Pending') {
+                        statusPath = ['Pending'];
+                      } else if (order.status === 'Processing') {
+                        statusPath = ['Pending', 'Processing'];
+                      } else if (order.status === 'Shipped') {
+                        statusPath = ['Pending', 'Processing', 'Shipped'];
+                      } else if (order.status === 'Delivered') {
+                        statusPath = ['Pending', 'Processing', 'Shipped', 'Delivered'];
+                      } else if (order.status === 'Cancelled') {
+                        // Can only cancel before shipped
+                        if (order.lastStatus === 'Processing' || order.lastStatus === 'Pending') {
+                          statusPath = ['Pending', 'Processing', 'Cancelled'];
+                        } else {
+                          statusPath = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled']; // fallback, but should not happen
+                        }
+                      } else if (order.status === 'Return Requested') {
+                        // Only after delivered
+                        statusPath = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Return Requested'];
+                      } else if (order.status === 'Return Rejected') {
+                        // Only after delivered
+                        statusPath = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Return Requested', 'Return Rejected'];
+                      } else if (order.status === 'Returned') {
+                        // Only after delivered
+                        statusPath = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Returned'];
+                      } else if (order.status === 'Failed') {
+                        // Failed can happen at any point, but usually early
+                        statusPath = ['Pending', 'Failed'];
+                      }
+                      const currentIndex = statusPath.length - 1;
                     %>
-                    <% statusList.forEach((status, idx) => { %>
+                    <% statusPath.forEach((status, idx) => { %>
                       <div class="stepper-step <%= idx < currentIndex ? 'done' : (idx === currentIndex ? 'active' : '') %>">
                         <div class="stepper-icon">
                           <i class="fas <%= statusIcons[status] %>"></i>
                         </div>
                         <div class="stepper-label"><%= status %></div>
-                        <% if (idx < statusList.length - 1) { %>
-                          <div class="stepper-line"></div>
+                        <% if (idx < statusPath.length - 1) { %>
+                          <div class="stepper-line <%= idx < currentIndex ? 'stepper-line-done' : (idx === currentIndex ? 'stepper-line-active' : '') %>"></div>
                         <% } %>
                       </div>
                     <% }) %>
@@ -1351,9 +1350,13 @@
                     background: #e0d8cc;
                     z-index: 0;
                     margin-left: 0.5rem;
+                    transition: background 0.3s;
                   }
-                  .stepper-step.done + .stepper-step .stepper-line {
-                    background: var(--muted-green);
+                  .stepper-line-done {
+                    background: var(--muted-green) !important;
+                  }
+                  .stepper-line-active {
+                    background: var(--muted-green) !important;
                   }
                   @media (max-width: 900px) {
                     .order-tracking-stepper {
@@ -1467,7 +1470,7 @@
                         </div>
                     </div>
                     <!-- Action Buttons -->
-                    <div class="order-actions-bottom" style="display:flex; justify-content:flex-end; gap:1rem; margin-top:2rem;">
+                    <div class="order-actions-bottom" style="display:flex; justify-content:center; align-items:center; gap:1rem; margin-top:2rem;">
                         <% if (order.status === 'Pending' || order.status === 'Processing') { %>
                             <button class="cancel-btn" onclick="openCancelModal()"> <i class="fas fa-times"></i> Cancel Order </button>
                         <% } %>
@@ -1475,6 +1478,33 @@
                         <a href="/orders/<%= order._id %>/invoice" class="download-btn"> <i class="fas fa-file-invoice"></i> Download Invoice</a>
                     </div>
                 </div>
+                <style>
+                  .order-actions-bottom {
+                    display: flex;
+                    justify-content: center !important;
+                    align-items: center !important;
+                    gap: 1rem;
+                    margin-top: 2rem;
+                  }
+                  .order-actions-bottom .cancel-btn,
+                  .order-actions-bottom .back-btn,
+                  .order-actions-bottom .download-btn {
+                    margin: 0;
+                  }
+                  @media (max-width: 900px) {
+                    .order-actions-bottom {
+                      flex-direction: column;
+                      align-items: center !important;
+                      gap: 1rem;
+                    }
+                    .order-actions-bottom .cancel-btn,
+                    .order-actions-bottom .back-btn,
+                    .order-actions-bottom .download-btn {
+                      width: 100%;
+                      min-width: 180px;
+                    }
+                  }
+                </style>
             </div>
         </div>
     <% } else { %>
@@ -1579,40 +1609,7 @@
     </div>
 
     <!-- Footer -->
-    <footer>
-        <div class="footer-container">
-            <div class="footer-column">
-                <h3>Company</h3>
-                <ul>
-                    <li><a href="/about-us">About Us</a></li>
-                    <li><a href="/careers">Careers</a></li>
-                    <li><a href="/contact">Contact</a></li>
-                    <li><a href="/privacy-policy">Privacy Policy</a></li>
-                </ul>
-            </div>
-            <div class="footer-column">
-                <h3>Shop</h3>
-                <ul>
-                    <li><a href="/rings">Rings</a></li>
-                    <li><a href="/necklaces">Necklaces</a></li>
-                    <li><a href="/earrings">Earrings</a></li>
-                    <li><a href="/bracelets">Bracelets</a></li>
-                </ul>
-            </div>
-            <div class="footer-column">
-                <h3>Connect With Us</h3>
-                <ul>
-                    <li><a href="https://instagram.com">Instagram</a></li>
-                    <li><a href="https://facebook.com">Facebook</a></li>
-                    <li><a href="https://pinterest.com">Pinterest</a></li>
-                    <li><a href="https://twitter.com">Twitter</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            © 2024 Lume Jewelry. All Rights Reserved.
-        </div>
-    </footer>
+<%-include('../partials/user/fooret.ejs')  %>
 
     <script>
         // Sidebar button functionality
