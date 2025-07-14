@@ -417,9 +417,12 @@
         @media (max-width: 1024px) {
   html, body,
   .main-container,
-  .sidebar,
   .content-area,
-  .orders-table-container {
+  .sidebar,
+  .orders-table-container,
+  .orders-table,
+  .no-orders,
+  .pagination {
     width: 100vw !important;
     max-width: 100vw !important;
     min-width: 0 !important;
@@ -430,21 +433,14 @@
     padding-right: 0 !important;
   }
   .main-container,
-  .content-area {
-    overflow-x: auto !important;
-  }
-  .sidebar {
-    padding: 1rem 0.5rem !important;
-    border-right: none !important;
-    border-bottom: 1px solid var(--theme-border) !important;
-  }
-  .content-area {
-    padding: 1rem 0.5rem !important;
-  }
   .orders-table-container {
     overflow-x: auto !important;
-    margin: 0 !important;
-    padding: 0 !important;
+  }
+  .content-area {
+    padding: 1rem 0.25rem !important;
+  }
+  .sidebar {
+    padding: 1rem 0.25rem !important;
   }
   .orders-table {
     min-width: 600px !important;
@@ -452,17 +448,19 @@
   }
   .page-header {
     flex-direction: column !important;
-    align-items: flex-start !important;
     gap: 0.5rem !important;
-    padding: 0 !important;
+    align-items: flex-start !important;
   }
 }
 @media (max-width: 768px) {
   html, body,
   .main-container,
-  .sidebar,
   .content-area,
-  .orders-table-container {
+  .sidebar,
+  .orders-table-container,
+  .orders-table,
+  .no-orders,
+  .pagination {
     width: 100vw !important;
     max-width: 100vw !important;
     min-width: 0 !important;
@@ -473,21 +471,14 @@
     padding-right: 0 !important;
   }
   .main-container,
-  .content-area {
-    overflow-x: auto !important;
-  }
-  .sidebar {
-    padding: 1rem 0.25rem !important;
-    border-right: none !important;
-    border-bottom: 1px solid var(--theme-border) !important;
-  }
-  .content-area {
-    padding: 0.5rem 0.25rem !important;
-  }
   .orders-table-container {
     overflow-x: auto !important;
-    margin: 0 !important;
-    padding: 0 !important;
+  }
+  .content-area {
+    padding: 0.5rem 0.1rem !important;
+  }
+  .sidebar {
+    padding: 0.5rem 0.1rem !important;
   }
   .orders-table {
     min-width: 500px !important;
@@ -495,9 +486,8 @@
   }
   .page-header {
     flex-direction: column !important;
-    align-items: flex-start !important;
     gap: 0.25rem !important;
-    padding: 0 !important;
+    align-items: flex-start !important;
   }
 }
     </style>
