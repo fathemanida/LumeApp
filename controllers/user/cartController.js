@@ -685,44 +685,26 @@ const applyCoupon = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Cart is empty or not found' });
     }
 
+    const now = new Date();
+    const offers = await Offer.find({
+      isActive: true,
+      startDate: { $lte: now },
+      endDate: { $gte: now }
+    });
+
     let totalPrice = 0;
     let totalOfferDiscount = 0;
 
     cart.items.forEach(item => {
       const product = item.productId;
       const quantity = item.quantity;
-
       const basePrice = product.salePrice && product.salePrice < product.regularPrice
         ? product.salePrice
         : product.regularPrice;
-
       const itemTotal = basePrice * quantity;
       totalPrice += itemTotal;
-
-      let largestDiscount = 0;
-
-      if (product.offer && product.offer.isActive) {
-        if (product.offer.discountType === 'percentage') {
-          const discount = (itemTotal * product.offer.discountValue) / 100;
-          largestDiscount = Math.max(largestDiscount, discount);
-        } else {
-          const discount = product.offer.discountValue * quantity;
-          largestDiscount = Math.max(largestDiscount, discount);
-        }
-      }
-
-      if (product.category?.categoryOffer?.active) {
-        const catOffer = product.category.categoryOffer;
-        if (catOffer.discountType === 'percentage') {
-          const discount = (itemTotal * catOffer.discountValue) / 100;
-          largestDiscount = Math.max(largestDiscount, discount);
-        } else {
-          const discount = catOffer.discountValue * quantity;
-          largestDiscount = Math.max(largestDiscount, discount);
-        }
-      }
-
-      totalOfferDiscount += largestDiscount;
+      const { maxDiscount } = getBestOffer(product, offers, quantity);
+      totalOfferDiscount += maxDiscount;
     });
 
     const coupon = await Coupon.findOne({
@@ -904,37 +886,26 @@ const placeOrder = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Cart is empty' });
     }
 
+    const now = new Date();
+    const offers = await Offer.find({
+      isActive: true,
+      startDate: { $lte: now },
+      endDate: { $gte: now }
+    });
+
     let totalPrice = 0;
     let totalOfferDiscount = 0;
 
     cart.items.forEach(item => {
       const product = item.productId;
+      const quantity = item.quantity;
       const basePrice = product.salePrice && product.salePrice < product.regularPrice
         ? product.salePrice
         : product.regularPrice;
-      const originalPrice = basePrice * item.quantity;
+      const originalPrice = basePrice * quantity;
       totalPrice += originalPrice;
-
-      let productOfferDiscount = 0;
-      if (product.offer && product.offer.isActive) {
-        if (product.offer.discountType === 'percentage') {
-          productOfferDiscount = (originalPrice * product.offer.discountValue) / 100;
-        } else {
-          productOfferDiscount = product.offer.discountValue * item.quantity;
-        }
-      }
-
-      let categoryOfferDiscount = 0;
-      if (product.category && product.category.categoryOffer && product.category.categoryOffer.active) {
-        if (product.category.categoryOffer.discountType === 'percentage') {
-          categoryOfferDiscount = (originalPrice * product.category.categoryOffer.discountValue) / 100;
-        } else {
-          categoryOfferDiscount = product.category.categoryOffer.discountValue * item.quantity;
-        }
-      }
-
-      const offerDiscount = Math.max(productOfferDiscount, categoryOfferDiscount);
-      totalOfferDiscount += offerDiscount;
+      const { maxDiscount } = getBestOffer(product, offers, quantity);
+      totalOfferDiscount += maxDiscount;
     });
 
     const shipping = totalPrice >= 1500 ? 0 : 40;
