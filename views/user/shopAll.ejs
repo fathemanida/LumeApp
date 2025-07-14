@@ -23,6 +23,7 @@
     html, body {
       height: 100%;
       margin: 0;
+      padding-top: 80px;
       padding: 0;
       background-color: #f0e9e0;
       font-family: 'Jost', sans-serif;
@@ -419,6 +420,13 @@
       padding-left: 5.5rem;
       padding-right: 5.5rem;
       margin-top: 80px;
+    }
+
+    @media (max-width: 767px) {
+      .main-content-container {
+        padding-left: 0;
+        padding-right: 0;
+      }
     }
 
     @media (min-width: 768px) {

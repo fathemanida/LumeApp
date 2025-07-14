@@ -835,81 +835,11 @@
 
 <body>
   <!-- Overlay -->
-  <div class="overlay" id="overlay"></div>
 
-  <!-- Sidebar -->
-  <div class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-      <div class="brand">LUME</div>
-    </div>
-    <div class="sidebar-menu">
-      <div class="sidebar-category mb-4">
-        <form id="sidebarSearchForm" onsubmit="return false;">
-          <div class="input-group">
-            <input type="text" class="form-control search-input" placeholder="Search products..." id="sidebarSearch" name="search">
-            <button class="btn btn-outline-dark" type="submit" id="sidebarSearchBtn">
-              <i class="fas fa-search"></i>
-            </button>
-          </div>
-        </form>
-      </div>
-      <div class="sidebar-category">
-        <div class="sidebar-title" onclick="toggleCategory(this)">
-          Categories <i class="fas fa-chevron-down"></i>
-        </div>
-        <div class="sidebar-items">
-          <% for(let i=0; i<category.length; i++) { %>
-            <div class="sidebar-item">
-              <a href="/filter?category=<%= category[i]._id %><%= selectedSort ? '&sort=' + selectedSort : '' %>"
-                class="<%= selectedCategory === category[i]._id.toString() ? 'active' : '' %>">
-                <%= category[i].name %>
-              </a>
-            </div>
-          <% } %>
-        </div>
-      </div>
-      <div class="sidebar-category">
-        <div class="sidebar-title" onclick="toggleCategory(this)">
-          Sort By <i class="fas fa-chevron-down"></i>
-        </div>
-        <div class="sidebar-items">
-          <div class="sidebar-item">
-            <a href="?sort=price-low&page=<%= currentPage %><%= selectedCategory ? '&category=' + selectedCategory : '' %>"
-              class="<%= selectedSort === 'price-low' ? 'active' : '' %>">Price: Low to High</a>
-          </div>
-          <div class="sidebar-item">
-            <a href="?sort=price-high&page=<%= currentPage %><%= selectedCategory ? '&category=' + selectedCategory : '' %>"
-              class="<%= selectedSort === 'price-high' ? 'active' : '' %>">Price: High to Low</a>
-          </div>
-          <div class="sidebar-item">
-            <a href="?sort=name-asc<%= selectedCategory ? '&category=' + selectedCategory : '' %>"
-              class="<%= selectedSort === 'name-asc' ? 'active' : '' %>">A-Z</a>
-          </div>
-          <div class="sidebar-item">
-            <a href="?sort=name-desc<%= selectedCategory ? '&category=' + selectedCategory : '' %>"
-              class="<%= selectedSort === 'name-desc' ? 'active' : '' %>">Z-A</a>
-          </div>
-          <div class="sidebar-item">
-            <a href="?sort=newest<%= selectedCategory ? '&category=' + selectedCategory : '' %>"
-              class="<%= selectedSort === 'newest' ? 'active' : '' %>">Newest First</a>
-          </div>
-        </div>
-      </div>
-      <div class="sidebar-category">
-        <div class="sidebar-title" onclick="toggleCategory(this)">
-          Collections <i class="fas fa-chevron-down"></i>
-        </div>
-        <div class="sidebar-items">
-          <div class="sidebar-item">New Arrivals</div>
-          <div class="sidebar-item">Best Sellers</div>
-          <div class="sidebar-item">Limited Edition</div>
-        </div>
-      </div>
-    </div>
-  </div>
 
-<% -include('../partials/user/header.ejs') %>
 
+<%-include('../partials/user/header.ejs')  %>
+ 
   <div class="container-fluid py-4 main-content-container">
     <div class="row">
       <div class="col-12">
@@ -1062,25 +992,10 @@
       });
     }
 
-    // Sidebar functionality
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('overlay');
-    const sidebarToggle = document.getElementById('sidebarToggle');
-    const searchContainer = document.querySelector('.search-container');
-
-    sidebarToggle.addEventListener('click', () => {
-      sidebar.classList.toggle('open');
-      overlay.classList.toggle('active');
-    });
-
-    overlay.addEventListener('click', () => {
-      sidebar.classList.remove('open');
-      overlay.classList.remove('active');
-    });
-
     // Search toggle functionality
     document.querySelector('.search-button').addEventListener('click', (e) => {
       e.preventDefault();
+      const searchContainer = document.querySelector('.search-container');
       searchContainer.classList.toggle('active');
       if (searchContainer.classList.contains('active')) {
         searchContainer.querySelector('input').focus();
@@ -1089,34 +1004,10 @@
 
     // Close search when clicking outside
     document.addEventListener('click', (e) => {
-      if (!searchContainer.contains(e.target) && !e.target.closest('.search-button')) {
+      const searchContainer = document.querySelector('.search-container');
+      if (searchContainer && !searchContainer.contains(e.target) && !e.target.closest('.search-button')) {
         searchContainer.classList.remove('active');
       }
-    });
-
-    // Category toggle functionality
-    function toggleCategory(element) {
-      const items = element.nextElementSibling;
-      const icon = element.querySelector('i');
-
-      items.classList.toggle('open');
-
-      if (items.classList.contains('open')) {
-        icon.classList.remove('fa-chevron-down');
-        icon.classList.add('fa-chevron-up');
-      } else {
-        icon.classList.remove('fa-chevron-up');
-        icon.classList.add('fa-chevron-down');
-      }
-    }
-
-    // Make sidebar items clickable
-    document.querySelectorAll('.sidebar-item').forEach(item => {
-      item.addEventListener('click', function () {
-        console.log('Navigating to:', this.textContent);
-        sidebar.classList.remove('open');
-        overlay.classList.remove('active');
-      });
     });
 
     // Wishlist functionality
@@ -1163,11 +1054,10 @@
 
     // Search functionality
     document.addEventListener('DOMContentLoaded', function () {
-      const sidebarSearch = document.getElementById('sidebarSearch');
       const productItems = document.querySelectorAll('.product-item');
 
       function performSearch() {
-        const searchTerm = sidebarSearch.value.trim().toLowerCase();
+        const searchTerm = document.getElementById('sidebarSearch').value.trim().toLowerCase();
 
         productItems.forEach(item => {
           const productName = item.dataset.name;
@@ -1189,8 +1079,6 @@
           countElement.textContent = `Showing ${visibleProducts} of ${totalProducts} products`;
         }
       }
-
-      sidebarSearch.addEventListener('input', performSearch);
 
       document.getElementById('sidebarSearchForm').addEventListener('submit', function (e) {
         e.preventDefault();
