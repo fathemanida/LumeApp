@@ -18,6 +18,7 @@
       --offer-red: #e63946;
       --dark-text: #2c1810;
       --darker-text: #1a0f0a;
+      --main-font: 'Aboreto', cursive, sans-serif;
     }
 
     html, body {
@@ -26,8 +27,11 @@
       padding-top: 80px;
       padding: 0;
       background-color: #f0e9e0;
-      font-family: 'Jost', sans-serif;
+      font-family: var(--main-font);
       color: var(--dark-text);
+    }
+    h1, h2, h3, h4, h5, h6, .section-heading, .page-title, .product-title, .footer-heading, .brand, .profile-dropdown-content a, .category-title-overlay, .product-title.card-title, .offer-badge, .new-badge, .product-category, .product-info, .product-price, .btn, .wishlist-icon, .pagination, .page-btn, .main-content-container, .category-grid, .category-grid-section, .footer, .footer-link, .footer-bottom, .profile-dropdown-content, .product-description, .product-card, .product-card .btn, .product-card .product-title, .product-card .product-category, .product-card .product-price, .product-card .offer-badge, .product-card .new-badge, .product-card .wishlist-icon, .product-card .btn, .product-info, .product-title.card-title {
+      font-family: var(--main-font) !important;
     }
 
     /* Sidebar Styles */
@@ -554,8 +558,8 @@
           Collections <i class="fas fa-chevron-down"></i>
         </div>
         <div class="sidebar-items">
-          <div class="sidebar-item">New Arrivals</div>
-          <div class="sidebar-item">Best Sellers</div>
+          <div class="sidebar-item" id="sidebarNewArrivals" style="cursor:pointer;">New Arrivals</div>
+          <div class="sidebar-item" id="sidebarBestSellers" style="cursor:pointer;">Best Sellers</div>
           <div class="sidebar-item">Limited Edition</div>
         </div>
       </div>
@@ -575,7 +579,7 @@
         <div id="productsGrid">
           <% if (products && products.length > 0) { %>
             <% products.forEach(product => { %>
-            <div class="col product-item" data-name="<%= product.productName.toLowerCase() %>" data-category="<%= product.category?.name?.toLowerCase() || '' %>">
+            <div class="col product-item" data-name="<%= product.productName.toLowerCase() %>" data-category="<%= product.category?.name?.toLowerCase() || '' %>" data-new="<%= product.new ? 'true' : 'false' %>" data-orders="<%= product.orderCount || 0 %>">
               <div class="product-card card text-center h-100 position-relative overflow-hidden">
                 <i class="far fa-heart wishlist-icon" onclick="event.stopPropagation(); toggleWishlist(this, '<%= product._id %>')"></i>
 
@@ -848,6 +852,43 @@
           if (query) {
             window.location.href = `/shopAll?search=${encodeURIComponent(query)}`;
           }
+        });
+      }
+
+      // Sidebar New Arrivals and Best Sellers filtering
+      const newArrivalsBtn = document.getElementById('sidebarNewArrivals');
+      const bestSellersBtn = document.getElementById('sidebarBestSellers');
+      const productItems = document.querySelectorAll('.product-item');
+      if (newArrivalsBtn) {
+        newArrivalsBtn.addEventListener('click', function() {
+          productItems.forEach(item => {
+            if (item.dataset.new === 'true') {
+              item.style.display = '';
+            } else {
+              item.style.display = 'none';
+            }
+          });
+        });
+      }
+      if (bestSellersBtn) {
+        bestSellersBtn.addEventListener('click', function() {
+          // Find the product-item with the highest data-orders attribute
+          let maxOrders = -1;
+          let bestItem = null;
+          productItems.forEach(item => {
+            const orders = parseInt(item.dataset.orders || '0', 10);
+            if (orders > maxOrders) {
+              maxOrders = orders;
+              bestItem = item;
+            }
+          });
+          productItems.forEach(item => {
+            if (item === bestItem) {
+              item.style.display = '';
+            } else {
+              item.style.display = 'none';
+            }
+          });
         });
       }
     });
