@@ -200,7 +200,10 @@
             <!-- Sales Data Table -->
             <div class="sales-table-container animate-fadeIn">
                 <h3 class="chart-title">Detailed Sales Data</h3>
-                <div class="table-responsive-admin-sales">
+                <div class="table-responsive-admin-sales" style="overflow-x:auto;width:100%;margin:0;padding:0;">
+                  <div class="scroll-cue" style="display:none; text-align:right; font-size:0.85rem; color:#aaa; margin-bottom:2px;">
+                    <i class="fas fa-arrows-alt-h"></i> Swipe to see more
+                  </div>
                   <table class="sales-table">
                       <thead>
                           <tr>
@@ -487,13 +490,13 @@
     <style>
     @media (max-width: 991px) {
       .table-responsive-admin-sales {
-        overflow-x: auto;
-        width: 100%;
-        margin: 0;
-        padding: 0;
+        overflow-x: auto !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
       }
       .table-responsive-admin-sales table {
-        min-width: 800px;
+        min-width: 800px !important;
       }
       .sales-table-container, .chart-container, .sales-summary {
         width: 100% !important;
@@ -501,6 +504,9 @@
         max-width: 100vw !important;
         margin: 0 auto !important;
         box-sizing: border-box;
+      }
+      .scroll-cue {
+        display: block !important;
       }
     }
   </style>
