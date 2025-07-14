@@ -14,6 +14,7 @@
    
 </head>
 <body>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
     <!-- Sidebar -->
     <aside class="sidebar">
         <div class="brand">LUME</div>
@@ -56,12 +57,17 @@
 
     <!-- Main Content -->
     <main class="main-content">
-        <div class="header">
-            <h1 class="page-title">Offers</h1>
+        <header class="header">
+            <div class="header-left">
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="page-title">Offers</h1>
+            </div>
             <a href="/admin/add-offer" class="btn btn-primary">
                 <i class="fas fa-plus"></i> Add New Offer
             </a>
-        </div>
+        </header>
 
         <!-- Search and Filter Section -->
         <div class="search-filter-section">
@@ -360,6 +366,56 @@
                 }
             }).showToast();
         };
+
+    // Sidebar toggle functionality (mobile/tablet)
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const sidebar = document.querySelector('.sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+    function toggleSidebar() {
+      sidebar.classList.toggle('active');
+      sidebarOverlay.style.display = sidebar.classList.contains('active') ? 'block' : 'none';
+      document.body.classList.toggle('sidebar-open', sidebar.classList.contains('active'));
+    }
+
+    if (mobileMenuBtn) {
+      mobileMenuBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        toggleSidebar();
+      });
+    }
+    if (sidebarOverlay) {
+      sidebarOverlay.addEventListener('click', toggleSidebar);
+    }
+    // Close sidebar when clicking anywhere on body (mobile/tablet only)
+    document.body.addEventListener('click', function(e) {
+      if (window.innerWidth <= 991 && sidebar.classList.contains('active')) {
+        if (!sidebar.contains(e.target) && e.target !== mobileMenuBtn && !mobileMenuBtn.contains(e.target)) {
+          sidebar.classList.remove('active');
+          sidebarOverlay.style.display = 'none';
+          document.body.classList.remove('sidebar-open');
+        }
+      }
+    });
+    // Prevent sidebar click from closing itself
+    sidebar.addEventListener('click', function(e) {
+      e.stopPropagation();
+    });
+    // Close sidebar when clicking on a nav link (for mobile)
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth <= 768) {
+          toggleSidebar();
+        }
+      });
+    });
+    // Close sidebar when window is resized to desktop size
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 768) {
+        sidebar.classList.remove('active');
+        sidebarOverlay.style.display = 'none';
+      }
+    });
     </script>
 </body>
 </html>
