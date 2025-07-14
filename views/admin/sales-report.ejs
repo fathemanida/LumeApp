@@ -494,6 +494,8 @@
         width: 100% !important;
         margin: 0 !important;
         padding: 0 !important;
+        -webkit-overflow-scrolling: touch;
+        touch-action: pan-x;
       }
       .table-responsive-admin-sales table {
         min-width: 800px !important;
@@ -508,7 +510,52 @@
       .scroll-cue {
         display: block !important;
       }
+      .sales-summary {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 1rem !important;
+        align-items: stretch !important;
+      }
+      .summary-card {
+        width: 100% !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        box-sizing: border-box;
+      }
+      .report-controls, .report-filter {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 0.5rem !important;
+      }
+      .report-filter {
+        display: flex !important;
+        flex-wrap: wrap !important;
+      }
+      .filter-group, .download-buttons {
+        width: 100% !important;
+        margin-bottom: 0.5rem !important;
+      }
+      .generate-btn, .download-btn {
+        width: 100% !important;
+        margin-bottom: 0.5rem !important;
+      }
     }
-  </style>
+    /* Extra small devices */
+    @media (max-width: 600px) {
+      .sales-summary {
+        gap: 0.5rem !important;
+      }
+      .summary-card {
+        font-size: 0.95rem !important;
+        padding: 0.75rem !important;
+      }
+      .report-title, .chart-title {
+        font-size: 1.1rem !important;
+      }
+      .sales-table-container {
+        padding: 0.5rem 0 !important;
+      }
+    }
+    </style>
 </body>
 </html>

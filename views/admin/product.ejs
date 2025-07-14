@@ -98,6 +98,9 @@
       </div>
 
       <div class="table-container">
+        <div class="scroll-cue" style="display:none; text-align:right; font-size:0.85rem; color:#aaa; margin-bottom:2px;">
+          <i class="fas fa-arrows-alt-h"></i> Swipe to see more
+        </div>
         <div class="table-responsive-admin-product" style="width:100%;overflow-x:auto;">
           <table>
             <thead>
@@ -403,9 +406,59 @@
       .table-responsive-admin-product {
         width: 100%;
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        touch-action: pan-x;
       }
       .table-responsive-admin-product table {
         min-width: 800px;
+      }
+      .scroll-cue {
+        display: block !important;
+      }
+      .action-bar {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        align-items: stretch;
+      }
+      .add-product-btn {
+        width: 100%;
+        margin-top: 0.5rem;
+      }
+      .search-container, .search-bar, .search-btn, .clear-search {
+        width: 100% !important;
+        box-sizing: border-box;
+      }
+      .main-header, .header-left, .header-right {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 0.5rem !important;
+      }
+      .profile-dropdown {
+        margin-top: 0.5rem;
+      }
+      .pagination {
+        flex-wrap: wrap;
+        gap: 0.25rem;
+        font-size: 0.95rem;
+      }
+      .table-container {
+        padding: 0.5rem 0 !important;
+      }
+    }
+    @media (max-width: 600px) {
+      .action-bar {
+        gap: 0.5rem;
+      }
+      .add-product-btn {
+        font-size: 1rem;
+        padding: 0.5rem 0.75rem;
+      }
+      .section-title {
+        font-size: 1.1rem;
+      }
+      .table-responsive-admin-product table {
+        min-width: 600px;
       }
     }
   </style>
