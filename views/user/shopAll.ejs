@@ -303,8 +303,14 @@
       background: rgba(255, 255, 255, 0.8);
       border-radius: 50%;
       padding: 0.3rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-
+    .wishlist-icon.fas,
+    .wishlist-icon.far {
+      display: inline-flex;
+    }
     .wishlist-icon:hover {
       color: #ff6b6b;
       transform: scale(1.1);
@@ -558,8 +564,12 @@
           Collections <i class="fas fa-chevron-down"></i>
         </div>
         <div class="sidebar-items">
-          <div class="sidebar-item" id="sidebarNewArrivals" style="cursor:pointer;">New Arrivals</div>
-          <div class="sidebar-item" id="sidebarBestSellers" style="cursor:pointer;">Best Sellers</div>
+          <div class="sidebar-item">
+            <a href="?filter=new" class="<%= (req.query.filter === 'new') ? 'active' : '' %>">New Arrivals</a>
+          </div>
+          <div class="sidebar-item">
+            <a href="?filter=best" class="<%= (req.query.filter === 'best') ? 'active' : '' %>">Best Sellers</a>
+          </div>
           <div class="sidebar-item">Limited Edition</div>
         </div>
       </div>
@@ -855,42 +865,7 @@
         });
       }
 
-      // Sidebar New Arrivals and Best Sellers filtering
-      const newArrivalsBtn = document.getElementById('sidebarNewArrivals');
-      const bestSellersBtn = document.getElementById('sidebarBestSellers');
-      const productItems = document.querySelectorAll('.product-item');
-      if (newArrivalsBtn) {
-        newArrivalsBtn.addEventListener('click', function() {
-          productItems.forEach(item => {
-            if (item.dataset.new === 'true') {
-              item.style.display = '';
-            } else {
-              item.style.display = 'none';
-            }
-          });
-        });
-      }
-      if (bestSellersBtn) {
-        bestSellersBtn.addEventListener('click', function() {
-          // Find the product-item with the highest data-orders attribute
-          let maxOrders = -1;
-          let bestItem = null;
-          productItems.forEach(item => {
-            const orders = parseInt(item.dataset.orders || '0', 10);
-            if (orders > maxOrders) {
-              maxOrders = orders;
-              bestItem = item;
-            }
-          });
-          productItems.forEach(item => {
-            if (item === bestItem) {
-              item.style.display = '';
-            } else {
-              item.style.display = 'none';
-            }
-          });
-        });
-      }
+      // Remove client-side filtering for New Arrivals and Best Sellers
     });
   </script>
   <% if (locals.user && locals.user.isBlocked) { %>

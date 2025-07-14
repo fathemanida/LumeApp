@@ -481,8 +481,7 @@ const loadShopAll = async (req, res) => {
     let userData = null;
     const user=req.session.user
     if (user) {
-          const userId=user.id
-
+      const userId=user.id
       userData = await User.findById(userId);
     }
 
@@ -492,6 +491,7 @@ const loadShopAll = async (req, res) => {
 
     const categoryId = req.query.category;
     const sortBy = req.query.sort;
+    const filter = req.query.filter;
 
     let query = {
       isBlocked: false,
@@ -509,12 +509,17 @@ const loadShopAll = async (req, res) => {
       query.category = categoryId;
     }
 
-    const totalProducts = await Product.countDocuments(query);
-    const page = parseInt(req.query.page) || 1;
-    const limit = 12;
-    const skip = (page - 1) * limit;
-    const totalPages = Math.ceil(totalProducts / limit);
+    // Server-side filtering for sidebar
+    if (filter === 'new') {
+      query.new = true;
+    }
 
+    let products = [];
+    let totalProducts = 0;
+    let page = parseInt(req.query.page) || 1;
+    let limit = 12;
+    let skip = (page - 1) * limit;
+    let totalPages = 1;
     let sort = { createdOn: -1 };
     if (sortBy) {
       switch (sortBy) {
@@ -536,23 +541,44 @@ const loadShopAll = async (req, res) => {
       }
     }
 
-    let products = await Product.find(query)
-      .sort(sort)
-      .skip(skip)
-      .limit(limit)
-      .populate("category", "name")
-      .populate({
-        path: 'offer',
-        match: {
-          isActive: true,
-          startDate: { $lte: new Date() },
-          endDate: { $gte: new Date() }
-        }
-      })
-      .lean();
+    if (filter === 'best') {
+      // Show only the product with the highest orderCount
+      products = await Product.find(query)
+        .sort({ orderCount: -1 })
+        .limit(1)
+        .populate("category", "name")
+        .populate({
+          path: 'offer',
+          match: {
+            isActive: true,
+            startDate: { $lte: new Date() },
+            endDate: { $gte: new Date() }
+          }
+        })
+        .lean();
+      totalProducts = products.length;
+      totalPages = 1;
+      page = 1;
+    } else {
+      totalProducts = await Product.countDocuments(query);
+      totalPages = Math.ceil(totalProducts / limit);
+      products = await Product.find(query)
+        .sort(sort)
+        .skip(skip)
+        .limit(limit)
+        .populate("category", "name")
+        .populate({
+          path: 'offer',
+          match: {
+            isActive: true,
+            startDate: { $lte: new Date() },
+            endDate: { $gte: new Date() }
+          }
+        })
+        .lean();
+    }
 
     const now = new Date();
-
     const offers = await Offer.find({
       isActive: true,
       startDate: { $lte: now },
@@ -561,45 +587,44 @@ const loadShopAll = async (req, res) => {
     }).lean();
 
     products = products.map((product) => {
-  const matchedOffers = offers.filter((offer) => {
-    if (offer.applicableOn === "all") return true;
-    if (
-      offer.applicableOn === "categories" &&
-      offer.categories.some(cat => cat.toString() === product.category._id.toString())
-    ) return true;
-    if (
-      offer.applicableOn === "products" &&
-      offer.products.some(prod => prod.toString() === product._id.toString())
-    ) return true;
-    return false;
-  });
+      const matchedOffers = offers.filter((offer) => {
+        if (offer.applicableOn === "all") return true;
+        if (
+          offer.applicableOn === "categories" &&
+          offer.categories.some(cat => cat.toString() === product.category._id.toString())
+        ) return true;
+        if (
+          offer.applicableOn === "products" &&
+          offer.products.some(prod => prod.toString() === product._id.toString())
+        ) return true;
+        return false;
+      });
 
-  if (matchedOffers.length > 0) {
-    let maxDiscount = 0;
-    let bestOffer = null;
+      if (matchedOffers.length > 0) {
+        let maxDiscount = 0;
+        let bestOffer = null;
 
-    matchedOffers.forEach((offer) => {
-      let discount = 0;
-      if (offer.discountType === 'percentage') {
-        discount = (product.salePrice * offer.discountValue) / 100;
-      } else {
-        discount = offer.discountValue;
+        matchedOffers.forEach((offer) => {
+          let discount = 0;
+          if (offer.discountType === 'percentage') {
+            discount = (product.salePrice * offer.discountValue) / 100;
+          } else {
+            discount = offer.discountValue;
+          }
+
+          if (discount > maxDiscount) {
+            maxDiscount = discount;
+            bestOffer = offer;
+          }
+        });
+
+        if (bestOffer) {
+          product.offer = bestOffer;
+        }
       }
 
-      if (discount > maxDiscount) {
-        maxDiscount = discount;
-        bestOffer = offer;
-      }
+      return product;
     });
-
-    if (bestOffer) {
-      product.offer = bestOffer;
-    }
-  }
-
-  return product;
-});
-
 
     const categoryData = categories.map((c) => ({
       _id: c._id,
@@ -616,7 +641,8 @@ const loadShopAll = async (req, res) => {
       category: categoryData,
       selectedCategory: categoryId || null,
       selectedSort: sortBy || null,
-      searchQuery: req.query.search || ""
+      searchQuery: req.query.search || "",
+      filter: filter || null
     });
   } catch (error) {
     console.error("Error in loadShopAll:", error);
