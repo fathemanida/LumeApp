@@ -13,6 +13,7 @@ const router = require("../../routes/userRoutes");
 const { error } = require("console");
 const mongoose = require('mongoose');
 const Order = require("../../models/orderSchema");
+const Offer = require("../../models/offerSchema"); // Added Offer model import
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -205,8 +206,15 @@ const cart = async (req, res) => {
       expiryDate: { $gt: new Date() }
     }).select('code discountType discountValue maxDiscount minOrderAmount expiryDate usedBy');
 
+    // --- NEW: Fetch all active offers (global, category, product) ---
+    const now = new Date();
+    const offers = await Offer.find({
+      isActive: true,
+      startDate: { $lte: now },
+      endDate: { $gte: now }
+    });
+
     if (!cart || cart.items.length === 0) {
-      console.log(coupons,'coupon in cart');
       return res.render('cart', {
         user: req.session.user,
         items: [],
@@ -231,60 +239,43 @@ const cart = async (req, res) => {
         product.salePrice : product.regularPrice;
       const originalPrice = basePrice * item.quantity;
       totalPrice += originalPrice;
-
       item.price = basePrice;
       item.originalPrice = originalPrice;
     });
 
+    // --- UPDATED: Apply best offer (global, category, product) ---
     cart.items.forEach(item => {
       const product = item.productId;
-      const basePrice = product.salePrice && product.salePrice < product.regularPrice ? 
-        product.salePrice : product.regularPrice;
-      let offerDiscount = 0;
-      let largestDiscount = 0;
-      let appliedOffer = null;
+      const originalPrice = item.originalPrice;
+      let maxDiscount = 0;
+      let bestOffer = null;
 
-      if (product.offer && product.offer.isActive) {
-        if (product.offer.discountType === 'percentage') {
-          const discountPercentage = product.offer.discountValue;
-          const discountAmount = (item.originalPrice * discountPercentage) / 100;
-          if (discountAmount > largestDiscount) {
-            largestDiscount = discountAmount;
-            offerDiscount = discountAmount;
-            appliedOffer = 'product';
-          }
-        } else {
-          if (product.offer.discountValue > largestDiscount) {
-            largestDiscount = product.offer.discountValue;
-            offerDiscount = product.offer.discountValue;
-            appliedOffer = 'product';
+      offers.forEach(offer => {
+        let applies = false;
+        if (offer.applicableOn === 'all') applies = true;
+        if (
+          offer.applicableOn === 'categories' &&
+          offer.categories && product.category &&
+          offer.categories.some(cat => cat.toString() === product.category._id.toString())
+        ) applies = true;
+        if (
+          offer.applicableOn === 'products' &&
+          offer.products && offer.products.some(prod => prod.toString() === product._id.toString())
+        ) applies = true;
+        if (applies) {
+          let discount = offer.discountType === 'percentage'
+            ? (originalPrice * offer.discountValue) / 100
+            : offer.discountValue * item.quantity;
+          if (discount > maxDiscount) {
+            maxDiscount = discount;
+            bestOffer = offer;
           }
         }
-      }
+      });
 
-      if (product.category && product.category.categoryOffer && 
-          product.category.categoryOffer.active) {
-        if (product.category.categoryOffer.discountType === 'percentage') {
-          const discountPercentage = product.category.categoryOffer.discountValue;
-          const discountAmount = (item.originalPrice * discountPercentage) / 100;
-          console.log(item.originalPrice,':orginal',discountAmount,':"disAmount');
-          if (discountAmount > largestDiscount) {
-            largestDiscount = discountAmount;
-            offerDiscount = discountAmount;
-            appliedOffer = 'category';
-          }
-        } else {
-          if (product.category.categoryOffer.discountValue > largestDiscount) {
-            largestDiscount = product.category.categoryOffer.discountValue;
-            offerDiscount = product.category.categoryOffer.discountValue;
-            appliedOffer = 'category';
-          }
-        }
-      }
-
-      item.offerDiscount = offerDiscount;
-      item.appliedOffer = appliedOffer;
-      totalOfferDiscount += offerDiscount;
+      item.offerDiscount = maxDiscount;
+      item.appliedOffer = bestOffer;
+      totalOfferDiscount += maxDiscount;
     });
 
     if (cart.appliedCoupon) {
@@ -312,8 +303,6 @@ const cart = async (req, res) => {
       item.couponDiscount = itemCouponDiscount;
       item.totalPrice = item.originalPrice - item.offerDiscount - itemCouponDiscount;
     });
-    console.log('coupon at cart',cart.appliedCoupon);
-console.log('cart',req.session.user,cart.items,totalPrice,totalCouponDiscount,totalOfferDiscount,shipping,finalPrice,'coup',coupons,'applied',cart.appliedCoupon);
     res.render('cart', {
       user: req.session.user,
       items: cart.items,
@@ -326,7 +315,6 @@ console.log('cart',req.session.user,cart.items,totalPrice,totalCouponDiscount,to
       appliedCoupon: cart.appliedCoupon,
       discount: totalCouponDiscount
     });
-
   } catch (error) {
     console.error('Error in cart:', error);
     res.status(500).send('Error loading cart');
