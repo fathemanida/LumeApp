@@ -192,7 +192,12 @@
     }
 
     /* Product Card Styles */
-    .product-card {
+    .product-card,
+    .product-card.card,
+    .product-card .card,
+    .card.product-card,
+    .card {
+      border-radius: 0 !important;
       background: transparent;
       border: none;
       overflow: hidden;
@@ -758,7 +763,7 @@
                   duration: 2000,
                   gravity: "top",
                   position: "right",
-                  backgroundColor: "#4CAF50",
+                  backgroundColor: "#A9BA9D",
                   stopOnFocus: true
                 }).showToast();
               } else {
