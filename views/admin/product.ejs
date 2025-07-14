@@ -98,107 +98,109 @@
       </div>
 
       <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>Image</th>
-              <th>Name</th>
-              <th>Category</th>
-              <th>Price</th>
-              <th>Offer</th>
-              <th>Discount</th>
-              <th>Valid Until</th>
-              <th>Stock</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% for (let i = 0; i < data.length; i++) { %>
-              <tr data-product-id="<%= data[i]._id %>">
-                <td>
-                  <img src="/uploads/product/<%= data[i].productImage[0] %>" alt="Product Image" style="height: 54px;" />
-                </td>
-                <td>
-                  <%= data[i].productName %>
-                </td>
-                <td>
-                  <%= data[i].category ? data[i].category.name : 'No Category' %>
-                </td>
-                <td>
-                  <% if (data[i].salePrice && data[i].salePrice < data[i].regularPrice) { %>
-                    <span style="text-decoration: line-through; color: var(--text-secondary);">₹<%= data[i].regularPrice.toFixed(2) %></span>
-                    <br>
-                    <span style="color: var(--accent-color);">₹<%= data[i].salePrice.toFixed(2) %></span>
-                  <% } else { %>
-                    ₹<%= data[i].regularPrice.toFixed(2) %>
-                  <% } %>
-                </td>
-                <td>
-                  <% if (data[i] && data[i].productOffer && data[i].productOffer.active) { %>
-                    <span class="badge badge-success">Active</span>
-                  <% } else if (data[i] && data[i].offer && data[i].offer.isActive) { %>
-                    <span class="badge badge-success">Active</span>
-                  <% } else { %>
-                    <span class="badge badge-secondary">Inactive</span>
-                  <% } %>
-                </td>
-                <td>
-                  <% if (data[i] && data[i].productOffer && data[i].productOffer.active) { %>
-                    <% if (data[i].productOffer.discountType === 'percentage') { %>
-                      <%= data[i].productOffer.discountValue %>%
-                    <% } else { %>
-                      ₹<%= data[i].productOffer.discountValue.toFixed(2) %>
-                    <% } %>
-                  <% } else if (data[i] && data[i].offer && data[i].offer.isActive) { %>
-                    <% if (data[i].offer.discountType === 'percentage') { %>
-                      <%= data[i].offer.discountValue %>%
-                    <% } else { %>
-                      ₹<%= data[i].offer.discountValue.toFixed(2) %>
-                    <% } %>
-                  <% } else { %>
-                    -
-                  <% } %>
-                </td>
-                <td>
-                  <% if (data[i] && data[i].productOffer && data[i].productOffer.active) { %>
-                    <%= new Date(data[i].productOffer.endDate).toLocaleDateString() %>
-                  <% } else if (data[i] && data[i].offer && data[i].offer.isActive) { %>
-                    <%= new Date(data[i].offer.endDate).toLocaleDateString() %>
-                  <% } else { %>
-                    -
-                  <% } %>
-                </td>
-                <td>
-                  <%= data[i].quantity || data[i].productStock || 0 %>
-                </td>
-                <td>
-                  <% if (data[i].isListed) { %>
-                    <span class="status-listed">Listed</span>
-                  <% } else { %>
-                    <span class="status-unlisted">Unlisted</span>
-                  <% } %>
-                </td>
-                <td>
-                  <div class="action-buttons">
-                    <a href="/admin/edit-product/<%= data[i]._id %>" class="action-btn edit-btn">
-                      <i class="fas fa-edit"></i>
-                    </a>
-                    <% if (data[i].isListed) { %>
-                      <button onclick="toggleListing('<%= data[i]._id %>', false)" class="action-btn unlist-btn">
-                        <i class="fas fa-eye-slash"></i>
-                      </button>
-                    <% } else { %>
-                      <button onclick="toggleListing('<%= data[i]._id %>', true)" class="action-btn list-btn">
-                        <i class="fas fa-eye"></i>
-                      </button>
-                    <% } %>
-                  </div>
-                </td>
+        <div class="table-responsive-admin-product" style="width:100%;overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Offer</th>
+                <th>Discount</th>
+                <th>Valid Until</th>
+                <th>Stock</th>
+                <th>Status</th>
+                <th>Actions</th>
               </tr>
-            <% } %>
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              <% for (let i = 0; i < data.length; i++) { %>
+                <tr data-product-id="<%= data[i]._id %>">
+                  <td>
+                    <img src="/uploads/product/<%= data[i].productImage[0] %>" alt="Product Image" style="height: 54px;" />
+                  </td>
+                  <td>
+                    <%= data[i].productName %>
+                  </td>
+                  <td>
+                    <%= data[i].category ? data[i].category.name : 'No Category' %>
+                  </td>
+                  <td>
+                    <% if (data[i].salePrice && data[i].salePrice < data[i].regularPrice) { %>
+                      <span style="text-decoration: line-through; color: var(--text-secondary);">₹<%= data[i].regularPrice.toFixed(2) %></span>
+                      <br>
+                      <span style="color: var(--accent-color);">₹<%= data[i].salePrice.toFixed(2) %></span>
+                    <% } else { %>
+                      ₹<%= data[i].regularPrice.toFixed(2) %>
+                    <% } %>
+                  </td>
+                  <td>
+                    <% if (data[i] && data[i].productOffer && data[i].productOffer.active) { %>
+                      <span class="badge badge-success">Active</span>
+                    <% } else if (data[i] && data[i].offer && data[i].offer.isActive) { %>
+                      <span class="badge badge-success">Active</span>
+                    <% } else { %>
+                      <span class="badge badge-secondary">Inactive</span>
+                    <% } %>
+                  </td>
+                  <td>
+                    <% if (data[i] && data[i].productOffer && data[i].productOffer.active) { %>
+                      <% if (data[i].productOffer.discountType === 'percentage') { %>
+                        <%= data[i].productOffer.discountValue %>%
+                      <% } else { %>
+                        ₹<%= data[i].productOffer.discountValue.toFixed(2) %>
+                      <% } %>
+                    <% } else if (data[i] && data[i].offer && data[i].offer.isActive) { %>
+                      <% if (data[i].offer.discountType === 'percentage') { %>
+                        <%= data[i].offer.discountValue %>%
+                      <% } else { %>
+                        ₹<%= data[i].offer.discountValue.toFixed(2) %>
+                      <% } %>
+                    <% } else { %>
+                      -
+                    <% } %>
+                  </td>
+                  <td>
+                    <% if (data[i] && data[i].productOffer && data[i].productOffer.active) { %>
+                      <%= new Date(data[i].productOffer.endDate).toLocaleDateString() %>
+                    <% } else if (data[i] && data[i].offer && data[i].offer.isActive) { %>
+                      <%= new Date(data[i].offer.endDate).toLocaleDateString() %>
+                    <% } else { %>
+                      -
+                    <% } %>
+                  </td>
+                  <td>
+                    <%= data[i].quantity || data[i].productStock || 0 %>
+                  </td>
+                  <td>
+                    <% if (data[i].isListed) { %>
+                      <span class="status-listed">Listed</span>
+                    <% } else { %>
+                      <span class="status-unlisted">Unlisted</span>
+                    <% } %>
+                  </td>
+                  <td>
+                    <div class="action-buttons">
+                      <a href="/admin/edit-product/<%= data[i]._id %>" class="action-btn edit-btn">
+                        <i class="fas fa-edit"></i>
+                      </a>
+                      <% if (data[i].isListed) { %>
+                        <button onclick="toggleListing('<%= data[i]._id %>', false)" class="action-btn unlist-btn">
+                          <i class="fas fa-eye-slash"></i>
+                        </button>
+                      <% } else { %>
+                        <button onclick="toggleListing('<%= data[i]._id %>', true)" class="action-btn list-btn">
+                          <i class="fas fa-eye"></i>
+                        </button>
+                      <% } %>
+                    </div>
+                  </td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
 
         <div class="pagination">
           <span style="margin-right: 1rem; align-self: center;">
@@ -243,12 +245,28 @@
     function toggleSidebar() {
       sidebar.classList.toggle('active');
       sidebarOverlay.style.display = sidebar.classList.contains('active') ? 'block' : 'none';
+      document.body.classList.toggle('sidebar-open', sidebar.classList.contains('active'));
     }
 
     mobileMenuBtn.addEventListener('click', toggleSidebar);
 
-    // Close sidebar when clicking outside
+    // Close sidebar when clicking outside (overlay)
     sidebarOverlay.addEventListener('click', toggleSidebar);
+
+    // Close sidebar when clicking anywhere on body (mobile/tablet only)
+    document.body.addEventListener('click', function(e) {
+      if (window.innerWidth <= 991 && sidebar.classList.contains('active')) {
+        if (!sidebar.contains(e.target) && e.target !== mobileMenuBtn && !mobileMenuBtn.contains(e.target)) {
+          sidebar.classList.remove('active');
+          sidebarOverlay.style.display = 'none';
+          document.body.classList.remove('sidebar-open');
+        }
+      }
+    });
+    // Prevent sidebar click from closing itself
+    sidebar.addEventListener('click', function(e) {
+      e.stopPropagation();
+    });
 
     // Close sidebar when clicking on a nav link (for mobile)
     document.querySelectorAll('.nav-link').forEach(link => {
@@ -380,6 +398,17 @@
       }
     });
   </script>
+  <style>
+    @media (max-width: 991px) {
+      .table-responsive-admin-product {
+        width: 100%;
+        overflow-x: auto;
+      }
+      .table-responsive-admin-product table {
+        min-width: 800px;
+      }
+    }
+  </style>
 </body>
 
 </html>
