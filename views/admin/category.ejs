@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Jost&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
        <link rel="stylesheet" href="/css/admin/category.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 
 </head>
 <body>
@@ -196,14 +197,17 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script>
         async function handleListUnlist(categoryId, action) {
             if (!categoryId || categoryId === 'null' || categoryId === 'undefined') {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Invalid category ID'
-                });
+                Toastify({
+                    text: 'Invalid category ID',
+                    duration: 3000,
+                    gravity: 'top',
+                    position: 'right',
+                    backgroundColor: '#f44336',
+                }).showToast();
                 return;
             }
             try {
@@ -214,36 +218,51 @@
                 const data = await response.json();
                 if (response.ok) {
                     if (data.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success',
+                        Toastify({
                             text: data.message,
-                            timer: 2000,
-                            showConfirmButton: false
-                        }).then(() => { window.location.reload(); });
+                            duration: 2000,
+                            gravity: 'top',
+                            position: 'right',
+                            backgroundColor: '#4CAF50',
+                        }).showToast();
+                        setTimeout(() => { window.location.reload(); }, 2000);
                     } else {
-                        Swal.fire({
-                            icon: 'info',
-                            title: 'Info',
-                            text: data.message
-                        });
+                        Toastify({
+                            text: data.message,
+                            duration: 3000,
+                            gravity: 'top',
+                            position: 'right',
+                            backgroundColor: '#ffa502',
+                        }).showToast();
                     }
                 } else {
                     throw new Error(data.message || 'Something went wrong');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: error.message || 'Failed to perform action'
-                });
+                Toastify({
+                    text: error.message || 'Failed to perform action',
+                    duration: 3000,
+                    gravity: 'top',
+                    position: 'right',
+                    backgroundColor: '#f44336',
+                }).showToast();
             }
         }
 
         document.addEventListener('DOMContentLoaded', function () {
             document.querySelectorAll('.list-btn, .unlist-btn').forEach(button => {
-                button.addEventListener('click', function () {
+                // Ensure data-id and data-action attributes are set
+                if (!button.getAttribute('data-id')) {
+                    const href = button.getAttribute('href');
+                    const match = href && href.match(/\/(list|unlist)-category\/(.+)$/);
+                    if (match) {
+                        button.setAttribute('data-id', match[2]);
+                        button.setAttribute('data-action', match[1]);
+                    }
+                }
+                button.addEventListener('click', function (e) {
+                    e.preventDefault();
                     const categoryId = this.getAttribute('data-id');
                     const action = this.getAttribute('data-action');
                     if (categoryId && action) {

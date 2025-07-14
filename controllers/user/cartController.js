@@ -984,7 +984,6 @@ function getBestOffer(product, offers, quantity = 1) {
   let bestOffer = null;
   offers.forEach(offer => {
     let applies = false;
-    // Debug: print offer and product IDs
     console.log('[OFFER DEBUG] Checking offer', offer._id, 'type:', offer.applicableOn, 'against product', product._id, 'category:', product.category?._id);
     if (offer.applicableOn === 'all') applies = true;
     if (
@@ -1009,7 +1008,7 @@ function getBestOffer(product, offers, quantity = 1) {
       })
     ) applies = true;
     if (!product.category || !product.category._id) {
-      console.log('[OFFER DEBUG] Product missing category or category._id:', product);
+      console.log('product missing category or id', product);
     }
     if (applies) {
       let price = (product.salePrice && product.salePrice < product.regularPrice)
@@ -1018,7 +1017,6 @@ function getBestOffer(product, offers, quantity = 1) {
       let discount = offer.discountType === 'percentage'
         ? (price * offer.discountValue / 100) * quantity
         : offer.discountValue * quantity;
-      console.log('[OFFER DEBUG] Product:', product.productName || product._id, 'Offer:', offer.name || offer._id, 'Type:', offer.applicableOn, 'Discount:', discount, 'IsActive:', offer.isActive, 'Dates:', offer.startDate, '-', offer.endDate);
       if (discount > maxDiscount) {
         maxDiscount = discount;
         bestOffer = offer;
