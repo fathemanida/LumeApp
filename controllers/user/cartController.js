@@ -81,46 +81,20 @@ const addToCart = async (req, res) => {
 
     const basePrice = product.salePrice && product.salePrice < product.regularPrice ? 
       product.salePrice : product.regularPrice;
-    let effectivePrice = basePrice;
-    let offerDiscount = 0;
-    let largestDiscount = 0;
 
-    if (product.offer && product.offer.isActive && 
-        new Date() >= product.offer.startDate && 
-        new Date() <= product.offer.endDate) {
-      if (product.offer.discountType === 'percentage') {
-        const discount = (basePrice * product.offer.discountValue) / 100;
-        if (discount > largestDiscount) {
-          largestDiscount = discount;
-          offerDiscount = discount;
-        }
-      } else {
-        if (product.offer.discountValue > largestDiscount) {
-          largestDiscount = product.offer.discountValue;
-          offerDiscount = product.offer.discountValue;
-        }
-      }
-    }
+    // Fetch all active offers (global, category, product)
+    const now = new Date();
+    const offers = await Offer.find({
+      isActive: true,
+      startDate: { $lte: now },
+      endDate: { $gte: now },
+      applicableOn: { $in: ['all', 'categories', 'products'] }
+    });
 
-    if (product.category && product.category.categoryOffer && 
-        product.category.categoryOffer.active &&
-        new Date() >= product.category.categoryOffer.startDate && 
-        new Date() <= product.category.categoryOffer.endDate) {
-      if (product.category.categoryOffer.discountType === 'percentage') {
-        const discount = (basePrice * product.category.categoryOffer.discountValue) / 100;
-        if (discount > largestDiscount) {
-          largestDiscount = discount;
-          offerDiscount = discount;
-        }
-      } else {
-        if (product.category.categoryOffer.discountValue > largestDiscount) {
-          largestDiscount = product.category.categoryOffer.discountValue;
-          offerDiscount = product.category.categoryOffer.discountValue;
-        }
-      }
-    }
-
-    effectivePrice = Math.max(basePrice - offerDiscount, 0);
+    // Use getBestOffer to determine the best discount
+    const { maxDiscount } = getBestOffer(product, offers, quantity);
+    let effectivePrice = basePrice - (maxDiscount / quantity);
+    if (effectivePrice < 0) effectivePrice = 0;
     const totalPrice = effectivePrice * quantity;
 
     const cart = await Cart.findOne({ userId });
