@@ -984,16 +984,33 @@ function getBestOffer(product, offers, quantity = 1) {
   let bestOffer = null;
   offers.forEach(offer => {
     let applies = false;
+    // Debug: print offer and product IDs
+    console.log('[OFFER DEBUG] Checking offer', offer._id, 'type:', offer.applicableOn, 'against product', product._id, 'category:', product.category?._id);
     if (offer.applicableOn === 'all') applies = true;
     if (
       offer.applicableOn === 'categories' &&
       offer.categories && product.category &&
-      offer.categories.some(cat => cat.toString() === product.category._id.toString())
+      offer.categories.some(cat => {
+        const match = cat.toString() === product.category._id?.toString();
+        if (!match) {
+          console.log('[OFFER DEBUG] Category mismatch:', cat, product.category._id);
+        }
+        return match;
+      })
     ) applies = true;
     if (
       offer.applicableOn === 'products' &&
-      offer.products && offer.products.some(prod => prod.toString() === product._id.toString())
+      offer.products && offer.products.some(prod => {
+        const match = prod.toString() === product._id?.toString();
+        if (!match) {
+          console.log('[OFFER DEBUG] Product mismatch:', prod, product._id);
+        }
+        return match;
+      })
     ) applies = true;
+    if (!product.category || !product.category._id) {
+      console.log('[OFFER DEBUG] Product missing category or category._id:', product);
+    }
     if (applies) {
       let price = (product.salePrice && product.salePrice < product.regularPrice)
         ? product.salePrice
@@ -1001,6 +1018,7 @@ function getBestOffer(product, offers, quantity = 1) {
       let discount = offer.discountType === 'percentage'
         ? (price * offer.discountValue / 100) * quantity
         : offer.discountValue * quantity;
+      console.log('[OFFER DEBUG] Product:', product.productName || product._id, 'Offer:', offer.name || offer._id, 'Type:', offer.applicableOn, 'Discount:', discount, 'IsActive:', offer.isActive, 'Dates:', offer.startDate, '-', offer.endDate);
       if (discount > maxDiscount) {
         maxDiscount = discount;
         bestOffer = offer;
