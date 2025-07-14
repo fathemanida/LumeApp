@@ -206,7 +206,6 @@ const cart = async (req, res) => {
       expiryDate: { $gt: new Date() }
     }).select('code discountType discountValue maxDiscount minOrderAmount expiryDate usedBy');
 
-    // --- NEW: Fetch all active offers (global, category, product) ---
     const now = new Date();
     const offers = await Offer.find({
       isActive: true,
@@ -243,36 +242,10 @@ const cart = async (req, res) => {
       item.originalPrice = originalPrice;
     });
 
-    // --- UPDATED: Apply best offer (global, category, product) ---
     cart.items.forEach(item => {
       const product = item.productId;
       const originalPrice = item.originalPrice;
-      let maxDiscount = 0;
-      let bestOffer = null;
-
-      offers.forEach(offer => {
-        let applies = false;
-        if (offer.applicableOn === 'all') applies = true;
-        if (
-          offer.applicableOn === 'categories' &&
-          offer.categories && product.category &&
-          offer.categories.some(cat => cat.toString() === product.category._id.toString())
-        ) applies = true;
-        if (
-          offer.applicableOn === 'products' &&
-          offer.products && offer.products.some(prod => prod.toString() === product._id.toString())
-        ) applies = true;
-        if (applies) {
-          let discount = offer.discountType === 'percentage'
-            ? (originalPrice * offer.discountValue) / 100
-            : offer.discountValue * item.quantity;
-          if (discount > maxDiscount) {
-            maxDiscount = discount;
-            bestOffer = offer;
-          }
-        }
-      });
-
+      const { maxDiscount, bestOffer } = getBestOffer(product, offers, item.quantity);
       item.offerDiscount = maxDiscount;
       item.appliedOffer = bestOffer;
       totalOfferDiscount += maxDiscount;
@@ -638,50 +611,10 @@ const getCheckout = async (req, res) => {
       const product = item.productId;
       const basePrice = product.salePrice && product.salePrice < product.regularPrice ? 
         product.salePrice : product.regularPrice;
-      let offerDiscount = 0;
-      let largestDiscount = 0;
-      let appliedOffer = null;
-
-      if (product.offer && product.offer.isActive) {
-        if (product.offer.discountType === 'percentage') {
-          const discountPercentage = product.offer.discountValue;
-          const discountAmount = (item.originalPrice * discountPercentage) / 100;
-          if (discountAmount > largestDiscount) {
-            largestDiscount = discountAmount;
-            offerDiscount = discountAmount;
-            appliedOffer = 'product';
-          }
-        } else {
-          if (product.offer.discountValue > largestDiscount) {
-            largestDiscount = product.offer.discountValue;
-            offerDiscount = product.offer.discountValue;
-            appliedOffer = 'product';
-          }
-        }
-      }
-
-      if (product.category && product.category.categoryOffer && 
-          product.category.categoryOffer.active) {
-        if (product.category.categoryOffer.discountType === 'percentage') {
-          const discountPercentage = product.category.categoryOffer.discountValue;
-          const discountAmount = (item.originalPrice * discountPercentage) / 100;
-          if (discountAmount > largestDiscount) {
-            largestDiscount = discountAmount;
-            offerDiscount = discountAmount;
-            appliedOffer = 'category';
-          }
-        } else {
-          if (product.category.categoryOffer.discountValue > largestDiscount) {
-            largestDiscount = product.category.categoryOffer.discountValue;
-            offerDiscount = product.category.categoryOffer.discountValue;
-            appliedOffer = 'category';
-          }
-        }
-      }
-
-      item.offerDiscount = offerDiscount;
-      item.appliedOffer = appliedOffer;
-      totalOfferDiscount += offerDiscount;
+      const { maxDiscount, bestOffer } = getBestOffer(product, offers, item.quantity);
+      item.offerDiscount = maxDiscount;
+      item.appliedOffer = bestOffer;
+      totalOfferDiscount += maxDiscount;
     });
 
     if (cart.appliedCoupon) {
@@ -1099,6 +1032,35 @@ const placeOrder = async (req, res) => {
     });
   }
 };
+
+// Helper to get best offer for a product
+function getBestOffer(product, offers, quantity = 1) {
+  let maxDiscount = 0;
+  let bestOffer = null;
+  offers.forEach(offer => {
+    let applies = false;
+    if (offer.applicableOn === 'all') applies = true;
+    if (
+      offer.applicableOn === 'categories' &&
+      offer.categories && product.category &&
+      offer.categories.some(cat => cat.toString() === product.category._id.toString())
+    ) applies = true;
+    if (
+      offer.applicableOn === 'products' &&
+      offer.products && offer.products.some(prod => prod.toString() === product._id.toString())
+    ) applies = true;
+    if (applies) {
+      let discount = offer.discountType === 'percentage'
+        ? ((product.salePrice && product.salePrice < product.regularPrice ? product.salePrice : product.regularPrice) * offer.discountValue * quantity) / 100
+        : offer.discountValue * quantity;
+      if (discount > maxDiscount) {
+        maxDiscount = discount;
+        bestOffer = offer;
+      }
+    }
+  });
+  return { maxDiscount, bestOffer };
+}
 
 module.exports = {
   addToCart,
