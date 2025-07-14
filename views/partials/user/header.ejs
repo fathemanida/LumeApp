@@ -34,7 +34,7 @@
       </div>
       <a href="/wishlist" class="icon-link"><i class="far fa-heart"></i></a>
       <a href="/cart" class="icon-link"><i class="fas fa-shopping-cart"></i></a>
-      <a href="/profile" class="icon-link profile-icon profile-dropdown">
+      <div class="icon-link profile-icon profile-dropdown" tabindex="0" id="profileDropdown">
         <i class="fas fa-user"></i>
         <div class="profile-dropdown-content">
           <% if (locals.user) { %>
@@ -48,7 +48,7 @@
             <a href="/signup"><i class="fas fa-user-plus"></i> Sign Up</a>
           <% } %>
         </div>
-      </a>
+      </div>
     </div>
 
     <!-- Mobile Toggle Button -->
@@ -217,6 +217,7 @@ body, html {
 .profile-dropdown {
   position: relative;
   display: inline-block;
+  cursor: pointer;
 }
 
 .dropdown-content {
@@ -277,7 +278,8 @@ body, html {
   background-color: #f8f8f8;
   color: #A9BA9D;
 }
-.profile-dropdown:hover .profile-dropdown-content {
+.profile-dropdown:hover .profile-dropdown-content,
+.profile-dropdown:focus-within .profile-dropdown-content {
   display: block;
 }
 
@@ -380,8 +382,8 @@ body, html {
     padding: 1rem;
   }
   .profile-dropdown-content {
-    right: 0;
     left: auto;
+    right: 0;
     min-width: 150px;
     top: 120%;
   }
@@ -488,5 +490,23 @@ document.addEventListener('DOMContentLoaded', function() {
       searchContainer.style.display = 'none';
     }
   });
+
+  // Profile dropdown for mobile (toggle on click)
+  const profileDropdown = document.getElementById('profileDropdown');
+  if (profileDropdown) {
+    profileDropdown.addEventListener('click', function(e) {
+      if (window.innerWidth <= 768) {
+        e.stopPropagation();
+        const dropdown = this.querySelector('.profile-dropdown-content');
+        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+      }
+    });
+    document.addEventListener('click', function(e) {
+      if (window.innerWidth <= 768 && !profileDropdown.contains(e.target)) {
+        const dropdown = profileDropdown.querySelector('.profile-dropdown-content');
+        if (dropdown) dropdown.style.display = 'none';
+      }
+    });
+  }
 });
 </script>
