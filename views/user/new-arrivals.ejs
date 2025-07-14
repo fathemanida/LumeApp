@@ -382,7 +382,7 @@
                 </a>
                 <button class="btn w-100"
                         <%= !product.isListed || product.quantity <= 0 ? 'disabled' : '' %>
-                        onclick="event.stopPropagation(); addToCart('<%= product._id %>', '<%= product.productName.replace(/'/g, '\\'') %>', '<%= product.regularPrice %>', '<%= product.salePrice %>', '<%= product.productImage[0] %>')">
+                        onclick="event.stopPropagation(); addToCart('<%= product._id %>', '<%= product.productName.replace(/'/g, "\\\\'") %>', '<%= product.regularPrice %>', '<%= product.salePrice %>', '<%= product.productImage[0] %>')">
                   <%= !product.isListed ? 'Not Available' : (product.quantity <= 0 ? 'Out of Stock' : 'Add to Cart') %>
                 </button>
               </div>

@@ -310,7 +310,6 @@
       font-family: 'Jost', sans-serif;
       font-size: 0.65rem;
       padding: 0.3rem 0.6rem;
-      border-radius: 12px;
       text-transform: uppercase;
       z-index: 2;
     }
@@ -686,6 +685,116 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
   <script>
+    // Move these functions outside DOMContentLoaded so they are globally accessible
+    async function toggleWishlist(iconElement, productId) {
+      try {
+        const response = await fetch('/wishlist/add', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ productId })
+        });
+        const data = await response.json();
+        if (data.success) {
+          iconElement.classList.toggle('far');
+          iconElement.classList.toggle('fas');
+          iconElement.classList.toggle('text-danger');
+          Toastify({
+            text: iconElement.classList.contains('fas') ? "Added to Wishlist 💖" : "Removed from Wishlist ❌",
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            backgroundColor: iconElement.classList.contains('fas') ? "#4CAF50" : "#f44336",
+            stopOnFocus: true
+          }).showToast();
+        } else {
+          Toastify({
+            text: data.message || "Something went wrong",
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#f44336"
+          }).showToast();
+        }
+      } catch (err) {
+        console.error('Wishlist error:', err);
+        Toastify({
+          text: "Server error. Try again later.",
+          duration: 3000,
+          gravity: "top",
+          position: "right",
+          backgroundColor: "#f44336"
+        }).showToast();
+      }
+    }
+
+    function addToCart(productId) {
+      fetch('/check-auth')
+        .then(response => response.json())
+        .then(data => {
+          if (!data.isAuthenticated) {
+            Toastify({
+              text: "Login required to add items to cart",
+              duration: 3000,
+              gravity: "top",
+              position: "right",
+              backgroundColor: "#A9BA9D",
+              stopOnFocus: true
+            }).showToast();
+            return;
+          }
+          fetch('/cart/add', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            body: JSON.stringify({ productId: productId, quantity: 1 })
+          })
+            .then(response => response.ok ? response.json() : response.json().then(err => Promise.reject(err)))
+            .then(data => {
+              if (data.success) {
+                Toastify({
+                  text: data.message || 'Added to Cart',
+                  duration: 2000,
+                  gravity: "top",
+                  position: "right",
+                  backgroundColor: "#4CAF50",
+                  stopOnFocus: true
+                }).showToast();
+              } else {
+                Toastify({
+                  text: data.message || 'Failed to add to cart',
+                  duration: 3000,
+                  gravity: "top",
+                  position: "right",
+                  backgroundColor: "#e63946",
+                  stopOnFocus: true
+                }).showToast();
+              }
+            })
+            .catch(error => {
+              Toastify({
+                text: error.message || 'Failed to add item to cart',
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#e63946",
+                stopOnFocus: true
+              }).showToast();
+            });
+        })
+        .catch(error => {
+          Toastify({
+            text: 'Failed to check authentication status',
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#e63946",
+            stopOnFocus: true
+          }).showToast();
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
       const sidebar = document.getElementById('sidebar');
       const overlay = document.getElementById('overlay');
@@ -723,135 +832,27 @@
           toggleCategory(this);
         });
       });
-
-      async function toggleWishlist(iconElement, productId) {
-        try {
-          const response = await fetch('/wishlist/add', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ productId })
-          });
-          const data = await response.json();
-          if (data.success) {
-            iconElement.classList.toggle('far');
-            iconElement.classList.toggle('fas');
-            iconElement.classList.toggle('text-danger');
-            Toastify({
-              text: iconElement.classList.contains('fas') ? "Added to Wishlist 💖" : "Removed from Wishlist ❌",
-              duration: 3000,
-              gravity: "top",
-              position: "right",
-              backgroundColor: iconElement.classList.contains('fas') ? "#4CAF50" : "#f44336",
-              stopOnFocus: true
-            }).showToast();
-          } else {
-            Toastify({
-              text: data.message || "Something went wrong",
-              duration: 3000,
-              gravity: "top",
-              position: "right",
-              backgroundColor: "#f44336"
-            }).showToast();
-          }
-        } catch (err) {
-          console.error('Wishlist error:', err);
-          Toastify({
-            text: "Server error. Try again later.",
-            duration: 3000,
-            gravity: "top",
-            position: "right",
-            backgroundColor: "#f44336"
-          }).showToast();
-        }
-      }
-
-      function addToCart(productId) {
-        fetch('/check-auth')
-          .then(response => response.json())
-          .then(data => {
-            if (!data.isAuthenticated) {
-              Toastify({
-                text: "Login required to add items to cart",
-                duration: 3000,
-                gravity: "top",
-                position: "right",
-                backgroundColor: "#A9BA9D",
-                stopOnFocus: true
-              }).showToast();
-              return;
-            }
-            fetch('/cart/add', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-              },
-              body: JSON.stringify({ productId: productId, quantity: 1 })
-            })
-              .then(response => response.ok ? response.json() : response.json().then(err => Promise.reject(err)))
-              .then(data => {
-                if (data.success) {
-                  Toastify({
-                    text: data.message || 'Added to Cart',
-                    duration: 2000,
-                    gravity: "top",
-                    position: "right",
-                    backgroundColor: "#4CAF50",
-                    stopOnFocus: true
-                  }).showToast();
-                } else {
-                  Toastify({
-                    text: data.message || 'Failed to add to cart',
-                    duration: 3000,
-                    gravity: "top",
-                    position: "right",
-                    backgroundColor: "#e63946",
-                    stopOnFocus: true
-                  }).showToast();
-                }
-              })
-              .catch(error => {
-                Toastify({
-                  text: error.message || 'Failed to add item to cart',
-                  duration: 3000,
-                  gravity: "top",
-                  position: "right",
-                  backgroundColor: "#e63946",
-                  stopOnFocus: true
-                }).showToast();
-              });
-          })
-          .catch(error => {
-            Toastify({
-              text: 'Failed to check authentication status',
-              duration: 3000,
-              gravity: "top",
-              position: "right",
-              backgroundColor: "#e63946",
-              stopOnFocus: true
-            }).showToast();
-          });
-      }
-
-      <% if (locals.user && locals.user.isBlocked) { %>
-        Swal.fire({
-          title: 'Account Blocked',
-          text: 'Your account has been blocked by the administrator. Please contact support for assistance.',
-          icon: 'error',
-          confirmButtonColor: '#291d0e',
-          allowOutsideClick: false,
-          allowEscapeKey: false,
-          allowEnterKey: false,
-          showCloseButton: false,
-          showCancelButton: false,
-          showDenyButton: false,
-          confirmButtonText: 'Ok',
-          willClose: () => {
-            window.location.href = '/logout';
-          }
-        });
-      <% } %>
     });
   </script>
+  <% if (locals.user && locals.user.isBlocked) { %>
+    <script>
+      Swal.fire({
+        title: 'Account Blocked',
+        text: 'Your account has been blocked by the administrator. Please contact support for assistance.',
+        icon: 'error',
+        confirmButtonColor: '#291d0e',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        allowEnterKey: false,
+        showCloseButton: false,
+        showCancelButton: false,
+        showDenyButton: false,
+        confirmButtonText: 'Ok',
+        willClose: () => {
+          window.location.href = '/logout';
+        }
+      });
+    </script>
+  <% } %>
 </body>
 </html>
