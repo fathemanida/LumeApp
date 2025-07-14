@@ -304,6 +304,18 @@
       box-shadow: 0 2px 10px rgba(0,0,0,0.05);
       transition: all 0.3s ease;
     }
+    @media (max-width: 768px) {
+      .profile-header {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.5rem 1rem;
+        text-align: center;
+      }
+      .profile-info h2, .profile-info p {
+        text-align: center;
+      }
+    }
 
     .profile-header:hover {
       transform: translateY(-4px);
@@ -469,48 +481,7 @@
 </head>
 <body>
     <!-- Navbar -->
-    <nav class="navbar">
-        <!-- Left side - Brand -->
-        <div class="brand">LUME</div>
-
-        <!-- Center - Navigation Links -->
-        <ul class="nav-links">
-            <li><a href="/" class="nav-link">Home</a></li>
-            <li><a href="/shopAll" class="nav-link">Shop All</a></li>
-            <li><a href="/featured" class="nav-link">Featured</a></li>
-            <li><a href="/new-arrivals" class="nav-link">New Arrivals</a></li>
-        </ul>
-
-        <!-- Right side - Icons -->
-        <ul class="icon-links">
-            <li>
-                <a href="/search" class="icon-link">
-                    <i class="fas fa-search"></i>
-                </a>
-            </li>
-            <li>
-                <a href="/cart" class="icon-link">
-                    <i class="fas fa-shopping-cart"></i>
-                </a>
-            </li>
-            <li>
-                <div class="profile-dropdown">
-                    <a href="#" class="icon-link"><i class="far fa-user"></i></a>
-                    <div class="profile-dropdown-content">
-                        <% if (locals.user) { %>
-                            <a href="/profile"><i class="fas fa-user"></i> My Profile</a>
-                            <a href="/orders"><i class="fas fa-box"></i> My Orders</a>
-                            <a href="/wishlist"><i class="fas fa-heart"></i> Wishlist</a>
-                            <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
-                        <% } else { %>
-                            <a href="/login"><i class="fas fa-sign-in-alt"></i> Login</a>
-                            <a href="/signup"><i class="fas fa-user-plus"></i> Sign Up</a>
-                        <% } %>
-                    </div>
-                </div>
-            </li>
-        </ul>
-    </nav>
+<%-include('../partials/user/header.ejs')  %>
 
     <% if (locals.user) { %>
         <div class="main-container">
@@ -611,47 +582,7 @@
     <% } %>
 
     <!-- Footer -->
-    <footer class="footer">
-      <div style="display: flex; justify-content: center; gap: 120px; padding: 0 20px; max-width: 1200px; margin: 0 auto;">
-        <!-- Company Section -->
-        <div>
-          <h3 class="footer-heading">Company</h3>
-          <ul style="list-style: none; padding: 0;">
-            <li><a href="/about-us" class="footer-link">About Us</a></li>
-            <li><a href="/careers" class="footer-link">Careers</a></li>
-            <li><a href="/contact" class="footer-link">Contact</a></li>
-            <li><a href="/privacy-policy" class="footer-link">Privacy Policy</a></li>
-          </ul>
-        </div>
-
-        <!-- Shop Section -->
-        <div>
-          <h3 class="footer-heading">Shop</h3>
-          <ul style="list-style: none; padding: 0;">
-            <li><a href="/rings" class="footer-link">Rings</a></li>
-            <li><a href="/necklaces" class="footer-link">Necklaces</a></li>
-            <li><a href="/earrings" class="footer-link">Earrings</a></li>
-            <li><a href="/bracelets" class="footer-link">Bracelets</a></li>
-          </ul>
-        </div>
-
-        <!-- Connect With Us Section -->
-        <div>
-          <h3 class="footer-heading">Connect With Us</h3>
-          <ul style="list-style: none; padding: 0;">
-            <li><a href="https://instagram.com" class="footer-link"><i class="fab fa-instagram"></i> Instagram</a></li>
-            <li><a href="https://facebook.com" class="footer-link"><i class="fab fa-facebook-f"></i> Facebook</a></li>
-            <li><a href="https://pinterest.com" class="footer-link"><i class="fab fa-pinterest-p"></i> Pinterest</a></li>
-            <li><a href="https://twitter.com" class="footer-link"><i class="fab fa-twitter"></i> Twitter</a></li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- Copyright Section -->
-      <div style="text-align: center; font-size: 12px; padding-top: 30px; margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1);">
-        © 2024 Lume Jewelry. All Rights Reserved.
-      </div>
-    </footer>
+<%-  %>
 
     <script>
         document.querySelector('.logout-btn').addEventListener('click', function() {

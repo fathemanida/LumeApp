@@ -33,119 +33,7 @@
       color: var(--dark-brown);
     }
 
-    /* Navbar */
-    .navbar {
-      background: white;
-      border-bottom: 1px solid var(--theme-border);
-      position: relative;
-      padding: 1rem 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: nowrap;
-    }
-
-    .brand {
-      font-family: 'Aboreto', cursive;
-      font-size: 1.5rem;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: var(--dark-brown);
-      cursor: pointer;
-      transition: color 0.3s ease;
-    }
-
-    .brand:hover {
-      color: var(--olive-green);
-    }
-
-    .nav-links {
-      display: flex;
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      flex: 1;
-      justify-content: center;
-    }
-
-    .nav-link {
-      color: var(--dark-brown);
-      font-family: 'Aboreto', sans-serif;
-      font-size: 0.9rem;
-      transition: all 0.3s ease;
-      padding: 0.5rem 1rem;
-      text-decoration: none;
-    }
-
-    .nav-link:hover {
-      color: var(--olive-green);
-      transform: translateY(-2px);
-    }
-
-    .icon-links {
-      display: flex;
-      align-items: center;
-      list-style: none;
-      margin: 0;
-      padding: 0;
-    }
-
-    .icon-link {
-      color: var(--dark-brown);
-      transition: all 0.3s ease;
-      font-size: 1.1rem;
-      padding: 0.5rem;
-      text-decoration: none;
-    }
-
-    .icon-link:hover {
-      color: var(--olive-green);
-      transform: translateY(-2px);
-    }
-
-    /* Profile Dropdown */
-    .profile-dropdown {
-      position: relative;
-      display: inline-block;
-    }
-
-    .profile-dropdown-content {
-      display: none;
-      position: absolute;
-      right: 0;
-      background-color: white;
-      min-width: 160px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-      z-index: 1000;
-      border-radius: 0;
-      padding: 0.5rem 0;
-    }
-
-    .profile-dropdown:hover .profile-dropdown-content {
-      display: block;
-    }
-
-    .profile-dropdown-content a {
-      color: var(--dark-brown);
-      padding: 0.75rem 1rem;
-      text-decoration: none;
-      display: block;
-      font-size: 0.9rem;
-      transition: all 0.3s ease;
-    }
-
-    .profile-dropdown-content a:hover {
-      background-color: var(--light-bg);
-      color: var(--olive-green);
-      transform: translateX(3px);
-    }
-
-    .profile-dropdown-content a i {
-      margin-right: 0.5rem;
-      width: 20px;
-      text-align: center;
-    }
-
+   
     /* Main Container */
     .container {
       display: flex;
@@ -477,59 +365,8 @@
       color: var(--theme-gray);
     }
 
-    /* Footer */
-    .footer {
-      background-color: var(--dark-brown);
-      color: white;
-      padding: 3rem 0;
-      margin-top: 3rem;
-    }
-
-    .footer-container {
-      display: flex;
-      justify-content: center;
-      gap: 120px;
-      padding: 0 20px;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .footer-column {
-      flex: 1;
-      min-width: 200px;
-    }
-
-    .footer-heading {
-      font-family: 'Aboreto', cursive;
-      font-size: 1rem;
-      letter-spacing: 1px;
-      margin-bottom: 1.25rem;
-      text-transform: uppercase;
-    }
-
-    .footer-link {
-      color: white;
-      font-family: 'Aboreto', sans-serif;
-      font-size: 0.9rem;
-      transition: all 0.3s ease;
-      display: block;
-      margin-bottom: 0.5rem;
-      text-decoration: none;
-    }
-
-    .footer-link:hover {
-      color: var(--light-bg);
-      transform: translateX(3px);
-    }
-
-    .footer-bottom {
-      text-align: center;
-      font-size: 0.8rem;
-      padding-top: 2rem;
-      margin-top: 2rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
+  
+   
     /* Responsive */
     @media (max-width: 768px) {
       .container {
@@ -554,43 +391,7 @@
 </head>
 <body>
     <!-- Navbar -->
-    <nav class="navbar">
-        <div class="brand">LUME</div>
-        <ul class="nav-links">
-            <li><a href="/" class="nav-link">Home</a></li>
-            <li><a href="/shopAll" class="nav-link">Shop All</a></li>
-            <li><a href="/featured" class="nav-link">Featured</a></li>
-            <li><a href="/new-arrivals" class="nav-link">New Arrivals</a></li>
-        </ul>
-        <ul class="icon-links">
-            <li>
-                <a href="/search" class="icon-link">
-                    <i class="fas fa-search"></i>
-                </a>
-            </li>
-            <li>
-                <a href="/cart" class="icon-link">
-                    <i class="fas fa-shopping-cart"></i>
-                </a>
-            </li>
-            <li>
-                <div class="profile-dropdown">
-                    <a href="#" class="icon-link"><i class="far fa-user"></i></a>
-                    <div class="profile-dropdown-content">
-                        <% if (locals.user) { %>
-                            <a href="/profile"><i class="fas fa-user"></i> My Profile</a>
-                            <a href="/orders"><i class="fas fa-box"></i> My Orders</a>
-                            <a href="/wishlist"><i class="fas fa-heart"></i> Wishlist</a>
-                            <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
-                        <% } else { %>
-                            <a href="/login"><i class="fas fa-sign-in-alt"></i> Login</a>
-                            <a href="/signup"><i class="fas fa-user-plus"></i> Sign Up</a>
-                        <% } %>
-                    </div>
-                </div>
-            </li>
-        </ul>
-    </nav>
+<%-include('../partials/user/header.ejs')  %>
 
     <div class="container">
         <!-- Sidebar -->
@@ -737,34 +538,7 @@
     </div>
 
     <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-container">
-            <div class="footer-column">
-                <h3 class="footer-heading">Company</h3>
-                <a href="/about-us" class="footer-link">About Us</a>
-                <a href="/careers" class="footer-link">Careers</a>
-                <a href="/contact" class="footer-link">Contact</a>
-                <a href="/privacy-policy" class="footer-link">Privacy Policy</a>
-            </div>
-            <div class="footer-column">
-                <h3 class="footer-heading">Shop</h3>
-                <a href="/rings" class="footer-link">Rings</a>
-                <a href="/necklaces" class="footer-link">Necklaces</a>
-                <a href="/earrings" class="footer-link">Earrings</a>
-                <a href="/bracelets" class="footer-link">Bracelets</a>
-            </div>
-            <div class="footer-column">
-                <h3 class="footer-heading">Connect With Us</h3>
-                <a href="https://instagram.com" class="footer-link">Instagram</a>
-                <a href="https://facebook.com" class="footer-link">Facebook</a>
-                <a href="https://pinterest.com" class="footer-link">Pinterest</a>
-                <a href="https://twitter.com" class="footer-link">Twitter</a>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            © 2024 Lume Jewelry. All Rights Reserved.
-        </div>
-    </footer>
+<%-include('../partials/user/fooret.ejs')  %>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>

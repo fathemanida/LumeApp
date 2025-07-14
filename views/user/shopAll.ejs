@@ -837,6 +837,19 @@
           toggleCategory(this);
         });
       });
+
+      // Sidebar search form handler
+      const sidebarSearchForm = document.getElementById('sidebarSearchForm');
+      if (sidebarSearchForm) {
+        sidebarSearchForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+          const searchInput = document.getElementById('sidebarSearch');
+          const query = searchInput.value.trim();
+          if (query) {
+            window.location.href = `/shopAll?search=${encodeURIComponent(query)}`;
+          }
+        });
+      }
     });
   </script>
   <% if (locals.user && locals.user.isBlocked) { %>
