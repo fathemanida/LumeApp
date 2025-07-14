@@ -95,7 +95,30 @@
     .toast.bg-warning .toast-header { background-color: #ffc107; color: var(--theme-black); }
     .toast-body { color: var(--theme-black); font-family: 'Aboreto', sans-serif; font-size: 0.9rem; padding: 0.75rem; }
     .btn-close { filter: invert(1); }
-  
+
+    @media (max-width: 768px) {
+      .action-buttons {
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 0.75rem;
+        width: 100%;
+      }
+      .action-buttons .btn,
+      .action-buttons .btn-dark,
+      .action-buttons .btn-outline-dark,
+      .action-buttons .btn-outline-danger {
+      width: 100%;
+        text-align: center;
+      }
+      /* Make tables horizontally scrollable on mobile */
+      .table-responsive {
+      width: 100%;
+        overflow-x: auto;
+      }
+      table {
+        min-width: 600px;
+      }
+    }
   </style>
 </head>
 
@@ -429,8 +452,9 @@
       });
       toast.show();
     }
-
+    </script>
     <% if (user && user.isBlocked) { %>
+      <script>
       showToast({
         title: 'Account Blocked',
         message: 'Your account has been blocked by the administrator. Please contact support for assistance.',
@@ -440,7 +464,9 @@
       setTimeout(() => {
         window.location.href = '/logout';
       }, 3000);
+      </script>
     <% } %>
+    <script>
 
     const imageContainer = document.querySelector('.main-image');
     const image = document.getElementById('mainProductImage');
