@@ -50,6 +50,7 @@
       </li>
     </ul>
   </aside>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <div class="main-content">
         <header class="main-header">
@@ -242,23 +243,18 @@
         document.getElementById('mobileMenuBtn').addEventListener('click', function() {
             document.querySelector('.sidebar').classList.toggle('active');
             document.body.classList.toggle('sidebar-open');
+            document.getElementById('sidebarOverlay').style.display = document.querySelector('.sidebar').classList.contains('active') ? 'block' : 'none';
         });
 
-        // Close sidebar when clicking outside (on body)
-        document.body.addEventListener('click', function(e) {
-            const sidebar = document.querySelector('.sidebar');
-            const menuBtn = document.getElementById('mobileMenuBtn');
-            if (window.innerWidth <= 991 && sidebar.classList.contains('active')) {
-                // If click is outside sidebar and not on menu button
-                if (!sidebar.contains(e.target) && e.target !== menuBtn && !menuBtn.contains(e.target)) {
-                    sidebar.classList.remove('active');
-                    document.body.classList.remove('sidebar-open');
-                }
-            }
+        // Close sidebar when clicking overlay
+        document.getElementById('sidebarOverlay').addEventListener('click', function() {
+          document.querySelector('.sidebar').classList.remove('active');
+          document.body.classList.remove('sidebar-open');
+          this.style.display = 'none';
         });
         // Prevent sidebar click from closing itself
         document.querySelector('.sidebar').addEventListener('click', function(e) {
-            e.stopPropagation();
+          e.stopPropagation();
         });
 
         const periodSelect = document.getElementById('report-period');
