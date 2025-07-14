@@ -28,222 +28,10 @@
     body {
       height: 100%;
       margin: 0;
-      padding: 10px;
+      padding-top: 80px;
       background-color: var(--light-bg);
       font-family: 'Jost', sans-serif;
       color: var(--dark-text);
-    }
-
-    /* Navbar */
-    .navbar {
-      background: white;
-      border-bottom: 1px solid var(--border-color);
-      position: relative;
-    }
-
-    .brand {
-      font-family: 'Aboreto', cursive;
-      font-size: 1.5rem;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: var(--darker-text);
-      cursor: pointer;
-    }
-
-    .nav-link {
-      color: var(--darker-text);
-      font-family: 'Jost', sans-serif;
-      font-size: 0.9rem;
-      transition: color 0.3s ease;
-    }
-
-    .nav-link:hover {
-      color: var(--muted-green);
-      font-weight: 500;
-    }
-
-    .icon-link {
-      color: var(--darker-text);
-      transition: color 0.3s ease;
-      font-size: 1.1rem;
-    }
-
-    .icon-link:hover {
-      color: var(--muted-green);
-    }
-
-    /* Search Bar */
-    .search-container {
-      position: relative;
-      display: none;
-    }
-
-    .search-container.active {
-      display: block;
-    }
-
-    .search-input {
-      border: 1px solid var(--border-color);
-      border-radius: 20px;
-      padding: 0.5rem 1rem;
-      padding-right: 2.5rem;
-      font-family: 'Jost', sans-serif;
-      width: 200px;
-      transition: all 0.3s ease;
-      color: var(--dark-text);
-    }
-
-    .search-input:focus {
-      outline: none;
-      border-color: var(--soft-beige);
-      width: 250px;
-      box-shadow: 0 0 0 2px rgba(212, 185, 150, 0.1);
-    }
-
-    .search-button {
-      position: absolute;
-      right: 10px;
-      background: none;
-      border: none;
-      color: var(--dark-text);
-      cursor: pointer;
-    }
-
-    .search-button:hover {
-      color: var(--muted-green);
-    }
-
-    /* Sidebar */
-    .sidebar {
-      position: fixed;
-      top: 0;
-      left: -300px;
-      width: 300px;
-      height: 100%;
-      background: white;
-      z-index: 1000;
-      transition: left 0.3s ease;
-      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-      overflow-y: auto;
-    }
-
-    .sidebar.open {
-      left: 0;
-    }
-
-    .sidebar-header {
-      padding: 1.5rem;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .sidebar-menu {
-      padding: 1rem;
-    }
-
-    .sidebar-category {
-      margin-bottom: 1.5rem;
-    }
-
-    .sidebar-title {
-      font-family: 'Aboreto', cursive;
-      font-size: 1rem;
-      margin-bottom: 0.5rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: pointer;
-      color: var(--darker-text);
-    }
-
-    .sidebar-items {
-      padding-left: 1rem;
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s ease;
-    }
-
-    .sidebar-items.open {
-      max-height: 500px;
-    }
-
-    .sidebar-item {
-      padding: 0.5rem 0;
-      cursor: pointer;
-    }
-
-    .sidebar-item:hover {
-      color: var(--muted-green);
-    }
-
-    .sidebar-item a {
-      color: var(--dark-text);
-      text-decoration: none;
-      display: block;
-      transition: color 0.3s ease;
-    }
-
-    .sidebar-item a:hover {
-      color: var(--muted-green);
-    }
-
-    .sidebar-item a.active {
-      color: var(--muted-green);
-      font-weight: 500;
-    }
-
-    .sidebar-item a.active::before {
-      content: "•";
-      margin-right: 5px;
-    }
-
-    .overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 999;
-      display: none;
-    }
-
-    .overlay.active {
-      display: block;
-    }
-
-    /* Hero Section */
-    .hero-section {
-      display: flex;
-      width: 100%;
-      margin: 0;
-      padding: 0;
-    }
-
-    .hero-img {
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      width: 100%;
-      height: 500px;
-      object-fit: cover;
-    }
-
-    .hero-img:hover {
-      transform: scale(1.02);
-      box-shadow: 0 5px 15px rgba(41, 29, 14, 0.1);
-    }
-
-    /* Section Headings */
-    .section-heading {
-      font-family: 'Aboreto', cursive;
-      color: var(--darker-text);
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      font-weight: 400;
-    }
-
-    .section-subtext {
-      font-family: 'Jost', sans-serif;
-      color: var(--dark-text);
-      font-size: 0.9rem;
     }
 
     /* Product Cards - Enhanced Styles */
@@ -1189,7 +977,7 @@
     <div class="ornament-banner-slides" id="ornamentSlides">
       <!-- Slide 1 -->
       <div class="ornament-banner-slide">
-        <img src="https://source.unsplash.com/random/1200x500/?antique+vase,1" alt="Antique Vase">
+        <img src="/uploads/banner/banner-1.png" alt="Antique Vase">
         <div class="ornament-slide-content">
           <h2>Timeless Elegance</h2>
           <p>"The beauty of ornaments lies in their ability to tell stories across generations."</p>
@@ -1429,7 +1217,7 @@
                   </div>
                 </div>
               </a>
-              <button class="btn w-100" style="background:#181818;color:#fff;border-radius:0;font-family:'Jost',sans-serif;font-size:1rem;text-transform:uppercase;letter-spacing:1px;padding:0.4rem 0;margin-top:0.5rem;">ADD TO CART</button>
+              <button class="btn w-100" style="background:#181818;color:#fff;border-radius:0;font-family:'Jost',sans-serif;font-size:1rem;text-transform:uppercase;letter-spacing:1px;padding:0.4rem 0;margin-top:0.5rem;" onclick="addToCart('<%= product._id %>')">ADD TO CART</button>
             </div>
           </div>
         <% }) %>
@@ -1532,7 +1320,7 @@
                   </div>
                 </div>
               </a>
-              <button class="btn w-100" style="background:#181818;color:#fff;border-radius:0;font-family:'Jost',sans-serif;font-size:1rem;text-transform:uppercase;letter-spacing:1px;padding:0.4rem 0;margin-top:0.5rem;">ADD TO CART</button>
+              <button class="btn w-100" style="background:#181818;color:#fff;border-radius:0;font-family:'Jost',sans-serif;font-size:1rem;text-transform:uppercase;letter-spacing:1px;padding:0.4rem 0;margin-top:0.5rem;" onclick="addToCart('<%= product._id %>')">ADD TO CART</button>
             </div>
           </div>
         <% }) %>
@@ -1843,7 +1631,7 @@
               duration: 3000,
               gravity: "top",
               position: "right",
-              backgroundColor: "#f44336",
+              backgroundColor: "#A9BA9D",
               stopOnFocus: true
             }).showToast();
             return;
