@@ -407,6 +407,24 @@
     .text-light {
       color: rgba(255, 255, 255, 0.7) !important;
     }
+
+    .table-responsive-wallet {
+      width: 100%;
+      overflow-x: auto;
+    }
+    .transactions-table {
+      min-width: 600px;
+    }
+    @media (max-width: 900px) {
+      .transactions-table {
+        min-width: 500px;
+      }
+    }
+    @media (max-width: 600px) {
+      .transactions-table {
+        min-width: 400px;
+      }
+    }
     </style>
 </head>
 <body>
@@ -474,41 +492,43 @@
                     <h2 class="section-title">Recent Transactions</h2>
                     
                     <% if (transactions && transactions.length > 0) { %>
-                        <table class="transactions-table">
-                            <thead>
-                                <tr>
-                                    <th>Description</th>
-                                    <th>Date</th>
-                                    <th>Amount</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% transactions.forEach(transaction => { %>
-                                    <tr>
-                                        <td>
-                                            <div class="transaction-details">
-                                                <div class="transaction-icon">
-                                                    <% if (transaction && transaction.type === 'CREDIT') { %>
-                                                        <i class="fas fa-arrow-down"></i>
-                                                    <% } else { %>
-                                                        <i class="fas fa-arrow-up"></i>
-                                                    <% } %>
-                                                </div>
-                                                <div class="transaction-description">
-                                                    <h4><%= transaction && transaction.description ? transaction.description : 'N/A' %></h4>
-                                                    <p><%= transaction && transaction.orderId ? transaction.orderId : 'N/A' %></p>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td><%= transaction && transaction.createdAt ? new Date(transaction.createdAt).toLocaleDateString() : 'N/A' %></td>
-                                        <td class="transaction-amount <%= transaction && transaction.type === 'CREDIT' ? 'credit' : 'debit' %>">
-                                            <% if (transaction && transaction.type === 'CREDIT') { %>+<% } else { %>-<% } %>
-                                            ₹<%= transaction && transaction.amount ? transaction.amount.toFixed(2) : '0.00' %>
-                                        </td>
-                                    </tr>
-                                <% }); %>
-                            </tbody>
-                        </table>
+                        <div class="table-responsive-wallet" style="width:100%;overflow-x:auto;">
+                          <table class="transactions-table">
+                              <thead>
+                                  <tr>
+                                      <th>Description</th>
+                                      <th>Date</th>
+                                      <th>Amount</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                  <% transactions.forEach(transaction => { %>
+                                      <tr>
+                                          <td>
+                                              <div class="transaction-details">
+                                                  <div class="transaction-icon">
+                                                      <% if (transaction && transaction.type === 'CREDIT') { %>
+                                                          <i class="fas fa-arrow-down"></i>
+                                                      <% } else { %>
+                                                          <i class="fas fa-arrow-up"></i>
+                                                      <% } %>
+                                                  </div>
+                                                  <div class="transaction-description">
+                                                      <h4><%= transaction && transaction.description ? transaction.description : 'N/A' %></h4>
+                                                      <p><%= transaction && transaction.orderId ? transaction.orderId : 'N/A' %></p>
+                                                  </div>
+                                              </div>
+                                          </td>
+                                          <td><%= transaction && transaction.createdAt ? new Date(transaction.createdAt).toLocaleDateString() : 'N/A' %></td>
+                                          <td class="transaction-amount <%= transaction && transaction.type === 'CREDIT' ? 'credit' : 'debit' %>">
+                                              <% if (transaction && transaction.type === 'CREDIT') { %>+<% } else { %>-<% } %>
+                                              ₹<%= transaction && transaction.amount ? transaction.amount.toFixed(2) : '0.00' %>
+                                          </td>
+                                      </tr>
+                                  <% }); %>
+                              </tbody>
+                          </table>
+                        </div>
                     <% } else { %>
                         <div class="no-transactions">
                             <p>No transactions found. Your transaction history will appear here.</p>

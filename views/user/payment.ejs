@@ -616,6 +616,12 @@ html, body {
                             <span>-₹<%= cart.offerDiscount.toFixed(2) %></span>
                         </div>
                     <% } %>
+                    <% if (cart.couponDiscount > 0) { %>
+                        <div class="summary-row">
+                            <span>Offer Discount</span>
+                            <span>-₹<%= cart.couponDiscount.toFixed(2) %></span>
+                        </div>
+                    <% } %>
                     <% if (cart.discount > 0) { %>
                         <div class="summary-row">
                             <span>Total Discount</span>

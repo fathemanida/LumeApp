@@ -1418,7 +1418,30 @@
                                       <% } else if (item.status === 'Cancelled') { %>
                                           <span class="badge badge-cancelled">Cancelled</span>
                                       <% } else { %>
-                                          <span class="badge badge-other"><%= item.status %></span>
+<%
+  let statusClass = '';
+  switch (item.status) {
+    case 'Cancelled':
+      statusClass = 'badge-danger';
+      break;
+    case 'Pending':
+      statusClass = 'badge-warning';
+      break;
+    case 'Shipped':
+      statusClass = 'badge-info';
+      break;
+    case 'Delivered':
+      statusClass = 'badge-success';
+      break;
+       case 'Returned':
+      statusClass = 'badge-danger';
+      break;
+    default:
+      statusClass = 'badge-secondary';
+  }
+%>
+
+<span class="badge <%= statusClass %>"><%= item.status %></span>
                                       <% } %>
                                   </td>
                                       <td>
