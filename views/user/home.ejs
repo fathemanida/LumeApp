@@ -1054,7 +1054,8 @@
                 <img src="/uploads/product/<%= spotlightProduct[0].productImage[1] %>" class="product-img-secondary d-none d-md-block" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.6s ease;border-radius:12px;" alt="<%= spotlightProduct[0].productName %> - Secondary View">
               <% } %>
               <span class="spotlight-shine"></span>
-              <a href="#" class="icon-link" onclick="event.preventDefault(); event.stopPropagation(); toggleWishlist(this.querySelector('i'), '<%= spotlightProduct[0]._id %>')"><i class="far fa-heart wishlist-icon"></i></a>
+              <i  class="fas fa-heart wishlist-icon"
+                onclick="event.preventDefault(); event.stopPropagation(); toggleWishlist(this, '<%= spotlightProduct[0]._id %>')"></i>
             </a>
             <div class="spotlight-details-col d-flex flex-column justify-content-center align-items-center" style="height:100%; min-height:320px;">
               <span class="new-badge">New Arrival</span>
@@ -1127,7 +1128,7 @@
         <% featured.forEach((product)=> { %>
           <div style="min-width:320px;max-width:320px;flex:0 0 320px;">
             <div class="product-card card text-center h-100" data-product-id="<%= product._id %>" style="border-radius:0;box-shadow:none;background:transparent;padding:0;">
-              <a href="#" class="icon-link" onclick="event.stopPropagation(); toggleWishlist(this.querySelector('i'), '<%= product._id %>')"><i class="far fa-heart wishlist-icon"></i></a>
+              <i class="fas fa-heart wishlist-icon" style="top:18px;right:18px;background:rgba(255,255,255,0.9);border-radius:50%;padding:0.3rem;" onclick="event.stopPropagation(); toggleWishlist(this, '<%= product._id %>')"></i>
               <a href="/product-details?id=<%= product._id %>" class="text-decoration-none">
                 <div class="product-image-container" style="position:relative;width:100%;aspect-ratio:1;overflow:hidden;border-radius:0;background:transparent;">
                   <img src="/uploads/product/<%= product.productImage[0] %>" alt="<%= product.productName %>"
@@ -1230,7 +1231,7 @@
         <% newCollections.forEach((product)=> { %>
           <div style="min-width:320px;max-width:320px;flex:0 0 320px;">
             <div class="product-card card text-center h-100" style="border-radius:0;box-shadow:none;background:transparent;padding:0;">
-              <a href="#" class="icon-link" onclick="event.stopPropagation(); toggleWishlist(this.querySelector('i'), '<%= product._id %>')"><i class="far fa-heart wishlist-icon"></i></a>
+              <i class="fas fa-heart wishlist-icon" style="top:18px;right:18px;background:rgba(255,255,255,0.9);border-radius:50%;padding:0.3rem;" onclick="event.stopPropagation(); toggleWishlist(this, '<%= product._id %>')"></i>
               <a href="/product-details?id=<%= product._id %>" class="text-decoration-none">
                 <div class="product-image-container" style="position:relative;width:100%;aspect-ratio:1;overflow:hidden;border-radius:0;background:transparent;">
                   <img src="/uploads/product/<%= product.productImage[0] %>" alt="<%= product.productName %>"
@@ -1463,15 +1464,15 @@
         });
         const data = await response.json();
         if (data.success) {
-          iconElement.classList.toggle('fa-regular');
-          iconElement.classList.toggle('fa-solid');
+          iconElement.classList.toggle('fas');
+          iconElement.classList.toggle('far');
           iconElement.classList.toggle('text-danger');
           Toastify({
-            text: iconElement.classList.contains('fa-solid') ? "Added to Wishlist 💖" : "Removed from Wishlist ❌",
+            text: iconElement.classList.contains('fas') ? "Added to Wishlist 💖" : "Removed from Wishlist ❌",
             duration: 3000,
             gravity: "top",
             position: "right",
-            backgroundColor: iconElement.classList.contains('fa-solid') ? "#4CAF50" : "#f44336",
+            backgroundColor: iconElement.classList.contains('fas') ? "#4CAF50" : "#f44336",
             stopOnFocus: true
           }).showToast();
         } else {
