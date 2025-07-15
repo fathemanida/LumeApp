@@ -580,7 +580,7 @@
             <% products.forEach(product => { %>
             <div class="col product-item" data-name="<%= product.productName.toLowerCase() %>" data-category="<%= product.category?.name?.toLowerCase() || '' %>" data-new="<%= product.new ? 'true' : 'false' %>" data-orders="<%= product.orderCount || 0 %>">
               <div class="product-card card text-center h-100 position-relative overflow-hidden">
-                <i class="fa-regular fa-heart wishlist-icon" onclick="event.stopPropagation(); toggleWishlist(this, '<%= product._id %>')"></i>
+                <i class="fa-regular fa-heart wishlist-icon" style="font-family:'Font Awesome 6 Free','Font Awesome 5 Free','FontAwesome',Arial,sans-serif !important;font-weight:400 !important;" onclick="event.stopPropagation(); toggleWishlist(this, '<%= product._id %>')"></i>
 
                 <a href="/product-details?id=<%= product._id %>" class="text-decoration-none">
                   <% if (product.isListed) { %>
