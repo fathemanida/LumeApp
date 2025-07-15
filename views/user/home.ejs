@@ -1128,7 +1128,7 @@
         <% featured.forEach((product)=> { %>
           <div style="min-width:320px;max-width:320px;flex:0 0 320px;">
             <div class="product-card card text-center h-100" data-product-id="<%= product._id %>" style="border-radius:0;box-shadow:none;background:transparent;padding:0;">
-              <i class="fa-regular fa-heart wishlist-icon" style="top:18px;right:18px;background:rgba(255,255,255,0.9);border-radius:50%;padding:0.3rem;" onclick="event.stopPropagation(); toggleWishlist(this, '<%= product._id %>')"></i>
+              <i class="far fa-heart wishlist-icon" style="top:18px;right:18px;background:rgba(255,255,255,0.9);border-radius:50%;padding:0.3rem;" onclick="event.stopPropagation(); toggleWishlist(this, '<%= product._id %>')"></i>
               <a href="/product-details?id=<%= product._id %>" class="text-decoration-none">
                 <div class="product-image-container" style="position:relative;width:100%;aspect-ratio:1;overflow:hidden;border-radius:0;background:transparent;">
                   <img src="/uploads/product/<%= product.productImage[0] %>" alt="<%= product.productName %>"
@@ -1231,7 +1231,7 @@
         <% newCollections.forEach((product)=> { %>
           <div style="min-width:320px;max-width:320px;flex:0 0 320px;">
             <div class="product-card card text-center h-100" style="border-radius:0;box-shadow:none;background:transparent;padding:0;">
-              <i class="fa-regular fa-heart wishlist-icon" style="top:18px;right:18px;background:rgba(255,255,255,0.9);border-radius:50%;padding:0.3rem;" onclick="event.stopPropagation(); toggleWishlist(this, '<%= product._id %>')"></i>
+              <i class="far fa-heart wishlist-icon" style="top:18px;right:18px;background:rgba(255,255,255,0.9);border-radius:50%;padding:0.3rem;" onclick="event.stopPropagation(); toggleWishlist(this, '<%= product._id %>')"></i>
               <a href="/product-details?id=<%= product._id %>" class="text-decoration-none">
                 <div class="product-image-container" style="position:relative;width:100%;aspect-ratio:1;overflow:hidden;border-radius:0;background:transparent;">
                   <img src="/uploads/product/<%= product.productImage[0] %>" alt="<%= product.productName %>"
