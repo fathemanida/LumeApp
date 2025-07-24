@@ -13,8 +13,7 @@ const router = require("../../routes/userRoutes");
 const { error } = require("console");
 const mongoose = require('mongoose');
 const Order = require("../../models/orderSchema");
-const Offer = require("../../models/offerSchema"); // Added Offer model import
-
+const Offer = require("../../models/offerSchema"); 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "public/uploads/user");
@@ -983,27 +982,22 @@ function getBestOffer(product, offers, quantity = 1) {
   offers.forEach(offer => {
     let applies = false;
     if (offer.applicableOn === 'all') applies = true;
-    if (
-      offer.applicableOn === 'categories' &&
-      offer.categories && product.category &&
-      offer.categories.some(cat => {
-        const match = cat.toString() === product.category._id?.toString();
-        if (!match) {
-          console.log('category mismatch:', cat, product.category._id);
-        }
-        return match;
-      })
-    ) applies = true;
-    if (
-      offer.applicableOn === 'products' &&
-      offer.products && offer.products.some(prod => {
-        const match = prod.toString() === product._id?.toString();
-        if (!match) {
-          console.log('offer mismatch');
-        }
-        return match;
-      })
-    ) 
+  if (
+  offer.applicableOn === 'categories' &&
+  Array.isArray(offer.categories) &&
+  product?.category?._id &&
+  offer.categories.some(cat => cat?.toString() === product.category._id?.toString())
+) {
+  applies = true;
+}
+if (
+  offer.applicableOn === 'products' &&
+  Array.isArray(offer.products) &&
+  product?._id &&
+  offer.products.some(prod => prod?.toString() === product._id?.toString())
+) {
+  applies = true;
+}
     applies = true;
     if (!product.category || !product.category._id) {
       console.log('product missing category or id', product);

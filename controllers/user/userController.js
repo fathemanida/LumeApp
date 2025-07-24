@@ -739,7 +739,7 @@ const filterProduct = async (req, res) => {
       startDate: { $lte: now },
       endDate: { $gte: now },
       applicableOn: { $in: ["all", "categories", "products"] },
-    }).lean();
+    })
 
     const filteredProductsWithOffers = filteredProducts.map((product) => {
       const matchedOffers = offers.filter((offer) => {
