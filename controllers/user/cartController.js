@@ -82,7 +82,6 @@ const addToCart = async (req, res) => {
     const basePrice = product.salePrice && product.salePrice < product.regularPrice ? 
       product.salePrice : product.regularPrice;
 
-    // Fetch all active offers (global, category, product)
     const now = new Date();
     const offers = await Offer.find({
       isActive: true,
@@ -91,7 +90,6 @@ const addToCart = async (req, res) => {
       applicableOn: { $in: ['all', 'categories', 'products'] }
     });
 
-    // Use getBestOffer to determine the best discount
     const { maxDiscount } = getBestOffer(product, offers, quantity);
     let effectivePrice = basePrice - (maxDiscount / quantity);
     if (effectivePrice < 0) effectivePrice = 0;
@@ -984,7 +982,6 @@ function getBestOffer(product, offers, quantity = 1) {
   let bestOffer = null;
   offers.forEach(offer => {
     let applies = false;
-    console.log('[OFFER DEBUG] Checking offer', offer._id, 'type:', offer.applicableOn, 'against product', product._id, 'category:', product.category?._id);
     if (offer.applicableOn === 'all') applies = true;
     if (
       offer.applicableOn === 'categories' &&
@@ -992,7 +989,7 @@ function getBestOffer(product, offers, quantity = 1) {
       offer.categories.some(cat => {
         const match = cat.toString() === product.category._id?.toString();
         if (!match) {
-          console.log('[OFFER DEBUG] Category mismatch:', cat, product.category._id);
+          console.log('category mismatch:', cat, product.category._id);
         }
         return match;
       })
@@ -1002,11 +999,12 @@ function getBestOffer(product, offers, quantity = 1) {
       offer.products && offer.products.some(prod => {
         const match = prod.toString() === product._id?.toString();
         if (!match) {
-          console.log('[OFFER DEBUG] Product mismatch:', prod, product._id);
+          console.log('offer mismatch');
         }
         return match;
       })
-    ) applies = true;
+    ) 
+    applies = true;
     if (!product.category || !product.category._id) {
       console.log('product missing category or id', product);
     }
@@ -1023,6 +1021,8 @@ function getBestOffer(product, offers, quantity = 1) {
       }
     }
   });
+  console.log('Available Offers:', offers.map(o => ({ id: o._id, applies: o.applicableOn })));
+
   return { maxDiscount, bestOffer };
 }
 

@@ -322,11 +322,9 @@
               <div class="product-card card text-center h-100 position-relative overflow-hidden">
                 <i class="far fa-heart wishlist-icon" onclick="event.stopPropagation(); toggleWishlist(this, '<%= product._id %>')"></i>
                 <a href="/product-details?id=<%= product._id %>" class="text-decoration-none">
-                  <% if (product.isListed) { %>
                     <% if (product.new) { %>
                       <span class="new-badge">New</span>
                     <% } %>
-                  <% } %>
                   <div class="product-image-container">
                     <% if (product.isListed && product.offer) { %>
                   <span class="offer-badge">

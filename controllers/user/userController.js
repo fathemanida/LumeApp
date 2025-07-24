@@ -733,7 +733,6 @@ const filterProduct = async (req, res) => {
       .limit(limit)
       .populate("category", "name");
 
-    // Fetch active offers
     const now = new Date();
     const offers = await Offer.find({
       isActive: true,
@@ -742,7 +741,6 @@ const filterProduct = async (req, res) => {
       applicableOn: { $in: ["all", "categories", "products"] },
     }).lean();
 
-    // Attach best offer to each filtered product
     const filteredProductsWithOffers = filteredProducts.map((product) => {
       const matchedOffers = offers.filter((offer) => {
         if (offer.applicableOn === "all") return true;
@@ -904,10 +902,8 @@ const newArrivals = async (req, res) => {
     const listedCategoryIds = categories.map((c) => c._id); 
 
     const query = {
-      isListed: true,
       status: "Available",
       isBlocked: false,
-      quantity: { $gt: 0 },
       new: true,
       category: { $in: listedCategoryIds },
     };
@@ -925,7 +921,53 @@ const newArrivals = async (req, res) => {
       .limit(limit)
       .populate("category")
       .exec();
+    const now = new Date();
+    const offers = await Offer.find({
+      isActive: true,
+      startDate: { $lte: now },
+      endDate: { $gte: now },
+      applicableOn: { $in: ["all", "categories", "products"] },
+    }).lean();
 
+    const filteredProductsWithOffers = filteredProducts.map((product) => {
+      const matchedOffers = offers.filter((offer) => {
+        if (offer.applicableOn === "all") return true;
+        if (
+          offer.applicableOn === "categories" &&
+          offer.categories.some(cat => cat.toString() === product.category._id.toString())
+        ) return true;
+        if (
+          offer.applicableOn === "products" &&
+          offer.products.some(prod => prod.toString() === product._id.toString())
+        ) return true;
+        return false;
+      });
+
+      if (matchedOffers.length > 0) {
+        let maxDiscount = 0;
+        let bestOffer = null;
+
+        matchedOffers.forEach((offer) => {
+          let discount = 0;
+          if (offer.discountType === 'percentage') {
+            discount = (product.salePrice * offer.discountValue) / 100;
+          } else {
+            discount = offer.discountValue;
+          }
+
+          if (discount > maxDiscount) {
+            maxDiscount = discount;
+            bestOffer = offer;
+          }
+        });
+
+        if (bestOffer) {
+          product.offer = bestOffer;
+        }
+      }
+
+      return product;
+    });
     const featuredWithPrices = await Promise.all(
       featuredData.map(async (product) => {
         const salesPrice = product.regularPrice;
@@ -964,10 +1006,8 @@ const featured = async (req, res) => {
     const listedCategoryIds = categories.map((c) => c._id);
 
     const query = {
-      isListed: true,
       status: "Available",
       isBlocked: false,
-      quantity: { $gt: 0 },
       featured: true,
       category: { $in: listedCategoryIds },
     };
