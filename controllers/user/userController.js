@@ -808,8 +808,11 @@ const filterProduct = async (req, res) => {
 const productDetails = async (req, res) => {
   try {
     let userData = null;
-    if (req.session.user) {
-      userData = await User.findById(req.session.user.id);
+    const user=req.session.user
+    if (user) {
+          const userId=user.id
+
+      userData = await User.findById(userId);
     }
 
     const productId = req.query.id;
@@ -896,10 +899,13 @@ console.log(maxQuantity,'max quantity');
 
 const newArrivals = async (req, res) => {
   try {
-    const userData = req.session.user?.id
-      ? await User.findById(req.session.user.id)
-      : null;
+     let userData = null;
+    const user=req.session.user
+    if (user) {
+          const userId=user.id
 
+      userData = await User.findById(userId);
+    }
     const categories = await Category.find({ isListed: true });
     const listedCategoryIds = categories.map((c) => c._id); 
 
@@ -1000,10 +1006,13 @@ const newArrivals = async (req, res) => {
 
 const featured = async (req, res) => {
   try {
-    const userData = req.session.user?.id
-      ? await User.findById(req.session.user.id)
-      : null;
+     let userData = null;
+    const user=req.session.user
+    if (user) {
+          const userId=user.id
 
+      userData = await User.findById(userId);
+    }
     const categories = await Category.find({ isListed: true });
     const listedCategoryIds = categories.map((c) => c._id);
 

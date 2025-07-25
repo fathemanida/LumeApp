@@ -51,6 +51,7 @@
 
     /* Wishlist Page Header */
     .wishlist-page-header {
+      background: white;
       padding: 3rem 0;
       margin-bottom: 2rem;
       border-bottom: 1px solid var(--theme-border);
@@ -70,19 +71,16 @@
     }
 
     /* Wishlist Items */
-.wishlist-item {
-  display: flex; /* ✅ THIS IS MISSING */
-  align-items: center;
-  border: 1px solid var(--theme-border);
-  border-radius: 0;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  transition: all 0.3s ease;
-  background: white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  flex-wrap: wrap;
-}
-
+    .wishlist-item {
+      border: 1px solid var(--theme-border);
+      border-radius: 0;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      transition: all 0.3s ease;
+      background: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      
+    }
 
     .wishlist-item:hover {
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
@@ -90,20 +88,16 @@
     }
 
     .wishlist-image {
-  flex: 0 0 120px;
-  width: 120px;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 0;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
+      width: 180px;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
 
-
-.wishlist-details {
-  flex: 1;
-  padding: 0 2rem;
-  min-width: 200px;
-}
+    .wishlist-details {
+      padding: 0 2rem;
+    }
 
     .wishlist-title {
       font-size: 1.4rem;
@@ -156,14 +150,11 @@
       border-color: var(--olive-green);
     }
 
-   .wishlist-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-left: auto; /* pushes to right end */
-  flex: 0 0 auto;
-}
-
+    .wishlist-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
 
     .wishlist-actions .btn {
       padding: 0.6rem 1.5rem;
@@ -200,6 +191,7 @@
     .empty-wishlist {
       text-align: center;
       padding: 4rem 2rem;
+      background: white;
       border-radius: 0;
       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
@@ -288,35 +280,6 @@
         gap: 0.5rem;
       }
     }
- @media (max-width: 576px) {
-  .wishlist-item {
-    flex-direction: column;
-    align-items: stretch;
-    text-align: center;
-  }
-
-  .wishlist-image {
-    width: 100px;
-    height: auto;
-    margin: 0 auto 1rem;
-  }
-
-  .wishlist-details {
-    width: 100%;
-    padding: 0;
-  }
-
-  .wishlist-actions {
-    flex-direction: row;
-    justify-content: center;
-    width: 100%;
-    margin-top: 1rem;
-  }
-
-  .wishlist-actions .btn {
-    flex: 1;
-  }
-}
 
     /* Toastify Custom Styles */
     .custom-toast {
@@ -355,48 +318,25 @@
 
             <!-- Wishlist Content Area -->
             <div class="content-area">
-  <div class="wishlist-page-header">
-    <div class="container">
-      <h1>My Wishlist</h1>
-      <p>Save your favorite items for later</p>
-    </div>
-  </div>
+                <div class="wishlist-page-header">
+                    <div class="container">
+                        <h1>My Wishlist</h1>
+                        <p>Save your favorite items for later</p>
+                    </div>
+                </div>
 
-  <div class="container my-4">
-    <div class="row">
-      <% if (wishlist && wishlist.items.length > 0) { %>
-        <% wishlist.items.forEach(item => { 
-             const discount = item.product.salePrice 
-               ? Math.round(((item.product.regularPrice - item.product.salePrice) / item.product.regularPrice) * 100)
-               : null;
-        %>
-          <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card h-100">
-              <img src="/uploads/product/<%= item.product.productImage[0] %>" class="card-img-top" alt="<%= item.product.productName %>">
-              <div class="card-body">
-                <h5 class="card-title"><%= item.product.productName %></h5>
-                <p class="wishlist-price">
-                  <% if (item.product.salePrice) { %>
-                    <strike class="text-muted">₹<%= item.product.regularPrice.toLocaleString() %></strike>
-                    <span class="text-danger ms-2 fw-bold">₹<%= item.product.salePrice.toLocaleString() %></span>
-                    <span class="text-success ms-2">(<%= discount %>% OFF)</span>
-                  <% } else { %>
-                    ₹<%= item.product.regularPrice.toLocaleString() %>
-                  <% } %>
-                </p>
-              </div>
+               <p class="wishlist-price">
+  <% if (item.product.salePrice) { 
+       const discount = Math.round(((item.product.regularPrice - item.product.salePrice) / item.product.regularPrice) * 100); %>
+    <strike class="text-muted">₹<%= item.product.regularPrice.toLocaleString() %></strike>
+    <span class="text-danger ms-2 fw-bold">₹<%= item.product.salePrice.toLocaleString() %></span>
+    <span class="text-success ms-2">(<%= discount %>% OFF)</span>
+  <% } else { %>
+    ₹<%= item.product.regularPrice.toLocaleString() %>
+  <% } %>
+</p>
+
             </div>
-          </div>
-        <% }); %>
-      <% } else { %>
-        <div class="col-12">
-          <p class="text-center text-muted">Your wishlist is empty.</p>
-        </div>
-      <% } %>
-    </div>
-  </div>
-</div>
-
         </div>
     <% } else { %>
         <div class="content-area">
