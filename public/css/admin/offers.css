@@ -26,71 +26,7 @@
             display: flex;
         }
 
-        /* Sidebar Styles */
-        .sidebar {
-            width: 280px;
-            background-color: var(--bg-secondary);
-            padding: 2rem 1.5rem;
-            border-right: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            position: fixed;
-            height: 100vh;
-            overflow-y: auto;
-        }
-
-        .brand {
-            font-family: 'Aboreto', cursive;
-            font-size: 1.5rem;
-            color: var(--accent-color);
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border-color);
-            letter-spacing: 1px;
-        }
-
-        .nav-menu {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            flex: 1;
-        }
-
-        .nav-item {
-            margin-bottom: 0.5rem;
-        }
-
-        .nav-link {
-            color: var(--text-secondary);
-            text-decoration: none;
-            padding: 0.75rem 1rem;
-            border-radius: 4px;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            font-size: 0.95rem;
-        }
-
-        .nav-link i {
-            width: 20px;
-            text-align: center;
-            color: var(--text-secondary);
-        }
-
-        .nav-link:hover {
-            background-color: var(--hover-bg);
-            color: var(--accent-color);
-            transform: translateX(4px);
-        }
-
-        .nav-link.active {
-            background-color: var(--hover-bg);
-            color: var(--accent-color);
-            font-weight: 500;
-            border-left: 3px solid var(--accent-color);
-        }
-
+        
         /* Main Content Styles */
         .main-content {
             flex: 1;
