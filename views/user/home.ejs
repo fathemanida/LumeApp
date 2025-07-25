@@ -752,64 +752,37 @@
       0% { background-position: -200px 0; }
       100% { background-position: 400px 0; }
     }
-   @media (max-width: 768px) {
-  .spotlight-highlight {
-    flex-direction: column;
-    min-height: unset;
-    padding: 1rem;
-    border-radius: 12px;
-  }
-
+    @media (max-width: 768px) {
+      .spotlight-highlight {
+        flex-direction: column;
+        min-height: unset;
+      }
+      .spotlight-highlight .spotlight-img-col, .spotlight-highlight .spotlight-details-col {
+        padding: 1.2rem 1rem;
+        min-height: unset;
+      }
+      .spotlight-highlight .spotlight-details-col {
+        padding-top: 0;
+      }
+      .spotlight-highlight .wishlist-icon {
+        top: 12px;
+        right: 12px;
+      }
   .spotlight-highlight .spotlight-img-col img {
-    max-width: 200px;
-    max-height: 220px;
+    max-width: 280px;
+    max-height: 300px;
     width: 100%;
     height: auto;
-    object-fit: cover;
-    border-radius: 8px;
-    box-shadow: 0 2px 12px rgba(41,29,14,0.08);
+    object-fit: contain;
   }
 
-  .spotlight-highlight .product-title {
-    font-size: 1.4rem;
-    margin-bottom: 0.4rem;
+  .spotlight-highlight .spotlight-img-col {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
   }
 
-  .spotlight-highlight .product-description {
-    font-size: 0.95rem;
-    line-height: 1.4;
-  }
-
-  .spotlight-highlight .product-category {
-    font-size: 0.95rem;
-  }
-
-  .spotlight-highlight .product-price {
-    font-size: 1.05rem;
-    margin-bottom: 1rem;
-  }
-
-  .spotlight-highlight .btn {
-    font-size: 0.95rem;
-    padding: 0.5rem 1.4rem;
-    margin-top: 0.8rem;
-  }
-
-  .spotlight-highlight .new-badge,
-  .spotlight-highlight .offer-badge {
-    font-size: 0.75rem;
-    padding: 0.25rem 0.6rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .spotlight-highlight .wishlist-icon {
-    top: 8px;
-    right: 10px;
-    font-size: 1.2rem;
-    padding: 0.5rem;
-  }
-}
-
+    }
 
     #newCollectionScroll, #featuredScroll {
       scrollbar-width: none;

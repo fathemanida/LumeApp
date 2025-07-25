@@ -809,7 +809,7 @@ const productDetails = async (req, res) => {
   try {
     let userData = null;
     if (req.session.user) {
-      userData = await User.findById(req.session.user._id);
+      userData = await User.findById(req.session.user.id);
     }
 
     const productId = req.query.id;
@@ -817,7 +817,7 @@ const productDetails = async (req, res) => {
     if (!productId) {
       return res
         .status(400)
-        .render("error", { message: "Product ID is required" });
+        .render("error", { message: "Product not Found" });
     }
 
     const product = await Product.findById(productId)
@@ -894,8 +894,8 @@ const productDetails = async (req, res) => {
 
 const newArrivals = async (req, res) => {
   try {
-    const userData = req.session.user?._id
-      ? await User.findById(req.session.user._id)
+    const userData = req.session.user?.id
+      ? await User.findById(req.session.user.id)
       : null;
 
     const categories = await Category.find({ isListed: true });
@@ -998,8 +998,8 @@ const newArrivals = async (req, res) => {
 
 const featured = async (req, res) => {
   try {
-    const userData = req.session.user?._id
-      ? await User.findById(req.session.user._id)
+    const userData = req.session.user?.id
+      ? await User.findById(req.session.user.id)
       : null;
 
     const categories = await Category.find({ isListed: true });
