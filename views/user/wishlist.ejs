@@ -70,16 +70,19 @@
     }
 
     /* Wishlist Items */
-    .wishlist-item {
-      border: 1px solid var(--theme-border);
-      border-radius: 0;
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
-      transition: all 0.3s ease;
-      background: white;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-      flex-wrap: wrap;
-    }
+.wishlist-item {
+  display: flex; /* ✅ THIS IS MISSING */
+  align-items: center;
+  border: 1px solid var(--theme-border);
+  border-radius: 0;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  flex-wrap: wrap;
+}
+
 
     .wishlist-item:hover {
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
@@ -87,16 +90,20 @@
     }
 
     .wishlist-image {
-      width: 180px;
-      height: 180px;
-      object-fit: cover;
-      border-radius: 0;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
+  flex: 0 0 120px;
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
 
-    .wishlist-details {
-      padding: 0 2rem;
-    }
+
+.wishlist-details {
+  flex: 1;
+  padding: 0 2rem;
+  min-width: 200px;
+}
 
     .wishlist-title {
       font-size: 1.4rem;
@@ -149,11 +156,14 @@
       border-color: var(--olive-green);
     }
 
-    .wishlist-actions {
-      display: flex;
-      gap: 1rem;
-      margin-top: 1.5rem;
-    }
+   .wishlist-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-left: auto; /* pushes to right end */
+  flex: 0 0 auto;
+}
+
 
     .wishlist-actions .btn {
       padding: 0.6rem 1.5rem;
@@ -278,32 +288,33 @@
         gap: 0.5rem;
       }
     }
-    @media (max-width: 576px) {
+ @media (max-width: 576px) {
   .wishlist-item {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
+    text-align: center;
   }
 
   .wishlist-image {
     width: 100px;
-    margin-bottom: 0.5rem;
+    height: auto;
+    margin: 0 auto 1rem;
   }
 
   .wishlist-details {
     width: 100%;
+    padding: 0;
   }
 
   .wishlist-actions {
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: center;
     width: 100%;
+    margin-top: 1rem;
   }
 
   .wishlist-actions .btn {
-    width: 100%;
-  }
-
-  .size-btn {
-    margin-bottom: 0.3rem;
+    flex: 1;
   }
 }
 
