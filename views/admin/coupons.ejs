@@ -15,44 +15,8 @@
 <body>
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
     <!-- Sidebar -->
-   <aside class="sidebar">
-    <div class="brand">LUME</div>
-    <ul class="nav-menu">
-      <li class="nav-item">
-        <a href="/admin/dashboard" class="nav-link"><i class="fas fa-home"></i> Dashboard</a>
-      </li>
-       <li class="nav-item">
-        <a href="/admin/sales-report" class="nav-link"><i class="fas fa-chart-line"></i> Sales Report</a>
-      </li>
-      <li class="nav-item">
-        <a href="/admin/product" class="nav-link"><i class="fas fa-box"></i> Product</a>
-      </li>
-      <li class="nav-item">
-        <a href="/admin/orders" class="nav-link"><i class="fas fa-shopping-cart"></i> Orders</a>
-      </li>
-      <li class="nav-item">
-        <a href="/admin/users" class="nav-link"><i class="fas fa-users"></i> Users</a>
-      </li>
-      <li class="nav-item">
-        <a href="/admin/Category" class="nav-link"><i class="fas fa-tags"></i> Category</a>
-      </li>
-      <li class="nav-item">
-        <a href="/admin/offers" class="nav-link"><i class="fas fa-ticket-alt"></i> Offers</a>
-      </li>
-      <li class="nav-item">
-        <a href="/admin/settings" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
-      </li>
-      <li class="nav-item">
-        <a href="/admin/banner" class="nav-link"><i class="fas fa-image"></i> Banner</a>
-      </li>
-      <li class="nav-item">
-        <a href="/admin/Coupons" class="nav-link active"><i class="fas fa-ticket-alt"></i> Coupons</a>
-      </li>
-      <li class="nav-item">
-        <a href="/admin/logout" class="nav-link logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
-      </li>
-    </ul>
-  </aside>
+<%-include('../partials/admin/sidebar.ejs',{currentPage:'Coupons'}) %>
+
 
     <!-- Main Content -->
     <main class="main-content">
