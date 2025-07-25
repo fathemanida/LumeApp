@@ -41,107 +41,7 @@
     }
 
     /* Sidebar */
-    .sidebar {
-      width: 280px;
-      background-color: white;
-      padding: 2rem 1.5rem;
-      border-right: 1px solid var(--theme-border);
-      display: flex;
-      flex-direction: column;
-    }
-
-    .sidebar-title {
-      font-family: 'Aboreto', cursive;
-      font-size: 1.5rem;
-      color: var(--dark-brown);
-      margin-bottom: 2rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid var(--theme-border);
-      letter-spacing: 1px;
-    }
-
-    .sidebar-nav {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      flex: 1;
-    }
-
-    .sidebar-nav a {
-      color: var(--dark-brown);
-      text-decoration: none;
-      padding: 0.75rem 1rem;
-      border-radius: 0;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      font-size: 0.95rem;
-    }
-
-    .sidebar-nav a i {
-      width: 20px;
-      text-align: center;
-      color: var(--olive-green);
-    }
-
-    .sidebar-nav a:hover {
-      background-color: rgba(107, 142, 35, 0.1);
-      color: var(--olive-green);
-      transform: translateX(4px);
-    }
-
-    .sidebar-nav a.active {
-      background-color: rgba(107, 142, 35, 0.2);
-      color: var(--olive-green);
-      font-weight: 500;
-      border-left: 3px solid var(--olive-green);
-    }
-
-    .sidebar-actions {
-      margin-top: auto;
-      padding-top: 1.5rem;
-      border-top: 1px solid var(--theme-border);
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-
-    .sidebar-actions button {
-      padding: 0.75rem;
-      border-radius: 0;
-      border: none;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-family: 'Aboreto', sans-serif;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-    }
-
-    .logout-btn {
-      background-color: rgba(107, 142, 35, 0.1);
-      color: var(--dark-brown);
-      border: 1px solid var(--theme-border);
-    }
-
-    .logout-btn:hover {
-      background-color: rgba(107, 142, 35, 0.2);
-      border-color: var(--olive-green);
-    }
-
-    .delete-btn {
-      background-color: transparent;
-      color: #ff6b6b;
-      border: 1px solid #ff6b6b;
-    }
-
-    .delete-btn:hover {
-      background-color: rgba(255, 107, 107, 0.1);
-    }
-
+    
     /* Content Area */
     .content-area {
       flex: 1;
@@ -151,7 +51,6 @@
 
     /* Wishlist Page Header */
     .wishlist-page-header {
-      background: white;
       padding: 3rem 0;
       margin-bottom: 2rem;
       border-bottom: 1px solid var(--theme-border);
@@ -179,6 +78,7 @@
       transition: all 0.3s ease;
       background: white;
       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      flex-wrap: wrap;
     }
 
     .wishlist-item:hover {
@@ -290,7 +190,6 @@
     .empty-wishlist {
       text-align: center;
       padding: 4rem 2rem;
-      background: white;
       border-radius: 0;
       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
@@ -379,6 +278,34 @@
         gap: 0.5rem;
       }
     }
+    @media (max-width: 576px) {
+  .wishlist-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .wishlist-image {
+    width: 100px;
+    margin-bottom: 0.5rem;
+  }
+
+  .wishlist-details {
+    width: 100%;
+  }
+
+  .wishlist-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .wishlist-actions .btn {
+    width: 100%;
+  }
+
+  .size-btn {
+    margin-bottom: 0.3rem;
+  }
+}
 
     /* Toastify Custom Styles */
     .custom-toast {
@@ -424,67 +351,17 @@
                     </div>
                 </div>
 
-                <div class="container py-4">
-                    <% if (wishlist && wishlist.items && wishlist.items.length > 0) { %>
-                        <div class="row">
-                            <% wishlist.items.forEach(item => { %>
-                                <div class="col-12">
-                                    <div class="wishlist-item d-flex align-items-center">
-                                        <img src="/uploads/product/<%= item.product.productImage[0] %>" 
-                                             alt="<%= item.product.productName %>" 
-                                             class="wishlist-image">
-                                        <div class="wishlist-details flex-grow-1">
-                                            <h3 class="wishlist-title"><%= item.product.productName %></h3>
-                                            <p class="wishlist-price">
-                                                <% if (item.product.salePrice) { %>
-                                                    <strike class="text-muted">₹<%= item.product.regularPrice.toLocaleString() %></strike>
-                                                    <span class="text-danger">₹<%= item.product.salePrice.toLocaleString() %></span>
-                                                <% } else { %>
-                                                    ₹<%= item.product.regularPrice.toLocaleString() %>
-                                                <% } %>
-                                            </p>
-                                            
-                                            <% if (item.product.sizes && item.product.sizes.length > 0) { %>
-                                                <div class="size-selection">
-                                                    <label class="me-2">Size:</label>
-                                                    <% item.product.sizes.forEach(size => { %>
-                                                        <button class="size-btn" 
-                                                                data-product-id="<%= item.product._id %>"
-                                                                data-size="<%= size %>"
-                                                                onclick="selectSize(this)">
-                                                            <%= size %>
-                                                        </button>
-                                                    <% }); %>
-                                                </div>
-                                            <% } %>
+               <p class="wishlist-price">
+  <% if (item.product.salePrice) { 
+       const discount = Math.round(((item.product.regularPrice - item.product.salePrice) / item.product.regularPrice) * 100); %>
+    <strike class="text-muted">₹<%= item.product.regularPrice.toLocaleString() %></strike>
+    <span class="text-danger ms-2 fw-bold">₹<%= item.product.salePrice.toLocaleString() %></span>
+    <span class="text-success ms-2">(<%= discount %>% OFF)</span>
+  <% } else { %>
+    ₹<%= item.product.regularPrice.toLocaleString() %>
+  <% } %>
+</p>
 
-                                            <div class="wishlist-actions">
-                                                <button class="btn btn-primary" 
-                                                        onclick="addToCart('<%= item.product._id %>')"
-                                                        data-product-id="<%= item.product._id %>">
-                                                    <i class="fas fa-shopping-cart me-2"></i>Add to Cart
-                                                </button>
-                                                <button class="btn btn-outline-danger" 
-                                                        onclick="removeFromWishlist('<%= item.product._id %>')">
-                                                    <i class="fas fa-trash-alt me-2"></i>Remove
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            <% }); %>
-                        </div>
-                    <% } else { %>
-                        <div class="empty-wishlist">
-                            <i class="far fa-heart"></i>
-                            <h3>Your wishlist is empty</h3>
-                            <p class="text-muted">Add items to your wishlist to see them here</p>
-                            <a href="/shopAll" class="btn btn-primary">
-                                <i class="fas fa-shopping-bag me-2"></i>Continue Shopping
-                            </a>
-                        </div>
-                    <% } %>
-                </div>
             </div>
         </div>
     <% } else { %>
