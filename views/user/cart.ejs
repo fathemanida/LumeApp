@@ -833,100 +833,112 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script>
-        async function updateQuantity(itemId, action) {
-            try {
-                if (!itemId || !['increase', 'decrease'].includes(action)) {
-                    showNotification('Invalid item or action', 'error');
-                    return;
-                }
-                const cartItem = document.querySelector(`.cart-item[data-id="${itemId}"]`);
-                if (!cartItem) {
-                    showNotification('Cart item not found', 'error');
-                    return;
-                }
-                const quantityInput = cartItem.querySelector('.quantity-input');
-                if (!quantityInput) {
-                    showNotification('Quantity input not found', 'error');
-                    return;
-                }
-                const currentQuantity = parseInt(quantityInput.value, 10);
-                const maxAllowed = parseInt(quantityInput.max, 10) || 6;
-                if (action === 'decrease' && currentQuantity <= 1) {
-                    showNotification('Minimum quantity reached', 'error');
-                    return;
-                }
-                if (action === 'increase' && currentQuantity >= maxAllowed) {
-                    if (maxAllowed <= 6) {
-                        showNotification(`Only ${maxAllowed} items available in stock`, 'error');
-                    } else {
-                        showNotification('Maximum quantity limit reached (6 items per product)', 'error');
-                    }
-                    return;
-                }
-                const buttons = cartItem.querySelectorAll('.quantity-btn');
-                buttons.forEach(btn => btn.disabled = true);
-                const response = await fetch('/cart/update-quantity', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ itemId, action })
-                });
-                const data = await response.json();
-                if (!data.success) {
-                    showNotification(data.message || 'Failed to update quantity', 'error');
-                    buttons.forEach(btn => btn.disabled = false);
-                    return;
-                }
-                quantityInput.value = data.quantity;
-                quantityInput.max = Math.min(data.stock, 6);
-                const totalElement = cartItem.querySelector('.product-price');
-                if (totalElement) {
-                    totalElement.innerHTML = data.offerDiscount || data.couponDiscount
-                        ? `<span class="text-decoration-line-through text-muted">₹${(data.originalPrice * data.quantity).toLocaleString()}</span> <span class="text-success ms-2">₹${data.totalPrice.toLocaleString()}</span>`
-                        : `₹${data.totalPrice.toLocaleString()}`;
-                }
-                const discountBadge = cartItem.querySelector('.discount-badge');
-                if (discountBadge) {
-                    let badgeHTML = '';
-                    if (data.offerDiscount > 0) {
-                        badgeHTML += `<span class="badge bg-success me-2">${data.appliedOffer === 'product' ? 'Product Offer' : 'Category Offer'}: -₹${data.offerDiscount.toLocaleString()}</span>`;
-                    }
-                    if (data.couponDiscount > 0) {
-                        badgeHTML += `<span class="badge bg-primary">Coupon: -₹${data.couponDiscount.toLocaleString()}</span>`;
-                    }
-                    discountBadge.innerHTML = badgeHTML;
-                }
-                const stockInfo = cartItem.querySelector('.stock-info small');
-                if (stockInfo) {
-                    if (data.stock <= 6) {
-                        stockInfo.textContent = `Only ${data.stock} items available`;
-                        stockInfo.className = 'text-warning';
-                    } else {
-                        stockInfo.textContent = 'Maximum 6 items allowed per product';
-                        stockInfo.className = 'text-muted';
-                    }
-                }
-                const increaseBtn = cartItem.querySelector('.quantity-btn[onclick*="increase"]');
-                const decreaseBtn = cartItem.querySelector('.quantity-btn[onclick*="decrease"]');
-                if (increaseBtn && decreaseBtn) {
-                    const maxAllowed = Math.min(data.stock, 6);
-                    increaseBtn.disabled = data.quantity >= maxAllowed;
-                    decreaseBtn.disabled = data.quantity <= 1;
-                }
-                document.getElementById('subtotal').textContent = `₹${data.cartTotal.toLocaleString()}`;
-                document.getElementById('shipping').textContent = data.shipping === 0 ? 'Free' : `₹${data.shipping.toLocaleString()}`;
-                document.getElementById('finalPrice').textContent = `₹${data.finalPrice.toLocaleString()}`;
-                updateSummaryDiscounts(data.totals.offerDiscount, data.totals.couponDiscount);
-                showNotification('Quantity updated successfully', 'success');
-            } catch (error) {
-                console.log('An error occurred while updating quantity', error);
-            } finally {
-                const cartItem = document.querySelector(`.cart-item[data-id="${itemId}"]`);
-                if (cartItem) {
-                    const buttons = cartItem.querySelectorAll('.quantity-btn');
-                    buttons.forEach(btn => btn.disabled = false);
-                }
-            }
+     async function updateQuantity(itemId, action) {
+    try {
+        if (!itemId || !['increase', 'decrease'].includes(action)) {
+            showNotification('Invalid item or action', 'error');
+            return;
         }
+
+        const cartItem = document.querySelector(`.cart-item[data-id="${itemId}"]`);
+        const quantityInput = cartItem?.querySelector('.quantity-input');
+        const currentQuantity = parseInt(quantityInput?.value || 0, 10);
+        const maxAllowed = parseInt(quantityInput?.max || 6, 10);
+
+        if (!cartItem || !quantityInput) {
+            showNotification('Cart item not found or quantity input missing', 'error');
+            return;
+        }
+
+        if (action === 'decrease' && currentQuantity <= 1) {
+            showNotification('Minimum quantity reached', 'error');
+            return;
+        }
+        if (action === 'increase' && currentQuantity >= maxAllowed) {
+            showNotification(
+                maxAllowed <= 6 ? `Only ${maxAllowed} items available in stock` : 'Maximum 6 items allowed',
+                'error'
+            );
+            return;
+        }
+
+        const newQuantity = action === 'increase' ? currentQuantity + 1 : currentQuantity - 1;
+        quantityInput.value = newQuantity;
+
+        const buttons = cartItem.querySelectorAll('.quantity-btn');
+        buttons.forEach(btn => btn.disabled = true);
+
+        const response = await fetch('/cart/update-quantity', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ itemId, action })
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+            quantityInput.value = currentQuantity;
+            showNotification(data.message || 'Failed to update quantity', 'error');
+            return;
+        }
+
+        quantityInput.value = data.quantity;
+        quantityInput.max = Math.min(data.stock, 6);
+
+        const totalElement = cartItem.querySelector('.product-price');
+        if (totalElement) {
+            totalElement.innerHTML = data.offerDiscount || data.couponDiscount
+                ? `<span class="text-decoration-line-through text-muted">₹${(data.originalPrice * data.quantity).toLocaleString()}</span> <span class="text-success ms-2">₹${data.totalPrice.toLocaleString()}</span>`
+                : `₹${data.totalPrice.toLocaleString()}`;
+        }
+
+        const discountBadge = cartItem.querySelector('.discount-badge');
+        if (discountBadge) {
+            let badgeHTML = '';
+            if (data.offerDiscount > 0) {
+                badgeHTML += `<span class="badge bg-success me-2">${data.appliedOffer === 'product' ? 'Product Offer' : 'Category Offer'}: -₹${data.offerDiscount.toLocaleString()}</span>`;
+            }
+            if (data.couponDiscount > 0) {
+                badgeHTML += `<span class="badge bg-primary">Coupon: -₹${data.couponDiscount.toLocaleString()}</span>`;
+            }
+            discountBadge.innerHTML = badgeHTML;
+        }
+
+        const stockInfo = cartItem.querySelector('.stock-info small');
+        if (stockInfo) {
+            stockInfo.textContent = data.stock <= 6
+                ? `Only ${data.stock} items available`
+                : 'Maximum 6 items allowed per product';
+            stockInfo.className = data.stock <= 6 ? 'text-warning' : 'text-muted';
+        }
+
+        const increaseBtn = cartItem.querySelector('.quantity-btn[onclick*="increase"]');
+        const decreaseBtn = cartItem.querySelector('.quantity-btn[onclick*="decrease"]');
+        if (increaseBtn && decreaseBtn) {
+            const maxAllowed = Math.min(data.stock, 6);
+            increaseBtn.disabled = data.quantity >= maxAllowed;
+            decreaseBtn.disabled = data.quantity <= 1;
+        }
+
+        document.getElementById('subtotal').textContent = `₹${data.cartTotal.toLocaleString()}`;
+        document.getElementById('shipping').textContent = data.shipping === 0 ? 'Free' : `₹${data.shipping.toLocaleString()}`;
+        document.getElementById('finalPrice').textContent = `₹${data.finalPrice.toLocaleString()}`;
+        updateSummaryDiscounts(data.totals.offerDiscount, data.totals.couponDiscount);
+
+        showNotification('Quantity updated successfully', 'success');
+
+    } catch (error) {
+        console.error('An error occurred while updating quantity', error);
+        showNotification('Something went wrong', 'error');
+    } finally {
+        const cartItem = document.querySelector(`.cart-item[data-id="${itemId}"]`);
+        if (cartItem) {
+            const buttons = cartItem.querySelectorAll('.quantity-btn');
+            buttons.forEach(btn => btn.disabled = false);
+        }
+    }
+}
+
 
         async function removeItem(itemId) {
             try {
