@@ -369,6 +369,55 @@
             color: white !important;
             transform: translateY(-2px);
         }
+        .search-container {
+  margin-bottom: 1rem;
+}
+
+.search-input {
+  padding: 0.6rem 1rem;
+  border: 2px solid var(--soft-beige);
+  background: var(--light-bg);
+  color: var(--soft-beige);
+  font-family: 'Jost', sans-serif;
+  font-size: 1rem;
+  outline: none;
+}
+
+.search-input::placeholder {
+  color: var(--soft-beige);
+}
+
+.search-button {
+  padding: 0.6rem 1rem;
+  background: var(--light-bg);
+  border: 2px solid var(--soft-beige);
+  color: var(--soft-beige);
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.search-button:hover {
+  background: var(--soft-beige);
+  color: white;
+}
+@media (max-width: 576px) {
+  .search-container {
+    width: 100%;
+  }
+
+  #searchForm {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .search-input,
+  .search-button {
+    width: 100%;
+    font-size: 0.95rem;
+    padding: 0.5rem 0.8rem;
+  }
+}
+
 
        
         /* Desktop styles */
@@ -504,7 +553,7 @@
 </head>
 <body>
     <!-- Navbar -->
-
+<%-include('../partials/user/header.ejs')  %>
     <% if (locals.user) { %>
         <div class="main-container">
 <%-include('../partials/user/sidebar.ejs',{currentPage:'orders'})  %>
@@ -652,8 +701,7 @@
         </div>
     <% } %>
 
-    <!-- Footer -->
-<% -include('../partials/user/fooret.ejs') %>
+ <%-include('../partials/user/fooret.ejs')  %>
 
     <script>
         // Sidebar button functionality
