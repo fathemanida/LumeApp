@@ -876,6 +876,7 @@ const productDetails = async (req, res) => {
       .lean();
 
     const categories = await Category.find({ isListed: true });
+const maxQuantity=product.maxQuantity = product.quantity > 6 ? 6 : product.quantity;
 
     res.render("product-details", {
       user: userData,
@@ -883,6 +884,7 @@ const productDetails = async (req, res) => {
       relatedProducts,
       category: categories,
       currentUser: userData,
+      max: maxQuantity,
     });
   } catch (error) {
     console.error("Error in productDetails:", error);
