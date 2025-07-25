@@ -998,7 +998,6 @@ if (
 ) {
   applies = true;
 }
-    applies = true;
     if (!product.category || !product.category._id) {
       console.log('product missing category or id', product);
     }
