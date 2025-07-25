@@ -1,143 +1,140 @@
-<div class="overlay" id="overlay"></div>
-<div class="sidebar" id="sidebar">
-  <div class="sidebar-header">
-    <div class="brand">LUME</div>
-  </div>
-  <div class="sidebar-menu">
-    <div class="sidebar-category mb-4">
-      <form id="sidebarSearchForm" onsubmit="return false;">
-        <div class="input-group">
-          <input type="text" class="form-control search-input" placeholder="Search products..." id="sidebarSearch" name="search">
-          <button class="btn btn-outline-dark" type="submit" id="sidebarSearchBtn">
-            <i class="fas fa-search"></i>
-          </button>
-        </div>
-      </form>
+<!-- views/partials/sidebar.ejs -->
+<div class="sidebar">
+    <div class="sidebar-title">My Account</div>
+    <div class="sidebar-nav">
+        <a href="/profile" class="nav-link <%= currentPage === 'profile' ? 'active' : '' %>">
+            <i class="fas fa-user"></i>
+            Profile
+        </a>
+        <a href="/wallet" class="nav-link <%= currentPage === 'wallet' ? 'active' : '' %>">
+            <i class="fas fa-wallet"></i>
+            Wallet
+        </a>
+        <a href="/address" class="nav-link <%= currentPage === 'address' ? 'active' : '' %>">
+            <i class="fas fa-map-marker-alt"></i>
+            Address
+        </a>
+        <a href="/orders" class="nav-link <%= currentPage === 'orders' ? 'active' : '' %>">
+            <i class="fas fa-box-open"></i>
+            Orders
+        </a>
+        <a href="/wishlist" class="nav-link <%= currentPage === 'wishlist' ? 'active' : '' %>">
+            <i class="fas fa-heart"></i>
+            Wishlist
+        </a>
     </div>
-    <div class="sidebar-category">
-      <div class="sidebar-title" onclick="toggleCategory(this)">
-        Categories <i class="fas fa-chevron-down"></i>
-      </div>
-      <div class="sidebar-items">
-        <% for(let i=0; i<category.length; i++) { %>
-          <div class="sidebar-item">
-            <a href="/shopAll?category=<%= category[i]._id %><%= selectedSort ? '&sort=' + selectedSort : '' %>"
-              class="<%= selectedCategory === category[i]._id.toString() ? 'active' : '' %>">
-              <%= category[i].name %>
-            </a>
-          </div>
-        <% } %>
-      </div>
+    <div class="sidebar-actions">
+        <button class="logout-btn">
+            <i class="fas fa-sign-out-alt"></i>
+            Logout
+        </button>
+        <button class="delete-btn">
+            <i class="fas fa-trash-alt"></i>
+            Delete Account
+        </button>
     </div>
-    <div class="sidebar-category">
-      <div class="sidebar-title" onclick="toggleCategory(this)">
-        Sort By <i class="fas fa-chevron-down"></i>
-      </div>
-      <div class="sidebar-items">
-        <div class="sidebar-item">
-          <a href="/shopAll?sort=price-low<%= selectedCategory ? '&category=' + selectedCategory : '' %>"
-            class="<%= selectedSort === 'price-low' ? 'active' : '' %>">Price: Low to High</a>
-        </div>
-        <div class="sidebar-item">
-          <a href="/shopAll?sort=price-high<%= selectedCategory ? '&category=' + selectedCategory : '' %>"
-            class="<%= selectedSort === 'price-high' ? 'active' : '' %>">Price: High to Low</a>
-        </div>
-        <div class="sidebar-item">
-          <a href="/shopAll?sort=name-asc<%= selectedCategory ? '&category=' + selectedCategory : '' %>"
-            class="<%= selectedSort === 'name-asc' ? 'active' : '' %>">A-Z</a>
-        </div>
-        <div class="sidebar-item">
-          <a href="/shopAll?sort=name-desc<%= selectedCategory ? '&category=' + selectedCategory : '' %>"
-            class="<%= selectedSort === 'name-desc' ? 'active' : '' %>">Z-A</a>
-        </div>
-        <div class="sidebar-item">
-          <a href="/shopAll?sort=newest<%= selectedCategory ? '&category=' + selectedCategory : '' %>"
-            class="<%= selectedSort === 'newest' ? 'active' : '' %>">Newest First</a>
-        </div>
-      </div>
-    </div>
-    <div class="sidebar-category">
-      <div class="sidebar-title" onclick="toggleCategory(this)">
-        Collections <i class="fas fa-chevron-down"></i>
-      </div>
-      <div class="sidebar-items">
-        <div class="sidebar-item">New Arrivals</div>
-        <div class="sidebar-item">Best Sellers</div>
-        <div class="sidebar-item">Limited Edition</div>
-      </div>
-    </div>
-  </div>
 </div>
 
 <style>
-.shop-sidebar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  width: 270px;
-  background: #fff;
-  box-shadow: 2px 0 12px rgba(212,185,150,0.08);
-  z-index: 1200;
-  transform: translateX(-100%);
-  transition: transform 0.3s cubic-bezier(.4,0,.2,1);
-  overflow-y: auto;
-}
-.shop-sidebar.open {
-  transform: translateX(0);
-}
-.sidebar-header {
-  border-bottom: 1px solid #e0d8cc;
-}
-.sidebar-title {
-  font-family: 'Aboreto', cursive;
-  font-size: 1.1rem;
-  color: #1a0f0a;
-  font-weight: 500;
-}
-.sidebar-categories, .sidebar-sort {
-  padding-left: 0;
-}
-.sidebar-link {
-  display: block;
-  color: #2c1810;
-  font-family: 'Jost', sans-serif;
-  font-size: 1rem;
-  padding: 0.4rem 0.2rem;
-  border-radius: 4px;
-  text-decoration: none;
-  transition: background 0.2s, color 0.2s;
-}
-.sidebar-link.active, .sidebar-link:hover {
-  background: #f8f5f2;
-  color: #A9BA9D;
-}
-.sidebar-overlay {
-  display: none;
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.18);
-  z-index: 1199;
-}
-@media (min-width: 992px) {
-  .shop-sidebar {
-    transform: none !important;
-    left: 0;
-    width: 240px;
-    position: sticky;
-    top: 70px;
-    height: calc(100vh - 70px);
-    box-shadow: none;
-    border-right: 1px solid #e0d8cc;
-  }
-  .sidebar-overlay { display: none !important; }
-}
-.sidebar-items {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease;
-}
-.sidebar-items.open {
-  max-height: 500px;
-}
+    /* Sidebar */
+    .sidebar {
+        width: 280px;
+        background-color: white;
+        padding: 2rem 1.5rem;
+        border-right: 1px solid var(--theme-border);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .sidebar-title {
+        font-family: 'Aboreto', cursive;
+        font-size: 1.5rem;
+        color: var(--dark-brown);
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--theme-border);
+        letter-spacing: 1px;
+    }
+
+    .sidebar-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        flex: 1;
+    }
+
+    .sidebar-nav a {
+        color: var(--dark-brown);
+        text-decoration: none;
+        padding: 0.75rem 1rem;
+        border-radius: 0;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 0.95rem;
+    }
+
+    .sidebar-nav a i {
+        width: 20px;
+        text-align: center;
+        color: var(--olive-green);
+    }
+
+    .sidebar-nav a:hover {
+        background-color: rgba(107, 142, 35, 0.1);
+        color: var(--olive-green);
+        transform: translateX(4px);
+    }
+
+    .sidebar-nav a.active {
+        background-color: rgba(107, 142, 35, 0.2);
+        color: var(--olive-green);
+        font-weight: 500;
+        border-left: 3px solid var(--olive-green);
+    }
+
+    .sidebar-actions {
+        margin-top: auto;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--theme-border);
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .sidebar-actions button {
+        padding: 0.75rem;
+        border-radius: 0;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: 'Aboreto', sans-serif;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .logout-btn {
+        background-color: rgba(107, 142, 35, 0.1);
+        color: var(--dark-brown);
+        border: 1px solid var(--theme-border);
+    }
+
+    .logout-btn:hover {
+        background-color: rgba(107, 142, 35, 0.2);
+        border-color: var(--olive-green);
+    }
+
+    .delete-btn {
+        background-color: transparent;
+        color: #ff6b6b;
+        border: 1px solid #ff6b6b;
+    }
+
+    .delete-btn:hover {
+        background-color: rgba(255, 107, 107, 0.1);
+    }
 </style>

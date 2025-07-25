@@ -150,108 +150,7 @@
       background-color: #f0e9e0;
     }
 
-    /* Sidebar */
-    .sidebar {
-      width: 280px;
-      background-color: white;
-      padding: 2rem 1.5rem;
-      border-right: 1px solid var(--theme-border);
-      display: flex;
-      flex-direction: column;
-    }
-
-    .sidebar-title {
-      font-family: 'Aboreto', cursive;
-      font-size: 1.5rem;
-      color: var(--dark-brown);
-      margin-bottom: 2rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid var(--theme-border);
-      letter-spacing: 1px;
-    }
-
-    .sidebar-nav {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      flex: 1;
-    }
-
-    .sidebar-nav a {
-      color: var(--dark-brown);
-      text-decoration: none;
-      padding: 0.75rem 1rem;
-      border-radius: 0;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      font-size: 0.95rem;
-    }
-
-    .sidebar-nav a i {
-      width: 20px;
-      text-align: center;
-      color: var(--olive-green);
-    }
-
-    .sidebar-nav a:hover {
-      background-color: rgba(107, 142, 35, 0.1);
-      color: var(--olive-green);
-      transform: translateX(4px);
-    }
-
-    .sidebar-nav a.active {
-      background-color: rgba(107, 142, 35, 0.2);
-      color: var(--olive-green);
-      font-weight: 500;
-      border-left: 3px solid var(--olive-green);
-    }
-
-    .sidebar-actions {
-      margin-top: auto;
-      padding-top: 1.5rem;
-      border-top: 1px solid var(--theme-border);
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-
-    .sidebar-actions button {
-      padding: 0.75rem;
-      border-radius: 0;
-      border: none;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-family: 'Aboreto', sans-serif;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-    }
-
-    .logout-btn {
-      background-color: rgba(107, 142, 35, 0.1);
-      color: var(--dark-brown);
-      border: 1px solid var(--theme-border);
-    }
-
-    .logout-btn:hover {
-      background-color: rgba(107, 142, 35, 0.2);
-      border-color: var(--olive-green);
-    }
-
-    .delete-btn {
-      background-color: transparent;
-      color: #ff6b6b;
-      border: 1px solid #ff6b6b;
-    }
-
-    .delete-btn:hover {
-      background-color: rgba(255, 107, 107, 0.1);
-    }
-
+  
     /* Content Area */
     .content-area {
       flex: 1;
@@ -482,46 +381,10 @@
 <body>
     <!-- Navbar -->
 <%-include('../partials/user/header.ejs')  %>
-
+<%-include('../partials/user/sidebar.ejs')  %>
     <% if (locals.user) { %>
-        <div class="main-container">
-            <!-- Elegant Dark Sidebar -->
-            <div class="sidebar">
-                <div class="sidebar-title">My Account</div>
-                <div class="sidebar-nav">
-                    <a href="/profile" class="nav-link active">
-                        <i class="fas fa-user"></i>
-                        Profile
-                    </a>
-                    <a href="/wallet" class="nav-link">
-                        <i class="fas fa-wallet"></i>
-                        Wallet
-                    </a>
-                    <a href="/address" class="nav-link">
-                        <i class="fas fa-map-marker-alt"></i>
-                        Address
-                    </a>
-                    <a href="/orders" class="nav-link">
-                        <i class="fas fa-box-open"></i>
-                        Orders
-                    </a>
-                    <a href="/wishlist" class="nav-link">
-                        <i class="fas fa-heart"></i>
-                        Wishlist
-                    </a>
-                   
-                </div>
-                <div class="sidebar-actions">
-                    <button class="logout-btn">
-                        <i class="fas fa-sign-out-alt"></i>
-                        Logout
-                    </button>
-                    <button class="delete-btn">
-                        <i class="fas fa-trash-alt"></i>
-                        Delete Account
-                    </button>
-                </div>
-            </div>
+        
+      
 
             <!-- Profile Content Area -->
             <div class="content-area">
