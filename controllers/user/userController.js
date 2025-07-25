@@ -876,7 +876,7 @@ const productDetails = async (req, res) => {
       .lean();
 
     const categories = await Category.find({ isListed: true });
-const maxQuantity=product.maxQuantity = product.quantity > 6 ? 6 : product.quantity;
+const maxQuantity = product.quantity > 6 ? 6 : product.quantity;
 
     res.render("product-details", {
       user: userData,
