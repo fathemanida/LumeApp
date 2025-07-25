@@ -6,7 +6,10 @@ const addToWishlist = async (req, res) => {
   try {
     const userId = req.session.user.id;
     const { productId } = req.body;
-
+    
+    if (!userId) {
+      return res.status(401).json({ success: false, message: "Please Login" });
+    }
     if (!productId) {
       return res.status(400).json({ success: false, message: 'Something went Wrong' });
     }

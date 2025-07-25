@@ -359,11 +359,47 @@
                          style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.3s ease;border-radius:0;z-index:2;">
                   </div>
                   <style>
-                  #relatedProductsGrid .product-image-container { position:relative; overflow:hidden; border-radius:0 !important; box-shadow:none !important; }
-                  #relatedProductsGrid .product-img, #relatedProductsGrid .product-img-secondary { border-radius:0 !important; box-shadow:none !important; }
-                  #relatedProductsGrid .product-image-container:hover .product-img { opacity:0; }
-                  #relatedProductsGrid .product-image-container:hover .product-img-secondary { opacity:1; }
-                  #relatedProductsGrid .product-img-secondary { pointer-events:none; }
+                 #relatedProductsGrid .product-image-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+#relatedProductsGrid .product-img,
+#relatedProductsGrid .product-img-secondary {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  transition: opacity 0.3s ease;
+  display: block;
+}
+
+#relatedProductsGrid .product-img {
+  opacity: 1;
+  position: relative;
+  z-index: 1;
+}
+
+#relatedProductsGrid .product-img-secondary {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+#relatedProductsGrid .product-image-container:hover .product-img {
+  opacity: 0;
+}
+
+#relatedProductsGrid .product-image-container:hover .product-img-secondary {
+  opacity: 1;
+}
+
                   </style>
                   <% if (!relatedProduct.isListed) { %>
                     <div class="unlisted-overlay" style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.7);z-index:1;display:flex;align-items:center;justify-content:center;border-radius:0;box-shadow:none;">
@@ -562,7 +598,7 @@
             duration: 3000,
             gravity: "top",
             position: "right",
-            backgroundColor: icon.classList.contains('fas') ? "#95951581" : "#f44336",
+            backgroundColor: icon.classList.contains('fas') ? "#a9ba9d" : "#f44336",
             stopOnFocus: true
           }).showToast();
         } else {
@@ -602,32 +638,35 @@
       selectedSize = size;
     }
 
-    function incrementQuantity() {
-      const max = parseInt(quantityInput.getAttribute('max'));
-      const current = parseInt(quantityInput.value);
-      if (current < max) {
-        quantityInput.value = current + 1;
-      } else {
-        showToast({
-          title: 'Maximum Quantity Reached',
-          message: `You can only add up to ${max} items`,
-          type: 'warning'
-        });
-      }
-    }
+ function incrementQuantity() {
+  const quantityInput = document.getElementById('quantity');
+  const max = parseInt(quantityInput.getAttribute('max'));
+  const current = parseInt(quantityInput.value);
+  if (current < max) {
+    quantityInput.value = current + 1;
+  } else {
+    showToast({
+      title: 'Maximum Quantity Reached',
+      message: `You can only add up to ${max} items`,
+      type: 'warning'
+    });
+  }
+}
 
-    function decrementQuantity() {
-      const current = parseInt(quantityInput.value);
-      if (current > 1) {
-        quantityInput.value = current - 1;
-      } else {
-        showToast({
-          title: 'Minimum Quantity',
-          message: 'Quantity cannot be less than 1',
-          type: 'warning'
-        });
-      }
-    }
+function decrementQuantity() {
+  const quantityInput = document.getElementById('quantity');
+  const current = parseInt(quantityInput.value);
+  if (current > 1) {
+    quantityInput.value = current - 1;
+  } else {
+    showToast({
+      title: 'Minimum Quantity',
+      message: 'Quantity cannot be less than 1',
+      type: 'warning'
+    });
+  }
+}
+
 
     quantityInput.addEventListener('input', function() {
       const max = parseInt(this.getAttribute('max'));
