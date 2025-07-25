@@ -658,15 +658,20 @@
                                             <div style="font-size:0.95em;color:#888;margin-top:2px;">
                                             </div>
                                         <% } %>
-                                        <div class="quantity-control">
-                                            <button class="quantity-btn" onclick="updateQuantity('<%= item._id %>', 'decrease')" <%= item.quantity <= 1 ? 'disabled' : '' %>>
-                                                <i class="fas fa-minus"></i>
-                                            </button>
-                                            <input type="number" class="quantity-input" value="<%= item.quantity %>" min="1" max="<%= Math.min(item.productId.quantity || item.productId.productStock || 6, 6) %>" readonly>
-                                            <button class="quantity-btn" onclick="updateQuantity('<%= item._id %>', 'increase')" <%= item.quantity >= Math.min(item.productId.quantity || item.productId.productStock || 6, 6) ? 'disabled' : '' %>>
-                                                <i class="fas fa-plus"></i>
-                                            </button>
-                                        </div>
+                                        <div class="quantity-control cart-item" data-id="<%= item._id %>">
+    <button class="quantity-btn" onclick="updateQuantity('<%= item._id %>', 'decrease')">
+        <i class="fas fa-minus"></i>
+    </button>
+    <input type="number" class="quantity-input" 
+           value="<%= item.quantity %>" 
+           min="1"
+           max="<%= Math.min(item.productId.quantity || item.productId.productStock || 6, 6) %>" 
+           readonly>
+    <button class="quantity-btn" onclick="updateQuantity('<%= item._id %>', 'increase')">
+        <i class="fas fa-plus"></i>
+    </button>
+</div>
+
                                         <p class="stock-info">
                                             <small class="<%= (item.productId.quantity || item.productId.productStock || 0) <= 6 ? 'text-warning' : 'text-muted' %>">
                                                 <% if ((item.productId.quantity || item.productId.productStock || 0) <= 6) { %>
@@ -833,40 +838,75 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script>
-     async function updateQuantity(itemId, action) {
-  const quantityInput = document.querySelector(`#quantity-${itemId}`);
-  let currentQuantity = parseInt(quantityInput.value);
+        async function updateQuantity(itemId, action) {
+    try {
+        if (!itemId || !['increase', 'decrease'].includes(action)) {
+            showNotification('Invalid item or action', 'error');
+            return;
+        }
 
-  if (action === 'increase' && currentQuantity < 6) {
-    quantityInput.value = currentQuantity + 1;
-  } else if (action === 'decrease' && currentQuantity > 1) {
-    quantityInput.value = currentQuantity - 1;
-  } else {
-    return;
-  }
+        const cartItem = document.querySelector(`.cart-item[data-id="${itemId}"]`);
+        if (!cartItem) return showNotification('Cart item not found', 'error');
 
-  // Send update in background, but don’t wait/block UI
-  fetch('/cart/update-quantity', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ itemId, action })
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (!data.success) {
-      // If backend fails, revert the change
-      quantityInput.value = currentQuantity;
-      showNotification(data.message || 'Update failed', 'error');
-    }
-  })
-  .catch(err => {
-    quantityInput.value = currentQuantity;
-    showNotification('Server error. Try again later.', 'error');
-  });
-}
+        const quantityInput = cartItem.querySelector('.quantity-input');
+        if (!quantityInput) return showNotification('Quantity input not found', 'error');
 
+        const currentQuantity = parseInt(quantityInput.value);
+        const maxAllowed = parseInt(quantityInput.max) || 6;
+
+        if (action === 'decrease' && currentQuantity <= 1) {
+            showNotification('Minimum quantity is 1', 'info');
+            return;
+        }
+
+        if (action === 'increase' && currentQuantity >= maxAllowed) {
+            showNotification(`Only ${maxAllowed} in stock`, 'info');
+            return;
+        }
+
+        const response = await fetch('/cart/update-quantity', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ itemId, action })
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+            showNotification(data.message || 'Failed to update', 'error');
+            return;
+        }
+
+        // Update UI
+        quantityInput.value = data.quantity;
+        quantityInput.max = Math.min(data.stock, 6);
+
+        // Update price
+        const priceEl = cartItem.querySelector('.product-price');
+        if (priceEl) {
+            priceEl.innerHTML = data.offerDiscount || data.couponDiscount
+                ? `<span class="text-decoration-line-through text-muted">₹${(data.originalPrice * data.quantity).toLocaleString()}</span> 
+                   <span class="text-success ms-2">₹${data.totalPrice.toLocaleString()}</span>`
+                : `₹${data.totalPrice.toLocaleString()}`;
+        }
+
+        // Update discounts
+        const badge = cartItem.querySelector('.discount-badge');
+        if (badge) {
+            let html = '';
+            if (data.offerDiscount > 0) {
+                html += `<span class="badge bg-success me-2">${data.appliedOffer === 'product' ? 'Product' : 'Category'}: -₹${data.offerDiscount}</span>`;
+            }
+            if (data.couponDiscount > 0) {
+                html += `<span class="badge bg-primary">Coupon: -₹${data.couponDiscount}</span>`;
+            }
+            badge.innerHTML = html;
+        }
+
+        // Stock info
+        const stockInfo = cartItem.querySelector('.stock-info small');
+        if (stockInfo) {
+            s
 
         async function removeItem(itemId) {
             try {
