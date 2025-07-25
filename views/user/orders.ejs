@@ -507,21 +507,8 @@
 
     <% if (locals.user) { %>
         <div class="main-container">
-            <!-- Sidebar -->
-            <div class="sidebar">
-                <div class="sidebar-title">My Account</div>
-                <div class="sidebar-nav">
-                    <a href="/profile" class="nav-link"><i class="fas fa-user"></i> Profile</a>
-                    <a href="/wallet" class="nav-link"><i class="fas fa-wallet"></i> Wallet</a>
-                    <a href="/address" class="nav-link"><i class="fas fa-map-marker-alt"></i> Address</a>
-                    <a href="/orders" class="nav-link active"><i class="fas fa-box-open"></i> Orders</a>
-                    <a href="/wishlist" class="nav-link"><i class="fas fa-heart"></i> Wishlist</a>
-                </div>
-                <div class="sidebar-actions">
-                    <button class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
-                    <button class="delete-btn"><i class="fas fa-trash-alt"></i> Delete Account</button>
-                </div>
-            </div>
+<%-include('../partials/user/sidebar.ejs',{currentPage:'orders'})  %>
+
 
             <!-- Orders Content Area -->
             <div class="content-area">
