@@ -1,0 +1,106 @@
+<!-- views/partials/sidebar.ejs -->
+<aside class="sidebar">
+    <div class="brand">LUME</div>
+    <ul class="nav-menu">
+      <li class="nav-item"><a href="/admin/dashboard" class="nav-link <%= currentPage === 'dashboard' ? 'active' : '' %>"><i class="fas fa-home"></i> Dashboard</a></li>
+      <li class="nav-item"><a href="/admin/sales-report" class="nav-link <%= currentPage === 'sales-report' ? 'active' : '' %>"><i class="fas fa-chart-line"></i> Sales Report</a></li>
+      <li class="nav-item"><a href="/admin/product" class="nav-link <%= currentPage === 'product' ? 'active' : '' %>"><i class="fas fa-box"></i> Product</a></li>
+      <li class="nav-item"><a href="/admin/orders" class="nav-link <%= currentPage === 'orders' ? 'active' : '' %>"><i class="fas fa-shopping-cart"></i> Orders</a></li>
+      <li class="nav-item"><a href="/admin/users" class="nav-link <%= currentPage === 'users' ? 'active' : '' %>"><i class="fas fa-users"></i> Users</a></li>
+      <li class="nav-item"><a href="/admin/Category" class="nav-link <%= currentPage === 'category' ? 'active' : '' %>"><i class="fas fa-tags"></i> Category</a></li>
+      <li class="nav-item"><a href="/admin/offers" class="nav-link <%= currentPage === 'offers' ? 'active' : '' %>"><i class="fas fa-ticket-alt"></i> Offers</a></li>
+      <li class="nav-item"><a href="/admin/settings" class="nav-link <%= currentPage === 'settings' ? 'active' : '' %>"><i class="fas fa-cog"></i> Settings</a></li>
+      <li class="nav-item"><a href="/admin/banner" class="nav-link <%= currentPage === 'banner' ? 'active' : '' %>"><i class="fas fa-image"></i> Banner</a></li>
+      <li class="nav-item"><a href="/admin/Coupons" class="nav-link <%= currentPage === 'coupons' ? 'active' : '' %>"><i class="fas fa-ticket-alt"></i> Coupons</a></li>
+      <li class="nav-item"><a href="/admin/logout" class="nav-link logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+    </ul>
+</aside>
+
+<style>
+    /* Sidebar Styles */
+    .sidebar {
+      width: 280px;
+      background-color: var(--bg-secondary);
+      padding: 2rem 1.5rem;
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+      z-index: 100;
+      transition: transform 0.3s ease;
+    }
+
+    .brand {
+      font-family: 'Aboreto', cursive;
+      font-size: 1.8rem;
+      color: var(--accent-color);
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-color);
+      letter-spacing: 2px;
+      text-shadow: 0 0 10px rgba(218, 198, 164, 0.3);
+    }
+
+    .nav-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      flex: 1;
+      list-style: none;
+    }
+
+    .nav-item {
+      margin-bottom: 0.5rem;
+    }
+
+    .nav-link {
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.95rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-link i {
+      width: 20px;
+      text-align: center;
+      color: var(--text-secondary);
+    }
+
+    .nav-link:hover {
+      background: var(--accent-gradient);
+      color: var(--bg-primary);
+      transform: translateX(4px);
+    }
+
+    .nav-link.active {
+      background: var(--accent-gradient);
+      color: var(--bg-primary);
+      font-weight: 600;
+      border-left: 4px solid var(--accent-color);
+    }
+
+    .nav-link.logout {
+      color: #c33;
+      margin-top: 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+        position: fixed;
+        z-index: 1000;
+      }
+      .sidebar.active {
+        transform: translateX(0);
+      }
+    }
+</style>
