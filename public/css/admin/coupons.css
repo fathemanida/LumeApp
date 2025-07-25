@@ -91,10 +91,7 @@ body {
     overflow-x: auto;
     box-shadow: 0 2px 6px rgb(129 83 50 / 49%);
 }
-.nav-link.logout {
-            color: #c33;
-            margin-top: 1.5rem;
-        }
+
 
 .table {
     width: 100%;
