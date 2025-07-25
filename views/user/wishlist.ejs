@@ -344,25 +344,48 @@
 
             <!-- Wishlist Content Area -->
             <div class="content-area">
-                <div class="wishlist-page-header">
-                    <div class="container">
-                        <h1>My Wishlist</h1>
-                        <p>Save your favorite items for later</p>
-                    </div>
-                </div>
+  <div class="wishlist-page-header">
+    <div class="container">
+      <h1>My Wishlist</h1>
+      <p>Save your favorite items for later</p>
+    </div>
+  </div>
 
-               <p class="wishlist-price">
-  <% if (item.product.salePrice) { 
-       const discount = Math.round(((item.product.regularPrice - item.product.salePrice) / item.product.regularPrice) * 100); %>
-    <strike class="text-muted">₹<%= item.product.regularPrice.toLocaleString() %></strike>
-    <span class="text-danger ms-2 fw-bold">₹<%= item.product.salePrice.toLocaleString() %></span>
-    <span class="text-success ms-2">(<%= discount %>% OFF)</span>
-  <% } else { %>
-    ₹<%= item.product.regularPrice.toLocaleString() %>
-  <% } %>
-</p>
-
+  <div class="container my-4">
+    <div class="row">
+      <% if (wishlist && wishlist.items.length > 0) { %>
+        <% wishlist.items.forEach(item => { 
+             const discount = item.product.salePrice 
+               ? Math.round(((item.product.regularPrice - item.product.salePrice) / item.product.regularPrice) * 100)
+               : null;
+        %>
+          <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100">
+              <img src="/uploads/product/<%= item.product.productImage[0] %>" class="card-img-top" alt="<%= item.product.productName %>">
+              <div class="card-body">
+                <h5 class="card-title"><%= item.product.productName %></h5>
+                <p class="wishlist-price">
+                  <% if (item.product.salePrice) { %>
+                    <strike class="text-muted">₹<%= item.product.regularPrice.toLocaleString() %></strike>
+                    <span class="text-danger ms-2 fw-bold">₹<%= item.product.salePrice.toLocaleString() %></span>
+                    <span class="text-success ms-2">(<%= discount %>% OFF)</span>
+                  <% } else { %>
+                    ₹<%= item.product.regularPrice.toLocaleString() %>
+                  <% } %>
+                </p>
+              </div>
             </div>
+          </div>
+        <% }); %>
+      <% } else { %>
+        <div class="col-12">
+          <p class="text-center text-muted">Your wishlist is empty.</p>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
         </div>
     <% } else { %>
         <div class="content-area">
