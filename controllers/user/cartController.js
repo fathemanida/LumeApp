@@ -163,34 +163,10 @@ const cart = async (req, res) => {
     const userId = req.session.user.id;
     const currentTime = new Date();
     
-    console.log('\n=== Cart Route Debug ===');
-    console.log('User ID:', userId);
-    
-    const allCategories = await Category.find({}).select('name categoryOffer');
-    console.log('\n=== All Categories with Offer Status ===');
-    allCategories.forEach((category, index) => {
-      const offer = category.categoryOffer || {};
-      console.log(`[${index + 1}] ${category.name} - Active: ${offer.active || false}`);
-      if (offer.active) {
-        console.log(`   Offer: ${offer.discountValue}${offer.discountType === 'percentage' ? '%' : ' flat'}`);
-        console.log(`   Start: ${offer.startDate}, End: ${offer.endDate}`);
-      }
-    });
-    
-    const categoriesWithOffers = allCategories.filter(category => {
-      const offer = category.categoryOffer || {};
-      return (
-        offer.active === true &&
-        (!offer.startDate || new Date(offer.startDate) <= currentTime) &&
-        (!offer.endDate || new Date(offer.endDate) >= currentTime)
-      );
-    });
-    
-    console.log('\n=== Active Category Offers ===');
-    console.log(`Found ${categoriesWithOffers.length} categories with active offers`);
-    categoriesWithOffers.forEach((category, index) => {
-      const offer = category.categoryOffer;
-      console.log(`[${index + 1}] ${category.name} - ${offer.discountValue}${offer.discountType === 'percentage' ? '%' : ' flat'}`);
+    const activeOffers = await Offer.find({
+      isActive: true,
+      startDate: { $lte: currentTime },
+      endDate: { $gte: currentTime }
     });
     
     const cart = await Cart.findOne({ userId })
@@ -200,106 +176,74 @@ const cart = async (req, res) => {
           { path: 'offer' },
           { 
             path: 'category',
-            select: 'name categoryOffer description image isListed'
+            select: 'name description image isListed'
           }
         ]
       })
       .populate('appliedCoupon');
-      
-    console.log('Cart after population:', JSON.stringify(cart, null, 2));
 
     if (cart && cart.items && cart.items.length > 0) {
-      console.log(`\nProcessing ${cart.items.length} cart items...`);
-      
-      cart.items.forEach(item => {
-        if (item.productId?.category) {
-          const category = item.productId.category;
-          const categoryId = category._id.toString();
+      for (const item of cart.items) {
+        if (item.productId) {
+          const product = item.productId;
+          const price = product.salePrice || product.regularPrice;
           
-          console.log(`\nProduct: ${item.productId.productName}`);
-          console.log('Category:', category.name);
-          
-          const categoryOffer = category.categoryOffer || {};
-          const offerStartDate = categoryOffer.startDate ? new Date(categoryOffer.startDate) : null;
-          const offerEndDate = categoryOffer.endDate ? new Date(categoryOffer.endDate) : null;
-          
-          const hasActiveOffer = categoryOffer.active === true &&
-            (!offerStartDate || offerStartDate <= currentTime) &&
-            (!offerEndDate || offerEndDate >= currentTime);
-          
-          console.log(`- Category ${category.name} offer status:`, {
-            active: categoryOffer.active,
-            startDate: offerStartDate,
-            endDate: offerEndDate,
-            currentTime: currentTime,
-            hasActiveOffer
+          const matchedOffers = activeOffers.filter(offer => {
+            if (offer.applicableOn === 'all') return true;
+            if (
+              offer.applicableOn === 'categories' &&
+              offer.categories.some(
+                catId => catId.toString() === product.category?._id.toString()
+              )
+            ) return true;
+            if (
+              offer.applicableOn === 'products' &&
+              offer.products.some(
+                prodId => prodId.toString() === product._id.toString()
+              )
+            ) return true;
+            return false;
           });
-          
-          if (hasActiveOffer) {
-            console.log(`- Found active category offer: ${categoryOffer.discountValue}${categoryOffer.discountType === 'percentage' ? '%' : ' flat'}`);
+console.log('MATCHED OFFERS========',matchedOffers)
+          let maxDiscount = 0;
+          let bestOffer = null;
+
+          for (const offer of matchedOffers) {
+            const discount = offer.discountType === 'percentage'
+              ? Math.floor((price * offer.discountValue) / 100)
+              : Math.min(offer.discountValue, price);
             
-            if (!item.offerDiscount && item.originalPrice) {
-              const discount = categoryOffer.discountType === 'percentage'
-                ? Math.floor((item.originalPrice * categoryOffer.discountValue) / 100)
-                : Math.min(categoryOffer.discountValue, item.originalPrice);
-                
-              console.log(`- Calculated discount: ${discount} (${categoryOffer.discountType})`);
-              
-              item.offerDiscount = discount; 
-              item.appliedOffer = {
-                offerId: category._id,
-                offerName: `${category.name} Special`,
-                offerType: 'category',
-                discountType: categoryOffer.discountType,
-                discountValue: categoryOffer.discountValue
-              };
-              
-              console.log(`- Applied category discount: ₹${item.offerDiscount}`);
-              
-              if (item.originalPrice) {
-                item.price = item.originalPrice - item.offerDiscount;
-                console.log(`- Updated price: ${item.originalPrice} - ${item.offerDiscount} = ${item.price}`);
-              }
+            if (discount > maxDiscount) {
+              maxDiscount = discount;
+              bestOffer = offer;
             }
+          }
+
+          if (bestOffer) {
+            item.offerDiscount = maxDiscount;
+            item.appliedOffer = {
+              offerId: bestOffer._id,
+              offerName: bestOffer.name,
+              offerType: bestOffer.applicableOn,
+              discountType: bestOffer.discountType,
+              discountValue: bestOffer.discountValue
+            };
+            item.price = price - maxDiscount;
           } else {
-            console.log(`- No active category offer found for ${category.name}`);
-            if (item.appliedOffer?.offerType === 'category') {
-              item.offerDiscount = 0;
-              item.appliedOffer = null;
-              item.price = item.originalPrice || item.price;
-            }
+            item.offerDiscount = 0;
+            item.appliedOffer = null;
+            item.price = price;
+          }
         }
-      });
+      }
     }
-
-    console.log('\n=== Cart Items ===');
-    if (cart && cart.items && cart.items.length > 0) {
-      console.log(`Found ${cart.items.length} items in cart`);
-      cart.items.forEach((item, index) => {
-        console.log(`\n[Item ${index + 1}] ${item.productId?.productName || 'Unknown Product'}`);
-        console.log('- Product ID:', item.productId?._id || 'None');
-        console.log('- Category:', item.productId?.category?.name || 'None', 
-                   `(ID: ${item.productId?.category?._id || 'None'})`);
-        console.log('- Category Offer:', item.productId?.category?.categoryOffer?.name || 'None');
-        console.log('- Quantity:', item.quantity);
-        console.log('- Price:', item.price);
-        console.log('- Original Price:', item.originalPrice || 'Not set');
-        console.log('- Offer Discount:', item.offerDiscount || 0);
-      });
-    } else {
-      console.log('Cart is empty or not found');
-    }
-
+console.log('BEST OFFER=====',bestOffer);
     const coupons = await Coupon.find({
       isActive: true,
       expiryDate: { $gt: new Date() }
     }).select('code discountType discountValue maxDiscount minOrderAmount expiryDate usedBy');
 
-    console.log('\n=== Available Coupons ===');
-    console.log(`Found ${coupons.length} active coupons`);
-    coupons.forEach((coupon, index) => {
-      console.log(`[${index + 1}] ${coupon.code}: ${coupon.discountValue}${coupon.discountType === 'PERCENTAGE' ? '%' : ' flat'}`);
-    });
+  
 
     const now = new Date();
     const offers = await Offer.find({
@@ -310,22 +254,9 @@ const cart = async (req, res) => {
     }).populate('categories', 'name')
       .populate('products', 'productName');
 
-    console.log('\n=== Available Offers ===');
-    console.log(`Found ${offers.length} active offers`);
-    offers.forEach((offer, index) => {
-      console.log(`\n[Offer ${index + 1}] ${offer.name || 'Unnamed Offer'}`);
-      console.log('- Type:', offer.applicableOn);
-      console.log(`- Discount: ${offer.discountValue}${offer.discountType === 'percentage' ? '%' : ' flat'}`);
-      if (offer.maxDiscount) console.log('- Max Discount:', offer.maxDiscount);
-      if (offer.applicableOn === 'categories') {
-        console.log('- Categories:', offer.categories?.map(c => c.name).join(', ') || 'None');
-      } else if (offer.applicableOn === 'products') {
-        console.log('- Products:', offer.products?.map(p => p.productName).join(', ') || 'None');
-      }
-    });
+   
 
     if (!cart || cart.items.length === 0) {
-      console.log('\n=== Rendering Empty Cart ===');
       return res.render('cart', {
         user: req.session.user,
         items: [],
@@ -344,7 +275,6 @@ const cart = async (req, res) => {
     let totalOfferDiscount = 0;
     let totalCouponDiscount = 0;
 
-    console.log('\n=== Calculating Prices and Applying Offers ===');
     
     cart.items.forEach(item => {
       const product = item.productId;
