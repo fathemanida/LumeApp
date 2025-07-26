@@ -648,7 +648,6 @@
                                         <h5 class="product-name"><%= item.productId.productName %></h5>
                                         <div class="product-price">
                                             <% 
-                                                // Debug: Log ALL item data to understand the issue
                                                 console.log('\n=== CART TEMPLATE DEBUG ===');
                                                 console.log('Item:', item.productId.productName);
                                                 console.log('Offer Discount:', item.offerDiscount);
@@ -667,7 +666,6 @@
                                             %>
                                             
                                             <% if (hasOffer) { %>
-                                                <!-- Show original price crossed out and discounted price -->
                                                 <div class="price-display">
                                                     <span class="text-decoration-line-through text-muted">₹<%= Math.round(originalPricePerUnit).toLocaleString() %></span>
                                                     <span class="text-success ms-2 fw-bold">₹<%= Math.round(finalPricePerUnit).toLocaleString() %></span>
@@ -682,14 +680,12 @@
                                                     </div>
                                                 <% } %>
                                             <% } else { %>
-                                                <!-- Show regular price -->
                                                 <div class="price-display">
                                                     <span class="fw-bold">₹<%= Math.round(item.price || originalPricePerUnit).toLocaleString() %></span>
                                                     <span class="text-muted ms-2 small">per unit</span>
                                                 </div>
                                             <% } %>
                                             
-                                            <!-- Show total for this item -->
                                             <div class="item-total small text-muted mt-1">
                                                 Total: ₹<%= Math.round((finalPricePerUnit * item.quantity) || (item.price * item.quantity)).toLocaleString() %>
                                             </div>
