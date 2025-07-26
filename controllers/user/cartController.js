@@ -549,6 +549,14 @@ const getCheckout = async (req, res) => {
       expiryDate: { $gt: new Date() }
     }).select('code discountType discountValue maxDiscount minOrderAmount expiryDate usedBy');
 
+    const now = new Date();
+    const offers = await Offer.find({
+      isActive: true,
+      startDate: { $lte: now },
+      endDate: { $gte: now },
+      applicableOn: { $in: ['all', 'categories', 'products'] }
+    });
+
     if (!cart || cart.items.length === 0) {
       return res.render('checkout', {
         user: req.session.user,

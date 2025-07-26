@@ -325,16 +325,53 @@
                     </div>
                 </div>
 
-               <p class="wishlist-price">
-  <% if (item.product.salePrice) { 
-       const discount = Math.round(((item.product.regularPrice - item.product.salePrice) / item.product.regularPrice) * 100); %>
-    <strike class="text-muted">₹<%= item.product.regularPrice.toLocaleString() %></strike>
-    <span class="text-danger ms-2 fw-bold">₹<%= item.product.salePrice.toLocaleString() %></span>
-    <span class="text-success ms-2">(<%= discount %>% OFF)</span>
-  <% } else { %>
-    ₹<%= item.product.regularPrice.toLocaleString() %>
-  <% } %>
-</p>
+                <!-- Wishlist items will be displayed here -->
+                <div class="container py-4">
+                    <% if (wishlist && wishlist.items && wishlist.items.length > 0) { %>
+                        <div class="row">
+                            <% wishlist.items.forEach(item => { %>
+                                <div class="col-md-6 col-lg-4 mb-4">
+                                    <div class="wishlist-item-card">
+                                        <div class="wishlist-item-image">
+                                            <img src="<%= item.product.productImage && item.product.productImage[0] ? item.product.productImage[0] : '/images/no-image.png' %>" 
+                                                 alt="<%= item.product.productName %>" class="img-fluid">
+                                        </div>
+                                        <div class="wishlist-item-details">
+                                            <h5 class="wishlist-item-name"><%= item.product.productName %></h5>
+                                            <p class="wishlist-price">
+                                                <% if (item.product.salePrice && item.product.salePrice < item.product.regularPrice) { 
+                                                     const discount = Math.round(((item.product.regularPrice - item.product.salePrice) / item.product.regularPrice) * 100); %>
+                                                    <strike class="text-muted">₹<%= item.product.regularPrice.toLocaleString() %></strike>
+                                                    <span class="text-danger ms-2 fw-bold">₹<%= item.product.salePrice.toLocaleString() %></span>
+                                                    <span class="text-success ms-2">(<%= discount %>% OFF)</span>
+                                                <% } else { %>
+                                                    <span class="fw-bold">₹<%= item.product.regularPrice.toLocaleString() %></span>
+                                                <% } %>
+                                            </p>
+                                            <div class="wishlist-actions">
+                                                <button class="btn btn-primary btn-sm add-to-cart" data-product-id="<%= item.product._id %>">
+                                                    <i class="fas fa-shopping-cart me-1"></i>Add to Cart
+                                                </button>
+                                                <button class="btn btn-outline-danger btn-sm remove-from-wishlist" data-product-id="<%= item.product._id %>">
+                                                    <i class="fas fa-trash me-1"></i>Remove
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% }); %>
+                        </div>
+                    <% } else { %>
+                        <div class="empty-wishlist text-center">
+                            <i class="far fa-heart fa-5x mb-3 text-muted"></i>
+                            <h3>Your wishlist is empty</h3>
+                            <p class="text-muted">Save your favorite items for later</p>
+                            <a href="/shop" class="btn btn-primary">
+                                <i class="fas fa-shopping-bag me-2"></i>Continue Shopping
+                            </a>
+                        </div>
+                    <% } %>
+                </div>
 
             </div>
         </div>
