@@ -152,7 +152,6 @@ const getOrderDetails = async (req, res) => {
             })
             .lean();
 
-        // Debug address population
         console.log('Order address field:', order.address);
         console.log('Order shippingAddress field:', order.shippingAddress);
         console.log('Order address type:', typeof order.address);
