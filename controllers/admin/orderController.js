@@ -90,7 +90,10 @@ const getOrderDetails = async (req, res) => {
                 model: 'Product',
                 select: 'productName productImage regularPrice salePrice quantity'
             })
-            .populate('address')
+            .populate({
+                path: 'address',
+                model: 'Address'
+            })
             .populate({
                 path: 'userId',
                 model: 'User',
@@ -119,14 +122,17 @@ const getOrderDetails = async (req, res) => {
                 };
             }
         }
-        let subtotal=0
-        basePrice = order.items[0].productId.salePrice && order.items[0].productId.salePrice < order.items[0].productId.regularPrice
-          ? order.items[0].productId.salePrice
-          : order.items[0].productId.regularPrice;
-        const originalPrice = basePrice * order.items[0].quantity;
-      const totalAmount = order.totalAmount || originalPrice;
-const shipping = totalAmount > 1500 ? 0 : 40;
-        subtotal += originalPrice;
+        // Calculate subtotal using original price (regularPrice) * quantity for all items
+        let subtotal = 0;
+        for (const item of order.items) {
+            if (item.productId && item.productId.regularPrice) {
+                const originalPrice = item.productId.regularPrice * item.quantity;
+                subtotal += originalPrice;
+            }
+        }
+        
+        const totalAmount = order.totalAmount || subtotal;
+        const shipping = totalAmount > 1500 ? 0 : 40;
 
         if (order.returnRequest && order.returnRequest.items && order.returnRequest.items.length > 0) {
             for (const item of order.returnRequest.items) {
@@ -164,7 +170,15 @@ const shipping = totalAmount > 1500 ? 0 : 40;
             status: order.status || 'Pending',
             paymentMethod: order.paymentMethod || 'COD',
             subtotal:subtotal,
-            address: order.address || null,
+            address: order.address || {
+                fullName: 'Address not available',
+                phone: 'N/A',
+                addressLine1: 'Address not provided',
+                addressLine2: '',
+                city: 'N/A',
+                state: 'N/A',
+                pincode: 'N/A'
+            },
             userId: userData || {
                 name: 'User not found',
                 email: 'No email'
