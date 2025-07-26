@@ -479,7 +479,7 @@ const updateQuantity = async (req, res) => {
     }
 
     if (product.category && product.category.categoryOffer && 
-        product.category.categoryOffer.active) {
+        product.category.categoryOffer.isActive) {
       if (product.category.categoryOffer.discountType === 'percentage') {
         const discount = (basePrice * product.category.categoryOffer.discountValue) / 100;
         if (discount > largestDiscount) {
@@ -523,7 +523,7 @@ const updateQuantity = async (req, res) => {
       }
 
       if (item.productId.category && item.productId.category.categoryOffer && 
-          item.productId.category.categoryOffer.active) {
+          item.productId.category.categoryOffer.isActive) {
         if (item.productId.category.categoryOffer.discountType === 'percentage') {
           const discount = (itemBasePrice * item.productId.category.categoryOffer.discountValue) / 100;
           if (discount > itemLargestDiscount) {
