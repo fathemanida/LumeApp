@@ -1506,14 +1506,33 @@
                                 <% } %>
                       </td>
                       <td>
-                        <% if (item.status !=='Cancelled' &&
-                          !['Delivered','Cancelled','Returned'].includes(order.status)) { %>
-                          <button class="cancel-btn"
-                            onclick="openItemCancelModal('<%= order._id %>','<%= item.productId %>')"
-                            style="padding: 0.5rem 1rem; font-size: 0.9rem;">
-                            <i class="fas fa-times"></i> Cancel Item
-                          </button>
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem; align-items: center;">
+                          <% if (item.status !=='Cancelled' &&
+                            !['Delivered','Cancelled','Returned'].includes(order.status)) { %>
+                            <button class="cancel-btn"
+                              onclick="openItemCancelModal('<%= order._id %>','<%= item.productId %>')"
+                              style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+                              <i class="fas fa-times"></i> Cancel Item
+                            </button>
                           <% } %>
+                          
+                          <% if (order.status === 'Delivered' && item.status === 'Delivered') { %>
+                            <button class="return-btn" onclick="openReturnModal()" 
+                              style="background-color: var(--muted-green); color: white; padding: 0.5rem; border: none; border-radius: 3px; cursor: pointer; font-size: 0.9rem; margin-top: 0.25rem;"
+                              title="Request Return">
+                              <i class="fas fa-undo"></i>
+                            </button>
+                            <small style="color: #666; font-size: 0.8rem; margin-top: 0.25rem;">Can Return</small>
+                          <% } else if (item.status === 'Return Requested') { %>
+                            <span style="color: var(--muted-green); font-size: 0.8rem; font-weight: 500;">
+                              <i class="fas fa-clock"></i> Return Requested
+                            </span>
+                          <% } else if (item.status === 'Returned') { %>
+                            <span style="color: #28a745; font-size: 0.8rem; font-weight: 500;">
+                              <i class="fas fa-check-circle"></i> Returned
+                            </span>
+                          <% } %>
+                        </div>
                       </td>
                     </tr>
                     <% }) %>
@@ -1595,12 +1614,6 @@
               style="display:flex; justify-content:center; align-items:center; gap:1rem; margin-top:2rem;">
               <% if (order.status==='Pending' || order.status==='Processing' ) { %>
                 <button class="cancel-btn" onclick="openCancelModal()"> <i class="fas fa-times"></i> Cancel Order
-                </button>
-                <% } %>
-              <% if (order.status === 'Delivered') { %>
-                <button class="return-btn" onclick="openReturnModal()" 
-                  style="background-color: #ff6b35; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 5px; cursor: pointer; font-size: 0.95rem; transition: background-color 0.3s;">
-                  <i class="fas fa-undo"></i> Return Order
                 </button>
                 <% } %>
                   <a href="/orders" class="back-btn">Back to Orders</a>
