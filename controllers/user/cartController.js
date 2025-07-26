@@ -154,38 +154,17 @@ const addToCart = async (req, res) => {
 };
 
 
-const cart = async (req, res) => {
+const cart= async (req, res) => {
   try {
-    if (!req.session.user) {
-      return res.redirect('/login');
-    }
+    const userId = req.session.user?.id;
+    if (!userId) return res.redirect("/login");
 
-    const userId = req.session.user.id;
-    const currentTime = new Date();
-    
-    const activeOffers = await Offer.find({
-      isActive: true,
-      startDate: { $lte: currentTime },
-      endDate: { $gte: currentTime }
-    });
-    
-    const cart = await Cart.findOne({ userId })
-      .populate({
-        path: 'items.productId',
-        populate: [
-          { path: 'offer' },
-          { 
-            path: 'category',
-            select: 'name description image isListed'
-          }
-        ]
-      })
-      .populate('appliedCoupon')
-      .lean(); 
-    
-    if (!cart || !cart.items || cart.items.length === 0) {
-      return res.render('cart', {
-        user: req.session.user,
+    const user = await User.findById(userId);
+    const cart = await Cart.findOne({ userId }).populate("items.productId").lean();
+
+    if (!cart || cart.items.length === 0) {
+      return res.render("cart", {
+        user,
         items: [],
         totalPrice: 0,
         totalOfferDiscount: 0,
@@ -193,261 +172,110 @@ const cart = async (req, res) => {
         shipping: 0,
         finalPrice: 0,
         coupons: [],
-        appliedCoupon: null
+        appliedCoupon: null,
+        discount: 0,
       });
     }
-    
-    const categoryIds = [...new Set(
-      cart.items
-        .map(item => item.productId?.category?._id)
-        .filter(Boolean)
-    )];
-    
-    const categoriesWithOffers = await Category.find({
-      _id: { $in: categoryIds },
-      'categoryOffer.isActive': true,
-      'categoryOffer.startDate': { $lte: new Date() },
-      'categoryOffer.endDate': { $gte: new Date() }
-    }).select('_id categoryOffer');
-    
-    const categoryOfferMap = new Map(
-      categoriesWithOffers.map(cat => [
-        cat._id.toString(), 
-        cat.categoryOffer
-      ])
-    );
-
-    cart.items.forEach(item => {
-      if (!item.productId) return;
-      
-      const product = item.productId;
-      const price = product.salePrice || product.regularPrice;
-      const quantity = item.quantity || 1;
-      
-      item.price = price;
-      item.originalPrice = price * quantity;
-      item.offerDiscount = 0;
-      
-      console.log(`\n[${product.productName}]`);
-      console.log('- Base Price:', price);
-      console.log('- Quantity:', quantity);
-      console.log('- Original Price:', item.originalPrice);
-    });
-    
-    cart.items.forEach(item => {
-      if (!item.productId) return;
-      
-      const product = item.productId;
-      const price = item.price;
-      const quantity = item.quantity || 1;
-      
-      console.log(`\n=== Applying Offers to ${product.productName} ===`);
-      
-      const matchedOffers = activeOffers.filter(offer => {
-        if (offer.applicableOn === 'all') return true;
-        if (offer.applicableOn === 'categories' && 
-            product.category && 
-            offer.categories.some(catId => catId.toString() === product.category._id.toString())) {
-          return true;
-        }
-        if (offer.applicableOn === 'products' && 
-            offer.products.some(prodId => prodId.toString() === product._id.toString())) {
-          return true;
-        }
-        return false;
-      });
-      
-      console.log('- Matched Offers:', matchedOffers.map(o => o.name));
-      
-      let maxDiscount = 0;
-      let bestOffer = null;
-      let offerType = null;
-      
-      for (const offer of matchedOffers) {
-        const discount = offer.discountType === 'percentage'
-          ? Math.floor((price * offer.discountValue) / 100)
-          : Math.min(offer.discountValue, price);
-        
-        if (discount > maxDiscount) {
-          maxDiscount = discount;
-          bestOffer = offer;
-          offerType = offer.applicableOn;
-        }
-      }
-      
-      if (bestOffer) {
-        const totalDiscount = maxDiscount * quantity;
-        item.offerDiscount = totalDiscount;
-        item.appliedOffer = {
-          offerId: bestOffer._id,
-          offerName: bestOffer.name || `Category Offer: ${product.category?.name || 'Special'}`,
-          offerType: offerType,
-          discountType: bestOffer.discountType,
-          discountValue: bestOffer.discountValue
-        };
-        item.price = price - maxDiscount;
-        
-        console.log(`- Applied ${offerType} offer:`, {
-          originalPrice: price,
-          discountPerUnit: maxDiscount,
-          totalDiscount: totalDiscount,
-          finalPrice: item.price,
-          offer: bestOffer.name
-        });
-      } else {
-        item.offerDiscount = 0;
-        item.appliedOffer = null;
-        console.log('- No applicable offers');
-      }
-    });
-console.log('BEST OFFER=====',bestOffer);
-    const coupons = await Coupon.find({
-      isActive: true,
-      expiryDate: { $gt: new Date() }
-    }).select('code discountType discountValue maxDiscount minOrderAmount expiryDate usedBy');
-
-  
 
     const now = new Date();
+
     const offers = await Offer.find({
       isActive: true,
       startDate: { $lte: now },
       endDate: { $gte: now },
-      applicableOn: { $in: ['all', 'categories', 'products'] }
-    }).populate("category", "name")
-
-      .populate('products', 'productName');
-
-   
-
-    if (!cart || cart.items.length === 0) {
-      return res.render('cart', {
-        user: req.session.user,
-        items: [],
-        totalPrice: 0,
-        totalOfferDiscount: 0,
-        totalCouponDiscount: 0,
-        shipping: 0,
-        finalPrice: 0,
-        coupons,
-        appliedCoupon: null,
-        discount: 0
-      });
-    }
+      applicableOn: { $in: ["all", "categories", "products"] },
+    }).lean();
 
     let totalPrice = 0;
     let totalOfferDiscount = 0;
-    let totalCouponDiscount = 0;
 
-    
-    cart.items.forEach(item => {
+    for (let item of cart.items) {
       const product = item.productId;
-      if (!product) {
-        console.warn('Skipping item with missing product data');
-        return;
-      }
-      
-      const basePrice = product.salePrice && product.salePrice < product.regularPrice ? 
-        product.salePrice : product.regularPrice;
-      const originalPrice = basePrice * item.quantity;
-      
-      console.log(`\n[${product.productName}]`);
-      console.log('- Base Price:', basePrice);
-      console.log('- Quantity:', item.quantity);
-      console.log('- Original Price:', originalPrice);
-      
-      item.price = basePrice;
-      item.originalPrice = originalPrice;
-      totalPrice += originalPrice;
-    });
+      const quantity = item.quantity;
 
-    cart.items.forEach(item => {
-      const product = item.productId;
-      if (!product) return;
-      
-      console.log(`\n=== Applying Offers to ${product.productName} ===`);
-      
-      const { maxDiscount, bestOffer, offerType } = getBestOffer(product, offers, item.quantity);
-      
-      item.offerDiscount = maxDiscount;
-      item.appliedOffer = bestOffer;
-      item.offerType = offerType;
-      totalOfferDiscount += maxDiscount;
-      
-      console.log(`- Applied Offer: ${bestOffer?.name || 'None'}`);
-      console.log(`- Offer Type: ${offerType || 'None'}`);
-      console.log(`- Offer Discount: ${maxDiscount}`);
-    });
+      // Find best applicable offer for this product
+      const matchedOffers = offers.filter((offer) => {
+        if (offer.applicableOn === "all") return true;
+        if (
+          offer.applicableOn === "categories" &&
+          offer.categories.some(cat => cat.toString() === product.category.toString())
+        ) return true;
+        if (
+          offer.applicableOn === "products" &&
+          offer.products.some(prod => prod.toString() === product._id.toString())
+        ) return true;
+        return false;
+      });
 
-    if (cart.appliedCoupon) {
-      console.log('\n=== Applying Coupon ===');
-      console.log('- Coupon Code:', cart.appliedCoupon.code);
-      console.log('- Discount Type:', cart.appliedCoupon.discountType);
-      console.log('- Discount Value:', cart.appliedCoupon.discountValue);
-      
-      const priceAfterOffer = totalPrice - totalOfferDiscount;
-      
-      if (cart.appliedCoupon.discountType === 'PERCENTAGE') {
-        totalCouponDiscount = (priceAfterOffer * cart.appliedCoupon.discountValue) / 100;
-        if (cart.appliedCoupon.maxDiscount) {
-          totalCouponDiscount = Math.min(totalCouponDiscount, cart.appliedCoupon.maxDiscount);
-          console.log('- Capped at max discount:', cart.appliedCoupon.maxDiscount);
+      let bestDiscount = 0;
+
+      matchedOffers.forEach((offer) => {
+        let discount = 0;
+        if (offer.discountType === "percentage") {
+          discount = (product.salePrice * offer.discountValue) / 100;
+        } else {
+          discount = offer.discountValue;
         }
-        console.log(`- Applied ${cart.appliedCoupon.discountValue}% discount: ${totalCouponDiscount}`);
+
+        if (discount > bestDiscount) bestDiscount = discount;
+      });
+
+      totalPrice += product.salePrice * quantity;
+      totalOfferDiscount += bestDiscount * quantity;
+    }
+
+    // Coupon logic
+    let totalCouponDiscount = 0;
+    let appliedCoupon = cart.appliedCoupon;
+
+    if (appliedCoupon) {
+      const coupon = await Coupon.findOne({
+        code: appliedCoupon,
+        isActive: true,
+        startDate: { $lte: now },
+        endDate: { $gte: now },
+        minPurchase: { $lte: totalPrice - totalOfferDiscount },
+      }).lean();
+
+      if (coupon) {
+        if (coupon.discountType === "percentage") {
+          totalCouponDiscount = ((totalPrice - totalOfferDiscount) * coupon.discountValue) / 100;
+        } else {
+          totalCouponDiscount = coupon.discountValue;
+        }
       } else {
-        totalCouponDiscount = cart.appliedCoupon.discountValue;
-        console.log(`- Applied flat discount: ${totalCouponDiscount}`);
+        appliedCoupon = null;
       }
     }
 
-    const shipping = totalPrice >= 1500 ? 0 : 40;
-    const finalPrice = Math.max(0, totalPrice - totalOfferDiscount - totalCouponDiscount + shipping);
-    
-    console.log('\n=== Final Cart Summary ===');
-    console.log('- Subtotal:', totalPrice);
-    console.log('- Total Offer Discount:', totalOfferDiscount);
-    console.log('- Total Coupon Discount:', totalCouponDiscount);
-    console.log('- Shipping:', shipping);
-    console.log('- Final Price:', finalPrice);
-    console.log('==========================\n');
+    const finalPrice = (totalPrice - totalOfferDiscount - totalCouponDiscount);
+    const shipping = finalPrice >= 1000 ? 0 : 50;
 
-    cart.items.forEach(item => {
-      let itemCouponDiscount = 0;
-      if (cart.appliedCoupon?.discountType === 'PERCENTAGE') {
-        const itemPriceAfterOffer = item.originalPrice - (item.offerDiscount || 0);
-        itemCouponDiscount = (itemPriceAfterOffer * cart.appliedCoupon.discountValue) / 100;
-        
-        if (cart.appliedCoupon.maxDiscount) {
-          const itemProportion = itemPriceAfterOffer / (totalPrice - totalOfferDiscount);
-          const maxItemDiscount = cart.appliedCoupon.maxDiscount * itemProportion;
-          itemCouponDiscount = Math.min(itemCouponDiscount, maxItemDiscount);
-        }
-      }
-      
-      item.couponDiscount = itemCouponDiscount;
-      item.totalPrice = item.originalPrice - (item.offerDiscount || 0) - itemCouponDiscount;
-    });
+    const availableCoupons = await Coupon.find({
+      isActive: true,
+      startDate: { $lte: now },
+      endDate: { $gte: now },
+      minPurchase: { $lte: totalPrice - totalOfferDiscount },
+    }).lean();
 
-    res.render('cart', {
-      user: req.session.user,
+    res.render("cart", {
+      user,
       items: cart.items,
       totalPrice,
       totalOfferDiscount,
       totalCouponDiscount,
       shipping,
-      finalPrice,
-      coupons,
-      appliedCoupon: cart.appliedCoupon,
-      discount: totalCouponDiscount
+      finalPrice: finalPrice + shipping,
+      coupons: availableCoupons,
+      appliedCoupon,
+      discount: totalCouponDiscount,
     });
-
-  } catch (error) {
-    console.error('\n=== Error in cart route ===');
-    console.error(error);
-    console.error('==========================\n');
-    res.status(500).send('Error loading cart');
+  } catch (err) {
+    console.error("Error loading cart:", err);
+    res.status(500).render("error", { message: "Unable to load cart page." });
   }
 };
+
 
 
 const updateQuantity = async (req, res) => {
