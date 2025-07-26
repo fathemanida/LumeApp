@@ -1489,27 +1489,25 @@
                       <td>₹<%= item.total?.toFixed(2) %>
                       </td>
                       <td>
-                        <% if (item.status==='Pending' ) { %>
-                          <span class="badge badge-pending">Pending</span>
-                          <% } else if (item.status==='Cancelled' ) { %>
-                            <span class="badge badge-cancelled">Cancelled</span>
-                            <% } else { %>
-                              <% let statusClass='' ; switch (item.status) { case 'Cancelled' :
-                                statusClass='badge-danger' ; break; case 'Pending' : statusClass='badge-warning' ;
-                                break; case 'Shipped' : statusClass='badge-info' ; break; case 'Delivered' :
-                                statusClass='badge-success' ; break; case 'Returned' : statusClass='badge-danger' ;
-                                break; default: statusClass='badge-secondary' ; } %>
-
-                                <span class="badge <%= statusClass %>">
-                                  <%= item.status %>
-                                </span>
-                                <% } %>
+                       <%= item.status  %>
                       </td>
                       <td>
                         <div style="display: flex; flex-direction: column; gap: 0.5rem; align-items: center;">
-                          <% if (item.status !== 'Cancelled' && 
-                               item.status !== 'Returned' && 
-                               !['Delivered', 'Cancelled', 'Returned', 'Return Requested'].includes(order.status)) { %>
+                          <!-- Debug: Item ID: <%= item.productId %>, Status: <%= item.status %>, Type: <%= typeof item.status %> -->
+                          <% 
+                            // Get status strings with case sensitivity
+                            const itemStatus = String(item.status || '').trim();
+                            const orderStatus = String(order.status || '').trim();
+                            
+                            // Check if the item can be cancelled (case-sensitive check)
+                            const canCancel = (
+                              itemStatus !== 'Cancelled' && 
+                              itemStatus !== 'Returned' &&
+                              !['Delivered', 'Cancelled', 'Returned', 'Return Requested'].includes(orderStatus)
+                            );
+                            
+                            if (canCancel) { 
+                          %>
                             <button class="cancel-btn"
                               onclick="openItemCancelModal('<%= order._id %>','<%= item.productId %>')"
                               style="padding: 0.5rem 1rem; font-size: 0.9rem;"
