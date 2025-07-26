@@ -1542,12 +1542,14 @@
               </div>
               <div class="order-status-payment" style="flex:1;">
                 <h3 style="font-size:1rem; color:var(--muted-green);">Order Status</h3>
-                <div style="color:#444; font-size:0.98rem;">Current Status: <%= order.status %><br>Last Updated: <%=
-                      order.updatedAt ? order.updatedAt : order.createdOn %>
+                <div style="color:#444; font-size:0.98rem;">Current Status: <%= order.status %><br>Order Created At: <%= order.createdOn %>
                 </div>
                 <h3 style="font-size:1rem; color:var(--muted-green); margin-top:1.5rem;">Payment Details</h3>
                 <div style="color:#444; font-size:0.98rem;">Payment Method: <%= order.paymentMethod %><br>Status: <%=
-                      order.paymentStatus || 'Paid' %><br>Paid At: <%= order.paidAt ? order.paidAt : order.createdOn %>
+                      order.paymentMethod === 'COD' ? 'Pending' : 
+                      (['Returned', 'Cancelled'].includes(order.status) && ['Razorpay', 'Wallet'].includes(order.paymentMethod)) ? 'Refunded' : 
+                      (order.paymentStatus || 'Paid') %>
+                <% if (order.paymentMethod !== 'COD') { %><br>Paid At: <%= order.paidAt ? order.paidAt : order.createdOn %><% } %>
                 </div>
               </div>
             </div>
