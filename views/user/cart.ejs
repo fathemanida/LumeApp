@@ -681,23 +681,35 @@
                                                 const basePrice = product.salePrice && product.salePrice < product.regularPrice ? 
                                                     product.salePrice : product.regularPrice;
                                                 
+                                                // Debug: Log category and offer information
+                                                console.log('Product:', product.productName);
+                                                console.log('Category:', product.category);
+                                                if (product.category) {
+                                                    console.log('Category Offer:', product.category.categoryOffer);
+                                                }
+                                                
                                                 // Calculate offer discount
                                                 let offerDiscount = 0;
                                                 let bestOffer = null;
                                                 
                                                 // Check product offer
-                                                if (product.offer && product.offer.isActive) {
-                                                    if (product.offer.discountType === 'percentage') {
-                                                        offerDiscount = (basePrice * product.offer.discountValue) / 100;
+                                                if (product.productOffer && product.productOffer.active) {
+                                                    if (product.productOffer.discountType === 'percentage') {
+                                                        offerDiscount = (basePrice * product.productOffer.discountValue) / 100;
                                                     } else {
-                                                        offerDiscount = product.offer.discountValue;
+                                                        offerDiscount = product.productOffer.discountValue;
                                                     }
-                                                    bestOffer = product.offer;
+                                                    // Create a best offer object with the product offer details
+                                                    bestOffer = {
+                                                        name: 'Product Offer',
+                                                        discountType: product.productOffer.discountType,
+                                                        discountValue: product.productOffer.discountValue
+                                                    };
                                                 }
                                                 
                                                 // Check category offer (only if better than product offer)
                                                 if (product.category && product.category.categoryOffer && 
-                                                    product.category.categoryOffer.isActive) {
+                                                    product.category.categoryOffer.active) {
                                                     let categoryDiscount = 0;
                                                     if (product.category.categoryOffer.discountType === 'percentage') {
                                                         categoryDiscount = (basePrice * product.category.categoryOffer.discountValue) / 100;
@@ -707,7 +719,12 @@
                                                     
                                                     if (categoryDiscount > offerDiscount) {
                                                         offerDiscount = categoryDiscount;
-                                                        bestOffer = product.category.categoryOffer;
+                                                        // Create a best offer object with the category offer details
+                                                        bestOffer = {
+                                                            name: 'Category Offer',
+                                                            discountType: product.category.categoryOffer.discountType,
+                                                            discountValue: product.category.categoryOffer.discountValue
+                                                        };
                                                     }
                                                 }
                                                 

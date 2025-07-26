@@ -160,7 +160,29 @@ const cart= async (req, res) => {
     if (!userId) return res.redirect("/login");
 
     const user = await User.findById(userId);
-    const cart = await Cart.findOne({ userId }).populate("items.productId").lean();
+    const cart = await Cart.findOne({ userId })
+      .populate({
+        path: 'items.productId',
+        populate: {
+          path: 'category',
+          populate: {
+            path: 'categoryOffer'
+          }
+        }
+      })
+      .lean();
+
+    // Debug: Log product and category data
+    if (cart && cart.items) {
+      console.log('Cart items with populated data:');
+      cart.items.forEach((item, index) => {
+        console.log(`\nItem ${index + 1}:`);
+        console.log('Product:', item.productId?.productName || 'No product');
+        console.log('Category:', item.productId?.category?.name || 'No category');
+        console.log('Category Offer:', item.productId?.category?.categoryOffer || 'No category offer');
+        console.log('Product Offer:', item.productId?.productOffer || 'No product offer');
+      });
+    }
 
     if (!cart || cart.items.length === 0) {
       return res.render("cart", {
