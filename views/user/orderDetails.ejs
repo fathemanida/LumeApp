@@ -1507,11 +1507,13 @@
                       </td>
                       <td>
                         <div style="display: flex; flex-direction: column; gap: 0.5rem; align-items: center;">
-                          <% if (item.status !=='Cancelled' &&
-                            !['Delivered','Cancelled','Returned'].includes(order.status)) { %>
+                          <% if (item.status !== 'Cancelled' && 
+                               item.status !== 'Returned' && 
+                               !['Delivered', 'Cancelled', 'Returned', 'Return Requested'].includes(order.status)) { %>
                             <button class="cancel-btn"
                               onclick="openItemCancelModal('<%= order._id %>','<%= item.productId %>')"
-                              style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+                              style="padding: 0.5rem 1rem; font-size: 0.9rem;"
+                              title="Cancel this item">
                               <i class="fas fa-times"></i> Cancel Item
                             </button>
                           <% } %>
