@@ -1495,15 +1495,13 @@
                         <div style="display: flex; flex-direction: column; gap: 0.5rem; align-items: center;">
                           <!-- Debug: Item ID: <%= item.productId %>, Status: <%= item.status %>, Type: <%= typeof item.status %> -->
                           <% 
-                            // Get status strings with case sensitivity
                             const itemStatus = String(item.status || '').trim();
                             const orderStatus = String(order.status || '').trim();
                             
-                            // Check if the item can be cancelled (case-sensitive check)
+                            // Check if item can be cancelled based on schema enums
                             const canCancel = (
-                              itemStatus !== 'Cancelled' && 
-                              itemStatus !== 'Returned' &&
-                              !['Delivered', 'Cancelled', 'Returned', 'Return Requested'].includes(orderStatus)
+                              itemStatus === 'Active' && // Only show for active items
+                              !['Delivered', 'Cancelled', 'Returned', 'Return Requested', 'Return Rejected', 'Failed'].includes(orderStatus)
                             );
                             
                             if (canCancel) { 
