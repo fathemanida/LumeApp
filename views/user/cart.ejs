@@ -708,8 +708,43 @@
                                             </div>
                                         </div>
                                         <% if (item.offerDiscount > 0) { %>
-                                            <div style="font-size:0.95em;color:#888;margin-top:2px;">
+                                            <div class="offer-badge">
+                                                <i class="fas fa-tag me-1"></i>
+                                                <span class="offer-text">
+                                                    <% if (item.appliedOffer) { %>
+                                                        <%= item.appliedOffer.offerName %>: 
+                                                        <% if (item.appliedOffer.discountType === 'percentage') { %>
+                                                            <%= item.appliedOffer.discountValue %>% OFF
+                                                        <% } else { %>
+                                                            ₹<%= item.appliedOffer.discountValue %> OFF
+                                                        <% } %>
+                                                        <span class="savings">(Save ₹<%= (item.offerDiscount / item.quantity).toFixed(2) %> per unit)</span>
+                                                    <% } %>
+                                                </span>
                                             </div>
+                                            <style>
+                                                .offer-badge {
+                                                    background-color: #e8f5e9;
+                                                    color: #2e7d32;
+                                                    padding: 4px 8px;
+                                                    border-radius: 4px;
+                                                    font-size: 0.85em;
+                                                    margin-top: 4px;
+                                                    display: inline-flex;
+                                                    align-items: center;
+                                                }
+                                                .offer-text {
+                                                    display: flex;
+                                                    flex-wrap: wrap;
+                                                    align-items: center;
+                                                    gap: 4px;
+                                                }
+                                                .savings {
+                                                    font-size: 0.9em;
+                                                    color: #43a047;
+                                                    font-weight: 500;
+                                                }
+                                            </style>
                                         <% } %>
                                         <div class="quantity-control">
                                             <button class="quantity-btn" onclick="updateQuantity('<%= item._id %>', 'decrease')" <%= item.quantity <= 1 ? 'disabled' : '' %>>

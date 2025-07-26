@@ -180,63 +180,126 @@ const cart = async (req, res) => {
           }
         ]
       })
-      .populate('appliedCoupon');
+      .populate('appliedCoupon')
+      .lean(); 
+    
+    if (!cart || !cart.items || cart.items.length === 0) {
+      return res.render('cart', {
+        user: req.session.user,
+        items: [],
+        totalPrice: 0,
+        totalOfferDiscount: 0,
+        totalCouponDiscount: 0,
+        shipping: 0,
+        finalPrice: 0,
+        coupons: [],
+        appliedCoupon: null
+      });
+    }
+    
+    const categoryIds = [...new Set(
+      cart.items
+        .map(item => item.productId?.category?._id)
+        .filter(Boolean)
+    )];
+    
+    const categoriesWithOffers = await Category.find({
+      _id: { $in: categoryIds },
+      'categoryOffer.isActive': true,
+      'categoryOffer.startDate': { $lte: new Date() },
+      'categoryOffer.endDate': { $gte: new Date() }
+    }).select('_id categoryOffer');
+    
+    const categoryOfferMap = new Map(
+      categoriesWithOffers.map(cat => [
+        cat._id.toString(), 
+        cat.categoryOffer
+      ])
+    );
 
-    if (cart && cart.items && cart.items.length > 0) {
-      for (const item of cart.items) {
-        if (item.productId) {
-          const product = item.productId;
-          const price = product.salePrice || product.regularPrice;
-          
-          const matchedOffers = activeOffers.filter(offer => {
-            if (offer.applicableOn === 'all') return true;
-            if (
-              offer.applicableOn === 'categories' &&
-              offer.categories.some(
-                catId => catId.toString() === product.category?._id.toString()
-              )
-            ) return true;
-            if (
-              offer.applicableOn === 'products' &&
-              offer.products.some(
-                prodId => prodId.toString() === product._id.toString()
-              )
-            ) return true;
-            return false;
-          });
-console.log('MATCHED OFFERS========',matchedOffers)
-          let maxDiscount = 0;
-          let bestOffer = null;
-
-          for (const offer of matchedOffers) {
-            const discount = offer.discountType === 'percentage'
-              ? Math.floor((price * offer.discountValue) / 100)
-              : Math.min(offer.discountValue, price);
-            
-            if (discount > maxDiscount) {
-              maxDiscount = discount;
-              bestOffer = offer;
-            }
-          }
-
-          if (bestOffer) {
-            item.offerDiscount = maxDiscount;
-            item.appliedOffer = {
-              offerId: bestOffer._id,
-              offerName: bestOffer.name,
-              offerType: bestOffer.applicableOn,
-              discountType: bestOffer.discountType,
-              discountValue: bestOffer.discountValue
-            };
-            item.price = price - maxDiscount;
-          } else {
-            item.offerDiscount = 0;
-            item.appliedOffer = null;
-            item.price = price;
-          }
+    cart.items.forEach(item => {
+      if (!item.productId) return;
+      
+      const product = item.productId;
+      const price = product.salePrice || product.regularPrice;
+      const quantity = item.quantity || 1;
+      
+      item.price = price;
+      item.originalPrice = price * quantity;
+      item.offerDiscount = 0;
+      
+      console.log(`\n[${product.productName}]`);
+      console.log('- Base Price:', price);
+      console.log('- Quantity:', quantity);
+      console.log('- Original Price:', item.originalPrice);
+    });
+    
+    cart.items.forEach(item => {
+      if (!item.productId) return;
+      
+      const product = item.productId;
+      const price = item.price;
+      const quantity = item.quantity || 1;
+      
+      console.log(`\n=== Applying Offers to ${product.productName} ===`);
+      
+      const matchedOffers = activeOffers.filter(offer => {
+        if (offer.applicableOn === 'all') return true;
+        if (offer.applicableOn === 'categories' && 
+            product.category && 
+            offer.categories.some(catId => catId.toString() === product.category._id.toString())) {
+          return true;
+        }
+        if (offer.applicableOn === 'products' && 
+            offer.products.some(prodId => prodId.toString() === product._id.toString())) {
+          return true;
+        }
+        return false;
+      });
+      
+      console.log('- Matched Offers:', matchedOffers.map(o => o.name));
+      
+      let maxDiscount = 0;
+      let bestOffer = null;
+      let offerType = null;
+      
+      for (const offer of matchedOffers) {
+        const discount = offer.discountType === 'percentage'
+          ? Math.floor((price * offer.discountValue) / 100)
+          : Math.min(offer.discountValue, price);
+        
+        if (discount > maxDiscount) {
+          maxDiscount = discount;
+          bestOffer = offer;
+          offerType = offer.applicableOn;
         }
       }
-    }
+      
+      if (bestOffer) {
+        const totalDiscount = maxDiscount * quantity;
+        item.offerDiscount = totalDiscount;
+        item.appliedOffer = {
+          offerId: bestOffer._id,
+          offerName: bestOffer.name || `Category Offer: ${product.category?.name || 'Special'}`,
+          offerType: offerType,
+          discountType: bestOffer.discountType,
+          discountValue: bestOffer.discountValue
+        };
+        item.price = price - maxDiscount;
+        
+        console.log(`- Applied ${offerType} offer:`, {
+          originalPrice: price,
+          discountPerUnit: maxDiscount,
+          totalDiscount: totalDiscount,
+          finalPrice: item.price,
+          offer: bestOffer.name
+        });
+      } else {
+        item.offerDiscount = 0;
+        item.appliedOffer = null;
+        console.log('- No applicable offers');
+      }
+    });
 console.log('BEST OFFER=====',bestOffer);
     const coupons = await Coupon.find({
       isActive: true,
@@ -251,7 +314,8 @@ console.log('BEST OFFER=====',bestOffer);
       startDate: { $lte: now },
       endDate: { $gte: now },
       applicableOn: { $in: ['all', 'categories', 'products'] }
-    }).populate('categories', 'name')
+    }).populate("category", "name")
+
       .populate('products', 'productName');
 
    
