@@ -161,9 +161,23 @@ const cart = async (req, res) => {
     }
 
     const userId = req.session.user.id;
+    const now = new Date();
     
     console.log('\n=== Cart Route Debug ===');
     console.log('User ID:', userId);
+    
+    const activeCategoryOffers = await Offer.find({
+      isActive: true,
+      applicableOn: 'categories',
+      startDate: { $lte: now },
+      endDate: { $gte: now }
+    }).populate('categories', 'name');
+    
+    console.log('Found', activeCategoryOffers.length, 'active category offers');
+    activeCategoryOffers.forEach((offer, index) => {
+      console.log(`[${index + 1}] ${offer.name} - ${offer.discountValue}${offer.discountType === 'percentage' ? '%' : ' flat'}`);
+      console.log('   Categories:', offer.categories?.map(c => c.name).join(', ') || 'None');
+    });
     
     const cart = await Cart.findOne({ userId })
       .populate({
@@ -171,19 +185,71 @@ const cart = async (req, res) => {
         populate: [
           { path: 'offer' },
           { 
-            path: 'category', 
-            populate: { 
-              path: 'categoryOffer',
-              match: { 
-                isActive: true,
-                startDate: { $lte: new Date() },
-                endDate: { $gte: new Date() }
-              }
-            }
+            path: 'category',
           }
         ]
       })
       .populate('appliedCoupon');
+
+    if (cart && cart.items && cart.items.length > 0) {
+      console.log(`\nProcessing ${cart.items.length} cart items...`);
+      
+      cart.items.forEach(item => {
+        if (item.productId?.category) {
+          const categoryOffers = activeCategoryOffers.filter(offer => 
+            offer.categories?.some(cat => 
+              cat._id.toString() === item.productId.category._id.toString()
+            )
+          );
+          
+          console.log(`\nProduct: ${item.productId.productName}`);
+          console.log('Category:', item.productId.category.name);
+          console.log('Matching category offers:', categoryOffers.length);
+          
+          // Attach the best category offer to the product's category
+          if (categoryOffers.length > 0) {
+            // Find the best offer (highest discount)
+            const bestOffer = categoryOffers.reduce((best, current) => {
+              const currentValue = current.discountType === 'percentage' 
+                ? current.discountValue 
+                : current.discountValue * 100; // Convert flat to comparable value
+              const bestValue = best?.discountType === 'percentage'
+                ? best.discountValue
+                : best?.discountValue * 100 || 0;
+                
+              return currentValue > bestValue ? current : best;
+            }, null);
+            
+            console.log(`- Best category offer: ${bestOffer.name} (${bestOffer.discountValue}${bestOffer.discountType === 'percentage' ? '%' : ' flat'})`);
+            
+            // Attach the best offer to the category
+            item.productId.category.categoryOffer = bestOffer;
+            
+            // Calculate and apply the offer discount if not already set
+            if (!item.offerDiscount && item.originalPrice) {
+              const discount = bestOffer.discountType === 'percentage'
+                ? (item.originalPrice * bestOffer.discountValue) / 100
+                : bestOffer.discountValue;
+                
+              item.offerDiscount = Math.min(discount, bestOffer.maxDiscount || Infinity);
+              item.appliedOffer = {
+                offerId: bestOffer._id,
+                offerName: bestOffer.name,
+                offerType: 'category',
+                discountType: bestOffer.discountType,
+                discountValue: bestOffer.discountValue,
+                maxDiscount: bestOffer.maxDiscount
+              };
+              
+              console.log(`- Applied category discount: ₹${item.offerDiscount}`);
+            }
+          } else {
+            console.log(`- No active category offers found for ${item.productId.category.name}`);
+            item.productId.category.categoryOffer = null;
+          }
+        }
+      });
+    }
 
     console.log('\n=== Cart Items ===');
     if (cart && cart.items && cart.items.length > 0) {
