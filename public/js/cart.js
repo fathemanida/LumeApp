@@ -59,8 +59,12 @@ window.updateQuantity = async function(itemId, action) {
     const data = await response.json();
     
     if (data.success) {
-      // Reload the page to reflect updated quantities and recalculated offers
-      location.reload();
+      // Update the DOM dynamically instead of reloading
+      updateCartItemDOM(itemId, data);
+      updateCartCount();
+      
+      // Show success notification
+      showNotification('Quantity updated successfully', 'success');
     } else {
       showNotification(data.message || 'Failed to update quantity', 'error');
     }
@@ -69,6 +73,65 @@ window.updateQuantity = async function(itemId, action) {
     showNotification('Error updating quantity', 'error');
   }
 };
+
+// Update cart item DOM dynamically
+function updateCartItemDOM(itemId, data) {
+  // Find the cart item element
+  const cartItemElement = document.querySelector(`[data-item-id="${itemId}"]`);
+  if (!cartItemElement) {
+    console.error('Cart item element not found for ID:', itemId);
+    return;
+  }
+
+  // Update quantity display
+  const quantityElement = cartItemElement.querySelector('.quantity-display, .quantity-value, input[type="number"]');
+  if (quantityElement) {
+    if (quantityElement.tagName === 'INPUT') {
+      quantityElement.value = data.quantity;
+    } else {
+      quantityElement.textContent = data.quantity;
+    }
+  }
+
+  // Update item subtotal
+  const subtotalElement = cartItemElement.querySelector('.item-subtotal, .subtotal, .item-total');
+  if (subtotalElement && data.totalPrice) {
+    subtotalElement.textContent = `₹${data.totalPrice.toFixed(2)}`;
+  }
+
+  // Update cart totals
+  updateCartTotalsDOM(data);
+
+  // Re-display offer information
+  displayOfferInfo();
+}
+
+// Update cart totals in DOM
+function updateCartTotalsDOM(data) {
+  // Update subtotal
+  const subtotalElement = document.querySelector('.cart-subtotal, #cart-subtotal');
+  if (subtotalElement && data.cartTotal !== undefined) {
+    subtotalElement.textContent = `₹${data.cartTotal.toFixed(2)}`;
+  }
+
+  // Update total discount
+  const discountElement = document.querySelector('.cart-discount, #cart-discount');
+  if (discountElement && data.discount !== undefined) {
+    discountElement.textContent = `₹${data.discount.toFixed(2)}`;
+  }
+
+  // Update shipping
+  const shippingElement = document.querySelector('.cart-shipping, #cart-shipping');
+  if (shippingElement && data.shipping !== undefined) {
+    shippingElement.textContent = `₹${data.shipping.toFixed(2)}`;
+  }
+
+  // Update final total
+  const totalElement = document.querySelector('.cart-total, #cart-total, .final-total');
+  if (totalElement && data.finalPrice !== undefined) {
+    totalElement.textContent = `₹${data.finalPrice.toFixed(2)}`;
+  }
+}
 
 // Remove item from cart
 window.removeItem = async function(itemId) {
