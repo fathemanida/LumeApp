@@ -644,18 +644,41 @@ const cancelOrderItem = async (req, res) => {
 
     if (order.paymentMethod !== 'COD') {
       try {
-        const refundBreakdown = await calculateRefund(order, [itemId], 'cancellation');
+        // Calculate refund for this specific item only
+        const itemRefund = item.finalPrice || (item.price * item.quantity);
         
-        if (refundBreakdown.success && refundBreakdown.totalRefund > 0) {
+        if (itemRefund > 0) {
           let wallet = await Wallet.findOne({ userId });
           if (!wallet) {
             wallet = new Wallet({ userId, balance: 0, transactions: [] });
           }
 
+          // Create a simplified refund breakdown for the single item
+          const refundBreakdown = {
+            success: true,
+            items: [{
+              productId: item.productId._id,
+              name: item.productId.productName,
+              quantity: item.quantity,
+              originalPrice: item.originalPrice || (item.price * item.quantity),
+              offerDiscount: item.appliedOffer?.discountAmount || 0,
+              couponDiscount: item.totalCouponDiscount || 0,
+              finalPrice: item.finalPrice || (item.price * item.quantity),
+              refundAmount: itemRefund
+            }],
+            subtotal: item.originalPrice || (item.price * item.quantity),
+            offerDiscount: item.appliedOffer?.discountAmount || 0,
+            couponDiscount: item.totalCouponDiscount || 0,
+            shippingRefund: 0, // No shipping refund for partial cancellation
+            totalRefund: itemRefund,
+            isFullOrder: false,
+            refundType: 'item_cancellation'
+          };
+
           const transaction = {
             type: 'CREDIT',
-            amount: refundBreakdown.totalRefund,
-            description: formatRefundDescription(refundBreakdown),
+            amount: itemRefund,
+            description: `Refund for cancelled item: ${item.productId.productName} (Qty: ${item.quantity})`,
             orderId: order._id,
             itemId: itemId,
             status: 'COMPLETED',
@@ -663,12 +686,14 @@ const cancelOrderItem = async (req, res) => {
             refundBreakdown: refundBreakdown
           };
 
-          wallet.balance += refundBreakdown.totalRefund;
+          wallet.balance += itemRefund;
           wallet.transactions.push(transaction);
           await wallet.save();
         }
       } catch (error) {
         console.error('Error processing refund for cancelled item:', error);
+        // Don't fail the entire operation if refund fails
+        // Just log the error and continue with the cancellation
       }
     }
 

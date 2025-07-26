@@ -67,8 +67,6 @@ const calculateRefund = async (order, itemsToRefund = [], refundType = 'cancella
   }
 };
 
-// Helper functions removed - no longer needed with historical data approach
-// All discount calculations now use stored data from order schema
 
 /**
  * Format refund breakdown for display
