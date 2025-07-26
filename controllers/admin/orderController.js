@@ -122,7 +122,6 @@ const getOrderDetails = async (req, res) => {
                 };
             }
         }
-        // Calculate subtotal using original price (regularPrice) * quantity for all items
         let subtotal = 0;
         for (const item of order.items) {
             if (item.productId && item.productId.regularPrice) {

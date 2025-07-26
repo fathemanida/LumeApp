@@ -430,7 +430,7 @@
                   
                 <div class="summary-row">
                     <span>Subtotal</span>
-<span>₹<%= ((order.totalAmount || 0) + (order.offerDiscount || 0) + (order.couponDiscount || 0)) * item.quantity %></span>
+                    <span>₹<%= order.subtotal.toFixed(2) %></span>
                 </div>
                
             
