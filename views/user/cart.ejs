@@ -122,6 +122,34 @@
       background-color: #f8f5f2;
       cursor: not-allowed;
     }
+    
+    /* Offer Badge Styles */
+    .offer-badge {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.85em;
+      margin-top: 4px;
+      display: inline-flex;
+      align-items: center;
+    }
+    .offer-text {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 4px;
+    }
+    .savings {
+      font-size: 0.9em;
+      color: #43a047;
+      font-weight: 500;
+    }
+    .offer-savings {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
     .remove-btn {
       background: none;
       border: none;
@@ -648,104 +676,82 @@
                                         <h5 class="product-name"><%= item.productId.productName %></h5>
                                         <div class="product-price">
                                             <% 
-                                                console.log('\n=== CART TEMPLATE DEBUG ===');
-                                                console.log('Item:', item.productId.productName);
-                                                console.log('Offer Discount:', item.offerDiscount);
-                                                console.log('Applied Offer:', item.appliedOffer);
-                                                console.log('Original Price:', item.originalPrice);
-                                                console.log('Item Price:', item.price);
-                                                console.log('Item Quantity:', item.quantity);
-                                                console.log('Product Category:', item.productId.category);
-                                                console.log('Product ID:', item.productId._id);
+                                                // Get product details from productId
+                                                const product = item.productId;
+                                                const basePrice = product.salePrice && product.salePrice < product.regularPrice ? 
+                                                    product.salePrice : product.regularPrice;
                                                 
-                                                // Debug category offer
-                                                const category = item.productId.category;
-                                                const categoryOffer = category && category.categoryOffer;
-                                                console.log('Category:', category ? category.name : 'None');
-                                                console.log('Category Offer:', categoryOffer);
+                                                // Calculate offer discount
+                                                let offerDiscount = 0;
+                                                let bestOffer = null;
                                                 
-                                                console.log('==========================\n');
+                                                // Check product offer
+                                                if (product.offer && product.offer.isActive) {
+                                                    if (product.offer.discountType === 'percentage') {
+                                                        offerDiscount = (basePrice * product.offer.discountValue) / 100;
+                                                    } else {
+                                                        offerDiscount = product.offer.discountValue;
+                                                    }
+                                                    bestOffer = product.offer;
+                                                }
                                                 
-                                                const originalPricePerUnit = (item.originalPrice || (item.price * item.quantity)) / item.quantity;
-                                                const offerDiscountPerUnit = (item.offerDiscount || 0) / item.quantity;
-                                                const finalPricePerUnit = originalPricePerUnit - offerDiscountPerUnit;
-                                                const hasOffer = item.offerDiscount && item.offerDiscount > 0;
-                                                const hasCategoryOffer = categoryOffer && categoryOffer.isActive;
+                                                // Check category offer (only if better than product offer)
+                                                if (product.category && product.category.categoryOffer && 
+                                                    product.category.categoryOffer.isActive) {
+                                                    let categoryDiscount = 0;
+                                                    if (product.category.categoryOffer.discountType === 'percentage') {
+                                                        categoryDiscount = (basePrice * product.category.categoryOffer.discountValue) / 100;
+                                                    } else {
+                                                        categoryDiscount = product.category.categoryOffer.discountValue;
+                                                    }
+                                                    
+                                                    if (categoryDiscount > offerDiscount) {
+                                                        offerDiscount = categoryDiscount;
+                                                        bestOffer = product.category.categoryOffer;
+                                                    }
+                                                }
+                                                
+                                                const finalPricePerUnit = Math.max(basePrice - offerDiscount, 0);
+                                                const hasOffer = offerDiscount > 0;
                                             %>
                                             
-                                            <% if (hasOffer || hasCategoryOffer) { %>
-                                                <div class="price-display">
-                                                    <span class="text-decoration-line-through text-muted">₹<%= Math.round(originalPricePerUnit).toLocaleString() %></span>
+                                            <div class="price-display">
+                                                <% if (hasOffer) { %>
+                                                    <span class="text-decoration-line-through text-muted">₹<%= Math.round(basePrice).toLocaleString() %></span>
                                                     <span class="text-success ms-2 fw-bold">₹<%= Math.round(finalPricePerUnit).toLocaleString() %></span>
-                                                    <span class="text-success ms-2 small">per unit</span>
-                                                </div>
-                                                <% if (offerDiscountPerUnit > 0) { %>
-                                                    <div class="offer-savings small text-success mt-1">
-                                                        <i class="fas fa-tag me-1"></i>You save ₹<%= Math.round(offerDiscountPerUnit).toLocaleString() %> per unit
-                                                    </div>
+                                                <% } else { %>
+                                                    <span class="fw-bold">₹<%= Math.round(basePrice).toLocaleString() %></span>
                                                 <% } %>
-                                                <% if (item.appliedOffer && item.appliedOffer.offerName) { %>
-                                                    <div class="offer-name small text-muted mt-1">
-                                                        <i class="fas fa-gift me-1"></i><%= item.appliedOffer.offerName %>
-                                                    </div>
-                                                <% } else if (hasCategoryOffer) { %>
-                                                    <div class="offer-name small text-muted mt-1">
-                                                        <i class="fas fa-tags me-1"></i>Category Offer: <%= categoryOffer.name %>
-                                                        (<%= categoryOffer.discountType === 'percentage' ? 
-                                                            categoryOffer.discountValue + '%' : 
-                                                            '₹' + categoryOffer.discountValue %> off)
-                                                    </div>
-                                                <% } %>
-                                            <% } else { %>
-                                                <div class="price-display">
-                                                    <span class="fw-bold">₹<%= Math.round(item.price || originalPricePerUnit).toLocaleString() %></span>
-                                                    <span class="text-muted ms-2 small">per unit</span>
+                                                <span class="text-muted ms-2 small">per unit</span>
+                                            </div>
+                                            
+                                            <% if (hasOffer) { %>
+                                                <div class="offer-savings small text-success mt-1">
+                                                    <i class="fas fa-tag me-1"></i>
+                                                    You save ₹<%= Math.round(offerDiscount).toLocaleString() %> per unit
+                                                    <% if (bestOffer) { %>
+                                                        <span class="ms-1">
+                                                            (<%= bestOffer.name || 'Special Offer' %>: 
+                                                            <% if (bestOffer.discountType === 'percentage') { %>
+                                                                <%= bestOffer.discountValue %>% off
+                                                            <% } else { %>
+                                                                ₹<%= bestOffer.discountValue %> off
+                                                            <% } %>)
+                                                        </span>
+                                                    <% } %>
                                                 </div>
                                             <% } %>
                                             
                                             <div class="item-total small text-muted mt-1">
-                                                Total: ₹<%= Math.round((finalPricePerUnit * item.quantity) || (item.price * item.quantity)).toLocaleString() %>
+                                                Total: ₹<%= Math.round((finalPricePerUnit * item.quantity)).toLocaleString() %>
+                                                <% if (hasOffer) { %>
+                                                    <span class="text-decoration-line-through text-muted ms-2">
+                                                        (₹<%= Math.round(basePrice * item.quantity).toLocaleString() %>)
+                                                    </span>
+                                                <% } %>
                                             </div>
                                         </div>
-                                        <% if (item.offerDiscount > 0) { %>
-                                            <div class="offer-badge">
-                                                <i class="fas fa-tag me-1"></i>
-                                                <span class="offer-text">
-                                                    <% if (item.appliedOffer) { %>
-                                                        <%= item.appliedOffer.offerName %>: 
-                                                        <% if (item.appliedOffer.discountType === 'percentage') { %>
-                                                            <%= item.appliedOffer.discountValue %>% OFF
-                                                        <% } else { %>
-                                                            ₹<%= item.appliedOffer.discountValue %> OFF
-                                                        <% } %>
-                                                        <span class="savings">(Save ₹<%= (item.offerDiscount / item.quantity).toFixed(2) %> per unit)</span>
-                                                    <% } %>
-                                                </span>
-                                            </div>
-                                            <style>
-                                                .offer-badge {
-                                                    background-color: #e8f5e9;
-                                                    color: #2e7d32;
-                                                    padding: 4px 8px;
-                                                    border-radius: 4px;
-                                                    font-size: 0.85em;
-                                                    margin-top: 4px;
-                                                    display: inline-flex;
-                                                    align-items: center;
-                                                }
-                                                .offer-text {
-                                                    display: flex;
-                                                    flex-wrap: wrap;
-                                                    align-items: center;
-                                                    gap: 4px;
-                                                }
-                                                .savings {
-                                                    font-size: 0.9em;
-                                                    color: #43a047;
-                                                    font-weight: 500;
-                                                }
-                                            </style>
-                                        <% } %>
+
                                         <div class="quantity-control">
                                             <button class="quantity-btn" onclick="updateQuantity('<%= item._id %>', 'decrease')" <%= item.quantity <= 1 ? 'disabled' : '' %>>
                                                 <i class="fas fa-minus"></i>
