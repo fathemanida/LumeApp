@@ -1591,6 +1591,10 @@
             </div>
           </div>
           <% } %>
+      </div>
+
+      <!-- Footer -->
+      <%-include('../partials/user/fooret.ejs') %>
 
             <!-- Cancel Order Modal -->
             <div id="cancelModal" class="modal">
@@ -1688,12 +1692,7 @@
               </div>
             </div>
 
-            <!-- Footer -->
-            <%-include('../partials/user/fooret.ejs') %>
-         
-
               <script>
-                // Sidebar button functionality
                 document.querySelector('.logout-btn').addEventListener('click', function () {
                   window.location.href = '/logout';
                 });
@@ -1704,7 +1703,6 @@
                   }
                 });
 
-                // Toast Notification Function
                 function showToast(type, title, message) {
                   const toastContainer = document.getElementById('toastContainer');
                   const toast = document.createElement('div');
