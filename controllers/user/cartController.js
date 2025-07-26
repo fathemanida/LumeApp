@@ -161,25 +161,36 @@ const cart = async (req, res) => {
     }
 
     const userId = req.session.user.id;
-    const now = new Date();
+    const currentTime = new Date();
     
     console.log('\n=== Cart Route Debug ===');
     console.log('User ID:', userId);
     
-    const categoriesWithOffers = await Category.find({
-      'categoryOffer.active': true,
-      'categoryOffer.startDate': { $lte: now },
-      'categoryOffer.endDate': { $gte: now }
-    }).select('name categoryOffer');
-    
-    console.log('Found', categoriesWithOffers.length, 'categories with active offers');
-    categoriesWithOffers.forEach((category, index) => {
-      console.log(`[${index + 1}] ${category.name} - ${category.categoryOffer.discountValue}${category.categoryOffer.discountType === 'percentage' ? '%' : ' flat'}`);
+    const allCategories = await Category.find({}).select('name categoryOffer');
+    console.log('\n=== All Categories with Offer Status ===');
+    allCategories.forEach((category, index) => {
+      const offer = category.categoryOffer || {};
+      console.log(`[${index + 1}] ${category.name} - Active: ${offer.active || false}`);
+      if (offer.active) {
+        console.log(`   Offer: ${offer.discountValue}${offer.discountType === 'percentage' ? '%' : ' flat'}`);
+        console.log(`   Start: ${offer.startDate}, End: ${offer.endDate}`);
+      }
     });
     
-    const categoryOffersMap = new Map();
-    categoriesWithOffers.forEach(category => {
-      categoryOffersMap.set(category._id.toString(), category.categoryOffer);
+    const categoriesWithOffers = allCategories.filter(category => {
+      const offer = category.categoryOffer || {};
+      return (
+        offer.active === true &&
+        (!offer.startDate || new Date(offer.startDate) <= currentTime) &&
+        (!offer.endDate || new Date(offer.endDate) >= currentTime)
+      );
+    });
+    
+    console.log('\n=== Active Category Offers ===');
+    console.log(`Found ${categoriesWithOffers.length} categories with active offers`);
+    categoriesWithOffers.forEach((category, index) => {
+      const offer = category.categoryOffer;
+      console.log(`[${index + 1}] ${category.name} - ${offer.discountValue}${offer.discountType === 'percentage' ? '%' : ' flat'}`);
     });
     
     const cart = await Cart.findOne({ userId })
@@ -189,11 +200,13 @@ const cart = async (req, res) => {
           { path: 'offer' },
           { 
             path: 'category',
-            select: 'name categoryOffer'
+            select: 'name categoryOffer description image isListed'
           }
         ]
       })
       .populate('appliedCoupon');
+      
+    console.log('Cart after population:', JSON.stringify(cart, null, 2));
 
     if (cart && cart.items && cart.items.length > 0) {
       console.log(`\nProcessing ${cart.items.length} cart items...`);
@@ -206,16 +219,32 @@ const cart = async (req, res) => {
           console.log(`\nProduct: ${item.productId.productName}`);
           console.log('Category:', category.name);
           
-          const categoryOffer = categoryOffersMap.get(categoryId);
+          const categoryOffer = category.categoryOffer || {};
+          const offerStartDate = categoryOffer.startDate ? new Date(categoryOffer.startDate) : null;
+          const offerEndDate = categoryOffer.endDate ? new Date(categoryOffer.endDate) : null;
           
-          if (categoryOffer && categoryOffer.active) {
+          const hasActiveOffer = categoryOffer.active === true &&
+            (!offerStartDate || offerStartDate <= currentTime) &&
+            (!offerEndDate || offerEndDate >= currentTime);
+          
+          console.log(`- Category ${category.name} offer status:`, {
+            active: categoryOffer.active,
+            startDate: offerStartDate,
+            endDate: offerEndDate,
+            currentTime: currentTime,
+            hasActiveOffer
+          });
+          
+          if (hasActiveOffer) {
             console.log(`- Found active category offer: ${categoryOffer.discountValue}${categoryOffer.discountType === 'percentage' ? '%' : ' flat'}`);
             
             if (!item.offerDiscount && item.originalPrice) {
               const discount = categoryOffer.discountType === 'percentage'
-                ? (item.originalPrice * categoryOffer.discountValue) / 100
-                : categoryOffer.discountValue;
+                ? Math.floor((item.originalPrice * categoryOffer.discountValue) / 100)
+                : Math.min(categoryOffer.discountValue, item.originalPrice);
                 
+              console.log(`- Calculated discount: ${discount} (${categoryOffer.discountType})`);
+              
               item.offerDiscount = discount; 
               item.appliedOffer = {
                 offerId: category._id,
@@ -229,6 +258,7 @@ const cart = async (req, res) => {
               
               if (item.originalPrice) {
                 item.price = item.originalPrice - item.offerDiscount;
+                console.log(`- Updated price: ${item.originalPrice} - ${item.offerDiscount} = ${item.price}`);
               }
             }
           } else {
