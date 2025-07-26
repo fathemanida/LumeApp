@@ -1282,25 +1282,41 @@
           <div class="order-tracking-stepper" style="margin-bottom:2.5rem;">
             <div class="stepper-row">
               <% 
-                , 'Shipped' , 'Delivered' , 'Cancelled' , 'Returned' , 'Return Requested' , 'Return Rejected' , 'Failed'
-                ]; const statusIcons={ 'Pending' : 'fa-clock' , 'Processing' : 'fa-cogs' , 'Shipped' : 'fa-truck'
-                , 'Delivered' : 'fa-box-open' , 'Cancelled' : 'fa-times-circle' , 'Returned' : 'fa-undo'
-                , 'Return Requested' : 'fa-undo-alt' , 'Return Rejected' : 'fa-ban' , 'Failed'
-                : 'fa-exclamation-triangle' }; 
-                (order.status==='Pending' ) { statusPath=['Pending']; } else if (order.status==='Processing' ) {
-                statusPath=['Pending', 'Processing' ]; } else if (order.status==='Shipped' ) {
-                statusPath=['Pending', 'Processing' , 'Shipped' ]; } else if (order.status==='Delivered' ) {
-                statusPath=['Pending', 'Processing' , 'Shipped' , 'Delivered' ]; } else if (order.status==='Cancelled' )
-                {
-                ) { statusPath=['Pending', 'Processing' , 'Cancelled' ]; } else { statusPath=['Pending', 'Processing'
-                , 'Shipped' , 'Delivered' , 'Cancelled' ];
-                (order.status==='Return Requested' ) {
-                , 'Shipped' , 'Delivered' , 'Return Requested' ]; } else if (order.status==='Return Rejected' ) { 
-                Only after delivered statusPath=['Pending', 'Processing' , 'Shipped' , 'Delivered' , 'Return Requested'
-                , 'Return Rejected' ]; } else if (order.status==='Returned' ) { 
-                statusPath=['Pending', 'Processing' , 'Shipped' , 'Delivered' , 'Returned' ]; } else if
-                (order.status==='Failed' ) { 
-                statusPath=['Pending', 'Failed' ]; } const currentIndex=statusPath.length - 1; %>
+                const allStatuses = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Returned', 'Return Requested', 'Return Rejected', 'Failed'];
+                const statusIcons = {
+                  'Pending': 'fa-clock',
+                  'Processing': 'fa-cogs',
+                  'Shipped': 'fa-truck',
+                  'Delivered': 'fa-box-open',
+                  'Cancelled': 'fa-times-circle',
+                  'Returned': 'fa-undo',
+                  'Return Requested': 'fa-undo-alt',
+                  'Return Rejected': 'fa-ban',
+                  'Failed': 'fa-exclamation-triangle'
+                };
+                
+                let statusPath = [];
+                if (order.status === 'Pending') {
+                  statusPath = ['Pending'];
+                } else if (order.status === 'Processing') {
+                  statusPath = ['Pending', 'Processing'];
+                } else if (order.status === 'Shipped') {
+                  statusPath = ['Pending', 'Processing', 'Shipped'];
+                } else if (order.status === 'Delivered') {
+                  statusPath = ['Pending', 'Processing', 'Shipped', 'Delivered'];
+                } else if (order.status === 'Cancelled') {
+                  statusPath = ['Pending', 'Processing', 'Cancelled'];
+                } else if (order.status === 'Return Requested') {
+                  statusPath = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Return Requested'];
+                } else if (order.status === 'Return Rejected') {
+                  statusPath = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Return Requested', 'Return Rejected'];
+                } else if (order.status === 'Returned') {
+                  statusPath = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Returned'];
+                } else if (order.status === 'Failed') {
+                  statusPath = ['Pending', 'Failed'];
+                }
+                const currentIndex = statusPath.length - 1;
+              %>
                 <% statusPath.forEach((status, idx)=> { %>
                   <div class="stepper-step <%= idx < currentIndex ? 'done' : (idx === currentIndex ? 'active' : '') %>">
                     <div class="stepper-icon">
