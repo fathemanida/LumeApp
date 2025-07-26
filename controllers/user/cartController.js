@@ -217,7 +217,16 @@ const cart = async (req, res) => {
     cart.items.forEach(item => {
       const product = item.productId;
       const originalPrice = item.originalPrice;
-      const { maxDiscount, bestOffer } = getBestOffer(product, offers, item.quantity);
+      const { maxDiscount, bestOffer, offerType } = getBestOffer(product, offers, item.quantity);
+      
+      // Debug logging
+      console.log(`Product: ${product.productName}`);
+      console.log(`Available offers: ${offers.length}`);
+      console.log(`Max discount: ${maxDiscount}`);
+      console.log(`Best offer:`, bestOffer);
+      console.log(`Offer type: ${offerType}`);
+      console.log('---');
+      
       item.offerDiscount = maxDiscount;
       item.appliedOffer = bestOffer;
       totalOfferDiscount += maxDiscount;
