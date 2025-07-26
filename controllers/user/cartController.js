@@ -166,17 +166,20 @@ const cart = async (req, res) => {
     console.log('\n=== Cart Route Debug ===');
     console.log('User ID:', userId);
     
-    const activeCategoryOffers = await Offer.find({
-      isActive: true,
-      applicableOn: 'categories',
-      startDate: { $lte: now },
-      endDate: { $gte: now }
-    }).populate('categories', 'name');
+    const categoriesWithOffers = await Category.find({
+      'categoryOffer.active': true,
+      'categoryOffer.startDate': { $lte: now },
+      'categoryOffer.endDate': { $gte: now }
+    }).select('name categoryOffer');
     
-    console.log('Found', activeCategoryOffers.length, 'active category offers');
-    activeCategoryOffers.forEach((offer, index) => {
-      console.log(`[${index + 1}] ${offer.name} - ${offer.discountValue}${offer.discountType === 'percentage' ? '%' : ' flat'}`);
-      console.log('   Categories:', offer.categories?.map(c => c.name).join(', ') || 'None');
+    console.log('Found', categoriesWithOffers.length, 'categories with active offers');
+    categoriesWithOffers.forEach((category, index) => {
+      console.log(`[${index + 1}] ${category.name} - ${category.categoryOffer.discountValue}${category.categoryOffer.discountType === 'percentage' ? '%' : ' flat'}`);
+    });
+    
+    const categoryOffersMap = new Map();
+    categoriesWithOffers.forEach(category => {
+      categoryOffersMap.set(category._id.toString(), category.categoryOffer);
     });
     
     const cart = await Cart.findOne({ userId })
@@ -186,6 +189,7 @@ const cart = async (req, res) => {
           { path: 'offer' },
           { 
             path: 'category',
+            select: 'name categoryOffer'
           }
         ]
       })
@@ -196,57 +200,44 @@ const cart = async (req, res) => {
       
       cart.items.forEach(item => {
         if (item.productId?.category) {
-          const categoryOffers = activeCategoryOffers.filter(offer => 
-            offer.categories?.some(cat => 
-              cat._id.toString() === item.productId.category._id.toString()
-            )
-          );
+          const category = item.productId.category;
+          const categoryId = category._id.toString();
           
           console.log(`\nProduct: ${item.productId.productName}`);
-          console.log('Category:', item.productId.category.name);
-          console.log('Matching category offers:', categoryOffers.length);
+          console.log('Category:', category.name);
           
-          // Attach the best category offer to the product's category
-          if (categoryOffers.length > 0) {
-            // Find the best offer (highest discount)
-            const bestOffer = categoryOffers.reduce((best, current) => {
-              const currentValue = current.discountType === 'percentage' 
-                ? current.discountValue 
-                : current.discountValue * 100; // Convert flat to comparable value
-              const bestValue = best?.discountType === 'percentage'
-                ? best.discountValue
-                : best?.discountValue * 100 || 0;
-                
-              return currentValue > bestValue ? current : best;
-            }, null);
+          const categoryOffer = categoryOffersMap.get(categoryId);
+          
+          if (categoryOffer && categoryOffer.active) {
+            console.log(`- Found active category offer: ${categoryOffer.discountValue}${categoryOffer.discountType === 'percentage' ? '%' : ' flat'}`);
             
-            console.log(`- Best category offer: ${bestOffer.name} (${bestOffer.discountValue}${bestOffer.discountType === 'percentage' ? '%' : ' flat'})`);
-            
-            // Attach the best offer to the category
-            item.productId.category.categoryOffer = bestOffer;
-            
-            // Calculate and apply the offer discount if not already set
             if (!item.offerDiscount && item.originalPrice) {
-              const discount = bestOffer.discountType === 'percentage'
-                ? (item.originalPrice * bestOffer.discountValue) / 100
-                : bestOffer.discountValue;
+              const discount = categoryOffer.discountType === 'percentage'
+                ? (item.originalPrice * categoryOffer.discountValue) / 100
+                : categoryOffer.discountValue;
                 
-              item.offerDiscount = Math.min(discount, bestOffer.maxDiscount || Infinity);
+              item.offerDiscount = discount; 
               item.appliedOffer = {
-                offerId: bestOffer._id,
-                offerName: bestOffer.name,
+                offerId: category._id,
+                offerName: `${category.name} Special`,
                 offerType: 'category',
-                discountType: bestOffer.discountType,
-                discountValue: bestOffer.discountValue,
-                maxDiscount: bestOffer.maxDiscount
+                discountType: categoryOffer.discountType,
+                discountValue: categoryOffer.discountValue
               };
               
               console.log(`- Applied category discount: ₹${item.offerDiscount}`);
+              
+              if (item.originalPrice) {
+                item.price = item.originalPrice - item.offerDiscount;
+              }
             }
           } else {
-            console.log(`- No active category offers found for ${item.productId.category.name}`);
-            item.productId.category.categoryOffer = null;
-          }
+            console.log(`- No active category offer found for ${category.name}`);
+            if (item.appliedOffer?.offerType === 'category') {
+              item.offerDiscount = 0;
+              item.appliedOffer = null;
+              item.price = item.originalPrice || item.price;
+            }
         }
       });
     }
@@ -319,14 +310,12 @@ const cart = async (req, res) => {
       });
     }
 
-    // Calculate prices and apply offers
     let totalPrice = 0;
     let totalOfferDiscount = 0;
     let totalCouponDiscount = 0;
 
     console.log('\n=== Calculating Prices and Applying Offers ===');
     
-    // First pass: Calculate base prices and original totals
     cart.items.forEach(item => {
       const product = item.productId;
       if (!product) {
@@ -348,7 +337,6 @@ const cart = async (req, res) => {
       totalPrice += originalPrice;
     });
 
-    // Second pass: Apply best offers
     cart.items.forEach(item => {
       const product = item.productId;
       if (!product) return;
@@ -367,7 +355,6 @@ const cart = async (req, res) => {
       console.log(`- Offer Discount: ${maxDiscount}`);
     });
 
-    // Apply coupon discount if any
     if (cart.appliedCoupon) {
       console.log('\n=== Applying Coupon ===');
       console.log('- Coupon Code:', cart.appliedCoupon.code);
