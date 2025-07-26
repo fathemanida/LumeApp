@@ -27,13 +27,49 @@ const orderSchema = new mongoose.Schema({
             required: true,
             min: 1
         },
+        originalPrice: {
+            type: Number,
+            required: true
+        },
         price: {
             type: Number,
             required: true
         },
+        appliedOffer: {
+            type: {
+                offerId: {
+                    type: Schema.Types.ObjectId,
+                    ref: 'Offer'
+                },
+                offerType: {
+                    type: String,
+                    enum: ['product', 'category']
+                },
+                offerName: String,
+                discountType: {
+                    type: String,
+                    enum: ['percentage', 'fixed']
+                },
+                discountValue: Number,
+                discountAmount: Number 
+            },
+            default: null
+        },
+        couponPerUnit: {
+            type: Number,
+            default: 0
+        },
+        totalCouponDiscount: {
+            type: Number,
+            default: 0 
+        },
+        finalPrice: {
+            type: Number,
+            required: true 
+        },
         status: {
             type: String,
-            enum: ['Active', 'Cancelled'],
+            enum: ['Active', 'Cancelled', 'Delivered', 'Shipped', 'Returned', 'Return Requested'],
             default: 'Active'
         }
     }],
@@ -64,6 +100,17 @@ const orderSchema = new mongoose.Schema({
     couponDiscount: {
         type: Number,
         default: 0
+    },
+   
+    couponDistribution: {
+        totalQuantities: {
+            type: Number,
+            default: 0
+        },
+        couponPerUnit: {
+            type: Number,
+            default: 0 
+        }
     },
     offerDiscount: {
         type: Number,

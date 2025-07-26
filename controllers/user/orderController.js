@@ -15,6 +15,7 @@ const router = require("../../routes/userRoutes.js");
 const { addRefund } = require('./walletController');
 const Wallet = require("../../models/walletSchema.js");
 const calculateCartTotals = require('../../helpers/calculateTotal');
+const { calculateRefund, formatRefundDescription } = require('../../helpers/refundCalculator');
 
 const PDFDocument = require('pdfkit');
 
@@ -96,30 +97,33 @@ const orders = async (req, res) => {
       let formattedItems = order.items.map(item => {
         const product = item.productId;
         const quantity = item.quantity;
-        let basePrice = 0;
-        let finalPrice = 0;
-        let discount = 0;
-        if (product) {
-          basePrice = product.salePrice && product.salePrice < product.regularPrice
-            ? product.salePrice
-            : product.regularPrice;
-          const originalPrice = basePrice * quantity;
-          subtotal += originalPrice;
-          finalPrice = item.price ? item.price * quantity : originalPrice;
-        }
+        
+        const originalPrice = item.originalPrice || (item.price * quantity);
+        const offerDiscount = item.appliedOffer ? item.appliedOffer.discountAmount : 0;
+        const couponDiscount = item.totalCouponDiscount || 0;
+        const finalPrice = item.finalPrice || (originalPrice - offerDiscount - couponDiscount);
+        const basePrice = item.price || (product?.salePrice && product.salePrice < product.regularPrice ? product.salePrice : product.regularPrice);
+        
+        subtotal += originalPrice;
+        
         return {
           name: product?.productName || 'Product not available',
           price: basePrice,
           quantity: quantity,
+          originalPrice: originalPrice,
+          offerDiscount: offerDiscount,
+          couponDiscount: couponDiscount,
           total: finalPrice,
-          discount: 0,
+          discount: offerDiscount + couponDiscount,
           image: product?.productImage?.[0] || '/images/no-image.png',
-          productId: product?._id || null
+          productId: product?._id || null,
+          status: item.status || 'Active'
         };
       });
+      
       const offerDiscount = typeof order.offerDiscount === 'number' ? order.offerDiscount : 0;
       const couponDiscount = typeof order.couponDiscount === 'number' ? order.couponDiscount : 0;
-      const shipping = typeof order.shipping === 'number' ? order.shipping : (subtotal >= 1500 ? 0 : 40);
+      const shipping = typeof order.shipping === 'number' ? order.shipping : 0;
       const totalAmount = typeof order.totalAmount === 'number' ? order.totalAmount : (subtotal - offerDiscount - couponDiscount + shipping);
       return {
         _id: order._id,
@@ -210,29 +214,34 @@ const orderDetails = async (req, res) => {
     let formattedItems = order.items.map(item => {
       const product = item.productId;
       const quantity = item.quantity;
-      let basePrice = 0;
-      let finalPrice = 0;
-      if (product) {
-        basePrice = product.salePrice && product.salePrice < product.regularPrice
-          ? product.salePrice
-          : product.regularPrice;
-        const originalPrice = basePrice * quantity;
-        subtotal += originalPrice;
-        finalPrice = item.price ? item.price * quantity : originalPrice;
-      }
+      
+      const originalPrice = item.originalPrice || (item.price * quantity);
+      const offerDiscount = item.appliedOffer ? item.appliedOffer.discountAmount : 0;
+      const couponDiscount = item.totalCouponDiscount || 0;
+      const finalPrice = item.finalPrice || (originalPrice - offerDiscount - couponDiscount);
+      const basePrice = item.price || (product?.salePrice && product.salePrice < product.regularPrice ? product.salePrice : product.regularPrice);
+      
+      subtotal += originalPrice;
+      
       return {
         name: product?.productName || 'Product not available',
         price: basePrice,
         quantity: quantity,
+        originalPrice: originalPrice,
+        offerDiscount: offerDiscount,
+        couponDiscount: couponDiscount,
         total: finalPrice,
-        discount: 0, 
+        discount: offerDiscount + couponDiscount,
         image: product?.productImage?.[0] || '/images/no-image.png',
-        productId: product?._id || null
+        productId: product?._id || null,
+        status: item.status || 'Active',
+        appliedOffer: item.appliedOffer || null
       };
     });
+    
     const offerDiscount = typeof order.offerDiscount === 'number' ? order.offerDiscount : 0;
     const couponDiscount = typeof order.couponDiscount === 'number' ? order.couponDiscount : 0;
-    const shipping = typeof order.shipping === 'number' ? order.shipping : (subtotal >= 1500 ? 0 : 40);
+    const shipping = typeof order.shipping === 'number' ? order.shipping : 0;
     const totalAmount = typeof order.totalAmount === 'number' ? order.totalAmount : (subtotal - offerDiscount - couponDiscount + shipping);
 
     let walletTransaction = null;
@@ -311,20 +320,33 @@ const cancelOrder = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Order is already cancelled' });
         }
 
-        if (order.paymentMethod !== 'COD' && order.totalAmount > 0) {
-            let wallet = await Wallet.findOne({ userId });
-            if (!wallet) {
-                wallet = new Wallet({ userId, balance: 0, transactions: [] });
-            }
+        if (order.paymentMethod !== 'COD') {
+            try {
+                const refundBreakdown = await calculateRefund(order, [], 'cancellation');
+                
+                if (refundBreakdown.success && refundBreakdown.totalRefund > 0) {
+                    let wallet = await Wallet.findOne({ userId });
+                    if (!wallet) {
+                        wallet = new Wallet({ userId, balance: 0, transactions: [] });
+                    }
 
-            wallet.balance += order.totalAmount;
-            wallet.transactions.push({
-                type: 'CREDIT',
-                amount: order.totalAmount,
-                description: `Refund for cancelled order #${order.orderId}`,
-                orderId: order._id,
-            });
-            await wallet.save();
+                    const transaction = {
+                        type: 'CREDIT',
+                        amount: refundBreakdown.totalRefund,
+                        description: formatRefundDescription(refundBreakdown),
+                        orderId: order._id,
+                        status: 'COMPLETED',
+                        createdAt: new Date(),
+                        refundBreakdown: refundBreakdown
+                    };
+
+                    wallet.balance += refundBreakdown.totalRefund;
+                    wallet.transactions.push(transaction);
+                    await wallet.save();
+                }
+            } catch (error) {
+                console.error('Error processing refund for cancelled order:', error);
+            }
         }
 
         for (const item of order.items) {
@@ -620,70 +642,34 @@ const cancelOrderItem = async (req, res) => {
       });
     }
 
-    if (order.paymentMethod !== 'COD' && item.price > 0) {
-      let wallet = await Wallet.findOne({ userId });
-      if (!wallet) {
-        wallet = new Wallet({ userId, balance: 0, transactions: [] });
-      }
-      // Calculate offer price for the item
-      const product = item.productId;
-      const quantity = item.quantity;
-      const basePrice = product.salePrice && product.salePrice < product.regularPrice ? product.salePrice : product.regularPrice;
-      const originalPrice = basePrice * quantity;
-      let productOfferDiscount = 0;
-      if (product.offer && product.offer.isActive) {
-        productOfferDiscount = product.offer.discountType === 'percentage'
-          ? (originalPrice * product.offer.discountValue) / 100
-          : product.offer.discountValue * quantity;
-      }
-      let categoryOfferDiscount = 0;
-      if (product.category && product.category.categoryOffer && product.category.categoryOffer.active) {
-        categoryOfferDiscount = product.category.categoryOffer.discountType === 'percentage'
-          ? (originalPrice * product.category.categoryOffer.discountValue) / 100
-          : product.category.categoryOffer.discountValue * quantity;
-      }
-      const bestOfferDiscount = Math.max(productOfferDiscount, categoryOfferDiscount);
-      const offerPrice = originalPrice - bestOfferDiscount;
-      // Proportional coupon refund logic
-      // Calculate total offer price for all non-cancelled items
-      const totalOrderOfferPrice = order.items.reduce((sum, i) => {
-        if (i.status !== 'Cancelled') {
-          const prod = i.productId;
-          const qty = i.quantity;
-          const base = prod.salePrice && prod.salePrice < prod.regularPrice ? prod.salePrice : prod.regularPrice;
-          const orig = base * qty;
-          let prodOffer = 0;
-          if (prod.offer && prod.offer.isActive) {
-            prodOffer = prod.offer.discountType === 'percentage'
-              ? (orig * prod.offer.discountValue) / 100
-              : prod.offer.discountValue * qty;
+    if (order.paymentMethod !== 'COD') {
+      try {
+        const refundBreakdown = await calculateRefund(order, [itemId], 'cancellation');
+        
+        if (refundBreakdown.success && refundBreakdown.totalRefund > 0) {
+          let wallet = await Wallet.findOne({ userId });
+          if (!wallet) {
+            wallet = new Wallet({ userId, balance: 0, transactions: [] });
           }
-          let catOffer = 0;
-          if (prod.category && prod.category.categoryOffer && prod.category.categoryOffer.active) {
-            catOffer = prod.category.categoryOffer.discountType === 'percentage'
-              ? (orig * prod.category.categoryOffer.discountValue) / 100
-              : prod.category.categoryOffer.discountValue * qty;
-          }
-          const best = Math.max(prodOffer, catOffer);
-          return sum + (orig - best);
+
+          const transaction = {
+            type: 'CREDIT',
+            amount: refundBreakdown.totalRefund,
+            description: formatRefundDescription(refundBreakdown),
+            orderId: order._id,
+            itemId: itemId,
+            status: 'COMPLETED',
+            createdAt: new Date(),
+            refundBreakdown: refundBreakdown
+          };
+
+          wallet.balance += refundBreakdown.totalRefund;
+          wallet.transactions.push(transaction);
+          await wallet.save();
         }
-        return sum;
-      }, 0);
-      const couponDiscount = order.couponDiscount || 0;
-      let proportionalCoupon = 0;
-      if (couponDiscount > 0 && totalOrderOfferPrice > 0) {
-        proportionalCoupon = (offerPrice / totalOrderOfferPrice) * couponDiscount;
+      } catch (error) {
+        console.error('Error processing refund for cancelled item:', error);
       }
-      const refundAmount = offerPrice - proportionalCoupon;
-      wallet.balance += refundAmount;
-      wallet.transactions.push({
-        type: 'CREDIT',
-        amount: refundAmount,
-        description: `Refund for cancelled item in order #${order.orderId}`,
-        orderId: order._id,
-        itemId: itemId
-      });
-      await wallet.save();
     }
 
     if (order.items.every(i => i.status === 'Cancelled')) {

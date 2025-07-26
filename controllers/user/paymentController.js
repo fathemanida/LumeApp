@@ -194,7 +194,6 @@ const paymentMethod = async (req, res) => {
       }
 
       address = order.address;
-      // Build processedCart directly from the order
       processedCart = {
         items: order.items.map(item => ({
           productId: {
@@ -205,7 +204,7 @@ const paymentMethod = async (req, res) => {
             salePrice: item.productId.salePrice
           },
           quantity: item.quantity,
-          price: item.price, // This should be the final price per item after discounts
+          price: item.price, 
         })),
         subtotal: order.subtotal,
         offerDiscount: order.offerDiscount,
@@ -375,9 +374,7 @@ const verifyPayment = async (req, res) => {
 
     console.log('Order updated successfully:', order._id);
 
-    // Mark coupon as used only after payment is successful
     if (order.coupon || order.usedCoupon || order.appliedCoupon) {
-      // Get coupon code and couponId
       let couponCode = null;
       let couponId = null;
       if (order.coupon && order.coupon.code) {
@@ -390,19 +387,16 @@ const verifyPayment = async (req, res) => {
         couponId = order.appliedCoupon._id;
       }
       if (!couponId && couponCode) {
-        // Find coupon by code if _id not present
         const couponDoc = await Coupon.findOne({ code: couponCode });
         if (couponDoc) couponId = couponDoc._id;
       }
       try {
         if (couponCode) {
-          // Add to user usedCoupons
           await User.findByIdAndUpdate(order.userId, {
             $addToSet: { usedCoupons: { code: couponCode, usedOn: new Date() } }
           });
         }
         if (couponId) {
-          // Add to coupon usedBy
           await Coupon.findByIdAndUpdate(couponId, {
             $addToSet: { usedBy: order.userId }
           });
@@ -446,7 +440,6 @@ const processPayment = async (req, res) => {
     const userId = req.session.user.id;
     const { method, addressId, orderId } = req.body;
 
-    // If orderId is present, this is a payment retry for an existing order
     if (orderId) {
       const order = await Order.findOne({ _id: orderId, userId })
         .populate({
@@ -463,18 +456,15 @@ const processPayment = async (req, res) => {
         return res.status(404).json({ success: false, message: 'Order not found' });
       }
 
-      // Only allow retry if order is not already paid
       if (order.status === 'Processing' || order.status === 'Delivered') {
         return res.status(400).json({ success: false, message: 'Order already paid or completed.' });
       }
 
-      // Update address if changed
       if (addressId && order.address.toString() !== addressId) {
         order.address = addressId;
         await order.save();
       }
 
-      // Recreate Razorpay order for retry
       if (method && method.toLowerCase() === 'razorpay') {
         const amountInPaise = Math.round(order.totalAmount * 100);
         const razorpayOrder = await razorpay.orders.create({
@@ -497,7 +487,6 @@ const processPayment = async (req, res) => {
         });
       }
 
-      // Wallet retry
       if (method && method.toLowerCase() === 'wallet') {
         let wallet = await Wallet.findOne({ userId });
         if (!wallet) {
@@ -527,7 +516,6 @@ const processPayment = async (req, res) => {
         });
       }
 
-      // COD retry
       if (method && method.toLowerCase() === 'cod') {
         if (order.totalAmount < 1000) {
           console.log('COD not allowed for amount < 1000. User:', userId);

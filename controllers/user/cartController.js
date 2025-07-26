@@ -867,8 +867,10 @@ const placeOrder = async (req, res) => {
 
     let totalPrice = 0;
     let totalOfferDiscount = 0;
+    let totalQuantities = 0;
+    const processedItems = [];
 
-    cart.items.forEach(item => {
+    for (const item of cart.items) {
       const product = item.productId;
       const quantity = item.quantity;
       const basePrice = product.salePrice && product.salePrice < product.regularPrice
@@ -876,9 +878,26 @@ const placeOrder = async (req, res) => {
         : product.regularPrice;
       const originalPrice = basePrice * quantity;
       totalPrice += originalPrice;
-      const { maxDiscount } = getBestOffer(product, offers, quantity);
+      totalQuantities += quantity;
+
+      const { maxDiscount, bestOffer, offerType } = getBestOffer(product, offers, quantity);
       totalOfferDiscount += maxDiscount;
-    });
+
+      processedItems.push({
+        productId: product._id,
+        quantity: quantity,
+        originalPrice: originalPrice,
+        price: basePrice,
+        appliedOffer: bestOffer ? {
+          offerId: bestOffer._id,
+          offerType: offerType,
+          offerName: bestOffer.offerName,
+          discountType: bestOffer.discountType,
+          discountValue: bestOffer.discountValue,
+          discountAmount: maxDiscount
+        } : null
+      });
+    }
 
     const shipping = totalPrice >= 1500 ? 0 : 40;
     let couponDiscount = 0;
@@ -915,19 +934,28 @@ const placeOrder = async (req, res) => {
 
     const finalPrice = totalPrice - totalOfferDiscount - couponDiscount + shipping;
 
+    const couponPerUnit = totalQuantities > 0 ? couponDiscount / totalQuantities : 0;
+
+    const finalItems = processedItems.map(item => ({
+      ...item,
+      couponPerUnit: couponPerUnit,
+      totalCouponDiscount: couponPerUnit * item.quantity,
+      finalPrice: item.originalPrice - (item.appliedOffer ? item.appliedOffer.discountAmount : 0) - (couponPerUnit * item.quantity)
+    }));
+
     const order = new Order({
       userId,
-      items: cart.items.map(item => ({
-        productId: item.productId._id,
-        quantity: item.quantity,
-        price: item.productId.salePrice || item.productId.regularPrice
-      })),
+      items: finalItems,
       totalAmount: finalPrice,
       shippingAddress: addressId,
       paymentMethod,
       status: 'Pending',
       usedCoupon: usedCoupon,
       couponDiscount: couponDiscount,
+      couponDistribution: {
+        totalQuantities: totalQuantities,
+        couponPerUnit: couponPerUnit
+      },
       offerDiscount: totalOfferDiscount,
       subtotal: totalPrice,
       shipping: shipping,
@@ -979,28 +1007,41 @@ const placeOrder = async (req, res) => {
 function getBestOffer(product, offers, quantity = 1) {
   let maxDiscount = 0;
   let bestOffer = null;
+  let offerType = null;
+  
   offers.forEach(offer => {
     let applies = false;
-    if (offer.applicableOn === 'all') applies = true;
-  if (
-  offer.applicableOn === 'categories' &&
-  Array.isArray(offer.categories) &&
-  product?.category?._id &&
-  offer.categories.some(cat => cat?.toString() === product.category._id?.toString())
-) {
-  applies = true;
-}
-if (
-  offer.applicableOn === 'products' &&
-  Array.isArray(offer.products) &&
-  product?._id &&
-  offer.products.some(prod => prod?.toString() === product._id?.toString())
-) {
-  applies = true;
-}
+    let currentOfferType = null;
+    
+    if (offer.applicableOn === 'all') {
+      applies = true;
+      currentOfferType = 'product';
+    }
+    
+    if (
+      offer.applicableOn === 'categories' &&
+      Array.isArray(offer.categories) &&
+      product?.category?._id &&
+      offer.categories.some(cat => cat?.toString() === product.category._id?.toString())
+    ) {
+      applies = true;
+      currentOfferType = 'category';
+    }
+    
+    if (
+      offer.applicableOn === 'products' &&
+      Array.isArray(offer.products) &&
+      product?._id &&
+      offer.products.some(prod => prod?.toString() === product._id?.toString())
+    ) {
+      applies = true;
+      currentOfferType = 'product';
+    }
+    
     if (!product.category || !product.category._id) {
       console.log('product missing category or id', product);
     }
+    
     if (applies) {
       let price = (product.salePrice && product.salePrice < product.regularPrice)
         ? product.salePrice
@@ -1011,12 +1052,14 @@ if (
       if (discount > maxDiscount) {
         maxDiscount = discount;
         bestOffer = offer;
+        offerType = currentOfferType;
       }
     }
   });
+  
   console.log('Available Offers:', offers.map(o => ({ id: o._id, applies: o.applicableOn })));
 
-  return { maxDiscount, bestOffer };
+  return { maxDiscount, bestOffer, offerType };
 }
 
 module.exports = {

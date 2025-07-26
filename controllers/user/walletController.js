@@ -2,6 +2,7 @@ const Order = require('../../models/orderSchema');
 const Wallet = require('../../models/walletSchema');
 const User = require('../../models/userSchema');
 const Product = require('../../models/productSchema');
+const { calculateRefund, formatRefundDescription } = require('../../helpers/refundCalculator');
 
 const cancelOrReturnOrder = async (req, res) => {
   try {
@@ -22,6 +23,9 @@ const cancelOrReturnOrder = async (req, res) => {
         }
         
       if (order.paymentMethod !== 'COD') {
+        // Calculate refund using unified refund calculator
+        const refundBreakdown = await calculateRefund(order, [], 'cancellation');
+        
         let wallet = await Wallet.findOne({ userId: order.userId });
         
         if (!wallet) {
@@ -34,14 +38,15 @@ const cancelOrReturnOrder = async (req, res) => {
 
         const transaction = {
           type: 'CREDIT',
-          amount: order.totalAmount,
-          description: `Direct refund for cancelled order #${order.orderId}`,
+          amount: refundBreakdown.totalRefund,
+          description: formatRefundDescription(refundBreakdown),
           orderId: order._id,
           status: 'COMPLETED',
-          createdAt: new Date()
+          createdAt: new Date(),
+          refundBreakdown: refundBreakdown // Store detailed breakdown
         };
 
-        wallet.balance += order.totalAmount;
+        wallet.balance += refundBreakdown.totalRefund;
         wallet.transactions.push(transaction);
         await wallet.save();
 
@@ -110,6 +115,9 @@ const processReturnRefund = async (req, res) => {
       });
     }
 
+    // Calculate refund using unified refund calculator
+    const refundBreakdown = await calculateRefund(order, [], 'return');
+    
     let wallet = await Wallet.findOne({ userId: order.userId });
     
     if (!wallet) {
@@ -120,18 +128,17 @@ const processReturnRefund = async (req, res) => {
       });
     }
 
-    const refundAmount = order.totalAmount;
-
     const transaction = {
       type: 'CREDIT',
-      amount: refundAmount,
-      description: `Refund for returned order #${order.orderId}`,
+      amount: refundBreakdown.totalRefund,
+      description: formatRefundDescription(refundBreakdown),
       orderId: order._id,
       status: 'COMPLETED',
-      createdAt: new Date()
+      createdAt: new Date(),
+      refundBreakdown: refundBreakdown // Store detailed breakdown
     };
 
-    wallet.balance += refundAmount;
+    wallet.balance += refundBreakdown.totalRefund;
     wallet.transactions.push(transaction);
     await wallet.save();
 
