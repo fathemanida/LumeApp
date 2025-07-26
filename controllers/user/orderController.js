@@ -235,18 +235,32 @@ const orderDetails = async (req, res) => {
     const shipping = typeof order.shipping === 'number' ? order.shipping : (subtotal >= 1500 ? 0 : 40);
     const totalAmount = typeof order.totalAmount === 'number' ? order.totalAmount : (subtotal - offerDiscount - couponDiscount + shipping);
 
+    let walletTransaction = null;
+    if (['Razorpay', 'Wallet'].includes(order.paymentMethod)) {
+      const wallet = await Wallet.findOne({ userId }).lean();
+      if (wallet && wallet.transactions) {
+        walletTransaction = wallet.transactions.find(transaction => 
+          transaction.orderId && transaction.orderId.toString() === order._id.toString()
+        );
+      }
+    }
+
     const formattedOrder = {
       _id: order._id,
       orderNumber: order._id.toString().slice(-6).toUpperCase(),
       status: order.status || 'Pending',
       date: order.createdOn,
+      createdOn: order.createdOn,
       paymentMethod: order.paymentMethod || 'COD',
+      paymentStatus: order.paymentStatus,
+      paidAt: order.paidAt,
       subtotal: subtotal,
       shipping: shipping,
       offerDiscount: offerDiscount,
       couponDiscount: couponDiscount,
       totalAmount: totalAmount,
       items: formattedItems,
+      walletTransaction: walletTransaction, 
       address: order.address ? {
         name: order.address.name,
         houseNo: order.address.houseNo,
