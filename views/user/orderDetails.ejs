@@ -1597,6 +1597,12 @@
                 <button class="cancel-btn" onclick="openCancelModal()"> <i class="fas fa-times"></i> Cancel Order
                 </button>
                 <% } %>
+              <% if (order.status === 'Delivered') { %>
+                <button class="return-btn" onclick="openReturnModal()" 
+                  style="background-color: #ff6b35; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 5px; cursor: pointer; font-size: 0.95rem; transition: background-color 0.3s;">
+                  <i class="fas fa-undo"></i> Return Order
+                </button>
+                <% } %>
                   <a href="/orders" class="back-btn">Back to Orders</a>
                   <a href="/orders/<%= order._id %>/invoice" class="download-btn"> <i class="fas fa-file-invoice"></i>
                     Download Invoice</a>
