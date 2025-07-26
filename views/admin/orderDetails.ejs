@@ -430,19 +430,19 @@
                   
                 <div class="summary-row">
                     <span>Subtotal</span>
-                    <span>₹<%= order.totalAmount %></span>
+                    <span>₹<%= (order.totalAmount || 0) + (order.offerDiscount || 0) + (order.couponDiscount || 0) %></span>
                 </div>
                
             
                 <% if (order.offerDiscount) { %>
                     <div class="summary-row">
-                        <span>Discount</span>
+                        <span>Offer Discount</span>
                         <span>-₹<%= order.offerDiscount.toFixed(2) %></span>
                     </div>
                 <% } %>
                  <% if (order.couponDiscount) { %>
                     <div class="summary-row">
-                        <span>Discount</span>
+                        <span>Coupon Discount</span>
                         <span>-₹<%= order.couponDiscount.toFixed(2) %></span>
                     </div>
                 <% } %>

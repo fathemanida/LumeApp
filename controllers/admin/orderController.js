@@ -164,6 +164,7 @@ const shipping = totalAmount > 1500 ? 0 : 40;
             status: order.status || 'Pending',
             paymentMethod: order.paymentMethod || 'COD',
             subtotal:subtotal,
+            address: order.address || null,
             userId: userData || {
                 name: 'User not found',
                 email: 'No email'
