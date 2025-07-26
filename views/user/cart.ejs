@@ -657,26 +657,43 @@
                                                 console.log('Item Quantity:', item.quantity);
                                                 console.log('Product Category:', item.productId.category);
                                                 console.log('Product ID:', item.productId._id);
+                                                
+                                                // Debug category offer
+                                                const category = item.productId.category;
+                                                const categoryOffer = category && category.categoryOffer;
+                                                console.log('Category:', category ? category.name : 'None');
+                                                console.log('Category Offer:', categoryOffer);
+                                                
                                                 console.log('==========================\n');
                                                 
                                                 const originalPricePerUnit = (item.originalPrice || (item.price * item.quantity)) / item.quantity;
                                                 const offerDiscountPerUnit = (item.offerDiscount || 0) / item.quantity;
                                                 const finalPricePerUnit = originalPricePerUnit - offerDiscountPerUnit;
                                                 const hasOffer = item.offerDiscount && item.offerDiscount > 0;
+                                                const hasCategoryOffer = categoryOffer && categoryOffer.isActive;
                                             %>
                                             
-                                            <% if (hasOffer) { %>
+                                            <% if (hasOffer || hasCategoryOffer) { %>
                                                 <div class="price-display">
                                                     <span class="text-decoration-line-through text-muted">₹<%= Math.round(originalPricePerUnit).toLocaleString() %></span>
                                                     <span class="text-success ms-2 fw-bold">₹<%= Math.round(finalPricePerUnit).toLocaleString() %></span>
                                                     <span class="text-success ms-2 small">per unit</span>
                                                 </div>
-                                                <div class="offer-savings small text-success mt-1">
-                                                    <i class="fas fa-tag me-1"></i>You save ₹<%= Math.round(offerDiscountPerUnit).toLocaleString() %> per unit
-                                                </div>
+                                                <% if (offerDiscountPerUnit > 0) { %>
+                                                    <div class="offer-savings small text-success mt-1">
+                                                        <i class="fas fa-tag me-1"></i>You save ₹<%= Math.round(offerDiscountPerUnit).toLocaleString() %> per unit
+                                                    </div>
+                                                <% } %>
                                                 <% if (item.appliedOffer && item.appliedOffer.offerName) { %>
                                                     <div class="offer-name small text-muted mt-1">
                                                         <i class="fas fa-gift me-1"></i><%= item.appliedOffer.offerName %>
+                                                    </div>
+                                                <% } else if (hasCategoryOffer) { %>
+                                                    <div class="offer-name small text-muted mt-1">
+                                                        <i class="fas fa-tags me-1"></i>Category Offer: <%= categoryOffer.name %>
+                                                        (<%= categoryOffer.discountType === 'percentage' ? 
+                                                            categoryOffer.discountValue + '%' : 
+                                                            '₹' + categoryOffer.discountValue %> off)
                                                     </div>
                                                 <% } %>
                                             <% } else { %>

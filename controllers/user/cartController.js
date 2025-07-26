@@ -165,7 +165,6 @@ const cart = async (req, res) => {
     console.log('\n=== Cart Route Debug ===');
     console.log('User ID:', userId);
     
-    // Fetch cart with detailed population
     const cart = await Cart.findOne({ userId })
       .populate({
         path: 'items.productId',
@@ -204,7 +203,6 @@ const cart = async (req, res) => {
       console.log('Cart is empty or not found');
     }
 
-    // Fetch all active coupons
     const coupons = await Coupon.find({
       isActive: true,
       expiryDate: { $gt: new Date() }
@@ -216,7 +214,6 @@ const cart = async (req, res) => {
       console.log(`[${index + 1}] ${coupon.code}: ${coupon.discountValue}${coupon.discountType === 'PERCENTAGE' ? '%' : ' flat'}`);
     });
 
-    // Fetch all active offers
     const now = new Date();
     const offers = await Offer.find({
       isActive: true,
@@ -326,7 +323,6 @@ const cart = async (req, res) => {
       }
     }
 
-    // Calculate shipping
     const shipping = totalPrice >= 1500 ? 0 : 40;
     const finalPrice = Math.max(0, totalPrice - totalOfferDiscount - totalCouponDiscount + shipping);
     
@@ -338,14 +334,12 @@ const cart = async (req, res) => {
     console.log('- Final Price:', finalPrice);
     console.log('==========================\n');
 
-    // Calculate item-level coupon discounts
     cart.items.forEach(item => {
       let itemCouponDiscount = 0;
       if (cart.appliedCoupon?.discountType === 'PERCENTAGE') {
         const itemPriceAfterOffer = item.originalPrice - (item.offerDiscount || 0);
         itemCouponDiscount = (itemPriceAfterOffer * cart.appliedCoupon.discountValue) / 100;
         
-        // Distribute max discount proportionally if applicable
         if (cart.appliedCoupon.maxDiscount) {
           const itemProportion = itemPriceAfterOffer / (totalPrice - totalOfferDiscount);
           const maxItemDiscount = cart.appliedCoupon.maxDiscount * itemProportion;
