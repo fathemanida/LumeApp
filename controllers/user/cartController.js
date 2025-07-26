@@ -161,31 +161,87 @@ const cart = async (req, res) => {
     }
 
     const userId = req.session.user.id;
-
+    
+    console.log('\n=== Cart Route Debug ===');
+    console.log('User ID:', userId);
+    
+    // Fetch cart with detailed population
     const cart = await Cart.findOne({ userId })
       .populate({
         path: 'items.productId',
         populate: [
           { path: 'offer' },
-          { path: 'category', populate: { path: 'categoryOffer' } }
+          { 
+            path: 'category', 
+            populate: { 
+              path: 'categoryOffer',
+              match: { 
+                isActive: true,
+                startDate: { $lte: new Date() },
+                endDate: { $gte: new Date() }
+              }
+            }
+          }
         ]
       })
       .populate('appliedCoupon');
 
+    console.log('\n=== Cart Items ===');
+    if (cart && cart.items && cart.items.length > 0) {
+      console.log(`Found ${cart.items.length} items in cart`);
+      cart.items.forEach((item, index) => {
+        console.log(`\n[Item ${index + 1}] ${item.productId?.productName || 'Unknown Product'}`);
+        console.log('- Product ID:', item.productId?._id || 'None');
+        console.log('- Category:', item.productId?.category?.name || 'None', 
+                   `(ID: ${item.productId?.category?._id || 'None'})`);
+        console.log('- Category Offer:', item.productId?.category?.categoryOffer?.name || 'None');
+        console.log('- Quantity:', item.quantity);
+        console.log('- Price:', item.price);
+        console.log('- Original Price:', item.originalPrice || 'Not set');
+        console.log('- Offer Discount:', item.offerDiscount || 0);
+      });
+    } else {
+      console.log('Cart is empty or not found');
+    }
+
+    // Fetch all active coupons
     const coupons = await Coupon.find({
       isActive: true,
       expiryDate: { $gt: new Date() }
     }).select('code discountType discountValue maxDiscount minOrderAmount expiryDate usedBy');
 
+    console.log('\n=== Available Coupons ===');
+    console.log(`Found ${coupons.length} active coupons`);
+    coupons.forEach((coupon, index) => {
+      console.log(`[${index + 1}] ${coupon.code}: ${coupon.discountValue}${coupon.discountType === 'PERCENTAGE' ? '%' : ' flat'}`);
+    });
+
+    // Fetch all active offers
     const now = new Date();
     const offers = await Offer.find({
       isActive: true,
       startDate: { $lte: now },
       endDate: { $gte: now },
       applicableOn: { $in: ['all', 'categories', 'products'] }
+    }).populate('categories', 'name')
+      .populate('products', 'productName');
+
+    console.log('\n=== Available Offers ===');
+    console.log(`Found ${offers.length} active offers`);
+    offers.forEach((offer, index) => {
+      console.log(`\n[Offer ${index + 1}] ${offer.name || 'Unnamed Offer'}`);
+      console.log('- Type:', offer.applicableOn);
+      console.log(`- Discount: ${offer.discountValue}${offer.discountType === 'percentage' ? '%' : ' flat'}`);
+      if (offer.maxDiscount) console.log('- Max Discount:', offer.maxDiscount);
+      if (offer.applicableOn === 'categories') {
+        console.log('- Categories:', offer.categories?.map(c => c.name).join(', ') || 'None');
+      } else if (offer.applicableOn === 'products') {
+        console.log('- Products:', offer.products?.map(p => p.productName).join(', ') || 'None');
+      }
     });
 
     if (!cart || cart.items.length === 0) {
+      console.log('\n=== Rendering Empty Cart ===');
       return res.render('cart', {
         user: req.session.user,
         items: [],
@@ -200,63 +256,107 @@ const cart = async (req, res) => {
       });
     }
 
+    // Calculate prices and apply offers
     let totalPrice = 0;
     let totalOfferDiscount = 0;
     let totalCouponDiscount = 0;
 
+    console.log('\n=== Calculating Prices and Applying Offers ===');
+    
+    // First pass: Calculate base prices and original totals
     cart.items.forEach(item => {
       const product = item.productId;
+      if (!product) {
+        console.warn('Skipping item with missing product data');
+        return;
+      }
+      
       const basePrice = product.salePrice && product.salePrice < product.regularPrice ? 
         product.salePrice : product.regularPrice;
       const originalPrice = basePrice * item.quantity;
-      totalPrice += originalPrice;
+      
+      console.log(`\n[${product.productName}]`);
+      console.log('- Base Price:', basePrice);
+      console.log('- Quantity:', item.quantity);
+      console.log('- Original Price:', originalPrice);
+      
       item.price = basePrice;
       item.originalPrice = originalPrice;
+      totalPrice += originalPrice;
     });
 
+    // Second pass: Apply best offers
     cart.items.forEach(item => {
       const product = item.productId;
-      const originalPrice = item.originalPrice;
-      const { maxDiscount, bestOffer, offerType } = getBestOffer(product, offers, item.quantity);
+      if (!product) return;
       
-      // Debug logging
-      console.log(`Product: ${product.productName}`);
-      console.log(`Available offers: ${offers.length}`);
-      console.log(`Max discount: ${maxDiscount}`);
-      console.log(`Best offer:`, bestOffer);
-      console.log(`Offer type: ${offerType}`);
-      console.log('---');
+      console.log(`\n=== Applying Offers to ${product.productName} ===`);
+      
+      const { maxDiscount, bestOffer, offerType } = getBestOffer(product, offers, item.quantity);
       
       item.offerDiscount = maxDiscount;
       item.appliedOffer = bestOffer;
+      item.offerType = offerType;
       totalOfferDiscount += maxDiscount;
+      
+      console.log(`- Applied Offer: ${bestOffer?.name || 'None'}`);
+      console.log(`- Offer Type: ${offerType || 'None'}`);
+      console.log(`- Offer Discount: ${maxDiscount}`);
     });
 
+    // Apply coupon discount if any
     if (cart.appliedCoupon) {
-      const coupon = cart.appliedCoupon;
+      console.log('\n=== Applying Coupon ===');
+      console.log('- Coupon Code:', cart.appliedCoupon.code);
+      console.log('- Discount Type:', cart.appliedCoupon.discountType);
+      console.log('- Discount Value:', cart.appliedCoupon.discountValue);
+      
       const priceAfterOffer = totalPrice - totalOfferDiscount;
-      if (coupon.discountType === 'PERCENTAGE') {
-        totalCouponDiscount = (priceAfterOffer * coupon.discountValue) / 100;
-        if (coupon.maxDiscount) {
-          totalCouponDiscount = Math.min(totalCouponDiscount, coupon.maxDiscount);
+      
+      if (cart.appliedCoupon.discountType === 'PERCENTAGE') {
+        totalCouponDiscount = (priceAfterOffer * cart.appliedCoupon.discountValue) / 100;
+        if (cart.appliedCoupon.maxDiscount) {
+          totalCouponDiscount = Math.min(totalCouponDiscount, cart.appliedCoupon.maxDiscount);
+          console.log('- Capped at max discount:', cart.appliedCoupon.maxDiscount);
         }
+        console.log(`- Applied ${cart.appliedCoupon.discountValue}% discount: ${totalCouponDiscount}`);
       } else {
-        totalCouponDiscount = coupon.discountValue;
+        totalCouponDiscount = cart.appliedCoupon.discountValue;
+        console.log(`- Applied flat discount: ${totalCouponDiscount}`);
       }
     }
 
+    // Calculate shipping
     const shipping = totalPrice >= 1500 ? 0 : 40;
-    const finalPrice = totalPrice - totalOfferDiscount - totalCouponDiscount + shipping;
+    const finalPrice = Math.max(0, totalPrice - totalOfferDiscount - totalCouponDiscount + shipping);
+    
+    console.log('\n=== Final Cart Summary ===');
+    console.log('- Subtotal:', totalPrice);
+    console.log('- Total Offer Discount:', totalOfferDiscount);
+    console.log('- Total Coupon Discount:', totalCouponDiscount);
+    console.log('- Shipping:', shipping);
+    console.log('- Final Price:', finalPrice);
+    console.log('==========================\n');
+
+    // Calculate item-level coupon discounts
     cart.items.forEach(item => {
       let itemCouponDiscount = 0;
-      if (cart.appliedCoupon && cart.appliedCoupon.discountType === 'PERCENTAGE') {
-        itemCouponDiscount = ((item.originalPrice - item.offerDiscount) * (cart.appliedCoupon.discountValue / 100));
-      } else if (cart.appliedCoupon) {
-        itemCouponDiscount = 0;
+      if (cart.appliedCoupon?.discountType === 'PERCENTAGE') {
+        const itemPriceAfterOffer = item.originalPrice - (item.offerDiscount || 0);
+        itemCouponDiscount = (itemPriceAfterOffer * cart.appliedCoupon.discountValue) / 100;
+        
+        // Distribute max discount proportionally if applicable
+        if (cart.appliedCoupon.maxDiscount) {
+          const itemProportion = itemPriceAfterOffer / (totalPrice - totalOfferDiscount);
+          const maxItemDiscount = cart.appliedCoupon.maxDiscount * itemProportion;
+          itemCouponDiscount = Math.min(itemCouponDiscount, maxItemDiscount);
+        }
       }
+      
       item.couponDiscount = itemCouponDiscount;
-      item.totalPrice = item.originalPrice - item.offerDiscount - itemCouponDiscount;
+      item.totalPrice = item.originalPrice - (item.offerDiscount || 0) - itemCouponDiscount;
     });
+
     res.render('cart', {
       user: req.session.user,
       items: cart.items,
@@ -269,12 +369,14 @@ const cart = async (req, res) => {
       appliedCoupon: cart.appliedCoupon,
       discount: totalCouponDiscount
     });
+
   } catch (error) {
-    console.error('Error in cart:', error);
+    console.error('\n=== Error in cart route ===');
+    console.error(error);
+    console.error('==========================\n');
     res.status(500).send('Error loading cart');
   }
 };
-
 
 
 const updateQuantity = async (req, res) => {
@@ -442,7 +544,7 @@ const updateQuantity = async (req, res) => {
 
     const shipping = totalPrice > 1500 ? 0 : 40;
     const discount = cart.discount || 0;
-    const finalPrice = totalPrice + shipping - discount;
+    const finalPrice = totalPrice - discount + shipping;
 
     res.json({
       success: true,
@@ -1021,62 +1123,116 @@ const placeOrder = async (req, res) => {
   }
 };
 
-function getBestOffer(product, offers, quantity = 1) {
-  let maxDiscount = 0;
-  let bestOffer = null;
-  let offerType = null;
-  
-  offers.forEach(offer => {
-    let applies = false;
-    let currentOfferType = null;
-    
-    if (offer.applicableOn === 'all') {
-      applies = true;
-      currentOfferType = 'product';
+/**
+ * Finds the best applicable offer for a product
+ * @param {Object} product - The product to find offers for
+ * @param {Array} offers - Array of offer objects
+ * @param {number} [quantity=1] - Quantity of the product
+ * @returns {Object} Object containing maxDiscount, bestOffer, and offerType
+ */
+function getBestOffer(product, offers = [], quantity = 1) {
+    // Input validation
+    if (!product || !Array.isArray(offers)) {
+        console.warn('Invalid input to getBestOffer:', { product, offers });
+        return { maxDiscount: 0, bestOffer: null, offerType: null };
     }
-    
-    if (
-      offer.applicableOn === 'categories' &&
-      Array.isArray(offer.categories) &&
-      product?.category?._id &&
-      offer.categories.some(cat => cat?.toString() === product.category._id?.toString())
-    ) {
-      applies = true;
-      currentOfferType = 'category';
-    }
-    
-    if (
-      offer.applicableOn === 'products' &&
-      Array.isArray(offer.products) &&
-      product?._id &&
-      offer.products.some(prod => prod?.toString() === product._id?.toString())
-    ) {
-      applies = true;
-      currentOfferType = 'product';
-    }
-    
-    if (!product.category || !product.category._id) {
-      console.log('product missing category or id', product);
-    }
-    
-    if (applies) {
-      let price = (product.salePrice && product.salePrice < product.regularPrice)
-        ? product.salePrice
-        : product.regularPrice;
-      let discount = offer.discountType === 'percentage'
-        ? (price * offer.discountValue / 100) * quantity
-        : offer.discountValue * quantity;
-      if (discount > maxDiscount) {
-        maxDiscount = discount;
-        bestOffer = offer;
-        offerType = currentOfferType;
-      }
-    }
-  });
-  
-  console.log('Available Offers:', offers.map(o => ({ id: o._id, applies: o.applicableOn })));
 
-  return { maxDiscount, bestOffer, offerType };
+    let maxDiscount = 0;
+    let bestOffer = null;
+    let offerType = null;
+    const now = new Date();
+
+    console.log(`\n=== getBestOffer for ${product.productName} (${product._id}) ===`);
+    console.log(`- Category: ${product.category?.name || 'None'} (${product.category?._id || 'N/A'})`);
+    console.log(`- Regular Price: ${product.regularPrice}, Sale Price: ${product.salePrice || 'None'}`);
+    console.log(`- Quantity: ${quantity}`);
+
+    // Sort offers by discount value (highest first)
+    const sortedOffers = [...offers].sort((a, b) => {
+        const aValue = a.discountType === 'percentage' ? a.discountValue * 1000 : a.discountValue;
+        const bValue = b.discountType === 'percentage' ? b.discountValue * 1000 : b.discountValue;
+        return bValue - aValue;
+    });
+
+    for (const offer of sortedOffers) {
+        // Skip if offer is not active or expired
+        if (!offer.isActive || now < new Date(offer.startDate) || now > new Date(offer.endDate)) {
+            console.log(`\nSkipping offer ${offer.name || offer._id} - ${!offer.isActive ? 'Inactive' : 'Expired'}`);
+            continue;
+        }
+
+        const price = (product.salePrice && product.salePrice < product.regularPrice)
+            ? product.salePrice
+            : product.regularPrice;
+
+        let applies = false;
+        let currentOfferType = null;
+
+        // Check offer applicability
+        if (offer.applicableOn === 'all') {
+            applies = true;
+            currentOfferType = 'all_products';
+            console.log(`\nOffer ${offer.name || offer._id}: Applies to all products`);
+        } 
+        else if (offer.applicableOn === 'categories' && product?.category?._id) {
+            const categoryMatch = Array.isArray(offer.categories) && 
+                offer.categories.some(catId => 
+                    catId.toString() === product.category._id.toString()
+                );
+            
+            if (categoryMatch) {
+                applies = true;
+                currentOfferType = 'category';
+                console.log(`\nOffer ${offer.name || offer._id}: Applies to category ${product.category.name}`);
+            }
+        }
+        else if (offer.applicableOn === 'products' && product?._id) {
+            const productMatch = Array.isArray(offer.products) && 
+                offer.products.some(prodId => 
+                    prodId.toString() === product._id.toString()
+                );
+            
+            if (productMatch) {
+                applies = true;
+                currentOfferType = 'product';
+                console.log(`\nOffer ${offer.name || offer._id}: Applies to this specific product`);
+            }
+        }
+
+        if (applies) {
+            // Calculate discount
+            let discount = offer.discountType === 'percentage'
+                ? (price * offer.discountValue / 100) * quantity
+                : offer.discountValue * quantity;
+
+            // Apply max discount cap if it exists
+            if (offer.discountType === 'percentage' && offer.maxDiscount) {
+                discount = Math.min(discount, offer.maxDiscount);
+                console.log(`- Capped at max discount: ${offer.maxDiscount}`);
+            }
+
+            console.log(`- Calculated discount: ${discount} (${offer.discountValue}${offer.discountType === 'percentage' ? '%' : ' flat'})`);
+
+            if (discount > maxDiscount) {
+                maxDiscount = discount;
+                bestOffer = offer;
+                offerType = currentOfferType;
+                console.log('- New best offer!');
+            }
+        }
+    }
+
+    console.log(`\n=== Best Offer for ${product.productName} ===`);
+    console.log(`- Offer: ${bestOffer?.name || 'None'}`);
+    console.log(`- Type: ${offerType || 'None'}`);
+    console.log(`- Max Discount: ${maxDiscount}`);
+    console.log('==============================\n');
+
+    return { 
+        maxDiscount: Math.max(0, maxDiscount), // Ensure non-negative
+        bestOffer,
+        offerType
+    };
 }
 
 module.exports = {
