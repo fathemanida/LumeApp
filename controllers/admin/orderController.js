@@ -73,6 +73,60 @@ const getOrders = async (req, res) => {
     }
 };
 
+const getOrderAddress = async (addressField) => {
+    try {
+        if (addressField && typeof addressField === 'object' && addressField.name) {
+            return {
+                fullName: addressField.name || 'N/A',
+                phone: addressField.phone || 'N/A',
+                addressLine1: `${addressField.houseNo || ''} ${addressField.roadArea || ''}`.trim() || 'Address not provided',
+                addressLine2: addressField.landMark || '',
+                city: addressField.city || 'N/A',
+                state: addressField.state || 'N/A',
+                pincode: addressField.pincode || 'N/A'
+            };
+        }
+        
+        if (addressField && typeof addressField === 'string') {
+            const Address = require('../../models/addressSchema');
+            const address = await Address.findById(addressField).lean();
+            
+            if (address) {
+                return {
+                    fullName: address.name || 'N/A',
+                    phone: address.phone || 'N/A',
+                    addressLine1: `${address.houseNo || ''} ${address.roadArea || ''}`.trim() || 'Address not provided',
+                    addressLine2: address.landMark || '',
+                    city: address.city || 'N/A',
+                    state: address.state || 'N/A',
+                    pincode: address.pincode || 'N/A'
+                };
+            }
+        }
+        
+        return {
+            fullName: 'Address not available',
+            phone: 'N/A',
+            addressLine1: 'Address not provided',
+            addressLine2: '',
+            city: 'N/A',
+            state: 'N/A',
+            pincode: 'N/A'
+        };
+    } catch (error) {
+        console.error('Error fetching address:', error);
+        return {
+            fullName: 'Error loading address',
+            phone: 'N/A',
+            addressLine1: 'Could not load address',
+            addressLine2: '',
+            city: 'N/A',
+            state: 'N/A',
+            pincode: 'N/A'
+        };
+    }
+};
+
 const getOrderDetails = async (req, res) => {
     try {
         const orderId = req.params.orderId;
@@ -90,16 +144,19 @@ const getOrderDetails = async (req, res) => {
                 model: 'Product',
                 select: 'productName productImage regularPrice salePrice quantity'
             })
-            .populate({
-                path: 'address',
-                model: 'Address'
-            })
+            .populate('address')
             .populate({
                 path: 'userId',
                 model: 'User',
                 select: 'username email name'
             })
             .lean();
+
+        // Debug address population
+        console.log('Order address field:', order.address);
+        console.log('Order shippingAddress field:', order.shippingAddress);
+        console.log('Order address type:', typeof order.address);
+        console.log('Order shippingAddress type:', typeof order.shippingAddress);
 
         if (!order) {
             return res.status(404).render('error', {
@@ -169,7 +226,15 @@ const getOrderDetails = async (req, res) => {
             status: order.status || 'Pending',
             paymentMethod: order.paymentMethod || 'COD',
             subtotal:subtotal,
-            address: order.address || {
+            address: order.address ? {
+                fullName: order.address.name,
+                phone: order.address.phone,
+                addressLine1: `${order.address.houseNo || ''} ${order.address.roadArea || ''}`.trim(),
+                addressLine2: order.address.landMark || '',
+                city: order.address.city,
+                state: order.address.state,
+                pincode: order.address.pincode
+            } : {
                 fullName: 'Address not available',
                 phone: 'N/A',
                 addressLine1: 'Address not provided',
