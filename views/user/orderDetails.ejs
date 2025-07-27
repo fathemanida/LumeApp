@@ -1524,13 +1524,13 @@
                 const itemStatus = String(item.status || '').trim();
                 const orderStatus = String(order.status || '').trim();
                 
-                // Show cancel button if item is active and order is not in final status
+                // Show cancel button if item is active and order is not in a final state
                 const canCancel = (
-                  itemStatus === 'Active' && 
-                  !['Delivered', 'Cancelled', 'Returned', 'Return Requested', 'Return Rejected', 'Failed'].includes(orderStatus)
+                  (itemStatus === 'Active' || itemStatus === 'Processing' || itemStatus === 'Pending') && 
+                  !['Cancelled', 'Returned', 'Return Requested', 'Return Rejected', 'Failed'].includes(itemStatus)
                 );
+                console.log('Item Status:', itemStatus, 'Can Cancel:', canCancel);
                 
-                // Show return button if item is delivered and not already returned/requested
                 const canReturn = (
                   itemStatus === 'Delivered' || 
                   (orderStatus === 'Delivered' && !['Returned', 'Return Requested', 'Return Rejected'].includes(itemStatus))
