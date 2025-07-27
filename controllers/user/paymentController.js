@@ -760,11 +760,53 @@ const processPayment = async (req, res) => {
       console.log('Creating COD order for user:', userId);
       const order = new Order({
         userId,
-        items: cartData.items.map(item => ({
-          productId: item.productId._id,
-          quantity: item.quantity,
-          price: item.totalPrice
-        })),
+      items: cartData.items.map(item => {
+  const basePrice = item.productId.salePrice && item.productId.salePrice < item.productId.regularPrice
+    ? item.productId.salePrice
+    : item.productId.regularPrice;
+  const originalPrice = basePrice * item.quantity;
+
+  const appliedOffer = item.productId.offer && item.productId.offer.isActive
+    ? {
+        offerId: item.productId.offer._id,
+        offerType: 'product',
+        offerName: item.productId.offer.name,
+        discountType: item.productId.offer.discountType,
+        discountValue: item.productId.offer.discountValue,
+        discountAmount: item.offerDiscount || 0
+      }
+    : item.productId.category?.categoryOffer?.active
+      ? {
+          offerId: item.productId.category.categoryOffer._id,
+          offerType: 'category',
+          offerName: item.productId.category.categoryOffer.name,
+          discountType: item.productId.category.categoryOffer.discountType,
+          discountValue: item.productId.category.categoryOffer.discountValue,
+          discountAmount: item.offerDiscount || 0
+        }
+      : null;
+
+  const priceAfterOffer = originalPrice - (item.offerDiscount || 0);
+  const couponPerUnit = cartData.appliedCoupon
+    ? +(totalCouponDiscount / cartData.items.reduce((acc, i) => acc + i.quantity, 0)).toFixed(2)
+    : 0;
+  const totalCouponDiscountItem = couponPerUnit * item.quantity;
+
+  const finalPrice = priceAfterOffer - totalCouponDiscountItem;
+
+  return {
+    productId: item.productId._id,
+    quantity: item.quantity,
+    originalPrice,
+    price: basePrice,
+    appliedOffer,
+    couponPerUnit,
+    totalCouponDiscount: totalCouponDiscountItem,
+    finalPrice,
+    status: 'Active'
+  };
+})
+,
         address: addressId,
         subtotal: totalPrice,
         totalAmount: finalAmount,
@@ -804,6 +846,8 @@ const paymentConfirmation = async (req, res) => {
     const userId = req.session.user.id;
     const orderId = req.query.orderId;
 
+    console.log('🧾 Fetching order for user:', userId, 'Order ID:', orderId);
+
     const order = await Order.findOne({ _id: orderId, userId })
       .populate({
         path: 'items.productId',
@@ -818,36 +862,60 @@ const paymentConfirmation = async (req, res) => {
       })
       .lean();
 
-    if (!order) return res.redirect('/orders');
+    if (!order) {
+      console.log('❌ Order not found or does not belong to user.');
+      return res.redirect('/orders');
+    }
+
+    console.log('✅ Order fetched successfully');
+    console.log('📦 Raw Order Items:', order.items.length);
 
     let subtotal = 0;
-    let formattedItems = order.items.map(item => {
+    const formattedItems = order.items.map(item => {
       const product = item.productId;
       const quantity = item.quantity;
       let basePrice = 0;
-      let finalPrice = 0;
+      let originalPrice = 0;
+      let itemTotal = 0;
+
       if (product) {
         basePrice = product.salePrice && product.salePrice < product.regularPrice
           ? product.salePrice
           : product.regularPrice;
-        const originalPrice = basePrice * quantity;
+
+        originalPrice = basePrice * quantity;
         subtotal += originalPrice;
-        finalPrice = item.price ? item.price * quantity : originalPrice;
+
+        itemTotal = item.finalPrice ?? item.price * quantity ?? originalPrice;
       }
+
+      console.log(`🧮 Item: ${product?.productName || 'Unknown'}, Quantity: ${quantity}, Base: ${basePrice}, Final: ${itemTotal}, Coupon/Unit: ${item.couponPerUnit}`);
+
       return {
         name: product?.productName || 'Product not available',
-        price: basePrice,
-        quantity: quantity,
-        total: finalPrice,
-        discount: 0,
         image: product?.productImage?.[0] || '/images/no-image.png',
-        productId: product?._id || null
+        productId: product?._id || null,
+        quantity: quantity,
+        price: basePrice,
+        total: itemTotal,
+        appliedOffer: item.appliedOffer || null,
+        couponPerUnit: item.couponPerUnit || 0,
+        totalCouponDiscount: item.totalCouponDiscount || 0,
+        finalPrice: item.finalPrice || itemTotal,
+        status: item.status || 'Active'
       };
     });
+
     const offerDiscount = typeof order.offerDiscount === 'number' ? order.offerDiscount : 0;
     const couponDiscount = typeof order.couponDiscount === 'number' ? order.couponDiscount : 0;
     const shipping = typeof order.shipping === 'number' ? order.shipping : (subtotal >= 1500 ? 0 : 40);
-    const totalAmount = typeof order.totalAmount === 'number' ? order.totalAmount : (subtotal - offerDiscount - couponDiscount + shipping);
+    const totalAmount = order.finalPrice || (subtotal - offerDiscount - couponDiscount + shipping);
+
+    console.log('🧾 Subtotal:', subtotal);
+    console.log('🏷️ Offer Discount:', offerDiscount);
+    console.log('🏷️ Coupon Discount:', couponDiscount);
+    console.log('🚚 Shipping:', shipping);
+    console.log('💰 Final Total:', totalAmount);
 
     const formattedOrder = {
       orderNumber: order._id.toString().slice(-6).toUpperCase(),
@@ -866,10 +934,11 @@ const paymentConfirmation = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error in paymentConfirmation:', error);
+    console.error('❗ Error in paymentConfirmation:', error);
     res.status(500).render('error', { message: 'Something went wrong' });
   }
 };
+
 
 const paymentFailure = async (req, res) => {
   try {
