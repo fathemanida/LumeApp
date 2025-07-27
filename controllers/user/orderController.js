@@ -644,7 +644,14 @@ const cancelOrderItem = async (req, res) => {
 
     if (order.paymentMethod !== 'COD') {
       try {
-const itemRefund = item.price * item.quantity;
+        // Calculate the final price after all discounts
+        const originalTotal = item.originalPrice || (item.price * item.quantity);
+        const offerDiscount = item.appliedOffer?.discountAmount || 0;
+        const couponDiscount = item.totalCouponDiscount || 0;
+        const finalPrice = originalTotal - offerDiscount - couponDiscount;
+        
+        // Refund the final price after all discounts
+        const itemRefund = finalPrice > 0 ? finalPrice : 0;
         
         if (itemRefund > 0) {
           let wallet = await Wallet.findOne({ userId });
@@ -658,15 +665,15 @@ const itemRefund = item.price * item.quantity;
               productId: item.productId._id,
               name: item.productId.productName,
               quantity: item.quantity,
-              originalPrice: item.originalPrice || (item.price * item.quantity),
-              offerDiscount: item.appliedOffer?.discountAmount || 0,
-              couponDiscount: item.totalCouponDiscount || 0,
-              finalPrice: item.price || (item.price * item.quantity),
+              originalPrice: originalTotal,
+              offerDiscount: offerDiscount,
+              couponDiscount: couponDiscount,
+              finalPrice: finalPrice,
               refundAmount: itemRefund
             }],
-            subtotal: item.originalPrice || (item.price * item.quantity),
-            offerDiscount: item.appliedOffer?.discountAmount || 0,
-            couponDiscount: item.totalCouponDiscount || 0,
+            subtotal: originalTotal,
+            offerDiscount: offerDiscount,
+            couponDiscount: couponDiscount,
             shippingRefund: 0,
             totalRefund: itemRefund,
             isFullOrder: false,
