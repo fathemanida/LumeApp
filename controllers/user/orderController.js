@@ -291,79 +291,7 @@ const orderDetails = async (req, res) => {
 
 
 
-const cancelOrder = async (req, res) => {
-    try {
-        const orderId = req.params.orderId;
-        const userId = req.session.user.id;
 
-        const order = await Order.findOne({ _id: orderId, userId }).populate('items.productId');
-
-        if (!order) {
-            return res.status(404).json({ success: false, message: 'Order not found' });
-        }
-        
-        if (order.status === 'Delivered') {
-            return res.status(400).json({ success: false, message: 'Cannot cancel a delivered order.' });
-        }
-        
-        if (order.status === 'Shipped') {
-          return res.status(400).json({success:false,message:'Cannot cancel, order has already been shipped.'})
-        }
-
-        if (order.status === 'Cancelled') {
-            return res.status(400).json({ success: false, message: 'Order is already cancelled' });
-        }
-
-        if (order.paymentMethod !== 'COD') {
-            try {
-                const refundBreakdown = await calculateRefund(order, [], 'cancellation');
-                
-                if (refundBreakdown.success && refundBreakdown.totalRefund > 0) {
-                    let wallet = await Wallet.findOne({ userId });
-                    if (!wallet) {
-                        wallet = new Wallet({ userId, balance: 0, transactions: [] });
-                    }
-
-                    const transaction = {
-                        type: 'CREDIT',
-                        amount: refundBreakdown.totalRefund,
-                        description: formatRefundDescription(refundBreakdown),
-                        orderId: order._id,
-                        status: 'COMPLETED',
-                        createdAt: new Date(),
-                        refundBreakdown: refundBreakdown
-                    };
-
-                    wallet.balance += refundBreakdown.totalRefund;
-                    wallet.transactions.push(transaction);
-                    await wallet.save();
-                }
-            } catch (error) {
-                console.error('Error processing refund for cancelled order:', error);
-            }
-        }
-
-        for (const item of order.items) {
-            const product = item.productId;
-            if (product) {
-                const newStock = product.quantity + item.quantity;
-                await Product.findByIdAndUpdate(product._id, {
-                    quantity: newStock,
-                    status: newStock > 0 ? 'Available' : 'Out of Stock'
-                });
-            }
-        }
-
-        order.status = 'Cancelled';
-        await order.save();
-
-        return res.status(200).json({ success: true, message: 'Order cancelled successfully' });
-
-    } catch (err) {
-        console.error('Error in cancelOrder:', err);
-        return res.status(500).json({ success: false, message: 'Internal server error' });
-    }
-};
 
 const returnOrder = async (req, res) => {
     try {
@@ -609,6 +537,8 @@ const downloadInvoice = async (req, res) => {
 };
 
 
+
+
 const cancelOrder = async (req, res) => {
   try {
     const { orderId } = req.params;
@@ -695,14 +625,6 @@ const cancelOrder = async (req, res) => {
 
     await order.save();
     
-    // Send email notification
-    try {
-      await sendOrderCancellationEmail(order, reason);
-    } catch (emailError) {
-      console.error('Error sending cancellation email:', emailError);
-      // Don't fail the request if email fails
-    }
-
     res.status(200).json({ 
       success: true, 
       message: 'Order cancelled successfully',
@@ -848,35 +770,28 @@ const cancelOrderItem = async (req, res) => {
     order.updatedAt = new Date();
     await order.save();
 
-    // Send notification
-    try {
-      await sendOrderItemCancellationEmail(order, item, reason);
-    } catch (emailError) {
-      console.error('Error sending cancellation email:', emailError);
-      // Don't fail the request if email fails
-    }
-
     res.status(200).json({ 
       success: true, 
       message: 'Item cancelled successfully',
       orderId: order._id,
       itemId: item._id,
-      refundAmount: item.finalPrice * item.quantity // Return the refunded amount for UI
+      refundAmount: item.finalPrice * item.quantity
     });
-  } catch (err) {
-    console.error('Error in cancelOrderItem:', err);
-    return res.status(500).json({ success: false, message: 'Internal server error' });
+  } catch (error) {
+    console.error('Error in cancelOrderItem:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Internal server error' 
+    });
   }
-  cancelOrderItem,
 };
 
-module.exports={
+module.exports = {
   orders,
   orderDetails,
   cancelOrder,
   returnOrder,
   returnRequest,
   downloadInvoice,
-  cancelOrder,
   cancelOrderItem
-}
+};
