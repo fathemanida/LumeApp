@@ -679,17 +679,10 @@ const cancelOrderItem = async (req, res) => {
     // Process refund if payment was made
     if (order.paymentMethod !== 'COD' && order.paymentStatus === 'Paid') {
       try {
-        const refundBreakdown = await calculateRefund(
-          order,
-          [item.productId._id.toString()],
-          'item_cancellation'
-        );
-
-        if (!refundBreakdown.success) {
-          throw new Error(refundBreakdown.message || 'Failed to calculate refund');
-        }
-
-        if (refundBreakdown.totalRefund > 0) {
+        // Calculate refund amount directly from item price and quantity
+        const refundAmount = item.price * item.quantity;
+        
+        if (refundAmount > 0) {
           // Find or create wallet
           let wallet = await Wallet.findOne({ userId });
           if (!wallet) {
@@ -700,33 +693,26 @@ const cancelOrderItem = async (req, res) => {
             });
           }
 
-          // Get the refund item details
-          const refundItem = refundBreakdown.items.find(i => 
-            i.productId.toString() === item.productId._id.toString()
-          );
-          
-          if (!refundItem) {
-            throw new Error('No refund item found in breakdown');
-          }
-
           // Create transaction record
           const transaction = {
             type: 'CREDIT',
-            amount: refundItem.refundAmount,
+            amount: refundAmount,
             description: `Refund for cancelled item: ${item.productId.productName} (Qty: ${item.quantity})`,
             orderId: order._id,
             itemId: item._id,
             status: 'COMPLETED',
             createdAt: new Date(),
             refundBreakdown: {
-              ...refundItem,
+              refundAmount: refundAmount,
+              originalPrice: item.price,
+              quantity: item.quantity,
               refundReason: reason,
               cancelledAt: new Date()
             }
           };
 
           // Update wallet
-          wallet.balance = Number((wallet.balance + refundItem.refundAmount).toFixed(2));
+          wallet.balance = Number((wallet.balance + refundAmount).toFixed(2));
           wallet.transactions.push(transaction);
           await wallet.save();
         }
