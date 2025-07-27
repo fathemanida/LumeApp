@@ -147,18 +147,29 @@ const createOrder = async (req, res) => {
       const finalPrice = item.finalPrice || originalPrice;
       const finalPricePerUnit = finalPrice / item.quantity;
       
+      // Format the offer data to match the schema
+      let appliedOffer = null;
+      if (item.appliedOffer) {
+        appliedOffer = {
+          offerId: item.appliedOffer._id || null,
+          offerType: item.appliedOffer.offerType || 'product',
+          offerName: item.appliedOffer.name || 'Special Offer',
+          discountType: item.appliedOffer.discountType || 'fixed',
+          discountValue: item.appliedOffer.discountValue || 0,
+          discountAmount: item.appliedOffer.discountAmount || 0
+        };
+      }
+      
       return {
         productId: product._id,
-        name: product.productName,
-        image: product.productImage?.[0] || '/images/no-image.png',
         quantity: item.quantity,
         originalPrice: originalPrice,
         price: basePrice,
-        finalPrice: finalPricePerUnit,
-        appliedOffer: item.appliedOffer || null,
+        appliedOffer: appliedOffer,
         couponPerUnit: item.couponPerUnit || 0,
         totalCouponDiscount: item.totalCouponDiscount || 0,
-        status: 'Processing',
+        finalPrice: finalPricePerUnit,
+        status: 'Active',
         createdAt: new Date(),
         updatedAt: new Date()
       };
@@ -175,19 +186,27 @@ const createOrder = async (req, res) => {
       userId,
       status: 'Pending',
       paymentStatus: 'Pending',
-      paymentMethod: paymentMethod || 'Razorpay',
+      paymentMethod: paymentMethod === 'Razorpay' ? 'Razorpay' : paymentMethod === 'COD' ? 'COD' : 'ONLINE',
       items: itemsForOrder,
-      subtotal: totalPrice,
-      shipping,
-      offerDiscount: totalOfferDiscount,
-      couponDiscount: totalCouponDiscount,
       totalAmount: finalAmount,
       address: addressId,
+      paymentDetails: {
+        method: paymentMethod,
+        status: 'Pending',
+        amount: finalAmount,
+        currency: 'INR',
+        createdAt: new Date()
+      },
+      orderDate: new Date(),
+      couponDiscount: totalCouponDiscount,
+      offerDiscount: totalOfferDiscount,
+      shipping: shipping,
+      subtotal: totalPrice,
       appliedCoupon: cart.appliedCoupon?._id || null,
       couponApplied: !!cart.appliedCoupon,
       coupon: couponData,
       razorpayOrderId: paymentMethod === 'Razorpay' ? `order_${require('crypto').randomBytes(8).toString('hex')}` : null,
-      orderId: require('crypto').randomUUID(),
+      orderId: `ORD${Date.now()}`,
       createdOn: new Date(),
       updatedAt: new Date(),
       estimatedDelivery: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000) // 5 days from now
