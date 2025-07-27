@@ -143,10 +143,8 @@ router.post('/payment/process', userAuth.isLogin, paymentController.processPayme
 router.get('/payment-confirmation',userAuth.isLogin,paymentController.paymentConfirmation)
 router.get('/orders',userAuth.isLogin,orderController.orders)
 router.get('/orders/:orderId', userAuth.isLogin, orderController.orderDetails)
-router.post('/orders/:orderId/cancel', userAuth.isLogin, orderController.cancelOrder)
 router.post('/orders/:orderId/return', userAuth.isLogin, orderController.returnRequest)
 router.get('/orders/:orderId/invoice', userAuth.isLogin, orderController.downloadInvoice)
-router.post('/orders/:orderId/items/:itemId/cancel', userAuth.isLogin, orderController.cancelOrderItem)
 
 router.post('/wishlist/add',userAuth.isLogin,wishlistController.addToWishlist)
 router.get('/wishlist', userAuth.isLogin, wishlistController.getWishlist)
@@ -162,11 +160,20 @@ router.get('/payment-failed', userAuth.isLogin, paymentController.paymentFailure
 //footr//
 
 router.get('/faqs',footerController.faq)
-router.get('/privacy-policy',footerController.privacyPolicy);
-router.get('/shipping-returns',footerController.shippingReturn);
-router.get('/refund-policy',footerController.refundPolicy);
-router.get('/contact',footerController.contact)
-router.post('/contact',footerController.contactPost)
+// Order routes
+router.get('/orders', userAuth.isLogin, orderController.orders);
+router.get('/order-details/:orderId', userAuth.isLogin, orderController.orderDetails);
+
+// Order cancellation routes
+router.post('/orders/:orderId/cancel', userAuth.isLogin, orderController.cancelOrder);
+router.post('/orders/:orderId/items/:itemId/cancel', userAuth.isLogin, orderController.cancelOrderItem);
+
+// Footer routes
+router.get('/privacy-policy', footerController.privacyPolicy);
+router.get('/shipping-returns', footerController.shippingReturn);
+router.get('/refund-policy', footerController.refundPolicy);
+router.get('/contact', footerController.contact);
+router.post('/contact', footerController.contactPost);
 
 
 
