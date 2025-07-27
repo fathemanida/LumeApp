@@ -1523,7 +1523,7 @@
   <% 
     const itemStatus = String(item.status || '').trim();
 
-    if (itemStatus === 'Processing' || itemStatus === 'Pending') {
+    if (item.status === 'Processing' || item.status === 'Pending') {
   %>
     <button class="action-btn cancel-btn"
       onclick="openItemCancelModal('<%= order._id %>','<%= item.productId %>')"
