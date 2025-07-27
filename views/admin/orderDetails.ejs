@@ -497,7 +497,6 @@
             });
             bsToast.show();
 
-            // Remove toast from DOM after it's hidden
             toast.addEventListener('hidden.bs.toast', () => {
                 toast.remove();
             });

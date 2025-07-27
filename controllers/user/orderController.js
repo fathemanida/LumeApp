@@ -644,7 +644,7 @@ const cancelOrderItem = async (req, res) => {
 
     if (order.paymentMethod !== 'COD') {
       try {
-        const itemRefund = item.finalPrice || (item.price * item.quantity);
+const itemRefund = item.price * item.quantity;
         
         if (itemRefund > 0) {
           let wallet = await Wallet.findOne({ userId });
@@ -661,7 +661,7 @@ const cancelOrderItem = async (req, res) => {
               originalPrice: item.originalPrice || (item.price * item.quantity),
               offerDiscount: item.appliedOffer?.discountAmount || 0,
               couponDiscount: item.totalCouponDiscount || 0,
-              finalPrice: item.finalPrice || (item.price * item.quantity),
+              finalPrice: item.price || (item.price * item.quantity),
               refundAmount: itemRefund
             }],
             subtotal: item.originalPrice || (item.price * item.quantity),
