@@ -491,12 +491,14 @@
       border: 1px solid var(--border-color);
     }
 
-    .cancel-btn,
-    .back-btn,
-    .return-btn {
+    .cancel-btn{
+      background-color: rgb(96, 61, 61);
+      color: white;
+    }
+    .back-btn {
       margin-top: 2rem;
       padding: 1rem 2rem;
-      background: var(--muted-green);
+      background: black;
       border-radius: 4px;
       border: none;
       color: white;
@@ -1461,8 +1463,7 @@
         <th>Product</th>
         <th>Size</th>
         <th>Qty</th>
-        <th>Unit Price</th>
-        <th>After Offer</th>
+        <th>Price</th>
         <th>Total</th>
         <th>Status</th>
         <th>Action</th>
@@ -1490,15 +1491,7 @@
               ₹<%= item.price?.toFixed(2) %>
             </span>
           </td>
-          <td>
-            <% if (item.discountedPrice) { %>
-              <span style="color: #e63946; font-weight: 500;">
-                ₹<%= item.discountedPrice.toFixed(2) %>
-              </span>
-            <% } else { %>
-              -
-            <% } %>
-          </td>
+         
           <td>
             <% const itemTotal = item.discountedPrice ? (item.discountedPrice * item.quantity) : item.total; %>
             ₹<%= itemTotal.toFixed(2) %>
@@ -1610,13 +1603,13 @@
     }
     
     .return-btn {
-      background-color: #1976d2;
+      background-color: #010a13;
       color: white;
       border: none;
     }
     
     .return-btn:hover {
-      background-color: #1565c0;
+      background-color: #929eac;
     }
     
     .status-message {
