@@ -1520,24 +1520,19 @@
           </td>
           <td>
 <div class="item-actions">
-  <% 
-    const itemStatus = String(item.status || '').trim();
+  <button class="action-btn cancel-btn"
+    onclick="openItemCancelModal('<%= order._id %>','<%= item.productId %>')"
+    title="Cancel this item">
+    <i class="fas fa-times"></i> Cancel
+  </button>
 
-    if (item.status === 'Processing' || item.status === 'Pending') {
-  %>
-    <button class="action-btn cancel-btn"
-      onclick="openItemCancelModal('<%= order._id %>','<%= item.productId %>')"
-      title="Cancel this item">
-      <i class="fas fa-times"></i> Cancel
-    </button>
-  <% } else { %>
-    <button class="action-btn return-btn" 
-      onclick="openReturnModal('<%= order._id %>', '<%= item.productId %>')"
-      title="Request Return">
-      <i class="fas fa-undo"></i> Return
-    </button>
-  <% } %>
+  <button class="action-btn return-btn" 
+    onclick="openReturnModal('<%= order._id %>', '<%= item.productId %>')"
+    title="Request Return">
+    <i class="fas fa-undo"></i> Return
+  </button>
 </div>
+
 
           </td>
         </tr>
