@@ -137,20 +137,41 @@ const createOrder = async (req, res) => {
     const shipping = totalPrice >= 1500 ? 0 : 40;
     const finalAmount = totalPrice - totalOfferDiscount - totalCouponDiscount + shipping;
 
-    const itemsForOrder = cart.items.map(item => ({
-      productId: item.productId._id,
-      quantity: item.quantity,
-      originalPrice: item.originalPrice,
-      price: item.basePrice, 
-      appliedOffer: item.appliedOffer,
-      couponPerUnit: item.couponPerUnit,
-      totalCouponDiscount: item.totalCouponDiscount,
-      finalPrice: item.finalPrice / item.quantity, 
-      status: 'Processing',
-      createdAt: new Date()
-    }));
+    const itemsForOrder = cart.items.map(item => {
+      const product = item.productId;
+      const basePrice = product.salePrice && product.salePrice < product.regularPrice
+        ? product.salePrice
+        : product.regularPrice;
+      
+      const originalPrice = basePrice * item.quantity;
+      const finalPrice = item.finalPrice || originalPrice;
+      const finalPricePerUnit = finalPrice / item.quantity;
+      
+      return {
+        productId: product._id,
+        name: product.productName,
+        image: product.productImage?.[0] || '/images/no-image.png',
+        quantity: item.quantity,
+        originalPrice: originalPrice,
+        price: basePrice,
+        finalPrice: finalPricePerUnit,
+        appliedOffer: item.appliedOffer || null,
+        couponPerUnit: item.couponPerUnit || 0,
+        totalCouponDiscount: item.totalCouponDiscount || 0,
+        status: 'Processing',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+    });
 
-    const order = new Order({
+    const couponData = cart.appliedCoupon ? {
+      code: cart.appliedCoupon.code,
+      discount: cart.appliedCoupon.discountValue,
+      type: cart.appliedCoupon.discountType,
+      maxDiscount: cart.appliedCoupon.maxDiscount
+    } : null;
+
+    const orderData = {
       userId,
       status: 'Pending',
       paymentStatus: 'Pending',
@@ -163,18 +184,16 @@ const createOrder = async (req, res) => {
       totalAmount: finalAmount,
       address: addressId,
       appliedCoupon: cart.appliedCoupon?._id || null,
-      coupon: cart.appliedCoupon
-        ? {
-            code: cart.appliedCoupon.code,
-            discount: cart.appliedCoupon.discountValue,
-            type: cart.appliedCoupon.discountType,
-            maxDiscount: cart.appliedCoupon.maxDiscount || 0
-          }
-        : null,
-      orderDate: new Date(),
-      razorpayOrderId: null,
-      paymentDetails: {}
-    });
+      couponApplied: !!cart.appliedCoupon,
+      coupon: couponData,
+      razorpayOrderId: paymentMethod === 'Razorpay' ? `order_${require('crypto').randomBytes(8).toString('hex')}` : null,
+      orderId: require('crypto').randomUUID(),
+      createdOn: new Date(),
+      updatedAt: new Date(),
+      estimatedDelivery: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000) // 5 days from now
+    };
+
+    const order = new Order(orderData);
 
     for (const item of cart.items) {
       const product = item.productId;
