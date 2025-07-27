@@ -644,37 +644,72 @@ const cancelOrderItem = async (req, res) => {
 
     if (order.paymentMethod !== 'COD') {
       try {
+        // Ensure the item is populated for accurate refund calculation
+        const populatedOrder = await Order.findById(order._id).populate('items.productId');
+        const itemToRefund = populatedOrder.items.find(i => i._id.toString() === itemId);
+        
+        if (!itemToRefund) {
+          throw new Error('Item not found in order');
+        }
+
         // Use the calculateRefund helper to get accurate refund amount
         const refundBreakdown = await calculateRefund(
-          order,
-          [item.productId._id.toString()],
+          populatedOrder,
+          [itemToRefund.productId._id.toString()],
           'item_cancellation'
         );
 
+        if (!refundBreakdown.success) {
+          throw new Error(refundBreakdown.message || 'Failed to calculate refund');
+        }
+
         if (refundBreakdown.totalRefund > 0) {
+          // Find or create wallet
           let wallet = await Wallet.findOne({ userId });
           if (!wallet) {
-            wallet = new Wallet({ userId, balance: 0, transactions: [] });
+            wallet = new Wallet({ 
+              userId, 
+              balance: 0, 
+              transactions: [] 
+            });
           }
 
+          // Get the refund item details
           const refundItem = refundBreakdown.items[0];
+          if (!refundItem) {
+            throw new Error('No refund item found in breakdown');
+          }
+
+          // Create transaction record
           const transaction = {
             type: 'CREDIT',
-            amount: refundBreakdown.totalRefund,
-            description: `Refund for cancelled item: ${item.productId.productName} (Qty: ${item.quantity})`,
+            amount: refundItem.refundAmount,
+            description: `Refund for cancelled item: ${itemToRefund.productId.productName} (Qty: ${itemToRefund.quantity})`,
             orderId: order._id,
             itemId: itemId,
             status: 'COMPLETED',
             createdAt: new Date(),
-            refundBreakdown: refundBreakdown
+            refundBreakdown: {
+              ...refundBreakdown,
+              refundReason: reason || 'Item cancellation',
+              cancelledAt: new Date()
+            }
           };
 
-          wallet.balance += refundBreakdown.totalRefund;
+          // Update wallet
+          wallet.balance = Number((wallet.balance + refundItem.refundAmount).toFixed(2));
           wallet.transactions.push(transaction);
           await wallet.save();
+
+          // Update the item's final price to reflect the refunded amount
+          item.finalPrice = 0; // Or adjust based on your business logic
+          item.status = 'Cancelled';
+          item.cancelledAt = new Date();
+          item.cancellationReason = reason;
         }
       } catch (error) {
         console.error('Error processing refund for cancelled item:', error);
+        // Don't throw the error, just log it and continue with order cancellation
       }
     }
 
