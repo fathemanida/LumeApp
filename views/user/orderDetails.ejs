@@ -1593,9 +1593,8 @@
     }
     
     .cancel-btn {
-      background-color: #fff;
-      color: #d32f2f;
-      border-color: #d32f2f;
+      background-color: #623838;
+      color: #fefdfd;
     }
     
     .cancel-btn:hover {
@@ -1720,7 +1719,6 @@
             <div class="order-actions-bottom"
               style="display:flex; justify-content:center; align-items:center; gap:1rem; margin-top:2rem;">
               <% if (order.status==='Pending' || order.status==='Processing' ) { %>
-                <button class="cancel-btn" onclick="openCancelModal()"> <i class="fas fa-times"></i> Cancel Order
                 </button>
                 <% } %>
                   <a href="/orders" class="back-btn">Back to Orders</a>
