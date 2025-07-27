@@ -33,15 +33,15 @@ const createOrder = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Address is required' });
     }
 
-const cart = await Cart.findOne({ userId })
-  .populate({
-    path: 'items.productId',
-    populate: [
-      { path: 'offer' },
-      { path: 'category', populate: { path: 'categoryOffer' } }
-    ]
-  })
-  .populate('appliedCoupon');
+    const cart = await Cart.findOne({ userId })
+      .populate({
+        path: 'items.productId',
+        populate: [
+          { path: 'offer' },
+          { path: 'category', populate: { path: 'categoryOffer' } }
+        ]
+      })
+      .populate('appliedCoupon');
 
     if (!cart || cart.items.length === 0) {
       return res.status(400).json({ success: false, message: 'Your cart is empty' });
@@ -59,6 +59,7 @@ const cart = await Cart.findOne({ userId })
         : product.regularPrice;
 
       const originalPrice = basePrice * quantity;
+
       let productOfferDiscount = 0;
       if (product.offer?.isActive) {
         if (product.offer.discountType === 'percentage') {
@@ -67,22 +68,44 @@ const cart = await Cart.findOne({ userId })
           productOfferDiscount = product.offer.discountValue * quantity;
         }
       }
+
       let categoryOfferDiscount = 0;
       if (product.category?.categoryOffer?.active) {
         if (product.category.categoryOffer.discountType === 'percentage') {
-          console.log('category off');
           categoryOfferDiscount = (originalPrice * product.category.categoryOffer.discountValue) / 100;
         } else {
           categoryOfferDiscount = product.category.categoryOffer.discountValue * quantity;
         }
       }
+
       const offerDiscount = Math.max(productOfferDiscount, categoryOfferDiscount);
+
       item.originalPrice = originalPrice;
       item.offerDiscount = offerDiscount;
+      item.appliedOffer = product.offer?.isActive
+        ? {
+            offerId: product.offer._id,
+            offerType: 'product',
+            offerName: product.offer.name || '',
+            discountType: product.offer.discountType,
+            discountValue: product.offer.discountValue,
+            discountAmount: productOfferDiscount
+          }
+        : product.category?.categoryOffer?.active
+        ? {
+            offerId: product.category.categoryOffer._id,
+            offerType: 'category',
+            offerName: product.category.categoryOffer.name || '',
+            discountType: product.category.categoryOffer.discountType,
+            discountValue: product.category.categoryOffer.discountValue,
+            discountAmount: categoryOfferDiscount
+          }
+        : null;
+
       totalPrice += originalPrice;
       totalOfferDiscount += offerDiscount;
     });
-  
+
     if (cart.appliedCoupon) {
       const priceAfterOffer = totalPrice - totalOfferDiscount;
       if (cart.appliedCoupon.discountType === 'PERCENTAGE') {
@@ -97,21 +120,48 @@ const cart = await Cart.findOne({ userId })
 
     const shipping = totalPrice >= 1500 ? 0 : 40;
     const finalAmount = totalPrice - totalOfferDiscount - totalCouponDiscount + shipping;
-console.log('createOrder',finalAmount,totalCouponDiscount,totalOfferDiscount);
-    const itemsForOrder = cart.items.map(item => ({
-      productId: item.productId._id,
-      quantity: item.quantity,
-      price: item.originalPrice - item.offerDiscount - (
-        cart.appliedCoupon?.discountType === 'percentage'
-          ? (item.originalPrice * cart.appliedCoupon.discountValue) / 100
-          : 0
-      )
-    }));
+    
+cart.items.forEach(item => {
+  item.priceAfterOffer = item.originalPrice - item.offerDiscount;
+});
+
+const totalPriceAfterOffer = cart.items.reduce((sum, item) => sum + item.priceAfterOffer, 0);
+
+cart.items.forEach(item => {
+  const itemCouponShare = totalCouponDiscount > 0
+    ? (item.priceAfterOffer / totalPriceAfterOffer) * totalCouponDiscount
+    : 0;
+
+  item.couponPerUnit = itemCouponShare / item.quantity;
+  item.totalCouponDiscount = itemCouponShare;
+});
+
+
+
+    const itemsForOrder = cart.items.map(item => {
+      const quantity = item.quantity;
+      const originalPrice = item.originalPrice;
+      const offerDiscount = item.offerDiscount || 0;
+
+      const price = originalPrice - offerDiscount; 
+      const finalPrice = price; 
+      return {
+        productId: item.productId._id,
+        quantity: quantity,
+        originalPrice: originalPrice,
+        price: price / quantity,
+        finalPrice: finalPrice,
+        appliedOffer: item.appliedOffer || null,
+        couponPerUnit: 0,
+        totalCouponDiscount: 0,
+        status: 'Processing'
+      };
+    });
 
     const order = new Order({
       userId,
       status: 'Pending',
-      paymentMethod: 'Razorpay',
+      paymentMethod: paymentMethod || 'Razorpay',
       items: itemsForOrder,
       subtotal: totalPrice,
       shipping,
@@ -120,13 +170,14 @@ console.log('createOrder',finalAmount,totalCouponDiscount,totalOfferDiscount);
       totalAmount: finalAmount,
       address: addressId,
       appliedCoupon: cart.appliedCoupon?._id || null,
-      coupon: cart.appliedCoupon ? {
-        code: cart.appliedCoupon.code,
-        discount: cart.appliedCoupon.discountValue,
-        type: cart.appliedCoupon.discountType
-      } : null
+      coupon: cart.appliedCoupon
+        ? {
+            code: cart.appliedCoupon.code,
+            discount: cart.appliedCoupon.discountValue,
+            type: cart.appliedCoupon.discountType
+          }
+        : null
     });
-console.log('final amount',finalAmount);
 
     for (const item of cart.items) {
       const product = item.productId;
@@ -157,6 +208,7 @@ console.log('final amount',finalAmount);
       currency: razorpayOrder.currency,
       amount: razorpayOrder.amount
     });
+
   } catch (error) {
     console.error('Error in createOrder:', error);
     res.status(500).json({
@@ -166,6 +218,7 @@ console.log('final amount',finalAmount);
     });
   }
 };
+
 
 const paymentMethod = async (req, res) => {
   try {
