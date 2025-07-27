@@ -23,7 +23,6 @@ const cancelOrReturnOrder = async (req, res) => {
         }
         
       if (order.paymentMethod !== 'COD') {
-        // Calculate refund using unified refund calculator
         const refundBreakdown = await calculateRefund(order, [], 'cancellation');
         
         let wallet = await Wallet.findOne({ userId: order.userId });
@@ -43,7 +42,7 @@ const cancelOrReturnOrder = async (req, res) => {
           orderId: order._id,
           status: 'COMPLETED',
           createdAt: new Date(),
-          refundBreakdown: refundBreakdown // Store detailed breakdown
+          refundBreakdown: refundBreakdown
         };
 
         wallet.balance += refundBreakdown.totalRefund;

@@ -172,7 +172,6 @@ const cart= async (req, res) => {
       })
       .lean();
 
-    // Debug: Log product and category data
     if (cart && cart.items) {
       console.log('Cart items with populated data:');
       cart.items.forEach((item, index) => {
@@ -215,7 +214,6 @@ const cart= async (req, res) => {
       const product = item.productId;
       const quantity = item.quantity;
 
-      // Find best applicable offer for this product
       const matchedOffers = offers.filter((offer) => {
         if (offer.applicableOn === "all") return true;
         if (

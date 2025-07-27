@@ -644,7 +644,6 @@ const cancelOrderItem = async (req, res) => {
 
     if (order.paymentMethod !== 'COD') {
       try {
-        // Calculate refund for this specific item only
         const itemRefund = item.finalPrice || (item.price * item.quantity);
         
         if (itemRefund > 0) {
@@ -653,7 +652,6 @@ const cancelOrderItem = async (req, res) => {
             wallet = new Wallet({ userId, balance: 0, transactions: [] });
           }
 
-          // Create a simplified refund breakdown for the single item
           const refundBreakdown = {
             success: true,
             items: [{
@@ -669,7 +667,7 @@ const cancelOrderItem = async (req, res) => {
             subtotal: item.originalPrice || (item.price * item.quantity),
             offerDiscount: item.appliedOffer?.discountAmount || 0,
             couponDiscount: item.totalCouponDiscount || 0,
-            shippingRefund: 0, // No shipping refund for partial cancellation
+            shippingRefund: 0,
             totalRefund: itemRefund,
             isFullOrder: false,
             refundType: 'item_cancellation'
@@ -692,8 +690,7 @@ const cancelOrderItem = async (req, res) => {
         }
       } catch (error) {
         console.error('Error processing refund for cancelled item:', error);
-        // Don't fail the entire operation if refund fails
-        // Just log the error and continue with the cancellation
+        
       }
     }
 

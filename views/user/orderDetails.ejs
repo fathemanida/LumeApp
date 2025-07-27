@@ -1456,90 +1456,230 @@
             <h3 style="font-size:1.1rem; color:var(--muted-green); margin-bottom:1rem;">Ordered Items</h3>
             <div class="table-responsive-order-items" style="width:100%;overflow-x:auto;">
               <table class="items-table">
-                <thead>
-                  <tr>
-                    <th>Product</th>
-                    <th>Size</th>
-                    <th>Quantity</th>
-                    <th>Unit Price</th>
-                    <th>Total</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <% order.items.forEach(item=> { %>
-                    <tr>
-                      <td>
-                        <div style="display: flex; align-items: center; gap: 1rem;">
-                          <img src="/uploads/product/<%= item.image %>" alt="<%= item.name %>" class="item-image">
-                          <span>
-                            <%= item.name %>
-                          </span>
-                        </div>
-                      </td>
-                      <td>
-                        <%= item.size || '-' %>
-                      </td>
-                      <td>
-                        <%= item.quantity %>
-                      </td>
-                      <td>₹<%= item.price?.toFixed(2) %>
-                      </td>
-                      <td>₹<%= item.total?.toFixed(2) %>
-                      </td>
-                      <td>
-                       <%= item.status  %>
-                      </td>
-                      <td>
-                        <div style="display: flex; flex-direction: column; gap: 0.5rem; align-items: center;">
-                          <!-- Debug: Item ID: <%= item.productId %>, Status: <%= item.status %>, Type: <%= typeof item.status %> -->
-                          <% 
-                            const itemStatus = String(item.status || '').trim();
-                            const orderStatus = String(order.status || '').trim();
-                            
-                            // Check if item can be cancelled based on schema enums
-                            const canCancel = (
-                              itemStatus === 'Active' && // Only show for active items
-                              !['Delivered', 'Cancelled', 'Returned', 'Return Requested', 'Return Rejected', 'Failed'].includes(orderStatus)
-                            );
-                            
-                            if (canCancel) { 
-                          %>
-                            <button class="cancel-btn"
-                              onclick="openItemCancelModal('<%= order._id %>','<%= item.productId %>')"
-                              style="padding: 0.5rem 1rem; font-size: 0.9rem;"
-                              title="Cancel this item">
-                              <i class="fas fa-times"></i> Cancel Item
-                            </button>
-                          <% } %>
-                          
-                          <!-- Debug: Order Status: <%= order.status %>, Item Status: <%= item.status %> -->
-                          <% if (order.status === 'Delivered' || item.status === 'Delivered') { %>
-                            <button class="return-btn" onclick="openReturnModal()" 
-                              style="background-color: #000000; color: white; padding: 0.5rem; border: none; border-radius: 3px; cursor: pointer; font-size: 0.9rem; margin-top: 0.25rem; transition: background-color 0.3s;"
-                              title="Request Return"
-                              onmouseover="this.style.backgroundColor='#0056b3'"
-                              onmouseout="this.style.backgroundColor='#007bff'">
-                              <i class="fas fa-undo"></i>
-                            </button>
-                            <small style="color: #666; font-size: 0.8rem; margin-top: 0.25rem;">Can Return</small>
-                          <% } else if (item.status === 'Return Requested') { %>
-                            <span style="color: var(--muted-green); font-size: 0.8rem; font-weight: 500;">
-                              <i class="fas fa-clock"></i> Return Requested
-                            </span>
-                          <% } else if (item.status === 'Returned') { %>
-                            <span style="color: #28a745; font-size: 0.8rem; font-weight: 500;">
-                              <i class="fas fa-check-circle"></i> Returned
-                            </span>
-                          <% } %>
-                        </div>
-                      </td>
-                    </tr>
-                    <% }) %>
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Size</th>
+        <th>Qty</th>
+        <th>Unit Price</th>
+        <th>After Offer</th>
+        <th>Total</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% order.items.forEach(item=> { %>
+        <tr>
+          <td>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <img src="/uploads/product/<%= item.image %>" alt="<%= item.name %>" class="item-image">
+              <span>
+                <%= item.name %>
+              </span>
+            </div>
+          </td>
+          <td>
+            <%= item.size || '-' %>
+          </td>
+          <td>
+            <%= item.quantity %>
+          </td>
+          <td>
+            <span style="<%= item.discountedPrice ? 'text-decoration: line-through; color: #999;' : '' %>">
+              ₹<%= item.price?.toFixed(2) %>
+            </span>
+          </td>
+          <td>
+            <% if (item.discountedPrice) { %>
+              <span style="color: #e63946; font-weight: 500;">
+                ₹<%= item.discountedPrice.toFixed(2) %>
+              </span>
+            <% } else { %>
+              -
+            <% } %>
+          </td>
+          <td>
+            <% const itemTotal = item.discountedPrice ? (item.discountedPrice * item.quantity) : item.total; %>
+            ₹<%= itemTotal.toFixed(2) %>
+          </td>
+          <td>
+            <% 
+              const status = item.status || 'Active';
+              const statusClass = {
+                'Active': 'status-active',
+                'Cancelled': 'status-cancelled',
+                'Returned': 'status-returned',
+                'Return Requested': 'status-requested',
+                'Delivered': 'status-delivered'
+              }[status] || 'status-other';
+            %>
+            <span class="status-badge <%= statusClass %>">
+              <%= status %>
+            </span>
+          </td>
+          <td>
+            <div class="item-actions">
+              <% 
+                const itemStatus = String(item.status || '').trim();
+                const orderStatus = String(order.status || '').trim();
+                
+                // Show cancel button if item is active and order is not in final status
+                const canCancel = (
+                  itemStatus === 'Active' && 
+                  !['Delivered', 'Cancelled', 'Returned', 'Return Requested', 'Return Rejected', 'Failed'].includes(orderStatus)
+                );
+                
+                // Show return button if item is delivered and not already returned/requested
+                const canReturn = (
+                  itemStatus === 'Delivered' || 
+                  (orderStatus === 'Delivered' && !['Returned', 'Return Requested', 'Return Rejected'].includes(itemStatus))
+                );
+                
+                if (canCancel) { 
+              %>
+                <button class="action-btn cancel-btn"
+                  onclick="openItemCancelModal('<%= order._id %>','<%= item.productId %>')"
+                  title="Cancel this item">
+                  <i class="fas fa-times"></i> Cancel
+                </button>
+              <% } %>
+              
+              <% if (canReturn) { %>
+                <button class="action-btn return-btn" 
+                  onclick="openReturnModal('<%= order._id %>', '<%= item.productId %>')"
+                  title="Request Return">
+                  <i class="fas fa-undo"></i> Return
+                </button>
+              <% } else if (itemStatus === 'Return Requested') { %>
+                <span class="status-message">
+                  <i class="fas fa-clock"></i> Return Requested
+                </span>
+              <% } else if (itemStatus === 'Returned') { %>
+                <span class="status-message success">
+                  <i class="fas fa-check-circle"></i> Returned
+                </span>
+              <% } %>
+            </div>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
 
-                </tbody>
-              </table>
+  <style>
+    .status-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      text-transform: capitalize;
+      white-space: nowrap;
+    }
+    
+    .status-active {
+      background-color: #e3f2fd;
+      color: #1976d2;
+    }
+    
+    .status-cancelled {
+      background-color: #ffebee;
+      color: #d32f2f;
+    }
+    
+    .status-returned {
+      background-color: #e8f5e9;
+      color: #388e3c;
+    }
+    
+    .status-requested {
+      background-color: #fff3e0;
+      color: #f57c00;
+    }
+    
+    .status-delivered {
+      background-color: #e3f2fd;
+      color: #1976d2;
+    }
+    
+    .item-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      align-items: center;
+      min-width: 120px;
+    }
+    
+    .action-btn {
+      padding: 0.4rem 0.8rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .cancel-btn {
+      background-color: #fff;
+      color: #d32f2f;
+      border-color: #d32f2f;
+    }
+    
+    .cancel-btn:hover {
+      background-color: #ffebee;
+    }
+    
+    .return-btn {
+      background-color: #1976d2;
+      color: white;
+      border: none;
+    }
+    
+    .return-btn:hover {
+      background-color: #1565c0;
+    }
+    
+    .status-message {
+      font-size: 0.8rem;
+      color: #666;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      white-space: nowrap;
+    }
+    
+    .status-message.success {
+      color: #388e3c;
+    }
+    
+    .status-message i {
+      font-size: 0.9rem;
+    }
+    
+    @media (max-width: 768px) {
+      .items-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+      
+      .item-actions {
+        min-width: 100px;
+      }
+      
+      .action-btn {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.8rem;
+      }
+    }
+  </style>
             </div>
             <!-- Order Summary, Address, and Status/Payment Details -->
             <div class="order-bottom-section"
