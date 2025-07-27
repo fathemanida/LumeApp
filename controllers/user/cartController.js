@@ -971,15 +971,37 @@ const placeOrder = async (req, res) => {
     }
 
     const finalPrice = totalPrice - totalOfferDiscount - couponDiscount + shipping;
-
     const couponPerUnit = totalQuantities > 0 ? couponDiscount / totalQuantities : 0;
 
-    const finalItems = processedItems.map(item => ({
-      ...item,
-      couponPerUnit: couponPerUnit,
-      totalCouponDiscount: couponPerUnit * item.quantity,
-      finalPrice: item.originalPrice - (item.appliedOffer ? item.appliedOffer.discountAmount : 0) - (couponPerUnit * item.quantity)
-    }));
+    const finalItems = processedItems.map(item => {
+      // Calculate offer details if any
+      let appliedOffer = null;
+      if (item.appliedOffer) {
+        appliedOffer = {
+          offerId: item.appliedOffer._id || item.appliedOffer.offerId,
+          offerType: item.appliedOffer.offerType || item.appliedOffer.type || 'product',
+          offerName: item.appliedOffer.name || item.appliedOffer.code || 'Special Offer',
+          discountType: item.appliedOffer.discountType || 'fixed',
+          discountValue: item.appliedOffer.discountValue || 0,
+          discountAmount: item.appliedOffer.discountAmount || 0
+        };
+      }
+
+      const itemCouponDiscount = couponPerUnit * item.quantity;
+      const itemFinalPrice = (item.originalPrice - (appliedOffer?.discountAmount || 0)) * item.quantity - itemCouponDiscount;
+
+      return {
+        productId: item.productId._id || item.productId,
+        quantity: item.quantity,
+        originalPrice: item.originalPrice,
+        price: item.originalPrice - (appliedOffer?.discountAmount || 0), // Price per unit after offers
+        appliedOffer: appliedOffer,
+        couponPerUnit: couponPerUnit,
+        totalCouponDiscount: itemCouponDiscount,
+        finalPrice: itemFinalPrice / item.quantity, // Final price per unit after all discounts
+        status: 'Processing'
+      };
+    });
 
     const order = new Order({
       userId,
@@ -990,14 +1012,13 @@ const placeOrder = async (req, res) => {
       status: 'Pending',
       usedCoupon: usedCoupon,
       couponDiscount: couponDiscount,
-      couponDistribution: {
-        totalQuantities: totalQuantities,
-        couponPerUnit: couponPerUnit
-      },
       offerDiscount: totalOfferDiscount,
       subtotal: totalPrice,
       shipping: shipping,
-      couponApplied: !!usedCoupon
+      couponApplied: !!usedCoupon,
+      // Add additional fields for better tracking
+      paymentStatus: 'Pending',
+      orderDate: new Date()
     });
 
     await order.save();
