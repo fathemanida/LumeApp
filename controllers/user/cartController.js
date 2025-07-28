@@ -42,7 +42,151 @@ const upload = multer({
 }).single("profileImage");
 
 
+const addToCart = async (req, res) => {
+  try {
+     console.log('======');
+    console.log('======');
+    console.log('======');
+    console.log('======');
+    const userId = req.session.user.id;
+    const { productId, selectedSize, quantity } = req.body;
 
+    const product = await Product.findById(productId).populate({
+      path: "category",
+      populate: { path: "categoryOffer" },
+    });
+
+    if (!product) {
+      return res.status(404).json({ success: false, message: "Product not found" });
+    }
+
+    const productStock = product.quantity || product.productStock || 0;
+    const maxAllowed = Math.min(productStock, 6);
+    console.log('======priduct stock',productStock);
+        console.log('======maxAllowed',maxAllowed);
+
+
+    if (productStock === 0) {
+      return res.status(400).json({ success: false, message: "Product is out of stock" });
+    }
+
+    if (quantity > maxAllowed) {
+      return res.status(400).json({
+        success: false,
+        message: productStock <= 6
+          ? `Only ${productStock} items available in stock`
+          : "Maximum 6 items allowed per product"
+      });
+    }
+
+    const basePrice = product.salePrice && product.salePrice < product.regularPrice
+      ? product.salePrice
+      : product.regularPrice;
+    console.log('======basePRice',basePrice);
+
+    const now = new Date();
+    const offers = await Offer.find({
+      isActive: true,
+      startDate: { $lte: now },
+      endDate: { $gte: now },
+      applicableOn: { $in: ["all", "categories", "products"] },
+    });
+       console.log('======offers,',offers);
+
+    const { maxDiscountPerUnit } = getBestOffer(product, offers);
+    const offerDiscount = maxDiscountPerUnit;
+    let finalPrice = basePrice - offerDiscount;
+    if (finalPrice < 0) finalPrice = 0;
+    const totalPrice = finalPrice * quantity;
+        console.log('======maxdiscount per unit',maxDiscountPerUnit);
+    console.log('======offerDis',offerDiscount);
+    console.log('======finalPrice',finalPrice);
+    console.log('======totalprice',totalPrice);
+    console.log('======');
+
+
+    let cart = await Cart.findOne({ userId });
+
+    if (!cart) {
+      cart = new Cart({
+        userId,
+        items: [],
+        totalOfferDiscount: 0,
+        cartTotal: 0,
+        finalCartTotal: 0,
+        couponDiscount: 0
+      });
+    }
+
+    const existingItem = cart.items.find(
+      item => item.productId.equals(productId) && item.size === selectedSize
+    );
+
+    if (existingItem) {
+      const newTotalQuantity = existingItem.quantity + Number(quantity);
+
+      if (newTotalQuantity > maxAllowed) {
+        const msg = productStock <= 6
+          ? `Cannot add more items. Only ${productStock} items available in stock`
+          : `Cannot add more items. Maximum 6 items allowed per product`;
+        return res.status(400).json({ success: false, message: msg });
+      }
+          console.log('======existingItem',existingItem);
+   
+
+
+
+      existingItem.quantity = newTotalQuantity;
+      existingItem.price = basePrice;
+      existingItem.offerDiscount = offerDiscount;
+      existingItem.finalPrice = finalPrice;
+      existingItem.totalPrice = newTotalQuantity * finalPrice;
+    } else {
+      cart.items.push({
+        productId,
+        size: selectedSize,
+        quantity,
+        price: basePrice,
+        offerDiscount,
+        finalPrice,
+        totalPrice,
+        status: "In Cart"
+      });
+    }
+
+    let totalOfferDiscount = 0;
+    let cartTotal = 0;
+
+    cart.items.forEach(item => {
+      totalOfferDiscount += (item.offerDiscount || 0) * item.quantity;
+      cartTotal += item.totalPrice;
+    });
+
+    cart.totalOfferDiscount = totalOfferDiscount;
+    cart.cartTotal = cartTotal;
+
+    const couponDiscount = cart.couponDiscount || 0;
+    cart.finalCartTotal = cartTotal - couponDiscount;
+     console.log('======Quanitity',existingItem.quantity);
+    console.log('======Price',existingItem.price);
+    console.log('======offerDis',existingItem.offerDiscount);
+    console.log('======finalprice',existingItem.finalPrice);
+        console.log('======totalPrice',existingItem.totalPrice);
+         console.log('======');
+    console.log('======totalofferDis',totalOfferDiscount);
+    console.log('======');
+    console.log('======cartTotal',cartTotal);
+
+
+    await cart.save();
+
+    return res.status(200).json({ success: true, message: "Product added to cart" });
+
+  } catch (error) {
+    console.error("Error adding to cart:", error);
+    res.status(500).json({ success: false, message: "Error adding to cart" });
+  }
+};
 
 
 
