@@ -15,14 +15,14 @@ const cartSchema = new mongoose.Schema({
   offerDiscount: { type: Number, default: 0 }, 
   finalPrice: { type: Number, required: true }, 
   totalPrice: { type: Number, required: true }, 
-  status: { type: String, default: "Placed" }
+  status: { type: String, default: "In Cart    " }
 }],
 
   appliedCoupon: {
     type: Schema.Types.ObjectId,
     ref: 'Coupon'
   },
-  appliedCouponDetails: {
+  appliedCoupnonDetails: {
     type: Object
   },
   couponDiscount: { 
