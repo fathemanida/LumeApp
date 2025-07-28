@@ -545,7 +545,6 @@ const cancelOrder = async (req, res) => {
     const userId = req.session.user.id;
     const reason = req.body.reason || 'Customer request';
 
-    // Find and validate order
     const order = await Order.findOne({ _id: orderId, userId })
       .populate('items.productId')
       .populate('address');
@@ -554,7 +553,6 @@ const cancelOrder = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Order not found' });
     }
 
-    // Check if order can be cancelled
     if (!['Pending', 'Processing'].includes(order.status)) {
       return res.status(400).json({ 
         success: false, 
@@ -562,16 +560,13 @@ const cancelOrder = async (req, res) => {
       });
     }
 
-    // Process refund if payment was made
     if (order.paymentMethod !== 'COD' && order.paymentStatus === 'Paid') {
       try {
-        // Calculate total refund amount
         const refundAmount = order.items.reduce((total, item) => {
           return total + ((item.finalPrice !== undefined ? item.finalPrice : item.price) * item.quantity);
         }, 0);
 
         if (refundAmount > 0) {
-          // Find or create wallet
           let wallet = await Wallet.findOne({ userId });
           if (!wallet) {
             wallet = new Wallet({ 
@@ -581,7 +576,6 @@ const cancelOrder = async (req, res) => {
             });
           }
 
-          // Create transaction record
           const transaction = {
             type: 'CREDIT',
             amount: refundAmount,
@@ -597,7 +591,6 @@ const cancelOrder = async (req, res) => {
             }
           };
 
-          // Save wallet with new transaction
           wallet.balance = Number((wallet.balance + refundAmount).toFixed(2));
           wallet.transactions.push(transaction);
           await wallet.save();
@@ -611,18 +604,15 @@ const cancelOrder = async (req, res) => {
       }
     }
 
-    // Update order status and items
     order.status = 'Cancelled';
     order.cancelledAt = new Date();
     order.cancellationReason = reason;
     
-    // Update each item status and restore product stock
     for (const item of order.items) {
       if (item.status === 'Active') {
         item.status = 'Cancelled';
         item.updatedAt = new Date();
         
-        // Restore product stock
         if (item.productId) {
           await Product.findByIdAndUpdate(item.productId._id, {
             $inc: { quantity: item.quantity }

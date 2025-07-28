@@ -2,6 +2,7 @@ function calculateCartTotals(cart) {
   let totalPrice = 0;
   let totalOfferDiscount = 0;
   let totalCouponDiscount = 0;
+  const currentTime = new Date();
 
   cart.items.forEach(item => {
     const product = item.productId;
@@ -23,10 +24,16 @@ function calculateCartTotals(cart) {
     let maxOfferDiscount = 0;
     let appliedOffer = null;
 
-    if (product.offer && product.offer.isActive) {
+    if (
+      product.offer &&
+      product.offer.isActive &&
+      product.offer.expiryDate &&
+      new Date(product.offer.expiryDate) > currentTime
+    ) {
       const value = product.offer.discountValue;
       const type = product.offer.discountType;
       const discount = type === 'percentage' ? (originalPrice * value) / 100 : value;
+
       if (discount > maxOfferDiscount) {
         maxOfferDiscount = discount;
         appliedOffer = 'product';
@@ -34,10 +41,16 @@ function calculateCartTotals(cart) {
     }
 
     const categoryOffer = product.category?.categoryOffer;
-    if (categoryOffer && categoryOffer.active) {
+    if (
+      categoryOffer &&
+      categoryOffer.active &&
+      categoryOffer.expiryDate &&
+      new Date(categoryOffer.expiryDate) > currentTime
+    ) {
       const value = categoryOffer.discountValue;
       const type = categoryOffer.discountType;
       const discount = type === 'percentage' ? (originalPrice * value) / 100 : value;
+
       if (discount > maxOfferDiscount) {
         maxOfferDiscount = discount;
         appliedOffer = 'category';
@@ -51,7 +64,11 @@ function calculateCartTotals(cart) {
 
   const priceAfterOffer = totalPrice - totalOfferDiscount;
 
-  if (cart.appliedCoupon) {
+  if (
+    cart.appliedCoupon &&
+    cart.appliedCoupon.expiryDate &&
+    new Date(cart.appliedCoupon.expiryDate) > currentTime
+  ) {
     const coupon = cart.appliedCoupon;
 
     if (coupon.discountType === 'PERCENTAGE') {
@@ -62,12 +79,14 @@ function calculateCartTotals(cart) {
     } else {
       totalCouponDiscount = coupon.discountValue;
     }
+  } else {
+    cart.appliedCoupon = null; 
   }
 
   const shipping = totalPrice >= 1500 ? 0 : 40;
 
   const finalPrice = totalPrice - totalOfferDiscount - totalCouponDiscount + shipping;
-  console.log('final:',finalPrice,'offer:',totalOfferDiscount,'coupon:',totalCouponDiscount);
+  console.log('final:', finalPrice, 'offer:', totalOfferDiscount, 'coupon:', totalCouponDiscount);
 
   cart.items.forEach(item => {
     const priceAfterOfferPerItem = item.originalPrice - item.offerDiscount;
