@@ -3,7 +3,14 @@ const Wallet = require('../../models/walletSchema');
 const User = require('../../models/userSchema');
 const Product = require('../../models/productSchema');
 const path = require('path');
-const { calculateRefund, formatRefundDescription } = require('../../helpers/refundHelpers');
+const fs = require('fs');
+
+// Construct absolute path to the helpers directory
+const helpersPath = path.join(process.cwd(), 'helpers', 'refundHelpers.js');
+if (!fs.existsSync(helpersPath)) {
+    console.error(`Helper module not found at: ${helpersPath}`);
+}
+const { calculateRefund, formatRefundDescription } = require(helpersPath);
 
 const cancelOrReturnOrder = async (req, res) => {
   try {
