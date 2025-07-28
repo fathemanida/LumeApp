@@ -43,6 +43,10 @@ const upload = multer({
 
 const addToCart = async (req, res) => {
   try {
+     console.log('======');
+    console.log('======');
+    console.log('======');
+    console.log('======');
     const userId = req.session.user.id;
     const { productId, selectedSize, quantity } = req.body;
 
