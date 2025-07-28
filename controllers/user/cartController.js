@@ -93,8 +93,8 @@ const addToCart = async (req, res) => {
     });
        console.log('======offers,',offers);
 
-    const { maxDiscountPerUnit } = getBestOffer(product, offers);
-    const offerDiscount = maxDiscountPerUnit;
+    const { maxDiscount } = getBestOffer(product, offers);
+    const offerDiscount = maxDiscount;
     let finalPrice = basePrice - offerDiscount;
     if (finalPrice < 0) finalPrice = 0;
     const totalPrice = finalPrice * quantity;
@@ -1214,7 +1214,6 @@ function getBestOffer(product, offers = [], quantity = 1) {
   );
   console.log(`- Quantity: ${quantity}`);
 
-  // Sort offers by discount value (highest first)
   const sortedOffers = [...offers].sort((a, b) => {
     const aValue =
       a.discountType === "percentage"
@@ -1228,7 +1227,6 @@ function getBestOffer(product, offers = [], quantity = 1) {
   });
 
   for (const offer of sortedOffers) {
-    // Skip if offer is not active or expired
     if (
       !offer.isActive ||
       now < new Date(offer.startDate) ||
