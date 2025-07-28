@@ -15,7 +15,6 @@ const router = require("../../routes/userRoutes.js");
 const { addRefund } = require('./walletController');
 const Wallet = require("../../models/walletSchema.js");
 const calculateCartTotals = require('../../helpers/calculateTotal');
-const { calculateRefund, formatRefundDescription } = require('../../helpers/refundCalculator');
 
 const PDFDocument = require('pdfkit');
 
