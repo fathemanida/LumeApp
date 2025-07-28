@@ -3,7 +3,7 @@ const Wallet = require('../../models/walletSchema');
 const User = require('../../models/userSchema');
 const Product = require('../../models/productSchema');
 const path = require('path');
-const { calculateRefund, formatRefundDescription } = require(path.join(__dirname, '../../helpers/refundHelpers'));
+const { calculateRefund, formatRefundDescription } = require('../../helpers/refundHelpers');
 
 const cancelOrReturnOrder = async (req, res) => {
   try {
