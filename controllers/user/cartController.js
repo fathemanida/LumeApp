@@ -14,6 +14,7 @@ const { error } = require("console");
 const mongoose = require("mongoose");
 const Order = require("../../models/orderSchema");
 const Offer = require("../../models/offerSchema");
+const { off } = require("process");
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "public/uploads/user");
@@ -56,6 +57,9 @@ const addToCart = async (req, res) => {
 
     const productStock = product.quantity || product.productStock || 0;
     const maxAllowed = Math.min(productStock, 6);
+    console.log('======priduct stock',productStock);
+        console.log('======maxAllowed',maxAllowed);
+
 
     if (productStock === 0) {
       return res.status(400).json({ success: false, message: "Product is out of stock" });
@@ -73,6 +77,7 @@ const addToCart = async (req, res) => {
     const basePrice = product.salePrice && product.salePrice < product.regularPrice
       ? product.salePrice
       : product.regularPrice;
+    console.log('======basePRice',basePrice);
 
     const now = new Date();
     const offers = await Offer.find({
@@ -81,12 +86,19 @@ const addToCart = async (req, res) => {
       endDate: { $gte: now },
       applicableOn: { $in: ["all", "categories", "products"] },
     });
+       console.log('======offers,',offers);
 
     const { maxDiscountPerUnit } = getBestOffer(product, offers);
     const offerDiscount = maxDiscountPerUnit;
     let finalPrice = basePrice - offerDiscount;
     if (finalPrice < 0) finalPrice = 0;
     const totalPrice = finalPrice * quantity;
+        console.log('======maxdiscount per unit',maxDiscountPerUnit);
+    console.log('======offerDis',offerDiscount);
+    console.log('======finalPrice',finalPrice);
+    console.log('======totalprice',totalPrice);
+    console.log('======');
+
 
     let cart = await Cart.findOne({ userId });
 
@@ -114,6 +126,10 @@ const addToCart = async (req, res) => {
           : `Cannot add more items. Maximum 6 items allowed per product`;
         return res.status(400).json({ success: false, message: msg });
       }
+          console.log('======existingItem',existingItem);
+   
+
+
 
       existingItem.quantity = newTotalQuantity;
       existingItem.price = basePrice;
@@ -146,6 +162,16 @@ const addToCart = async (req, res) => {
 
     const couponDiscount = cart.couponDiscount || 0;
     cart.finalCartTotal = cartTotal - couponDiscount;
+     console.log('======Quanitity',existingItem.quantity);
+    console.log('======Price',existingItem.price);
+    console.log('======offerDis',existingItem.offerDiscount);
+    console.log('======finalprice',existingItem.finalPrice);
+        console.log('======totalPrice',existingItem.totalPrice);
+         console.log('======');
+    console.log('======totalofferDis',totalOfferDiscount);
+    console.log('======');
+    console.log('======cartTotal',cartTotal);
+
 
     await cart.save();
 
