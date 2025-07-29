@@ -35,12 +35,12 @@ const paymentMethod = async (req, res) => {
     const userId = req.session.user.id;
     const user = await User.findById(userId);
     
-    const address = await Address.findOne({ userId, isDefault: true });
+    const address = await Address.findOne({ userId});
     if (!address) {
       req.flash('error', 'Please add a default address before proceeding to payment');
       return res.redirect('/checkout');
     }
-    
+    console.log('====adrress',address);
     const cart = await Cart.findOne({ userId })
       .populate({
         path: 'items.productId',
