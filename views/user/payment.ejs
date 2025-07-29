@@ -690,24 +690,67 @@ html, body {
         var isRetry = '<%= orderId ? 'true' : 'false' %>';
 
         let paymentInProgress = false;
+        
+        async function createOrder() {
+            const method = document.querySelector('input[name="paymentMethod"]:checked').value;
+            const addressId = '<%= address._id %>';
+            
+            console.log('Creating order with method:', method, 'and address:', addressId);
+            
+            try {
+                const response = await fetch('/create-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        addressId: addressId,
+                        paymentMethod: method
+                    })
+                });
+                
+                const data = await response.json();
+                console.log('Order creation response:', data);
+                
+                if (!response.ok) {
+                    throw new Error(data.message || 'Failed to create order');
+                }
+                
+                return data; 
+            } catch (error) {
+                console.error('Error creating order:', error);
+                throw error;
+            }
+        }
+        
         async function processPayment() {
-    if (paymentInProgress) return;
-    paymentInProgress = true;
+            if (paymentInProgress) return;
+            paymentInProgress = true;
 
-    const payBtn = document.getElementById('payNowBtn');
-    if (payBtn) {
-        payBtn.disabled = true;
-        payBtn.textContent = 'Processing...';
-    }
+            const payBtn = document.getElementById('payNowBtn');
+            if (payBtn) {
+                payBtn.disabled = true;
+                payBtn.textContent = 'Processing...';
+            }
 
-    const method = document.querySelector('input[name="paymentMethod"]:checked').value;
-    const addressId = '<%= address._id %>';
-    const loadingOverlay = document.getElementById('loadingOverlay');
+            const method = document.querySelector('input[name="paymentMethod"]:checked').value;
+            const loadingOverlay = document.getElementById('loadingOverlay');
 
-    if (loadingOverlay) loadingOverlay.style.display = 'flex';
+            if (loadingOverlay) loadingOverlay.style.display = 'flex';
 
-    try {
-        const payload = { method, addressId };
+            try {
+                const orderData = await createOrder();
+                const orderId = orderData.orderId;
+                
+                if (!orderId) {
+                    throw new Error('No order ID received from server');
+                }
+                
+                console.log('Order created successfully with ID:', orderId);
+                
+                const payload = { 
+                    method, 
+                    addressId: '<%= address._id %>',
+                    orderId: orderId 
+                };
 
         if (method === 'upi') {
             const upiId = document.getElementById('upiId').value;
@@ -719,11 +762,8 @@ html, body {
             payload.walletId = walletId;
         }
 
-        if (isRetry === 'true') {
-            payload.orderId = '<%= orderId %>';
-        }
 
-        console.log('Sending payment request with payload:', payload);
+        console.log('Processing payment for order:', orderId, 'with payload:', payload);
 
         const res = await fetch('/payment/process', {
             method: 'POST',
@@ -804,7 +844,7 @@ html, body {
         } else {
             if (data.success) {
                 console.log('success');
-                window.location.href = data.redirect || '/payment-confirmation';
+                window.location.href = data.redirect || `/payment-confirmation?orderId=${orderId}`;
             } else {
                 console.log('failed');
                 let errorMessage = data.message || "Payment processing failed";
