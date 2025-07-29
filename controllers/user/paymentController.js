@@ -275,7 +275,7 @@ const createOrder = async (req, res) => {
 
 const paymentMethod = async (req, res) => {
   try {
-    const userId = req.session.userId;
+    const userId=req.session.user.id
 
     const user = await User.findById(userId);
     const cart = await Cart.findOne({ userId }).populate('items.productId');
