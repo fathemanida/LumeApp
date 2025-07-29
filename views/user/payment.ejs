@@ -744,7 +744,13 @@ html, body {
                     throw new Error('No order ID received from server');
                 }
                 
-                console.log('Order created successfully with ID:', orderId);
+                console.log('Order created successfully with ID:', orderId, 'Method:', method);
+                
+                if (method === 'COD' || method === 'Wallet') {
+                    console.log('Redirecting to confirmation for', method, 'order');
+                    window.location.href = `/payment-confirmation?orderId=${orderId}`;
+                    return;
+                }
                 
                 const payload = { 
                     method, 
@@ -752,39 +758,38 @@ html, body {
                     orderId: orderId 
                 };
 
-        if (method === 'upi') {
-            const upiId = document.getElementById('upiId').value;
-            if (!upiId) throw new Error('Please enter UPI ID');
-            payload.upiId = upiId;
-        } else if (method === 'wallet') {
-            const walletId = document.getElementById('walletId').value;
-            if (!walletId) throw new Error('Please select a wallet');
-            payload.walletId = walletId;
-        }
+                if (method === 'upi') {
+                    const upiId = document.getElementById('upiId').value;
+                    if (!upiId) throw new Error('Please enter UPI ID');
+                    payload.upiId = upiId;
+                } else if (method === 'wallet') {
+                    const walletId = document.getElementById('walletId').value;
+                    if (!walletId) throw new Error('Please select a wallet');
+                    payload.walletId = walletId;
+                }
 
+                console.log('Processing payment for order:', orderId, 'with payload:', payload);
 
-        console.log('Processing payment for order:', orderId, 'with payload:', payload);
+                const res = await fetch('/payment/process', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
 
-        const res = await fetch('/payment/process', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
+                let responseData;
+                try {
+                    responseData = await res.json();
+                    console.log('Payment response status:', res.status, 'Data:', responseData);
+                } catch (e) {
+                    console.error('Error parsing payment response:', e);
+                    throw new Error('Invalid response from server');
+                }
 
-        let responseData;
-        try {
-            responseData = await res.json();
-            console.log('Payment response status:', res.status, 'Data:', responseData);
-        } catch (e) {
-            console.error('Error parsing payment response:', e);
-            throw new Error('Invalid response from server');
-        }
+                if (!res.ok) {
+                    throw new Error(responseData.message || `Payment failed with status: ${res.status}`);
+                }
 
-        if (!res.ok) {
-            throw new Error(responseData.message || `Payment failed with status: ${res.status}`);
-        }
-
-        const data = responseData;
+                const data = responseData;
 
         if (data.razorpayOrderId) {
             console.log('razorpay');
