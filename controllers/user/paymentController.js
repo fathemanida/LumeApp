@@ -279,8 +279,15 @@ const paymentMethod = async (req, res) => {
     const userId=req.session.user.id
 
     const user = await User.findById(userId);
-    const cart = await Cart.findOne({ userId }).populate('items.productId');
-    console.log('=====cartData',cart);
+  const cart = await Cart.findOne({ userId })
+      .populate({
+        path: "items.productId",
+        populate: [
+          { path: "offer" },
+          { path: "category", populate: { path: "categoryOffer" } },
+        ],
+      })
+      .populate("appliedCoupon");    console.log('=====cartData',cart);
     console.log('=====user',user);
 
     if (!cart || cart.items.length === 0) {
