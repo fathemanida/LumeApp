@@ -365,7 +365,6 @@ const paymentMethod = async (req, res) => {
   }
 };
 
-module.exports = getPaymentPage;
 
 
 
