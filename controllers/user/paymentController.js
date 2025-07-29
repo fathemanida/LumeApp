@@ -592,27 +592,25 @@ const verifyPayment = async (req, res) => {
 
 const processPayment = async (req, res) => {
   try {
-    const userId = req.session.user._id;
+    const userId = req.session.user.id;
     
-    // First, get the cart with basic population
-    let cartData = await Cart.findOne({ user: userId })
+    const cartData = await Cart.findOne({ userId })
       .populate({
         path: 'items.productId',
         populate: [
-          { path: 'category', model: 'Category' },
-          { path: 'offer', model: 'Offer' }
+          { path: 'offer' },
+          { path: 'category', populate: { path: 'categoryOffer' } }
         ]
       })
       .populate('appliedCoupon');
 
-    console.log('=====cart Data before processing', JSON.stringify(cartData, null, 2));
+    console.log('=====cart Data before processing',cartData);
     
     if (!cartData || !cartData.items || cartData.items.length === 0) {
       console.log('No items in cart or cart not found');
       return res.status(400).json({ success: false, message: "Your cart is empty" });
     }
     
-    // Filter out any items where product is null or undefined
     cartData.items = cartData.items.filter(item => item.productId);
     
     if (cartData.items.length === 0) {
@@ -625,14 +623,12 @@ const processPayment = async (req, res) => {
     let totalCouponDiscount = 0;
     const now = new Date();
     
-    // Get all active offers
     const activeOffers = await Offer.find({
       isActive: true,
       startDate: { $lte: now },
       endDate: { $gte: now }
     });
 
-    // First pass: Calculate base prices and original prices
     for (const item of cartData.items) {
       const product = item.productId;
       if (!product) continue;
@@ -641,17 +637,13 @@ const processPayment = async (req, res) => {
         ? product.salePrice
         : product.regularPrice;
       
-      // Ensure price is a valid number
       item.price = parseFloat(basePrice) || 0;
       item.originalPrice = (parseFloat(basePrice) * parseInt(item.quantity)) || 0;
       totalPrice += item.originalPrice;
       
-      // Initialize offer discount if not present
       item.offerDiscount = 0;
-      item.finalPrice = item.originalPrice;
     }
     
-    // Second pass: Calculate offer discounts
     for (const item of cartData.items) {
       const product = item.productId;
       if (!product) continue;
@@ -660,7 +652,6 @@ const processPayment = async (req, res) => {
       let bestOffer = null;
       let offerType = null;
 
-      // Check product-specific offers first
       if (product.offer && 
           product.offer.isActive && 
           product.offer.startDate <= now && 
@@ -672,12 +663,10 @@ const processPayment = async (req, res) => {
         
         if (type === 'percentage') {
           discount = (item.originalPrice * value) / 100;
-          // Apply max discount if specified
           if (product.offer.maxDiscount && discount > product.offer.maxDiscount) {
             discount = product.offer.maxDiscount;
           }
         } else {
-          // Flat discount
           discount = value * item.quantity;
         }
         
@@ -689,7 +678,6 @@ const processPayment = async (req, res) => {
       }
 
       const categoryOffer = product.category?.categoryOffer;
-      // Check category offers if no product offer or for better category offer
       if (product.category?.categoryOffer?.isActive &&
           product.category.categoryOffer.startDate <= now &&
           product.category.categoryOffer.endDate >= now) {
@@ -700,12 +688,10 @@ const processPayment = async (req, res) => {
         
         if (type === 'percentage') {
           discount = (item.originalPrice * value) / 100;
-          // Apply max discount if specified
           if (product.category.categoryOffer.maxDiscount && discount > product.category.categoryOffer.maxDiscount) {
             discount = product.category.categoryOffer.maxDiscount;
           }
         } else {
-          // Flat discount
           discount = value * item.quantity;
         }
         
@@ -716,7 +702,6 @@ const processPayment = async (req, res) => {
         }
       }
       
-      // Check global offers if no better offer found
       for (const offer of activeOffers) {
         if (offer.applicableOn === 'all' || 
             (offer.applicableOn === 'categories' && offer.categories.includes(product.category?._id?.toString())) ||
@@ -728,12 +713,10 @@ const processPayment = async (req, res) => {
           
           if (type === 'percentage') {
             discount = (item.originalPrice * value) / 100;
-            // Apply max discount if specified
             if (offer.maxDiscount && discount > offer.maxDiscount) {
               discount = offer.maxDiscount;
             }
           } else {
-            // Flat discount
             discount = value * item.quantity;
           }
           
@@ -745,7 +728,6 @@ const processPayment = async (req, res) => {
         }
       }
       
-      // Apply the best offer found
       if (maxOfferDiscount > 0 && bestOffer) {
         item.offerDiscount = Math.min(maxOfferDiscount, item.originalPrice);
         item.appliedOffer = {
@@ -759,7 +741,6 @@ const processPayment = async (req, res) => {
         totalOfferDiscount += item.offerDiscount;
       }
 
-      // Apply the best offer found
       if (maxOfferDiscount > 0 && bestOffer) {
         item.offerDiscount = Math.min(maxOfferDiscount, item.originalPrice);
         item.appliedOffer = {
@@ -776,10 +757,8 @@ const processPayment = async (req, res) => {
       }
     }
 
-    // Calculate price after offer discounts
     const priceAfterOffer = Math.max(0, totalPrice - totalOfferDiscount);
     
-    // Apply coupon discount if valid
     if (cartData.appliedCoupon) {
       const coupon = cartData.appliedCoupon;
       const isCouponValid = !coupon.validTill || new Date(coupon.validTill) >= now;
@@ -794,7 +773,6 @@ const processPayment = async (req, res) => {
           totalCouponDiscount = Math.min(coupon.discountValue || 0, priceAfterOffer);
         }
         
-        // Distribute coupon discount proportionally across items
         const totalDiscountableAmount = cartData.items.reduce((sum, item) => {
           return sum + Math.max(0, item.finalPrice);
         }, 0);
@@ -802,10 +780,8 @@ const processPayment = async (req, res) => {
         if (totalDiscountableAmount > 0) {
           let remainingCouponDiscount = totalCouponDiscount;
           
-          // First pass: Calculate proportional discount for each item
           cartData.items.forEach((item, index) => {
             if (index === cartData.items.length - 1) {
-              // Last item gets remaining discount to avoid floating point issues
               item.couponDiscount = Math.min(remainingCouponDiscount, item.finalPrice);
             } else {
               const itemRatio = item.finalPrice / totalDiscountableAmount;
@@ -813,21 +789,17 @@ const processPayment = async (req, res) => {
               remainingCouponDiscount -= item.couponDiscount;
             }
             
-            // Ensure final price is never negative
             item.finalPrice = Math.max(0, item.finalPrice - item.couponDiscount);
           });
         }
       } else {
-        // Coupon expired, remove it
         cartData.appliedCoupon = null;
         cartData.couponDiscount = 0;
       }
     }
     
-    // Calculate shipping (free for orders over 1500)
     const shipping = totalPrice >= 1500 ? 0 : 40;
     
-    // Recalculate totals to ensure consistency
     const recalculatedSubtotal = cartData.items.reduce((sum, item) => 
       sum + (item.price * item.quantity), 0);
     const recalculatedOfferDiscount = cartData.items.reduce((sum, item) => 
@@ -839,16 +811,13 @@ const processPayment = async (req, res) => {
       recalculatedSubtotal - recalculatedOfferDiscount - recalculatedCouponDiscount + shipping
     );
     
-    // Update cart with calculated values
     cartData.cartTotal = recalculatedSubtotal;
     cartData.totalOfferDiscount = recalculatedOfferDiscount;
     cartData.couponDiscount = recalculatedCouponDiscount;
     cartData.finalCartTotal = finalPrice;
     
-    // Save the updated cart
     await cartData.save();
     
-    // Prepare the response
     const response = {
       success: true,
       cart: {
