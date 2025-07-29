@@ -166,7 +166,7 @@ const paymentMethod = async (req, res) => {
     });
     
     try {
-      return res.render('/payment', {
+      return res.render('payment', {
         user: user,
         cart: cartData,
         address: address,
