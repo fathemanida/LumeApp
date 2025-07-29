@@ -195,8 +195,12 @@ const paymentMethod = async (req, res) => {
 
 
 const createOrder = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  
   try {
-    console.log('===user reached here');
+    console.log('=== Starting order creation ===');
+    const startTime = Date.now();
     const userId = req.session.user.id;
     const { addressId, paymentMethod } = req.body;
 
@@ -204,17 +208,37 @@ const createOrder = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Address is required' });
     }
 
+    // Optimize the cart query
     const cart = await Cart.findOne({ userId })
       .populate({
         path: 'items.productId',
+        select: 'productName salePrice regularPrice offer category quantity status',
         populate: [
-          { path: 'offer' },
-          { path: 'category', populate: { path: 'categoryOffer' } }
+          { 
+            path: 'offer',
+            select: 'isActive discountType discountValue name startDate expiryDate',
+            match: { isActive: true }
+          },
+          { 
+            path: 'category', 
+            select: 'categoryOffer',
+            populate: { 
+              path: 'categoryOffer',
+              select: 'active discountType discountValue name startDate expiryDate'
+            }
+          }
         ]
       })
-      .populate('appliedCoupon');
+      .populate({
+        path: 'appliedCoupon',
+        select: 'code discountValue discountType maxDiscount'
+      })
+      .lean()
+      .session(session);
 
-    if (!cart || cart.items.length === 0) {
+    if (!cart || !cart.items || cart.items.length === 0) {
+      await session.abortTransaction();
+      session.endSession();
       return res.status(400).json({ success: false, message: 'Your cart is empty' });
     }
 
@@ -222,6 +246,8 @@ const createOrder = async (req, res) => {
     let totalOfferDiscount = 0;
     let totalCouponDiscount = 0;
     const now = new Date();
+    
+    console.log(`Cart processed in ${Date.now() - startTime}ms`);
 
     cart.items.forEach(item => {
       const product = item.productId;
@@ -383,48 +409,81 @@ const createOrder = async (req, res) => {
     };
 
     const order = new Order(orderData);
-    console.log('===new order',order);
+    await order.save({ session });
+    console.log(`Order created in ${Date.now() - startTime}ms`);
 
-    for (const item of cart.items) {
+    const bulkOps = cart.items.map(item => {
       const product = item.productId;
-      if (product) {
-        const newStock = (product.quantity || 0) - item.quantity;
-        await Product.findByIdAndUpdate(product._id, {
-          quantity: newStock < 0 ? 0 : newStock,
-          status: newStock > 0 ? 'Available' : 'Out of Stock'
-        });
-      }
+      if (!product) return null;
+      
+      const newStock = (product.quantity || 0) - item.quantity;
+      return {
+        updateOne: {
+          filter: { _id: product._id },
+          update: {
+            $set: {
+              quantity: newStock < 0 ? 0 : newStock,
+              status: newStock > 0 ? 'Available' : 'Out of Stock',
+              updatedAt: new Date()
+            }
+          }
+        }
+      };
+    }).filter(Boolean);
+
+    if (bulkOps.length > 0) {
+      await Product.bulkWrite(bulkOps, { session });
     }
 
     if (paymentMethod === 'Razorpay') {
-      const amountInPaise = Math.round(finalAmount * 100);
-      const razorpayOrder = await razorpay.orders.create({
-        amount: amountInPaise,
-        currency: 'INR',
-        receipt: order._id.toString(),
-        payment_capture: 1
-      });
-      order.razorpayOrderId = razorpayOrder.id;
-      await order.save();
-
-      return res.status(200).json({
-        success: true,
-        orderId: order._id,
-        razorpayOrderId: razorpayOrder.id,
-        currency: razorpayOrder.currency,
-        amount: razorpayOrder.amount
-      });
+      try {
+        const amountInPaise = Math.round(finalAmount * 100);
+        const razorpayOrder = await razorpay.orders.create({
+          amount: amountInPaise,
+          currency: 'INR',
+          receipt: order._id.toString(),
+          payment_capture: 1
+        });
+        
+        order.razorpayOrderId = razorpayOrder.id;
+        await order.save({ session });
+        
+        await session.commitTransaction();
+        session.endSession();
+        
+        console.log(`Razorpay order created in ${Date.now() - startTime}ms`);
+        
+        return res.status(200).json({
+          success: true,
+          orderId: order._id,
+          razorpayOrderId: razorpayOrder.id,
+          currency: razorpayOrder.currency,
+          amount: razorpayOrder.amount
+        });
+        
+      } catch (razorpayError) {
+        await session.abortTransaction();
+        session.endSession();
+        console.error('Razorpay error:', razorpayError);
+        throw new Error('Failed to create Razorpay order');
+      }
+      
     } else if (paymentMethod === 'COD' || paymentMethod === 'Wallet') {
       order.status = 'Processing';
       order.paymentStatus = paymentMethod === 'COD' ? 'Pending' : 'Paid';
-      await order.save();
+      await order.save({ session });
 
       await Cart.findOneAndUpdate(
         { userId },
-        { $set: { items: [], appliedCoupon: null } }
+        { $set: { items: [], appliedCoupon: null, updatedAt: new Date() } },
+        { session }
       );
-      console.log('====paymrnt methid',paymentMethod);
-console.log('returning');
+      
+      await session.commitTransaction();
+      session.endSession();
+      
+      console.log(`Order completed in ${Date.now() - startTime}ms`);
+      
       return res.status(200).json({
         success: true,
         orderId: order._id,
@@ -434,9 +493,18 @@ console.log('returning');
 
   } catch (error) {
     console.error('Error in createOrder:', error);
+    
+    try {
+      await session.abortTransaction();
+    } catch (abortError) {
+      console.error('Error aborting transaction:', abortError);
+    }
+    
+    session.endSession();
+    
     return res.status(500).json({
       success: false,
-      message: 'Failed to create order',
+      message: 'Failed to create order. Please try again.',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }

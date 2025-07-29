@@ -687,8 +687,6 @@ html, body {
             }
         }
 
-        var isRetry = '<%= orderId ? 'true' : 'false' %>';
-
         let paymentInProgress = false;
         
         async function createOrder() {
@@ -748,9 +746,7 @@ html, body {
                 
                 if (method === 'COD' || method === 'Wallet') {
                     console.log('Redirecting to confirmation for', method, 'order');
-                    // Hide loading overlay before redirect
                     if (loadingOverlay) loadingOverlay.style.display = 'none';
-                    // Force a small delay to ensure UI updates before redirect
                     setTimeout(() => {
                         window.location.href = `/payment-confirmation?orderId=${orderId}`;
                     }, 100);
