@@ -139,7 +139,7 @@ router.post('/create-order',userAuth.isLogin,paymentController.createOrder)
 
 router.post('/verify-payment',userAuth.isLogin,paymentController.verifyPayment)
 
-router.post('/payment/process', userAuth.isLogin, paymentController.createOrder)
+router.post('/payment/process', userAuth.isLogin, paymentController.processPayment)
 router.get('/payment-confirmation',userAuth.isLogin,paymentController.paymentConfirmation)
 router.get('/orders',userAuth.isLogin,orderController.orders)
 router.get('/orders/:orderId', userAuth.isLogin, orderController.orderDetails)
