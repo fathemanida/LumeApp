@@ -85,7 +85,6 @@ const paymentMethod = async (req, res) => {
       });
     }
 
-    // Calculate coupon discount if applied
     let couponDiscount = 0;
     if (cart.appliedCoupon) {
       const coupon = await Coupon.findOne({ _id: cart.appliedCoupon._id });
@@ -104,12 +103,10 @@ const paymentMethod = async (req, res) => {
       }
     }
 
-    // Calculate shipping and final total
     const shipping = subtotal >= 1500 ? 0 : 40;
     const totalDiscount = totalOfferDiscount + couponDiscount;
     const finalTotal = Math.max(0, subtotal - totalDiscount + shipping);
 
-    // Prepare the cart object that matches the view's expectations
     const cartData = {
       items: items,
       subtotal: subtotal,
@@ -128,8 +125,9 @@ const paymentMethod = async (req, res) => {
       cart: cartData,
       RAZORPAY_KEY_ID: process.env.RAZORPAY_KEY_ID,
       razorpayOrderId: null,
-      amount: finalTotal * 100, // Convert to paise for Razorpay
-      currency: 'INR'
+      amount: finalTotal * 100, 
+      currency: 'INR',
+      orderId: null 
     });
 
   } catch (error) {
