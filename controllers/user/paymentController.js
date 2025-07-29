@@ -195,9 +195,7 @@ const paymentMethod = async (req, res) => {
 
 
 const createOrder = async (req, res) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
-  
+    
   try {
     console.log('=== Starting order creation ===');
     const startTime = Date.now();

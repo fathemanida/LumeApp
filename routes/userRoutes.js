@@ -168,6 +168,14 @@ router.get('/order-details/:orderId', userAuth.isLogin, orderController.orderDet
 router.post('/orders/:orderId/cancel', userAuth.isLogin, orderController.cancelOrder);
 router.post('/orders/:orderId/items/:itemId/cancel', userAuth.isLogin, orderController.cancelOrderItem);
 
+// Payment routes
+router.get('/proceed-payment', userAuth.isLogin, paymentController.paymentMethod);
+router.post('/create-order', userAuth.isLogin, paymentController.createOrder);
+router.post('/payment/process', userAuth.isLogin, paymentController.processPayment);
+router.get('/payment-confirmation', userAuth.isLogin, paymentController.paymentConfirmation);
+router.post('/verify-payment', userAuth.isLogin, paymentController.verifyPayment);
+router.get('/payment-failure', userAuth.isLogin, paymentController.paymentFailure);
+
 // Footer routes
 router.get('/privacy-policy', footerController.privacyPolicy);
 router.get('/shipping-returns', footerController.shippingReturn);
