@@ -698,30 +698,56 @@ html, body {
                 payBtn.disabled = true;
                 payBtn.textContent = 'Processing...';
             }
+            
             const method = document.querySelector('input[name="paymentMethod"]:checked').value;
             const addressId = '<%= address._id %>';
             const loadingOverlay = document.getElementById('loadingOverlay');
+            
             if (loadingOverlay) loadingOverlay.style.display = 'flex';
+            
             try {
-                const payload = { method, addressId };
+                const payload = { 
+                    method, 
+                    addressId 
+                };
+                
                 if (method === 'upi') {
-                    payload.upiId = document.getElementById('upiId').value;
+                    const upiId = document.getElementById('upiId').value;
+                    if (!upiId) throw new Error('Please enter UPI ID');
+                    payload.upiId = upiId;
                 } else if (method === 'wallet') {
-                    payload.walletId = document.getElementById('walletId').value;
+                    const walletId = document.getElementById('walletId').value;
+                    if (!walletId) throw new Error('Please select a wallet');
+                    payload.walletId = walletId;
                 }
+                
                 if (isRetry === 'true') {
                     payload.orderId = '<%= orderId %>';
                 }
+                
+                console.log('Sending payment request with payload:', payload);
+                
                 const res = await fetch('/payment/process', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                if (!res.ok) {
-                    const errorData = await res.json();
-                    throw new Error(errorData.message || `HTTP error! status: ${res.status}`);
+                
+                let responseData;
+                try {
+                    responseData = await res.json();
+                    console.log('Payment response status:', res.status, 'Data:', responseData);
+                } catch (e) {
+                    console.error('Error parsing payment response:', e);
+                    throw new Error('Invalid response from server');
                 }
-                const data = await res.json();
+                
+                if (!res.ok) {
+                    throw new Error(responseData.message || `Payment failed with status: ${res.status}`);
+                }
+                
+                return responseData;
+                const data = responseData;
                 if (data.razorpayOrderId) {
                     const options = {
                         key: "<%= RAZORPAY_KEY_ID %>",
@@ -775,27 +801,36 @@ html, body {
                 } else if (data.redirect) {
                     window.location.href = data.redirect;
                 } else {
-                    let errorMessage = data.message || "Payment failed";
-                    Swal.fire({
-                        title: "Payment Failed",
-                        text: errorMessage,
-                        icon: "error",
-                        confirmButtonColor: "#2c1810"
-                    });
+                    if (data.success) {
+                        window.location.href = data.redirect || '/order-success';
+                    } else {
+                        let errorMessage = data.message || "Payment processing failed";
+                        throw new Error(errorMessage);
+                    }
                 }
             } catch (error) {
+                console.error('Payment processing error:', error);
+                
                 if (loadingOverlay) loadingOverlay.style.display = 'none';
                 if (payBtn) {
                     payBtn.disabled = false;
                     payBtn.textContent = 'Pay Now';
                 }
-                paymentInProgress = false;
+                
                 Swal.fire({
-                    title: "Payment Failed",
-                    text: error.message,
-                    icon: "error",
-                    confirmButtonColor: "#2c1810"
+                    title: 'Payment Error',
+                    text: error.message || 'An error occurred while processing your payment. Please try again.',
+                    icon: 'error',
+                    confirmButtonColor: '#2c1810'
                 });
+                
+                // Reset payment in progress flag
+                paymentInProgress = false;
+                
+                // Log the error for debugging
+                if (error.stack) {
+                    console.error('Error stack:', error.stack);
+                }
             }
         }
 

@@ -196,6 +196,7 @@ const paymentMethod = async (req, res) => {
 
 const createOrder = async (req, res) => {
   try {
+    console.log('===user reached here');
     const userId = req.session.user.id;
     const { addressId, paymentMethod } = req.body;
 
@@ -382,6 +383,7 @@ const createOrder = async (req, res) => {
     };
 
     const order = new Order(orderData);
+    console.log('===new order',order);
 
     for (const item of cart.items) {
       const product = item.productId;
