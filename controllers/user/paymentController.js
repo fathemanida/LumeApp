@@ -25,7 +25,6 @@ const razorpay = new Razorpay({
   test_mode: true
 });
 
-// Payment method to render the payment page
 const paymentMethod = async (req, res) => {
   try {
     if (!req.session.user) {
@@ -49,7 +48,6 @@ const paymentMethod = async (req, res) => {
       return res.redirect('/cart');
     }
 
-    // Get all active offers
     const now = new Date();
     const activeOffers = await Offer.find({
       isActive: true,
@@ -61,7 +59,6 @@ const paymentMethod = async (req, res) => {
     let totalOfferDiscount = 0;
     const items = [];
 
-    // Process each item in the cart
     for (const item of cart.items) {
       const product = item.productId;
       if (!product || !product.isListed) continue;
