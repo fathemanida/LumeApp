@@ -868,7 +868,7 @@ console.log('=====activeOffers',activeOffers);
       }
     };
 
-    console.log('Processed payment data:',res);
+    console.log('Processed payment data:', JSON.stringify(response, null, 2));
     return res.json(response);
   } catch (error) {
     console.error("Error in processPayment:", error);
