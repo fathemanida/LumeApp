@@ -364,7 +364,8 @@ const paymentMethod = async (req, res) => {
       finalPrice,
       shipping,
       appliedCoupon,
-      user
+      user,
+      cart
     });
 
   } catch (error) {
