@@ -748,7 +748,12 @@ html, body {
                 
                 if (method === 'COD' || method === 'Wallet') {
                     console.log('Redirecting to confirmation for', method, 'order');
-                    window.location.href = `/payment-confirmation?orderId=${orderId}`;
+                    // Hide loading overlay before redirect
+                    if (loadingOverlay) loadingOverlay.style.display = 'none';
+                    // Force a small delay to ensure UI updates before redirect
+                    setTimeout(() => {
+                        window.location.href = `/payment-confirmation?orderId=${orderId}`;
+                    }, 100);
                     return;
                 }
                 
