@@ -26,7 +26,9 @@ const razorpay = new Razorpay({
 
 const paymentMethod = async (req, res) => {
   try {
+    console.log('Payment method called');
     if (!req.session.user) {
+      console.log('No user session, redirecting to login');
       return res.redirect('/login');
     }
 
@@ -49,7 +51,14 @@ const paymentMethod = async (req, res) => {
       })
       .populate('appliedCoupon');
 
-    if (!cart || !cart.items || cart.items.length === 0) {
+    if (!cart) {
+      console.log('No cart found for user');
+      req.flash('error', 'Your cart is empty');
+      return res.redirect('/cart');
+    }
+    
+    if (!cart.items || cart.items.length === 0) {
+      console.log('Cart is empty');
       req.flash('error', 'Your cart is empty');
       return res.redirect('/cart');
     }
@@ -112,7 +121,7 @@ const paymentMethod = async (req, res) => {
     const shipping = subtotal >= 1500 ? 0 : 40;
     const totalDiscount = totalOfferDiscount + couponDiscount;
     const finalTotal = Math.max(0, subtotal - totalDiscount + shipping);
-
+    
     const cartData = {
       items: items,
       subtotal: subtotal,
@@ -124,7 +133,13 @@ const paymentMethod = async (req, res) => {
       appliedCoupon: cart.appliedCoupon
     };
 
-    console.log('Rendering payment with cart data:', JSON.stringify(cartData, null, 2));
+    console.log('Rendering payment with cart data:',cartDat);
+    
+    console.log('Rendering payment page with data:', {
+      user: user ? 'User exists' : 'No user',
+      cartItems: cart.items.length,
+      address: address ? 'Address exists' : 'No address'
+    });
     
     res.render('user/payment', {
       user: user,
