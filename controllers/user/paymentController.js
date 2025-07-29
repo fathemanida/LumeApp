@@ -281,46 +281,95 @@ const paymentMethod = async (req, res) => {
     const orderId = req.query.orderId;
     let address, cart, cartData, processedCart;
 
+    // Handle existing order (retry payment)
     if (orderId) {
-      const order = await Order.findOne({ _id: orderId, userId })
-        .populate({
-          path: 'items.productId',
-          populate: [
-            { path: 'offer' },
-            { path: 'category', populate: { path: 'categoryOffer' } }
-          ]
-        })
-        .populate('usedCoupon')
-        .populate('address');
+      let order;
+      try {
+        order = await Order.findOne({ _id: orderId, userId })
+          .populate({
+            path: 'items.productId',
+            populate: [
+              { path: 'offer' },
+              { path: 'category', populate: { path: 'categoryOffer' } }
+            ]
+          })
+          .populate('usedCoupon')
+          .populate('address');
 
-      if (!order) {
+        if (!order) {
+          req.flash('error', 'Order not found');
+          return res.redirect('/orders');
+        }
+
+        if (!order.address) {
+          req.flash('error', 'Shipping address not found');
+          return res.redirect(`/checkout?orderId=${orderId}`);
+        }
+
+        address = order.address;
+        
+        // Process order items with validation
+        const validItems = [];
+        let subtotal = 0;
+        
+        for (const item of order.items) {
+          if (!item.productId) {
+            console.warn(`Skipping invalid order item (missing product):`, item);
+            continue;
+          }
+          
+          const price = Number(item.price) || 0;
+          const quantity = Number(item.quantity) || 0;
+          const itemOfferDiscount = Number(item.offerDiscount) || 0;
+          const itemCouponDiscount = Number(item.couponDiscount) || 0;
+          const totalPrice = Number(item.totalPrice) || (price * quantity);
+          
+          validItems.push({
+            productId: {
+              _id: item.productId._id?.toString(),
+              productName: item.productId.productName || 'Product',
+              productImage: item.productId.productImage || '/images/default-product.png',
+              regularPrice: item.originalPrice || price,
+              salePrice: price
+            },
+            quantity: quantity,
+            price: price,
+            originalPrice: item.originalPrice || price,
+            offerDiscount: itemOfferDiscount,
+            couponDiscount: itemCouponDiscount,
+            totalPrice: totalPrice
+          });
+          
+          subtotal += totalPrice;
+        }
+
+        if (validItems.length === 0) {
+          req.flash('error', 'No valid items found in order');
+          return res.redirect('/cart');
+        }
+
+        // Calculate order totals with validation
+        const offerDiscount = Number(order.offerDiscount) || 0;
+        const couponDiscount = Number(order.couponDiscount) || 0;
+        const totalDiscount = offerDiscount + couponDiscount;
+        const shipping = Number(order.shipping) || 0;
+        const totalPrice = Number(order.totalAmount) || (subtotal - totalDiscount + shipping);
+        
+        processedCart = {
+          items: validItems,
+          subtotal: subtotal,
+          offerDiscount: offerDiscount,
+          couponDiscount: couponDiscount,
+          discount: totalDiscount,
+          shipping: shipping,
+          totalPrice: totalPrice
+        };
+        
+      } catch (error) {
+        console.error('Error processing order:', error);
+        req.flash('error', 'Error processing your order');
         return res.redirect('/orders');
       }
-
-      address = order.address;
-      processedCart = {
-        items: order.items.map(item => ({
-          productId: {
-            _id: item.productId._id,
-            productName: item.productId.productName,
-            productImage: item.productId.productImage,
-            regularPrice: item.productId.regularPrice,
-            salePrice: item.productId.salePrice
-          },
-          quantity: item.quantity,
-          price: item.price,
-          originalPrice: item.originalPrice,
-          offerDiscount: item.offerDiscount || 0,
-          couponDiscount: item.couponDiscount || 0,
-          totalPrice: item.totalPrice
-        })),
-        subtotal: order.subtotal,
-        offerDiscount: order.offerDiscount || 0,
-        couponDiscount: order.couponDiscount || 0,
-        shipping: order.shipping || 0,
-        discount: (order.offerDiscount || 0) + (order.couponDiscount || 0),
-        totalPrice: order.totalAmount
-      };
 
       return res.render('payment', {
         user: req.session.user,
@@ -358,34 +407,71 @@ const paymentMethod = async (req, res) => {
       return res.redirect('/cart');
     }
 
-    cartData = calculateCartTotals(cart);
+    // Calculate cart totals with error handling
+    try {
+      cartData = calculateCartTotals(cart);
+      if (!cartData || !cartData.items) {
+        throw new Error('Invalid cart data');
+      }
+    } catch (error) {
+      console.error('Error calculating cart totals:', error);
+      return res.status(500).render('error', { message: 'Error calculating cart totals' });
+    }
 
-    const subtotal = cartData.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    // Calculate subtotal with proper type conversion
+    const subtotal = cartData.items.reduce((sum, item) => {
+      const price = Number(item.price) || 0;
+      const quantity = Number(item.quantity) || 0;
+      return sum + (price * quantity);
+    }, 0);
     
-    const totalDiscount = (cartData.totalOfferDiscount || 0) + (cartData.totalCouponDiscount || 0);
+    // Calculate discounts with proper type conversion
+    const offerDiscount = Number(cartData.totalOfferDiscount) || 0;
+    const couponDiscount = Number(cartData.totalCouponDiscount) || 0;
+    const totalDiscount = offerDiscount + couponDiscount;
+    const shipping = Number(cartData.shipping) || 0;
     
+    // Calculate final price with fallback
+    const finalPrice = Number(cartData.finalPrice) || (subtotal - totalDiscount + shipping);
+    
+    // Prepare cart items with null checks
     processedCart = {
-      items: cartData.items.map(item => ({
-        productId: {
-          _id: item.productId._id,
-          productName: item.productId.productName,
-          productImage: item.productId.productImage,
-          regularPrice: item.productId.regularPrice,
-          salePrice: item.productId.salePrice
-        },
-        quantity: item.quantity,
-        price: item.price,
-        originalPrice: item.originalPrice || item.price,
-        offerDiscount: item.offerDiscount || 0,
-        couponDiscount: item.couponDiscount || 0,
-        totalPrice: item.totalPrice || (item.price * item.quantity)
-      })),
+      items: cartData.items.map(item => {
+        // Handle cases where product might be deleted or not properly populated
+        if (!item.productId) {
+          return null;
+        }
+        
+        const price = Number(item.price) || 0;
+        const quantity = Number(item.quantity) || 0;
+        const originalPrice = Number(item.originalPrice) || price;
+        const offerDiscount = Number(item.offerDiscount) || 0;
+        const couponDiscount = Number(item.couponDiscount) || 0;
+        const totalPrice = Number(item.totalPrice) || (price * quantity);
+        
+        return {
+          productId: {
+            _id: item.productId._id?.toString(),
+            productName: item.productId.productName || 'Product',
+            productImage: item.productId.productImage || '/images/default-product.png',
+            regularPrice: item.productId.regularPrice || originalPrice,
+            salePrice: item.productId.salePrice || price
+          },
+          quantity: quantity,
+          price: price,
+          originalPrice: originalPrice,
+          offerDiscount: offerDiscount,
+          couponDiscount: couponDiscount,
+          totalPrice: totalPrice
+        };
+      }).filter(Boolean), // Remove any null items
+      
       subtotal: subtotal,
-      offerDiscount: cartData.totalOfferDiscount || 0,
-      couponDiscount: cartData.totalCouponDiscount || 0,
+      offerDiscount: offerDiscount,
+      couponDiscount: couponDiscount,
       discount: totalDiscount,
-      shipping: cartData.shipping || 0,
-      totalPrice: cartData.finalPrice || (subtotal - totalDiscount + (cartData.shipping || 0))
+      shipping: shipping,
+      totalPrice: finalPrice
     };
 
     res.render('payment', {
