@@ -32,6 +32,13 @@ const paymentMethod = async (req, res) => {
 
     const userId = req.session.user.id;
     const user = await User.findById(userId);
+    
+    const address = await Address.findOne({ userId, isDefault: true });
+    if (!address) {
+      req.flash('error', 'Please add a default address before proceeding to payment');
+      return res.redirect('/checkout');
+    }
+    
     const cart = await Cart.findOne({ userId })
       .populate({
         path: 'items.productId',
@@ -70,7 +77,6 @@ const paymentMethod = async (req, res) => {
       const originalPrice = basePrice * quantity;
       subtotal += originalPrice;
 
-      // Get best offer for this product
       const { maxDiscount: offerDiscount } = getBestOffer(product, activeOffers, quantity);
       totalOfferDiscount += offerDiscount;
 
@@ -123,6 +129,7 @@ const paymentMethod = async (req, res) => {
     res.render('user/payment', {
       user: user,
       cart: cartData,
+      address: address,
       RAZORPAY_KEY_ID: process.env.RAZORPAY_KEY_ID,
       razorpayOrderId: null,
       amount: finalTotal * 100, 
