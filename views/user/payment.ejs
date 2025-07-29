@@ -747,6 +747,7 @@ html, body {
         const data = responseData;
 
         if (data.razorpayOrderId) {
+            console.log('razorpay');
             const options = {
                 key: "<%= RAZORPAY_KEY_ID %>",
                 amount: data.amount,
@@ -798,11 +799,14 @@ html, body {
             });
             rzp.open();
         } else if (data.redirect) {
+            console.log('redirect');
             window.location.href = data.redirect;
         } else {
             if (data.success) {
-                window.location.href = data.redirect || '/order-success';
+                console.log('success');
+                window.location.href = data.redirect || '/payment-confirmation';
             } else {
+                console.log('failed');
                 let errorMessage = data.message || "Payment processing failed";
                 throw new Error(errorMessage);
             }
