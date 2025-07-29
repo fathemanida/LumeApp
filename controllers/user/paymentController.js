@@ -88,7 +88,7 @@ const paymentMethod = async (req, res) => {
 
       const { maxDiscount: offerDiscount } = getBestOffer(product, activeOffers, quantity);
       totalOfferDiscount += offerDiscount;
-
+      console.log('=====payment');
       items.push({
         productId: product._id,
         name: product.productName || 'Product',
@@ -133,29 +133,62 @@ const paymentMethod = async (req, res) => {
       appliedCoupon: cart.appliedCoupon
     };
 
-    console.log('Rendering payment with cart data:',cartDat);
+    console.log('Rendering payment with cart data:', cartData);
+    
+    if (!user) {
+      const error = new Error('User data is missing');
+      console.error('Validation error:', error.message);
+      req.flash('error', 'User session expired. Please login again.');
+      return res.redirect('/login');
+    }
+    
+    if (!cart || !cart.items || cart.items.length === 0) {
+      const error = new Error('Cart is empty');
+      console.error('Validation error:', error.message);
+      req.flash('error', 'Your cart is empty');
+      return res.redirect('/cart');
+    }
+    
+    if (!address) {
+      const error = new Error('Address is required');
+      console.error('Validation error:', error.message);
+      req.flash('error', 'Please add a shipping address before proceeding to payment');
+      return res.redirect('/checkout');
+    }
     
     console.log('Rendering payment page with data:', {
       user: user ? 'User exists' : 'No user',
       cartItems: cart.items.length,
-      address: address ? 'Address exists' : 'No address'
+      address: address ? 'Address exists' : 'No address',
+      subtotal: subtotal,
+      totalDiscount: totalDiscount,
+      finalTotal: finalTotal
     });
     
-    res.render('user/payment', {
-      user: user,
-      cart: cartData,
-      address: address,
-      RAZORPAY_KEY_ID: process.env.RAZORPAY_KEY_ID,
-      razorpayOrderId: null,
-      amount: finalTotal * 100, 
-      currency: 'INR',
-      orderId: null 
-    });
-
+    try {
+      return res.render('/payment', {
+        user: user,
+        cart: cartData,
+        address: address,
+        RAZORPAY_KEY_ID: process.env.RAZORPAY_KEY_ID,
+        razorpayOrderId: null,
+        amount: finalTotal * 100, 
+        currency: 'INR',
+        orderId: null 
+      });
+    } catch (renderError) {
+      console.error('Render error in paymentMethod:', renderError);
+      console.error('Render error details:', {
+        message: renderError.message,
+        stack: renderError.stack
+      });
+      req.flash('error', 'Failed to load payment page. Please try again.');
+      return res.redirect('/cart');
+    }
   } catch (error) {
     console.error('Error in paymentMethod:', error);
     req.flash('error', 'An error occurred while processing your payment');
-    res.redirect('/cart');
+    return res.redirect('/cart');
   }
 };
 
