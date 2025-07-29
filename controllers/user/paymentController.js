@@ -16,6 +16,7 @@ const Coupon = require('../../models/couponSchema');
 const calculateCartTotals = require('../../helpers/calculateTotal');
 const Wallet = require('../../models/walletSchema');
 
+
 const Razorpay = require('razorpay');
 
 const razorpay = new Razorpay({
@@ -1011,6 +1012,143 @@ const paymentFailure = async (req, res) => {
     });
   }
 };
+
+function getBestOffer(product, offers = [], quantity = 1) {
+  if (!product || !Array.isArray(offers)) {
+    console.warn("Invalid input to getBestOffer:", { product, offers });
+    return { maxDiscount: 0, bestOffer: null, offerType: null };
+  }
+
+  let maxDiscount = 0;
+  let bestOffer = null;
+  let offerType = null;
+  const now = new Date();
+
+  console.log(
+    `\n=== getBestOffer for ${product.productName} (${product._id}) ===`
+  );
+  console.log(
+    `- Category: ${product.category?.name || "None"} (${
+      product.category?._id || "N/A"
+    })`
+  );
+  console.log(
+    `- Regular Price: ${product.regularPrice}, Sale Price: ${
+      product.salePrice || "None"
+    }`
+  );
+  console.log(`- Quantity: ${quantity}`);
+
+  const sortedOffers = [...offers].sort((a, b) => {
+    const aValue =
+      a.discountType === "percentage"
+        ? a.discountValue * 1000
+        : a.discountValue;
+    const bValue =
+      b.discountType === "percentage"
+        ? b.discountValue * 1000
+        : b.discountValue;
+    return bValue - aValue;
+  });
+
+  for (const offer of sortedOffers) {
+    if (
+      !offer.isActive ||
+      now < new Date(offer.startDate) ||
+      now > new Date(offer.endDate)
+    ) {
+      console.log(
+        `\nSkipping offer ${offer.name || offer._id} - ${
+          !offer.isActive ? "Inactive" : "Expired"
+        }`
+      );
+      continue;
+    }
+
+    const price =
+      product.salePrice && product.salePrice < product.regularPrice
+        ? product.salePrice
+        : product.regularPrice;
+
+    let applies = false;
+    let currentOfferType = null;
+
+    if (offer.applicableOn === "all") {
+      applies = true;
+      currentOfferType = "all_products";
+      console.log(
+        `\nOffer ${offer.name || offer._id}: Applies to all products`
+      );
+    } else if (offer.applicableOn === "categories" && product?.category?._id) {
+      const categoryMatch =
+        Array.isArray(offer.categories) &&
+        offer.categories.some(
+          (catId) => catId.toString() === product.category._id.toString()
+        );
+
+      if (categoryMatch) {
+        applies = true;
+        currentOfferType = "category";
+        console.log(
+          `\nOffer ${offer.name || offer._id}: Applies to category ${
+            product.category.name
+          }`
+        );
+      }
+    } else if (offer.applicableOn === "products" && product?._id) {
+      const productMatch =
+        Array.isArray(offer.products) &&
+        offer.products.some(
+          (prodId) => prodId.toString() === product._id.toString()
+        );
+
+      if (productMatch) {
+        applies = true;
+        currentOfferType = "product";
+        console.log(
+          `\nOffer ${offer.name || offer._id}: Applies to this specific product`
+        );
+      }
+    }
+
+    if (applies) {
+      let discount =
+        offer.discountType === "percentage"
+          ? ((price * offer.discountValue) / 100) * quantity
+          : offer.discountValue * quantity;
+
+      if (offer.discountType === "percentage" && offer.maxDiscount) {
+        discount = Math.min(discount, offer.maxDiscount);
+        console.log(`- Capped at max discount: ${offer.maxDiscount}`);
+      }
+
+      console.log(
+        `- Calculated discount: ${discount} (${offer.discountValue}${
+          offer.discountType === "percentage" ? "%" : " flat"
+        })`
+      );
+
+      if (discount > maxDiscount) {
+        maxDiscount = discount;
+        bestOffer = offer;
+        offerType = currentOfferType;
+        console.log("- New best offer!");
+      }
+    }
+  }
+
+  console.log(`\n=== Best Offer for ${product.productName} ===`);
+  console.log(`- Offer: ${bestOffer?.name || "None"}`);
+  console.log(`- Type: ${offerType || "None"}`);
+  console.log(`- Max Discount: ${maxDiscount}`);
+  console.log("==============================\n");
+
+  return {
+    maxDiscount: Math.max(0, maxDiscount), 
+    bestOffer,
+    offerType,
+  };
+}
 
 module.exports = {
   paymentMethod,
