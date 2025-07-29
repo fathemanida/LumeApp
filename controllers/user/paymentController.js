@@ -423,7 +423,8 @@ const createOrder = async (req, res) => {
         { userId },
         { $set: { items: [], appliedCoupon: null } }
       );
-
+      console.log('====paymrnt methid',paymentMethod);
+console.log('returning');
       return res.status(200).json({
         success: true,
         orderId: order._id,
