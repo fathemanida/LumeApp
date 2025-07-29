@@ -167,15 +167,27 @@ const addToCart = async (req, res) => {
 
     const couponDiscount = cart.couponDiscount || 0;
     cart.finalCartTotal = cartTotal - couponDiscount;
-     console.log('======Quanitity',existingItem.quantity);
-    console.log('======Price',existingItem.price);
-    console.log('======offerDis',existingItem.offerDiscount);
-    console.log('======finalprice',existingItem.finalPrice);
-        console.log('======totalPrice',existingItem.totalPrice);
-         console.log('======');
-    console.log('======totalofferDis',totalOfferDiscount);
+    
+    if (existingItem) {
+      console.log('======Quantity', existingItem.quantity);
+      console.log('======Price', existingItem.price);
+      console.log('======offerDis', existingItem.offerDiscount);
+      console.log('======finalprice', existingItem.finalPrice);
+      console.log('======totalPrice', existingItem.totalPrice);
+    } else {
+      const newItem = cart.items.find(item => item.productId.equals(productId) && item.size === selectedSize);
+      if (newItem) {
+        console.log('======New Item Quantity', newItem.quantity);
+        console.log('======New Item Price', newItem.price);
+        console.log('======New Item offerDis', newItem.offerDiscount);
+        console.log('======New Item finalprice', newItem.finalPrice);
+        console.log('======New Item totalPrice', newItem.totalPrice);
+      }
+    }
+    
+    console.log('======totalofferDis', totalOfferDiscount);
     console.log('======');
-    console.log('======cartTotal',cartTotal);
+    console.log('======cartTotal', cartTotal);
 
 
     await cart.save();
