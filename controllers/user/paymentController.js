@@ -281,7 +281,6 @@ const paymentMethod = async (req, res) => {
     const orderId = req.query.orderId;
     let address, cart, cartData, processedCart;
 
-    // Handle existing order (retry payment)
     if (orderId) {
       let order;
       try {
@@ -308,7 +307,6 @@ const paymentMethod = async (req, res) => {
 
         address = order.address;
         
-        // Process order items with validation
         const validItems = [];
         let subtotal = 0;
         
@@ -650,7 +648,7 @@ const processPayment = async (req, res) => {
         model: "Category",
       },
     });
-
+console.log('=====cart Dat',cartData);
     if (!cartData || cartData.items.length === 0) {
       return res.status(400).json({ success: false, message: "Cart is empty" });
     }
