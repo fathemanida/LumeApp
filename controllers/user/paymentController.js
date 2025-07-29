@@ -17,7 +17,6 @@ const calculateCartTotals = require('../../helpers/calculateTotal');
 const Wallet = require('../../models/walletSchema');
 const Razorpay = require('razorpay');
 const Offer = require('../../models/offerSchema');
-const paymentFailure = require('./paymentFailure');
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -1007,7 +1006,31 @@ const paymentConfirmation = async (req, res) => {
   }
 };
 
+const paymentFailure = async (req, res) => {
+  try {
+    const { orderId, error } = req.query;
+    
+    if (orderId) {
+      await Order.findByIdAndUpdate(orderId, {
+        status: 'Failed',
+        paymentStatus: 'Failed',
+        paymentError: error || 'Payment failed'
+      });
+    }
 
+    res.render('paymentFailed', {
+      user: req.session.user,
+      error: error || 'Payment could not be processed',
+      orderId
+    });
+  } catch (error) {
+    console.error('Error in paymentFailure:', error);
+    res.render('paymentFailed', {
+      user: req.session.user,
+      error: 'An unexpected error occurred'
+    });
+  }
+};
 
 function getBestOffer(product, offers = [], quantity = 1) {
   if (!product || !Array.isArray(offers)) {
