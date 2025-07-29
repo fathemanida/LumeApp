@@ -310,14 +310,14 @@ const paymentMethod = async (req, res) => {
           quantity: item.quantity,
           price: item.price,
           originalPrice: item.originalPrice,
-          offerDiscount: item.offerDiscount,
-          couponDiscount: item.couponDiscount,
+          offerDiscount: item.offerDiscount || 0,
+          couponDiscount: item.couponDiscount || 0,
           totalPrice: item.totalPrice
         })),
         subtotal: order.subtotal,
-        totalOfferDiscount: order.offerDiscount,
-        totalCouponDiscount: order.couponDiscount,
-        shipping: order.shipping,
+        offerDiscount: order.offerDiscount || 0,
+        couponDiscount: order.couponDiscount || 0,
+        shipping: order.shipping || 0,
         discount: (order.offerDiscount || 0) + (order.couponDiscount || 0),
         totalPrice: order.totalAmount
       };
@@ -360,6 +360,10 @@ const paymentMethod = async (req, res) => {
 
     cartData = calculateCartTotals(cart);
 
+    const subtotal = cartData.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    
+    const totalDiscount = (cartData.totalOfferDiscount || 0) + (cartData.totalCouponDiscount || 0);
+    
     processedCart = {
       items: cartData.items.map(item => ({
         productId: {
@@ -371,17 +375,17 @@ const paymentMethod = async (req, res) => {
         },
         quantity: item.quantity,
         price: item.price,
-        originalPrice: item.originalPrice,
-        offerDiscount: item.offerDiscount,
-        couponDiscount: item.couponDiscount,
-        totalPrice: item.totalPrice
+        originalPrice: item.originalPrice || item.price,
+        offerDiscount: item.offerDiscount || 0,
+        couponDiscount: item.couponDiscount || 0,
+        totalPrice: item.totalPrice || (item.price * item.quantity)
       })),
-      subtotal: cartData.totalPrice,
-      totalOfferDiscount: cartData.totalOfferDiscount,
-      totalCouponDiscount: cartData.totalCouponDiscount,
-      shipping: cartData.shipping,
-      discount: cartData.totalOfferDiscount + cartData.totalCouponDiscount,
-      totalPrice: cartData.finalPrice
+      subtotal: subtotal,
+      offerDiscount: cartData.totalOfferDiscount || 0,
+      couponDiscount: cartData.totalCouponDiscount || 0,
+      discount: totalDiscount,
+      shipping: cartData.shipping || 0,
+      totalPrice: cartData.finalPrice || (subtotal - totalDiscount + (cartData.shipping || 0))
     };
 
     res.render('payment', {
