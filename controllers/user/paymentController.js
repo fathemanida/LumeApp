@@ -195,9 +195,7 @@ const paymentMethod = async (req, res) => {
 
 
 const createOrder = async (req, res) => {
-    
   try {
-    console.log('=== Starting order creation ===');
     const startTime = Date.now();
     const userId = req.session.user.id;
     const { addressId, paymentMethod } = req.body;
@@ -206,7 +204,6 @@ const createOrder = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Address is required' });
     }
 
-    // Optimize the cart query
     const cart = await Cart.findOne({ userId })
       .populate({
         path: 'items.productId',
@@ -231,12 +228,9 @@ const createOrder = async (req, res) => {
         path: 'appliedCoupon',
         select: 'code discountValue discountType maxDiscount'
       })
-      .lean()
-      .session(session);
+      .lean();
 
     if (!cart || !cart.items || cart.items.length === 0) {
-      await session.abortTransaction();
-      session.endSession();
       return res.status(400).json({ success: false, message: 'Your cart is empty' });
     }
 
@@ -403,11 +397,11 @@ const createOrder = async (req, res) => {
       orderId: `ORD${Date.now()}`,
       createdOn: new Date(),
       updatedAt: new Date(),
-      estimatedDelivery: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000) 
+      estimatedDelivery: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000)
     };
 
     const order = new Order(orderData);
-    await order.save({ session });
+    await order.save();
     console.log(`Order created in ${Date.now() - startTime}ms`);
 
     const bulkOps = cart.items.map(item => {
@@ -430,7 +424,7 @@ const createOrder = async (req, res) => {
     }).filter(Boolean);
 
     if (bulkOps.length > 0) {
-      await Product.bulkWrite(bulkOps, { session });
+      await Product.bulkWrite(bulkOps);
     }
 
     if (paymentMethod === 'Razorpay') {
@@ -444,10 +438,7 @@ const createOrder = async (req, res) => {
         });
         
         order.razorpayOrderId = razorpayOrder.id;
-        await order.save({ session });
-        
-        await session.commitTransaction();
-        session.endSession();
+        await order.save();
         
         console.log(`Razorpay order created in ${Date.now() - startTime}ms`);
         
@@ -460,25 +451,19 @@ const createOrder = async (req, res) => {
         });
         
       } catch (razorpayError) {
-        await session.abortTransaction();
-        session.endSession();
         console.error('Razorpay error:', razorpayError);
         throw new Error('Failed to create Razorpay order');
       }
-      
     } else if (paymentMethod === 'COD' || paymentMethod === 'Wallet') {
       order.status = 'Processing';
       order.paymentStatus = paymentMethod === 'COD' ? 'Pending' : 'Paid';
-      await order.save({ session });
+      await order.save();
 
+      // Clear cart
       await Cart.findOneAndUpdate(
         { userId },
-        { $set: { items: [], appliedCoupon: null, updatedAt: new Date() } },
-        { session }
+        { $set: { items: [], appliedCoupon: null, updatedAt: new Date() } }
       );
-      
-      await session.commitTransaction();
-      session.endSession();
       
       console.log(`Order completed in ${Date.now() - startTime}ms`);
       
@@ -491,14 +476,6 @@ const createOrder = async (req, res) => {
 
   } catch (error) {
     console.error('Error in createOrder:', error);
-    
-    try {
-      await session.abortTransaction();
-    } catch (abortError) {
-      console.error('Error aborting transaction:', abortError);
-    }
-    
-    session.endSession();
     
     return res.status(500).json({
       success: false,
