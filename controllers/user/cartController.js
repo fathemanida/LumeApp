@@ -98,10 +98,10 @@ const addToCart = async (req, res) => {
     let finalPrice = basePrice - offerDiscount;
     if (finalPrice < 0) finalPrice = 0;
     const totalPrice = finalPrice * quantity;
-        console.log('======maxdiscount per unit',maxDiscountPerUnit);
-    console.log('======offerDis',offerDiscount);
-    console.log('======finalPrice',finalPrice);
-    console.log('======totalprice',totalPrice);
+        console.log('======maxdiscount:', maxDiscount);
+    console.log('======offerDis:', offerDiscount);
+    console.log('======finalPrice:', finalPrice);
+    console.log('======totalprice:', totalPrice);
     console.log('======');
 
 
@@ -1188,7 +1188,6 @@ const removeCoupon = async (req, res) => {
  * @returns {Object} Object containing maxDiscount, bestOffer, and offerType
  */
 function getBestOffer(product, offers = [], quantity = 1) {
-  // Input validation
   if (!product || !Array.isArray(offers)) {
     console.warn("Invalid input to getBestOffer:", { product, offers });
     return { maxDiscount: 0, bestOffer: null, offerType: null };
@@ -1248,7 +1247,6 @@ function getBestOffer(product, offers = [], quantity = 1) {
     let applies = false;
     let currentOfferType = null;
 
-    // Check offer applicability
     if (offer.applicableOn === "all") {
       applies = true;
       currentOfferType = "all_products";
@@ -1288,13 +1286,11 @@ function getBestOffer(product, offers = [], quantity = 1) {
     }
 
     if (applies) {
-      // Calculate discount
       let discount =
         offer.discountType === "percentage"
           ? ((price * offer.discountValue) / 100) * quantity
           : offer.discountValue * quantity;
 
-      // Apply max discount cap if it exists
       if (offer.discountType === "percentage" && offer.maxDiscount) {
         discount = Math.min(discount, offer.maxDiscount);
         console.log(`- Capped at max discount: ${offer.maxDiscount}`);
@@ -1322,7 +1318,7 @@ function getBestOffer(product, offers = [], quantity = 1) {
   console.log("==============================\n");
 
   return {
-    maxDiscount: Math.max(0, maxDiscount), // Ensure non-negative
+    maxDiscount: Math.max(0, maxDiscount), 
     bestOffer,
     offerType,
   };
