@@ -691,148 +691,146 @@ html, body {
 
         let paymentInProgress = false;
         async function processPayment() {
-            if (paymentInProgress) return;
-            paymentInProgress = true;
-            const payBtn = document.getElementById('payNowBtn');
-            if (payBtn) {
-                payBtn.disabled = true;
-                payBtn.textContent = 'Processing...';
-            }
-            
-            const method = document.querySelector('input[name="paymentMethod"]:checked').value;
-            const addressId = '<%= address._id %>';
-            const loadingOverlay = document.getElementById('loadingOverlay');
-            
-            if (loadingOverlay) loadingOverlay.style.display = 'flex';
-            
-            try {
-                const payload = { 
-                    method, 
-                    addressId 
-                };
-                
-                if (method === 'upi') {
-                    const upiId = document.getElementById('upiId').value;
-                    if (!upiId) throw new Error('Please enter UPI ID');
-                    payload.upiId = upiId;
-                } else if (method === 'wallet') {
-                    const walletId = document.getElementById('walletId').value;
-                    if (!walletId) throw new Error('Please select a wallet');
-                    payload.walletId = walletId;
-                }
-                
-                if (isRetry === 'true') {
-                    payload.orderId = '<%= orderId %>';
-                }
-                
-                console.log('Sending payment request with payload:', payload);
-                
-                const res = await fetch('/payment/process', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                
-                let responseData;
-                try {
-                    responseData = await res.json();
-                    console.log('Payment response status:', res.status, 'Data:', responseData);
-                } catch (e) {
-                    console.error('Error parsing payment response:', e);
-                    throw new Error('Invalid response from server');
-                }
-                
-                if (!res.ok) {
-                    throw new Error(responseData.message || `Payment failed with status: ${res.status}`);
-                }
-                
-                return responseData;
-                const data = responseData;
-                if (data.razorpayOrderId) {
-                    const options = {
-                        key: "<%= RAZORPAY_KEY_ID %>",
-                        amount: data.amount,
-                        currency: data.currency,
-                        name: "Lume",
-                        description: "Order Payment",
-                        order_id: data.razorpayOrderId,
-                        handler: async function (response) {
-                            try {
-                                const verifyRes = await fetch('/verify-payment', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({
-                                        razorpay_payment_id: response.razorpay_payment_id,
-                                        razorpay_order_id: response.razorpay_order_id,
-                                        razorpay_signature: response.razorpay_signature,
-                                        orderId: data.orderId,
-                                        addressId: addressId
-                                    })
-                                });
-                                if (!verifyRes.ok) {
-                                    const errorData = await verifyRes.json();
-                                    throw new Error(errorData.message || `HTTP error! status: ${verifyRes.status}`);
-                                }
-                                const verifyData = await verifyRes.json();
-                                if (verifyData.redirect) {
-                                    window.location.href = verifyData.redirect;
-                                }
-                            } catch (error) {
-                                window.location.href = `/payment-failed?orderId=${data.orderId}&error=${encodeURIComponent(error.message)}`;
-                            }
-                        },
-                        prefill: {
-                            name: "<%= user.name %>",
-                            email: "<%= user.email %>",
-                            contact: "<%= user.phone %>"
-                        },
-                        theme: { color: "#D4B996" },
-                        modal: {
-                            ondismiss: function() {
-                                window.location.href = `/payment-failed?orderId=${data.orderId}&error=Payment cancelled by user`;
-                            }
+    if (paymentInProgress) return;
+    paymentInProgress = true;
+
+    const payBtn = document.getElementById('payNowBtn');
+    if (payBtn) {
+        payBtn.disabled = true;
+        payBtn.textContent = 'Processing...';
+    }
+
+    const method = document.querySelector('input[name="paymentMethod"]:checked').value;
+    const addressId = '<%= address._id %>';
+    const loadingOverlay = document.getElementById('loadingOverlay');
+
+    if (loadingOverlay) loadingOverlay.style.display = 'flex';
+
+    try {
+        const payload = { method, addressId };
+
+        if (method === 'upi') {
+            const upiId = document.getElementById('upiId').value;
+            if (!upiId) throw new Error('Please enter UPI ID');
+            payload.upiId = upiId;
+        } else if (method === 'wallet') {
+            const walletId = document.getElementById('walletId').value;
+            if (!walletId) throw new Error('Please select a wallet');
+            payload.walletId = walletId;
+        }
+
+        if (isRetry === 'true') {
+            payload.orderId = '<%= orderId %>';
+        }
+
+        console.log('Sending payment request with payload:', payload);
+
+        const res = await fetch('/payment/process', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        let responseData;
+        try {
+            responseData = await res.json();
+            console.log('Payment response status:', res.status, 'Data:', responseData);
+        } catch (e) {
+            console.error('Error parsing payment response:', e);
+            throw new Error('Invalid response from server');
+        }
+
+        if (!res.ok) {
+            throw new Error(responseData.message || `Payment failed with status: ${res.status}`);
+        }
+
+        const data = responseData;
+
+        if (data.razorpayOrderId) {
+            const options = {
+                key: "<%= RAZORPAY_KEY_ID %>",
+                amount: data.amount,
+                currency: data.currency,
+                name: "Lume",
+                description: "Order Payment",
+                order_id: data.razorpayOrderId,
+                handler: async function (response) {
+                    try {
+                        const verifyRes = await fetch('/verify-payment', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_signature: response.razorpay_signature,
+                                orderId: data.orderId,
+                                addressId: addressId
+                            })
+                        });
+                        if (!verifyRes.ok) {
+                            const errorData = await verifyRes.json();
+                            throw new Error(errorData.message || `HTTP error! status: ${verifyRes.status}`);
                         }
-                    };
-                    const rzp = new Razorpay(options);
-                    rzp.on('payment.failed', function (response) {
-                        window.location.href = `/payment-failed?orderId=${data.orderId}&error=${encodeURIComponent(response.error.description || 'Payment failed')}`;
-                    });
-                    rzp.open();
-                } else if (data.redirect) {
-                    window.location.href = data.redirect;
-                } else {
-                    if (data.success) {
-                        window.location.href = data.redirect || '/order-success';
-                    } else {
-                        let errorMessage = data.message || "Payment processing failed";
-                        throw new Error(errorMessage);
+                        const verifyData = await verifyRes.json();
+                        if (verifyData.redirect) {
+                            window.location.href = verifyData.redirect;
+                        }
+                    } catch (error) {
+                        window.location.href = `/payment-failed?orderId=${data.orderId}&error=${encodeURIComponent(error.message)}`;
+                    }
+                },
+                prefill: {
+                    name: "<%= user.name %>",
+                    email: "<%= user.email %>",
+                    contact: "<%= user.phone %>"
+                },
+                theme: { color: "#D4B996" },
+                modal: {
+                    ondismiss: function () {
+                        window.location.href = `/payment-failed?orderId=${data.orderId}&error=Payment cancelled by user`;
                     }
                 }
-            } catch (error) {
-                console.error('Payment processing error:', error);
-                
-                if (loadingOverlay) loadingOverlay.style.display = 'none';
-                if (payBtn) {
-                    payBtn.disabled = false;
-                    payBtn.textContent = 'Pay Now';
-                }
-                
-                Swal.fire({
-                    title: 'Payment Error',
-                    text: error.message || 'An error occurred while processing your payment. Please try again.',
-                    icon: 'error',
-                    confirmButtonColor: '#2c1810'
-                });
-                
-                // Reset payment in progress flag
-                paymentInProgress = false;
-                
-                // Log the error for debugging
-                if (error.stack) {
-                    console.error('Error stack:', error.stack);
-                }
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.on('payment.failed', function (response) {
+                window.location.href = `/payment-failed?orderId=${data.orderId}&error=${encodeURIComponent(response.error.description || 'Payment failed')}`;
+            });
+            rzp.open();
+        } else if (data.redirect) {
+            window.location.href = data.redirect;
+        } else {
+            if (data.success) {
+                window.location.href = data.redirect || '/order-success';
+            } else {
+                let errorMessage = data.message || "Payment processing failed";
+                throw new Error(errorMessage);
             }
         }
+
+    } catch (error) {
+        console.error('Payment processing error:', error);
+
+        if (loadingOverlay) loadingOverlay.style.display = 'none';
+        if (payBtn) {
+            payBtn.disabled = false;
+            payBtn.textContent = 'Pay Now';
+        }
+
+        Swal.fire({
+            title: 'Payment Error',
+            text: error.message || 'An error occurred while processing your payment. Please try again.',
+            icon: 'error',
+            confirmButtonColor: '#2c1810'
+        });
+
+        paymentInProgress = false;
+
+        if (error.stack) {
+            console.error('Error stack:', error.stack);
+        }
+    }
+}
 
         document.getElementById('upiId')?.addEventListener('input', () => validateForm('upi'));
         document.getElementById('walletId')?.addEventListener('input', () => validateForm('wallet'));
