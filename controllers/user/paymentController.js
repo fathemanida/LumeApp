@@ -628,7 +628,7 @@ const processPayment = async (req, res) => {
       startDate: { $lte: now },
       endDate: { $gte: now }
     });
-
+console.log('=====activeOffers',activeOffers);
     for (const item of cartData.items) {
       const product = item.productId;
       if (!product) continue;
@@ -758,7 +758,7 @@ const processPayment = async (req, res) => {
     }
 
     const priceAfterOffer = Math.max(0, totalPrice - totalOfferDiscount);
-    
+    console.log('=====priceAfterOffer',priceAfterOffer);
     if (cartData.appliedCoupon) {
       const coupon = cartData.appliedCoupon;
       const isCouponValid = !coupon.validTill || new Date(coupon.validTill) >= now;
@@ -817,7 +817,8 @@ const processPayment = async (req, res) => {
     cartData.finalCartTotal = finalPrice;
     
     await cartData.save();
-    
+    console.log('=====finalPrice',finalPrice);
+    console.log('=====cartData',cartData);
     const response = {
       success: true,
       cart: {
@@ -867,7 +868,7 @@ const processPayment = async (req, res) => {
       }
     };
 
-    console.log('Processed payment data:', JSON.stringify(response, null, 2));
+    console.log('Processed payment data:');
     return res.json(response);
   } catch (error) {
     console.error("Error in processPayment:", error);
@@ -1016,7 +1017,7 @@ const paymentConfirmation = async (req, res) => {
     res.render('orderConfirmation', responseData);
 
   } catch (error) {
-    console.error('❗ Error in paymentConfirmation:', error);
+    console.error('Error in paymentConfirmation:', error);
     
     res.status(500).render('error', { 
       message: 'Something went wrong while loading your order details.',
@@ -1031,6 +1032,7 @@ const paymentConfirmation = async (req, res) => {
 const paymentFailure = async (req, res) => {
   try {
     const { orderId, error } = req.query;
+
     
     if (orderId) {
       await Order.findByIdAndUpdate(orderId, {
