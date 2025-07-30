@@ -426,7 +426,7 @@ const createOrder = async (req, res) => {
     if (bulkOps.length > 0) {
       await Product.bulkWrite(bulkOps);
     }
-
+console.log('====payment mehotd',paymentMethod);
     if (paymentMethod === 'Razorpay') {
       try {
         const amountInPaise = Math.round(finalAmount * 100);
@@ -459,7 +459,6 @@ const createOrder = async (req, res) => {
       order.paymentStatus = paymentMethod === 'COD' ? 'Pending' : 'Paid';
       await order.save();
 
-      // Clear cart
       await Cart.findOneAndUpdate(
         { userId },
         { $set: { items: [], appliedCoupon: null, updatedAt: new Date() } }
@@ -638,13 +637,14 @@ const verifyPayment = async (req, res) => {
 
 const processPayment = async (req, res) => {
   try {
+    console.log('====req got');
     const { method, orderId, upiId, walletId } = req.body;
     const userId = req.session.user.id;
 
     if (!orderId) {
       return res.status(400).json({ success: false, message: 'Order ID is required' });
     }
-
+console.log('=====method,orderId,upiId,walletid',method,orderId,upiId,walletId);
     const order = await Order.findById(orderId)
       .populate('items.productId')
       .populate('address');
@@ -653,14 +653,12 @@ const processPayment = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Order not found' });
     }
 
-    // Verify the order belongs to the current user
     if (order.userId.toString() !== userId) {
       return res.status(403).json({ success: false, message: 'Unauthorized access to this order' });
     }
 
     if (method === 'Razorpay') {
-      // For Razorpay, we already created the order in createOrder
-      // Just return the existing Razorpay order details
+      
       if (!order.razorpayOrderId) {
         return res.status(400).json({ success: false, message: 'Invalid payment method for this order' });
       }
@@ -669,12 +667,11 @@ const processPayment = async (req, res) => {
         success: true,
         razorpayOrderId: order.razorpayOrderId,
         orderId: order._id,
-        amount: Math.round(order.totalAmount * 100), // Convert to paise
+        amount: Math.round(order.totalAmount * 100), 
         currency: 'INR',
         key: process.env.RAZORPAY_KEY_ID
       });
     } else if (method === 'COD' || method === 'Wallet' || method === 'UPI') {
-      // For COD, Wallet, and UPI, mark as paid and redirect to confirmation
       order.paymentStatus = method === 'COD' ? 'Pending' : 'Paid';
       order.status = 'Processing';
       
@@ -686,7 +683,6 @@ const processPayment = async (req, res) => {
       
       await order.save();
 
-      // Clear the user's cart
       await Cart.findOneAndUpdate(
         { userId },
         { $set: { items: [], appliedCoupon: null, updatedAt: new Date() } }
