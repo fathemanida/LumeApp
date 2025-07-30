@@ -290,7 +290,7 @@ const createOrder = async (req, res) => {
         price: basePrice,
         originalPrice,
         finalPrice,
-        status: 'pending'
+        status: 'Active'
       };
     });
 
@@ -315,7 +315,7 @@ const createOrder = async (req, res) => {
       totalAmount: finalAmount,
       shipping,
       paymentMethod,
-      status: 'pending',
+      status: 'Pending',
       address: addressId,
       couponDiscount: totalCouponDiscount,
       offerDiscount: totalOfferDiscount,
@@ -370,7 +370,7 @@ const createOrder = async (req, res) => {
         console.error('Razorpay error:', razorpayError);
         return res.status(500).json({ success: false, message: 'Failed to create Razorpay order' });
       }
-    } else if (['COD', 'WALLET', 'UPI'].includes(paymentMethod)) {
+    } else if (['COD', 'Wallet', 'UPI'].includes(paymentMethod)) {
       order.paymentStatus = paymentMethod === 'COD' ? 'Pending' : 'Paid';
       order.status = 'processing';
       await order.save();
