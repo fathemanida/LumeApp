@@ -204,6 +204,7 @@ const createOrder = async (req, res) => {
 
     const userId = req.session.user.id;
     let { addressId, paymentMethod, orderId } = req.body;
+    console.log('===orderId,address,method',orderId,paymentMethod,addressId);
 
     paymentMethod = (paymentMethod || '').trim().toLowerCase();
     const validPaymentMethods = {
