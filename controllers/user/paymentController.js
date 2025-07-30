@@ -47,7 +47,7 @@ const paymentMethod = async (req, res) => {
 
     // CASE 1: Retry Payment with Existing Failed Order
     if (orderId) {
-      order = await Order.findById(orderId).populate('items.productId appliedCoupon');
+      order = await Order.findById(orderId).populate('items.productId couponApplied');
 
       if (!order) {
         req.flash('error', 'Order not found');
@@ -72,7 +72,7 @@ const paymentMethod = async (req, res) => {
         discount: order.totalDiscount,
         shipping: order.shipping,
         totalPrice: order.finalPrice,
-        appliedCoupon: order.appliedCoupon
+        couponApplied: order.couponApplied
       };
 
       return res.render('payment', {
@@ -96,7 +96,7 @@ const paymentMethod = async (req, res) => {
           { path: 'category', populate: { path: 'categoryOffer' } }
         ]
       })
-      .populate('appliedCoupon');
+      .populate('couponApplied');
 
     if (!cart || cart.items.length === 0) {
       req.flash('error', 'Your cart is empty');
@@ -142,8 +142,8 @@ const paymentMethod = async (req, res) => {
 
     // Coupon logic
     let couponDiscount = 0;
-    if (cart.appliedCoupon) {
-      const coupon = await Coupon.findById(cart.appliedCoupon._id);
+    if (cart.couponApplied) {
+      const coupon = await Coupon.findById(cart.couponApplied._id);
       const isUsed = user.usedCoupons?.some(c => c.code === coupon.code);
       if (coupon && coupon.isActive && coupon.expiry > now && !isUsed) {
         const discountableAmount = subtotal - totalOfferDiscount;
@@ -170,7 +170,7 @@ const paymentMethod = async (req, res) => {
       discount: totalDiscount,
       shipping,
       totalPrice: finalTotal,
-      appliedCoupon: cart.appliedCoupon
+      couponApplied: cart.couponApplied
     };
 
     return res.render('payment', {
