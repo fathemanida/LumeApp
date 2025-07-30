@@ -636,6 +636,166 @@ const paymentConfirmation = async (req, res) => {
     });
   }
 };
+const verifyPayment = async (req, res) => {
+  try {
+    const {
+      razorpay_payment_id,
+      razorpay_order_id,
+      razorpay_signature,
+      orderId,
+      addressId
+    } = req.body;
+
+    console.log('Verifying payment:', {
+      razorpay_payment_id,
+      razorpay_order_id,
+      orderId,
+      addressId
+    });
+
+    if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing payment credentials',
+        redirect: `/payment-failed?orderId=${orderId}&error=Missing payment credentials`
+      });
+    }
+
+    const generated_signature = crypto
+      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+      .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+      .digest('hex');
+
+    if (generated_signature !== razorpay_signature) {
+      console.error('Signature verification failed:', {
+        generated: generated_signature,
+        received: razorpay_signature
+      });
+      return res.status(400).json({
+        success: false,
+        message: 'Signature verification failed',
+        redirect: `/payment-failed?orderId=${orderId}&error=Payment verification failed`
+      });
+    }
+
+    const order = await Order.findById(orderId)
+      .populate('appliedCoupon')
+      .populate('userId');
+
+    if (!order) {
+      console.error('Order not found:', orderId);
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found',
+        redirect: '/payment-failed?error=Order not found'
+      });
+    }
+
+    if (order.razorpayOrderId !== razorpay_order_id) {
+      console.error('Order ID mismatch:', {
+        stored: order.razorpayOrderId,
+        received: razorpay_order_id
+      });
+      return res.status(400).json({
+        success: false,
+        message: 'Order ID mismatch',
+        redirect: `/payment-failed?orderId=${orderId}&error=Order ID mismatch`
+      });
+    }
+
+    order.paymentStatus = 'Paid';
+    order.status = 'Processing';
+    order.paymentDetails = {
+      razorpay: {
+        paymentId: razorpay_payment_id,
+        orderId: razorpay_order_id,
+        signature: razorpay_signature,
+        verifiedAt: new Date()
+      },
+      method: 'Razorpay',
+      status: 'Completed',
+      amount: order.totalAmount,
+      currency: 'INR',
+      paidAt: new Date()
+    };
+
+    if (addressId) {
+      order.address = addressId;
+    }
+
+    order.items = order.items.map(item => ({
+      ...item.toObject(),
+      status: 'Processing',
+      updatedAt: new Date()
+    }));
+
+    await order.save();
+    console.log('Order updated successfully:', order._id);
+
+    if (order.appliedCoupon) {
+      try {
+        const { code, _id: couponId } = order.appliedCoupon;
+
+        await User.findByIdAndUpdate(
+          order.userId,
+          {
+            $addToSet: {
+              usedCoupons: {
+                code,
+                usedOn: new Date(),
+                orderId: order._id
+              }
+            }
+          }
+        );
+
+        await Coupon.findByIdAndUpdate(
+          couponId,
+          {
+            $inc: { usageCount: 1 },
+            $addToSet: { usedBy: order.userId },
+            lastUsedAt: new Date()
+          }
+        );
+      } catch (error) {
+        console.error('Error updating coupon usage:', error);
+      }
+    }
+
+    if (req.session.user) {
+      await Cart.findOneAndUpdate(
+        { userId: req.session.user.id },
+        {
+          $set: {
+            items: [],
+            discount: 0,
+            appliedCoupon: null,
+            updatedAt: new Date()
+          }
+        }
+      );
+      console.log('Cart cleared for user:', req.session.user.id);
+    }
+
+
+
+    return res.status(200).json({
+      success: true,
+      message: 'Payment verified successfully',
+      orderId: order._id,
+      redirect: `/payment-confirmation?orderId=${order._id}`
+    });
+
+  } catch (error) {
+    console.error('Payment verification error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+      redirect: `/payment-failed?orderId=${orderId}&error=Payment processing failed`
+    });
+  }
+};
 
 const paymentFailure = async (req, res) => {
   try {
