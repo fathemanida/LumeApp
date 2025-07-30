@@ -568,8 +568,10 @@ const paymentConfirmation = async (req, res) => {
         select: 'name houseNo roadArea city state pincode phone isDefault'
       })
       .populate({
-        path: 'appliedCoupon',
-        select: 'code discountType discountValue maxDiscount'
+        path: 'usedCoupon',
+        select: 'code discountType discountValue maxDiscount',
+        // Handle the case where the field might not exist in the schema
+        options: { strictPopulate: false }
       })
       .lean();
 
