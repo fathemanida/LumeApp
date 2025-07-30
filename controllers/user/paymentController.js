@@ -206,17 +206,16 @@ const createOrder = async (req, res) => {
     const userId = req.session.user.id;
     let { addressId, paymentMethod } = req.body;
     
-    // Normalize payment method to match schema enum values exactly
     paymentMethod = paymentMethod.trim();
     switch(paymentMethod.toLowerCase()) {
       case 'cod':
         paymentMethod = 'COD';
         break;
       case 'razorpay':
-        paymentMethod = 'Razorpay'; // Must be exactly 'Razorpay'
+        paymentMethod = 'Razorpay'; 
         break;
       case 'wallet':
-        paymentMethod = 'Wallet'; // Must be exactly 'Wallet'
+        paymentMethod = 'Wallet';
         break;
       default:
         return res.status(400).json({ success: false, message: 'Invalid payment method' });
@@ -397,8 +396,17 @@ const createOrder = async (req, res) => {
       order.status = 'Processing';
       await order.save();
 
+      // Clear the cart after successful order
+      await Cart.findOneAndUpdate(
+        { userId },
+        { $set: { items: [], appliedCoupon: null, updatedAt: new Date() } }
+      );
+
       return res.json({
         success: true,
+        orderId: order._id.toString(),
+        paymentMethod: paymentMethod,
+        amount: finalAmount,
         redirect: `/payment-confirmation?orderId=${order._id}`
       });
     } else {
@@ -407,7 +415,7 @@ const createOrder = async (req, res) => {
     await Cart.findOneAndUpdate(
       { userId },
       { $set: { items: [], appliedCoupon: null, updatedAt: new Date() } }
-    );s
+    );
 
   } catch (error) {
     console.error('Error in createOrder:', error);
