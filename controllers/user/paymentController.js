@@ -206,20 +206,27 @@ const createOrder = async (req, res) => {
     const userId = req.session.user.id;
     let { addressId, paymentMethod } = req.body;
     
-    paymentMethod = paymentMethod.trim();
-    switch(paymentMethod.toLowerCase()) {
-      case 'cod':
-        paymentMethod = 'COD';
-        break;
-      case 'razorpay':
-        paymentMethod = 'Razorpay'; 
-        break;
-      case 'wallet':
-        paymentMethod = 'Wallet';
-        break;
-      default:
-        return res.status(400).json({ success: false, message: 'Invalid payment method' });
+    // Log the incoming payment method for debugging
+    console.log('Received payment method:', paymentMethod);
+    
+    // Normalize the payment method
+    paymentMethod = paymentMethod.trim().toLowerCase();
+    
+    // Map to valid payment methods
+    const validPaymentMethods = {
+      'cod': 'COD',
+      'razorpay': 'Razorpay',
+      'wallet': 'Wallet',
+      'upi': 'UPI'
+    };
+    
+    if (!(paymentMethod in validPaymentMethods)) {
+      console.log('Invalid payment method received:', paymentMethod);
+      return res.status(400).json({ success: false, message: 'Invalid payment method' });
     }
+    
+    paymentMethod = validPaymentMethods[paymentMethod];
+    console.log('Normalized payment method to:', paymentMethod);
 
     if (!addressId || !paymentMethod) {
       return res.status(400).json({ success: false, message: 'Address and payment method are required' });
