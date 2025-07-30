@@ -206,12 +206,13 @@ const createOrder = async (req, res) => {
     const userId = req.session.user.id;
     let { addressId, paymentMethod } = req.body;
     
+    // Normalize payment method to match schema enum values exactly
     if (paymentMethod.toLowerCase() === 'razorpay') {
-      paymentMethod = 'razorpay'; 
+      paymentMethod = 'Razorpay'; // Capital 'R' as per schema
     } else if (paymentMethod.toLowerCase() === 'wallet') {
-      paymentMethod = 'Wallet'; 
+      paymentMethod = 'Wallet'; // Capital 'W' as per schema
     } else {
-      paymentMethod = paymentMethod.toUpperCase(); 
+      paymentMethod = paymentMethod.toUpperCase(); // For COD, UPI, etc.
     }
 
     if (!addressId || !paymentMethod) {
