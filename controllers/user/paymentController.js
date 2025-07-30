@@ -207,12 +207,19 @@ const createOrder = async (req, res) => {
     let { addressId, paymentMethod } = req.body;
     
     // Normalize payment method to match schema enum values exactly
-    if (paymentMethod.toLowerCase() === 'razorpay') {
-      paymentMethod = 'Razorpay'; // Capital 'R' as per schema
-    } else if (paymentMethod.toLowerCase() === 'wallet') {
-      paymentMethod = 'Wallet'; // Capital 'W' as per schema
-    } else {
-      paymentMethod = paymentMethod.toUpperCase(); // For COD, UPI, etc.
+    paymentMethod = paymentMethod.trim();
+    switch(paymentMethod.toLowerCase()) {
+      case 'cod':
+        paymentMethod = 'COD';
+        break;
+      case 'razorpay':
+        paymentMethod = 'Razorpay'; // Must be exactly 'Razorpay'
+        break;
+      case 'wallet':
+        paymentMethod = 'Wallet'; // Must be exactly 'Wallet'
+        break;
+      default:
+        return res.status(400).json({ success: false, message: 'Invalid payment method' });
     }
 
     if (!addressId || !paymentMethod) {
