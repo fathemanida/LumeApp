@@ -570,7 +570,6 @@ const paymentConfirmation = async (req, res) => {
       .populate({
         path: 'usedCoupon',
         select: 'code discountType discountValue maxDiscount',
-        // Handle the case where the field might not exist in the schema
         options: { strictPopulate: false }
       })
       .lean();
@@ -652,12 +651,18 @@ const paymentConfirmation = async (req, res) => {
     const responseData = {
       user: req.session.user,
       order: {
-        ...orderSummary,
+        ...order.toObject(), // Include all order fields
+        ...orderSummary,     // Include calculated summary
         items: formattedItems,
         address: order.address,
         canCancel: ['Pending', 'Processing', 'Confirmed'].includes(order.status),
         canTrack: ['Processing', 'Shipped', 'Out for Delivery'].includes(order.status),
-        paymentDetails: order.paymentDetails || {}
+        paymentDetails: order.paymentDetails || {},
+        // Ensure these fields are included for the template
+        totalAmount: order.totalAmount || totalAmount,
+        subtotal: subtotal,
+        discount: totalDiscount,
+        shipping: shipping
       },
       showSuccess: req.query.success === 'true',
       successMessage: 'Your order has been placed successfully!',
