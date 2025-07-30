@@ -207,9 +207,11 @@ const createOrder = async (req, res) => {
     let { addressId, paymentMethod } = req.body;
     
     if (paymentMethod.toLowerCase() === 'razorpay') {
-      paymentMethod = 'Razorpay'; 
+      paymentMethod = 'razorpay'; 
+    } else if (paymentMethod.toLowerCase() === 'wallet') {
+      paymentMethod = 'Wallet'; 
     } else {
-      paymentMethod = paymentMethod.toUpperCase();
+      paymentMethod = paymentMethod.toUpperCase(); 
     }
 
     if (!addressId || !paymentMethod) {
@@ -217,6 +219,7 @@ const createOrder = async (req, res) => {
     }
 
 
+    console.log('Searching for cart with userId:', userId);
     const cart = await Cart.findOne({ userId })
       .populate({
         path: 'items.productId',
@@ -243,7 +246,15 @@ const createOrder = async (req, res) => {
       })
       .lean();
 
-    if (!cart || !cart.items || cart.items.length === 0) {
+    console.log('Found cart:', JSON.stringify(cart, null, 2));
+    
+    if (!cart) {
+      console.log('No cart found for user');
+      return res.status(400).json({ success: false, message: 'Your cart is empty' });
+    }
+    
+    if (!cart.items || cart.items.length === 0) {
+      console.log('Cart found but has no items');
       return res.status(400).json({ success: false, message: 'Your cart is empty' });
     }
 
