@@ -194,33 +194,23 @@ const paymentMethod = async (req, res) => {
 
 
 const createOrder = async (req, res) => {
-  let transaction;
   try {
     console.log('=== Starting createOrder ===');
     const startTime = Date.now();
     console.log('Request body:', JSON.stringify(req.body, null, 2));
 
     if (!req.session.user) {
-      console.error('No user session found');
       return res.status(401).json({ success: false, message: 'User not authenticated' });
     }
 
     const userId = req.session.user.id;
-    const { addressId, paymentMethod } = req.body;
+    let { addressId, paymentMethod } = req.body;
 
-    console.log(`Processing order for user ${userId} with payment method: ${paymentMethod}`);
-
-    if (!addressId) {
-      console.error('No addressId provided in request');
-      return res.status(400).json({ success: false, message: 'Address is required' });
+    if (!addressId || !paymentMethod) {
+      return res.status(400).json({ success: false, message: 'Address and payment method are required' });
     }
 
-    if (!paymentMethod) {
-      console.error('No paymentMethod provided in request');
-      return res.status(400).json({ success: false, message: 'Payment method is required' });
-    }
 
-    console.log('Fetching cart for user...');
     const cart = await Cart.findOne({ userId })
       .populate({
         path: 'items.productId',
@@ -245,26 +235,21 @@ const createOrder = async (req, res) => {
         path: 'appliedCoupon',
         select: 'code discountValue discountType maxDiscount minOrderAmount validTill'
       })
-      .lean()
-      .maxTimeMS(10000);
-
-    console.log(`Cart fetched in ${Date.now() - startTime}ms`);
+      .lean();
 
     if (!cart || !cart.items || cart.items.length === 0) {
-      console.error('Cart is empty or not found');
       return res.status(400).json({ success: false, message: 'Your cart is empty' });
     }
-
-    console.log(`Processing ${cart.items.length} items in cart`);
 
     let totalPrice = 0;
     let totalOfferDiscount = 0;
     let totalCouponDiscount = 0;
     const now = new Date();
 
-    for (const item of cart.items) {
+    const processedItems = cart.items.map(item => {
       const product = item.productId;
       const quantity = item.quantity;
+
       const basePrice = product.salePrice && product.salePrice < product.regularPrice
         ? product.salePrice
         : product.regularPrice;
@@ -272,29 +257,42 @@ const createOrder = async (req, res) => {
       const originalPrice = basePrice * quantity;
 
       let productOfferDiscount = 0;
-      if (product.offer?.isActive &&
+      if (
+        product.offer?.isActive &&
         (!product.offer.startDate || new Date(product.offer.startDate) <= now) &&
-        (!product.offer.expiryDate || new Date(product.offer.expiryDate) >= now)) {
+        (!product.offer.expiryDate || new Date(product.offer.expiryDate) >= now)
+      ) {
         productOfferDiscount = product.offer.discountType === 'percentage'
           ? (originalPrice * product.offer.discountValue) / 100
           : product.offer.discountValue * quantity;
       }
 
       let categoryOfferDiscount = 0;
-      if (product.category?.categoryOffer?.active &&
+      if (
+        product.category?.categoryOffer?.active &&
         (!product.category.categoryOffer.startDate || new Date(product.category.categoryOffer.startDate) <= now) &&
-        (!product.category.categoryOffer.expiryDate || new Date(product.category.categoryOffer.expiryDate) >= now)) {
+        (!product.category.categoryOffer.expiryDate || new Date(product.category.categoryOffer.expiryDate) >= now)
+      ) {
         categoryOfferDiscount = product.category.categoryOffer.discountType === 'percentage'
           ? (originalPrice * product.category.categoryOffer.discountValue) / 100
           : product.category.categoryOffer.discountValue * quantity;
       }
 
       const offerDiscount = Math.max(productOfferDiscount, categoryOfferDiscount);
-      const priceAfterOffer = originalPrice - offerDiscount;
+      const finalPrice = originalPrice - offerDiscount;
 
       totalPrice += originalPrice;
       totalOfferDiscount += offerDiscount;
-    }
+
+      return {
+        productId: product._id,
+        quantity,
+        price: basePrice,
+        originalPrice,
+        finalPrice,
+        status: 'pending'
+      };
+    });
 
     const priceAfterOffer = totalPrice - totalOfferDiscount;
 
@@ -313,17 +311,11 @@ const createOrder = async (req, res) => {
 
     const orderData = {
       userId,
-      items: cart.items.map(item => ({
-        productId: item.productId._id,
-        quantity: item.quantity,
-        price: item.basePrice,
-        totalPrice: item.finalPrice,
-        status: 'Pending'
-      })),
+      items: processedItems,
       totalAmount: finalAmount,
       shipping,
       paymentMethod,
-      status: 'Pending',
+      status: 'pending',
       address: addressId,
       couponDiscount: totalCouponDiscount,
       offerDiscount: totalOfferDiscount,
@@ -331,8 +323,7 @@ const createOrder = async (req, res) => {
     };
 
     const order = new Order(orderData);
-    await order.save({ maxTimeMS: 10000 });
-    console.log('Order saved:', order._id);
+    await order.save();
 
     const bulkOps = cart.items.map(item => ({
       updateOne: {
@@ -354,7 +345,7 @@ const createOrder = async (req, res) => {
       { $set: { items: [], appliedCoupon: null, updatedAt: new Date() } }
     );
 
-    if (paymentMethod === 'Razorpay') {
+    if (paymentMethod === 'RAZORPAY') {
       try {
         const amountInPaise = Math.round(finalAmount * 100);
         const razorpayOrder = await razorpay.orders.create({
@@ -379,9 +370,9 @@ const createOrder = async (req, res) => {
         console.error('Razorpay error:', razorpayError);
         return res.status(500).json({ success: false, message: 'Failed to create Razorpay order' });
       }
-    } else if (['COD', 'Wallet', 'UPI'].includes(paymentMethod)) {
+    } else if (['COD', 'WALLET', 'UPI'].includes(paymentMethod)) {
       order.paymentStatus = paymentMethod === 'COD' ? 'Pending' : 'Paid';
-      order.status = 'Processing';
+      order.status = 'processing';
       await order.save();
 
       return res.json({
@@ -391,6 +382,7 @@ const createOrder = async (req, res) => {
     } else {
       return res.status(400).json({ success: false, message: 'Invalid payment method' });
     }
+
   } catch (error) {
     console.error('Error in createOrder:', error);
     return res.status(500).json({
@@ -399,7 +391,9 @@ const createOrder = async (req, res) => {
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
-}
+};
+
+
 
 
 
