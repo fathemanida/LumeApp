@@ -205,6 +205,12 @@ const createOrder = async (req, res) => {
 
     const userId = req.session.user.id;
     let { addressId, paymentMethod } = req.body;
+    
+    if (paymentMethod.toLowerCase() === 'razorpay') {
+      paymentMethod = 'razorpay';
+    } else {
+      paymentMethod = paymentMethod.toUpperCase();
+    }
 
     if (!addressId || !paymentMethod) {
       return res.status(400).json({ success: false, message: 'Address and payment method are required' });
