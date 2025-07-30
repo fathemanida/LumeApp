@@ -195,19 +195,37 @@ const paymentMethod = async (req, res) => {
 
 
 const createOrder = async (req, res) => {
+  let transaction;
   try {
+    console.log('=== Starting createOrder ===');
     const startTime = Date.now();
+    console.log('Request body:', JSON.stringify(req.body, null, 2));
+    
+    if (!req.session.user) {
+      console.error('No user session found');
+      return res.status(401).json({ success: false, message: 'User not authenticated' });
+    }
+    
     const userId = req.session.user.id;
     const { addressId, paymentMethod } = req.body;
+    
+    console.log(`Processing order for user ${userId} with payment method: ${paymentMethod}`);
 
     if (!addressId) {
+      console.error('No addressId provided in request');
       return res.status(400).json({ success: false, message: 'Address is required' });
     }
+    
+    if (!paymentMethod) {
+      console.error('No paymentMethod provided in request');
+      return res.status(400).json({ success: false, message: 'Payment method is required' });
+    }
 
+    console.log('Fetching cart for user...');
     const cart = await Cart.findOne({ userId })
       .populate({
         path: 'items.productId',
-        select: 'productName salePrice regularPrice offer category quantity status',
+        select: 'productName salePrice regularPrice offer category quantity status images',
         populate: [
           { 
             path: 'offer',
@@ -216,7 +234,7 @@ const createOrder = async (req, res) => {
           },
           { 
             path: 'category', 
-            select: 'categoryOffer',
+            select: 'name categoryOffer',
             populate: { 
               path: 'categoryOffer',
               select: 'active discountType discountValue name startDate expiryDate'
@@ -226,13 +244,24 @@ const createOrder = async (req, res) => {
       })
       .populate({
         path: 'appliedCoupon',
-        select: 'code discountValue discountType maxDiscount'
+        select: 'code discountValue discountType maxDiscount minOrderAmount validTill'
       })
-      .lean();
+      .lean()
+      .maxTimeMS(10000); // 10 second timeout
+      
+    console.log(`Cart fetched in ${Date.now() - startTime}ms`);
 
-    if (!cart || !cart.items || cart.items.length === 0) {
+    if (!cart) {
+      console.error('No cart found for user');
       return res.status(400).json({ success: false, message: 'Your cart is empty' });
     }
+    
+    if (!cart.items || cart.items.length === 0) {
+      console.error('No items in cart');
+      return res.status(400).json({ success: false, message: 'Your cart is empty' });
+    }
+    
+    console.log(`Processing ${cart.items.length} items in cart`);
 
     let totalPrice = 0;
     let totalOfferDiscount = 0;
@@ -456,8 +485,10 @@ console.log('====payment mehotd',paymentMethod);
       }
     } else if (paymentMethod === 'COD' || paymentMethod === 'Wallet') {
       order.status = 'Processing';
+      console.log('===order.status',order.status);
       order.paymentStatus = paymentMethod === 'COD' ? 'Pending' : 'Paid';
       await order.save();
+      console.log('====payment status',order.paymentStatus);
 
       await Cart.findOneAndUpdate(
         { userId },

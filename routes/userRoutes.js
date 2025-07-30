@@ -137,14 +137,17 @@ router.get('/proceed-payment',userAuth.isLogin,paymentController.paymentMethod)
 
 router.post('/create-order',userAuth.isLogin,paymentController.createOrder)
 
-router.post('/verify-payment',userAuth.isLogin,paymentController.verifyPayment)
+// Payment routes
+router.post('/payment/process', userAuth.isLogin, paymentController.processPayment);
+router.get('/payment-confirmation', userAuth.isLogin, paymentController.paymentConfirmation);
+router.post('/verify-payment', userAuth.isLogin, paymentController.verifyPayment);
+router.get('/payment-failure', userAuth.isLogin, paymentController.paymentFailure);
 
-router.post('/payment/process', userAuth.isLogin, paymentController.processPayment)
-router.get('/payment-confirmation',userAuth.isLogin,paymentController.paymentConfirmation)
-router.get('/orders',userAuth.isLogin,orderController.orders)
-router.get('/orders/:orderId', userAuth.isLogin, orderController.orderDetails)
-router.post('/orders/:orderId/return', userAuth.isLogin, orderController.returnRequest)
-router.get('/orders/:orderId/invoice', userAuth.isLogin, orderController.downloadInvoice)
+// Order routes
+router.get('/orders', userAuth.isLogin, orderController.orders);
+router.get('/orders/:orderId', userAuth.isLogin, orderController.orderDetails);
+router.post('/orders/:orderId/return', userAuth.isLogin, orderController.returnRequest);
+router.get('/orders/:orderId/invoice', userAuth.isLogin, orderController.downloadInvoice);
 
 router.post('/wishlist/add',userAuth.isLogin,wishlistController.addToWishlist)
 router.get('/wishlist', userAuth.isLogin, wishlistController.getWishlist)
