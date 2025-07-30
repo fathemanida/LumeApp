@@ -207,7 +207,7 @@ const createOrder = async (req, res) => {
     let { addressId, paymentMethod } = req.body;
     
     if (paymentMethod.toLowerCase() === 'razorpay') {
-      paymentMethod = 'razorpay';
+      paymentMethod = 'Razorpay'; 
     } else {
       paymentMethod = paymentMethod.toUpperCase();
     }
