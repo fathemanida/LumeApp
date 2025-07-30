@@ -697,6 +697,46 @@ function decrementQuantity() {
       }
     });
 
+    async function buyNow(productId) {
+      try {
+        const quantity = parseInt(document.getElementById('quantity').value) || 1;
+        const size = selectedSize || 'default';
+        
+        const response = await fetch('/cart/add', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            productId: productId,
+            quantity: quantity,
+            size: size,
+            buyNow: true // Flag to indicate this is a buy now action
+          })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          // Redirect to checkout page
+          window.location.href = '/checkout';
+        } else {
+          showToast({
+            title: 'Error',
+            message: data.message || 'Failed to process your request',
+            type: 'error'
+          });
+        }
+      } catch (error) {
+        console.error('Buy Now error:', error);
+        showToast({
+          title: 'Error',
+          message: 'An error occurred while processing your request',
+          type: 'error'
+        });
+      }
+    }
+
     function addToCart(productId) {
       const addToCartBtn = document.querySelector('.btn-dark');
       const originalText = addToCartBtn.innerHTML;
