@@ -378,7 +378,7 @@ const createOrder = async (req, res) => {
       }
     } else if (['COD', 'Wallet', 'UPI'].includes(paymentMethod)) {
       order.paymentStatus = paymentMethod === 'COD' ? 'Pending' : 'Paid';
-      order.status = 'processing';
+      order.status = 'Processing';
       await order.save();
 
       return res.json({
