@@ -199,22 +199,22 @@ const createOrder = async (req, res) => {
     console.log('=== Starting createOrder ===');
     const startTime = Date.now();
     console.log('Request body:', JSON.stringify(req.body, null, 2));
-    
+
     if (!req.session.user) {
       console.error('No user session found');
       return res.status(401).json({ success: false, message: 'User not authenticated' });
     }
-    
+
     const userId = req.session.user.id;
     const { addressId, paymentMethod } = req.body;
-    
+
     console.log(`Processing order for user ${userId} with payment method: ${paymentMethod}`);
 
     if (!addressId) {
       console.error('No addressId provided in request');
       return res.status(400).json({ success: false, message: 'Address is required' });
     }
-    
+
     if (!paymentMethod) {
       console.error('No paymentMethod provided in request');
       return res.status(400).json({ success: false, message: 'Payment method is required' });
@@ -226,15 +226,15 @@ const createOrder = async (req, res) => {
         path: 'items.productId',
         select: 'productName salePrice regularPrice offer category quantity status images',
         populate: [
-          { 
+          {
             path: 'offer',
             select: 'isActive discountType discountValue name startDate expiryDate',
             match: { isActive: true }
           },
-          { 
-            path: 'category', 
+          {
+            path: 'category',
             select: 'name categoryOffer',
-            populate: { 
+            populate: {
               path: 'categoryOffer',
               select: 'active discountType discountValue name startDate expiryDate'
             }
@@ -246,31 +246,23 @@ const createOrder = async (req, res) => {
         select: 'code discountValue discountType maxDiscount minOrderAmount validTill'
       })
       .lean()
-      .maxTimeMS(10000); // 10 second timeout
-      
+      .maxTimeMS(10000);
+
     console.log(`Cart fetched in ${Date.now() - startTime}ms`);
 
-    if (!cart) {
-      console.error('No cart found for user');
+    if (!cart || !cart.items || cart.items.length === 0) {
+      console.error('Cart is empty or not found');
       return res.status(400).json({ success: false, message: 'Your cart is empty' });
     }
-    
-    if (!cart.items || cart.items.length === 0) {
-      console.error('No items in cart');
-      return res.status(400).json({ success: false, message: 'Your cart is empty' });
-    }
-    
+
     console.log(`Processing ${cart.items.length} items in cart`);
 
     let totalPrice = 0;
     let totalOfferDiscount = 0;
     let totalCouponDiscount = 0;
     const now = new Date();
-    
-    console.log(`Processing cart items...`);
-    const processStartTime = Date.now();
 
-    cart.items.forEach(item => {
+    for (const item of cart.items) {
       const product = item.productId;
       const quantity = item.quantity;
       const basePrice = product.salePrice && product.salePrice < product.regularPrice
@@ -280,97 +272,45 @@ const createOrder = async (req, res) => {
       const originalPrice = basePrice * quantity;
 
       let productOfferDiscount = 0;
-      if (product.offer?.isActive && 
-          (!product.offer.startDate || new Date(product.offer.startDate) <= now) &&
-          (!product.offer.expiryDate || new Date(product.offer.expiryDate) >= now)) {
-        if (product.offer.discountType === 'percentage') {
-          productOfferDiscount = (originalPrice * product.offer.discountValue) / 100;
-        } else {
-          productOfferDiscount = product.offer.discountValue * quantity;
-        }
+      if (product.offer?.isActive &&
+        (!product.offer.startDate || new Date(product.offer.startDate) <= now) &&
+        (!product.offer.expiryDate || new Date(product.offer.expiryDate) >= now)) {
+        productOfferDiscount = product.offer.discountType === 'percentage'
+          ? (originalPrice * product.offer.discountValue) / 100
+          : product.offer.discountValue * quantity;
       }
 
       let categoryOfferDiscount = 0;
       if (product.category?.categoryOffer?.active &&
-          (!product.category.categoryOffer.startDate || new Date(product.category.categoryOffer.startDate) <= now) &&
-          (!product.category.categoryOffer.expiryDate || new Date(product.category.categoryOffer.expiryDate) >= now)) {
-        if (product.category.categoryOffer.discountType === 'percentage') {
-          categoryOfferDiscount = (originalPrice * product.category.categoryOffer.discountValue) / 100;
-        } else {
-          categoryOfferDiscount = product.category.categoryOffer.discountValue * quantity;
-        }
+        (!product.category.categoryOffer.startDate || new Date(product.category.categoryOffer.startDate) <= now) &&
+        (!product.category.categoryOffer.expiryDate || new Date(product.category.categoryOffer.expiryDate) >= now)) {
+        categoryOfferDiscount = product.category.categoryOffer.discountType === 'percentage'
+          ? (originalPrice * product.category.categoryOffer.discountValue) / 100
+          : product.category.categoryOffer.discountValue * quantity;
       }
 
       const offerDiscount = Math.max(productOfferDiscount, categoryOfferDiscount);
       const priceAfterOffer = originalPrice - offerDiscount;
 
-      item.originalPrice = originalPrice;
-      item.basePrice = basePrice;
-      item.priceAfterOffer = priceAfterOffer;
-      item.offerDiscount = offerDiscount;
-      // Determine which offer to apply (product or category)
-      if (productOfferDiscount >= categoryOfferDiscount) {
-        item.appliedOffer = product.offer?.isActive ? {
-          offerId: product.offer._id,
-          offerType: 'product',
-          offerName: product.offer.name || '',
-          discountType: product.offer.discountType,
-          discountValue: product.offer.discountValue,
-          discountAmount: productOfferDiscount
-        } : null;
-      } else {
-        item.appliedOffer = product.category?.categoryOffer?.active ? {
-          offerId: product.category.categoryOffer._id,
-          offerType: 'category',
-          offerName: product.category.categoryOffer.name || '',
-          discountType: product.category.categoryOffer.discountType,
-          discountValue: product.category.categoryOffer.discountValue,
-          discountAmount: categoryOfferDiscount
-        } : null;
-      }
-
       totalPrice += originalPrice;
       totalOfferDiscount += offerDiscount;
     }
-    
-    console.log(`Cart items processed in ${Date.now() - processStartTime}ms`);
-    
-    // Validate cart totals
-    if (isNaN(totalPrice) || totalPrice < 0) {
-      console.error('Invalid cart total calculated:', totalPrice);
-      return res.status(500).json({ success: false, message: 'Error calculating cart total' });
-    }
+
+    const priceAfterOffer = totalPrice - totalOfferDiscount;
 
     if (cart.appliedCoupon) {
-      const priceAfterOffer = totalPrice - totalOfferDiscount;
-      if (cart.appliedCoupon.discountType === 'PERCENTAGE') {
-        totalCouponDiscount = (priceAfterOffer * cart.appliedCoupon.discountValue) / 100;
-        if (cart.appliedCoupon.maxDiscount) {
-          totalCouponDiscount = Math.min(totalCouponDiscount, cart.appliedCoupon.maxDiscount);
-        }
-      } else {
-        totalCouponDiscount = cart.appliedCoupon.discountValue;
+      totalCouponDiscount = cart.appliedCoupon.discountType === 'PERCENTAGE'
+        ? (priceAfterOffer * cart.appliedCoupon.discountValue) / 100
+        : cart.appliedCoupon.discountValue;
+
+      if (cart.appliedCoupon.maxDiscount) {
+        totalCouponDiscount = Math.min(totalCouponDiscount, cart.appliedCoupon.maxDiscount);
       }
     }
 
-    // Calculate total price after offers
-    const totalPriceAfterOffer = cart.items.reduce((sum, item) => sum + (item.priceAfterOffer || 0), 0);
-    
-    cart.items.forEach(item => {
-      const itemCouponShare = totalCouponDiscount > 0 && totalPriceAfterOffer > 0
-        ? (item.priceAfterOffer / totalPriceAfterOffer) * totalCouponDiscount
-        : 0;
-      item.couponPerUnit = item.quantity > 0 ? itemCouponShare / item.quantity : 0;
-      item.totalCouponDiscount = itemCouponShare;
-      item.finalPrice = item.priceAfterOffer - itemCouponShare;
-    });
-
     const shipping = totalPrice >= 1500 ? 0 : 40;
-    const finalAmount = Math.max(0, totalPrice - totalOfferDiscount - totalCouponDiscount + shipping);
-    
-    console.log('Final amount:', finalAmount);
-    
-    // Prepare order data
+    const finalAmount = Math.max(0, priceAfterOffer - totalCouponDiscount + shipping);
+
     const orderData = {
       userId,
       items: cart.items.map(item => ({
@@ -389,45 +329,31 @@ const createOrder = async (req, res) => {
       offerDiscount: totalOfferDiscount,
       subtotal: totalPrice
     };
-    
-    // Save order to database with timeout
-    console.log('Saving order to database...');
+
     const order = new Order(orderData);
     await order.save({ maxTimeMS: 10000 });
     console.log('Order saved:', order._id);
-    
-    // Update product quantities
-    // Update product quantities
-    const bulkOps = [];
-    for (const item of cart.items) {
-      if (item.productId && item.productId._id) {
-        bulkOps.push({
-          updateOne: {
-            filter: { _id: item.productId._id },
-            update: { $inc: { quantity: -item.quantity } }
-          }
-        });
+
+    const bulkOps = cart.items.map(item => ({
+      updateOne: {
+        filter: { _id: item.productId._id },
+        update: { $inc: { quantity: -item.quantity } }
       }
-    }
-    
+    }));
+
     if (bulkOps.length > 0) {
       try {
         await Product.bulkWrite(bulkOps, { ordered: false });
       } catch (bulkWriteError) {
         console.error('Error updating product quantities:', bulkWriteError);
-        // Continue with order creation even if stock update fails
       }
     }
-    
-    console.log(`Order created in ${Date.now() - startTime}ms`);
-    
-    // Clear cart
+
     await Cart.findOneAndUpdate(
       { userId },
       { $set: { items: [], appliedCoupon: null, updatedAt: new Date() } }
     );
-    
-    // Handle different payment methods
+
     if (paymentMethod === 'Razorpay') {
       try {
         const amountInPaise = Math.round(finalAmount * 100);
@@ -437,10 +363,10 @@ const createOrder = async (req, res) => {
           receipt: order._id.toString(),
           payment_capture: 1
         });
-        
+
         order.razorpayOrderId = razorpayOrder.id;
         await order.save();
-        
+
         return res.json({
           success: true,
           orderId: order._id,
@@ -449,16 +375,15 @@ const createOrder = async (req, res) => {
           currency: 'INR',
           key: process.env.RAZORPAY_KEY_ID
         });
-        
       } catch (razorpayError) {
         console.error('Razorpay error:', razorpayError);
-        throw new Error('Failed to create Razorpay order');
+        return res.status(500).json({ success: false, message: 'Failed to create Razorpay order' });
       }
-    } else if (paymentMethod === 'COD' || paymentMethod === 'Wallet' || paymentMethod === 'UPI') {
+    } else if (['COD', 'Wallet', 'UPI'].includes(paymentMethod)) {
       order.paymentStatus = paymentMethod === 'COD' ? 'Pending' : 'Paid';
       order.status = 'Processing';
       await order.save();
-      
+
       return res.json({
         success: true,
         redirect: `/payment-confirmation?orderId=${order._id}`
@@ -466,7 +391,6 @@ const createOrder = async (req, res) => {
     } else {
       return res.status(400).json({ success: false, message: 'Invalid payment method' });
     }
-    
   } catch (error) {
     console.error('Error in createOrder:', error);
     return res.status(500).json({
@@ -475,7 +399,9 @@ const createOrder = async (req, res) => {
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
-};
+}
+
+
 
 const processPayment = async (req, res) => {
   try {

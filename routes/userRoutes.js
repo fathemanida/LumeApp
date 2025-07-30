@@ -148,28 +148,17 @@ router.get('/orders', userAuth.isLogin, orderController.orders);
 router.get('/orders/:orderId', userAuth.isLogin, orderController.orderDetails);
 router.post('/orders/:orderId/return', userAuth.isLogin, orderController.returnRequest);
 router.get('/orders/:orderId/invoice', userAuth.isLogin, orderController.downloadInvoice);
+router.post('/orders/:orderId/cancel', userAuth.isLogin, orderController.cancelOrder);
+router.post('/orders/:orderId/items/:itemId/cancel', userAuth.isLogin, orderController.cancelOrderItem);
 
-router.post('/wishlist/add',userAuth.isLogin,wishlistController.addToWishlist)
-router.get('/wishlist', userAuth.isLogin, wishlistController.getWishlist)
+// Wishlist routes
+router.post('/wishlist/add', userAuth.isLogin, wishlistController.addToWishlist);
+router.get('/wishlist', userAuth.isLogin, wishlistController.getWishlist);
 
-///wallet///
+// Wallet routes
 router.get('/wallet', userAuth.isLogin, walletController.getWallet);
 router.get('/wallet/transactions', userAuth.isLogin, walletController.getTransactions);
 router.post('/wallet/refund', userAuth.isLogin, walletController.addRefund);
-
-router.get('/payment-failed', userAuth.isLogin, paymentController.paymentFailure);
-
-
-//footr//
-
-router.get('/faqs',footerController.faq)
-// Order routes
-router.get('/orders', userAuth.isLogin, orderController.orders);
-router.get('/order-details/:orderId', userAuth.isLogin, orderController.orderDetails);
-
-// Order cancellation routes
-router.post('/orders/:orderId/cancel', userAuth.isLogin, orderController.cancelOrder);
-router.post('/orders/:orderId/items/:itemId/cancel', userAuth.isLogin, orderController.cancelOrderItem);
 
 // Payment routes
 router.get('/proceed-payment', userAuth.isLogin, paymentController.paymentMethod);
@@ -178,6 +167,10 @@ router.post('/payment/process', userAuth.isLogin, paymentController.processPayme
 router.get('/payment-confirmation', userAuth.isLogin, paymentController.paymentConfirmation);
 router.post('/verify-payment', userAuth.isLogin, paymentController.verifyPayment);
 router.get('/payment-failure', userAuth.isLogin, paymentController.paymentFailure);
+router.get('/payment-failed', userAuth.isLogin, paymentController.paymentFailure); // Alias for payment-failure
+
+// Footer routes
+router.get('/faqs', footerController.faq);
 
 // Footer routes
 router.get('/privacy-policy', footerController.privacyPolicy);
