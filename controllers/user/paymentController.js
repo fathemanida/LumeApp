@@ -24,113 +24,55 @@ const razorpay = new Razorpay({
 });
 const paymentMethod = async (req, res) => {
   try {
-    console.log('Payment method called');
-
+    console.log('🔔 Payment method called');
+    
     if (!req.session.user) {
       return res.redirect('/login');
     }
-    const orderId=req.query.orderId
-    console.log('===orderId',orderId);
 
     const userId = req.session.user.id;
     const user = await User.findById(userId);
-
     const address = await Address.findOne({ userId });
+
     if (!address) {
       req.flash('error', 'Please add a default address before proceeding to payment');
       return res.redirect('/checkout');
     }
 
+    // Extract orderId based on method
+    const orderId = req.method === 'POST' ? req.body.orderId : req.query.orderId;
+    console.log('🧾 orderId:', orderId);
+
     let order;
-    if (req.body.orderId) {
-      order = await Order.findById(req.body.orderId).populate('items.productId appliedCoupon');
+
+    // CASE 1: Retry Payment with Existing Failed Order
+    if (orderId) {
+      order = await Order.findById(orderId).populate('items.productId appliedCoupon');
+
       if (!order) {
         req.flash('error', 'Order not found');
         return res.redirect('/orders');
       }
-    } else {
-      const cart = await Cart.findOne({ userId })
-        .populate({
-          path: 'items.productId',
-          populate: [
-            { path: 'offer' },
-            { path: 'category', populate: { path: 'categoryOffer' } }
-          ]
-        })
-        .populate('appliedCoupon');
 
-      if (!cart || !cart.items.length) {
-        req.flash('error', 'Your cart is empty');
-        return res.redirect('/cart');
-      }
-
-      const now = new Date();
-      const activeOffers = await Offer.find({
-        isActive: true,
-        startDate: { $lte: now },
-        endDate: { $gte: now }
-      });
-
-      let subtotal = 0;
-      let totalOfferDiscount = 0;
-      const items = [];
-
-      for (const item of cart.items) {
-        const product = item.productId;
-        if (!product || !product.isListed) continue;
-
-        const quantity = item.quantity;
-        const basePrice = product.salePrice && product.salePrice < product.regularPrice
-          ? product.salePrice
-          : product.regularPrice;
-
-        const originalPrice = basePrice * quantity;
-        subtotal += originalPrice;
-
-        const { maxDiscount: offerDiscount } = getBestOffer(product, activeOffers, quantity);
-        totalOfferDiscount += offerDiscount;
-
-        items.push({
-          productId: product._id,
-          name: product.productName || 'Product',
-          price: basePrice,
-          quantity: quantity,
-          total: basePrice * quantity,
-          image: product.images?.[0] || '/images/default-product.png',
-          offerDiscount: offerDiscount
-        });
-      }
-
-      let couponDiscount = 0;
-      if (cart.appliedCoupon) {
-        const coupon = await Coupon.findOne({ _id: cart.appliedCoupon._id });
-        const isUsed = user.usedCoupons?.some(c => c.code === coupon.code);
-        if (coupon && coupon.isActive && coupon.expiry > now && !isUsed) {
-          const discountableAmount = subtotal - totalOfferDiscount;
-          if (coupon.discountType === 'percentage') {
-            couponDiscount = (discountableAmount * coupon.discountValue) / 100;
-            if (coupon.maxDiscount) {
-              couponDiscount = Math.min(couponDiscount, coupon.maxDiscount);
-            }
-          } else {
-            couponDiscount = Math.min(coupon.discountValue, discountableAmount);
-          }
-        }
-      }
-
-      const shipping = subtotal >= 1500 ? 0 : 40;
-      const totalDiscount = totalOfferDiscount + couponDiscount;
-      const finalTotal = Math.max(0, subtotal - totalDiscount + shipping);
+      const items = order.items.map(item => ({
+        productId: item.productId._id,
+        name: item.productId.productName,
+        price: item.price,
+        quantity: item.quantity,
+        total: item.total,
+        image: item.productId.images?.[0] || '/images/default-product.png',
+        offerDiscount: item.offerDiscount || 0
+      }));
 
       const cartData = {
         items,
-        subtotal,
-        offerDiscount: totalOfferDiscount,
-        couponDiscount,
-        discount: totalDiscount,
-        shipping,
-        totalPrice: finalTotal,
-        appliedCoupon: cart.appliedCoupon
+        subtotal: order.totalPrice + order.totalDiscount - order.shipping,
+        offerDiscount: order.totalOfferDiscount || 0,
+        couponDiscount: order.totalCouponDiscount || 0,
+        discount: order.totalDiscount,
+        shipping: order.shipping,
+        totalPrice: order.finalPrice,
+        appliedCoupon: order.appliedCoupon
       };
 
       return res.render('payment', {
@@ -139,32 +81,96 @@ const paymentMethod = async (req, res) => {
         address,
         RAZORPAY_KEY_ID: process.env.RAZORPAY_KEY_ID,
         razorpayOrderId: null,
-        amount: finalTotal * 100,
+        amount: order.finalPrice * 100,
         currency: 'INR',
-        orderId: null
+        orderId: order._id
       });
     }
 
-    const items = order.items.map(item => ({
-      productId: item.productId._id,
-      name: item.productId.productName,
-      price: item.price,
-      quantity: item.quantity,
-      total: item.total,
-      image: item.productId.images?.[0] || '/images/default-product.png',
-      offerDiscount: item.offerDiscount || 0
-    }));
-    console.log('===items',items);
+    // CASE 2: Fresh Order from Cart
+    const cart = await Cart.findOne({ userId })
+      .populate({
+        path: 'items.productId',
+        populate: [
+          { path: 'offer' },
+          { path: 'category', populate: { path: 'categoryOffer' } }
+        ]
+      })
+      .populate('appliedCoupon');
+
+    if (!cart || cart.items.length === 0) {
+      req.flash('error', 'Your cart is empty');
+      return res.redirect('/cart');
+    }
+
+    const now = new Date();
+    const activeOffers = await Offer.find({
+      isActive: true,
+      startDate: { $lte: now },
+      endDate: { $gte: now }
+    });
+
+    let subtotal = 0;
+    let totalOfferDiscount = 0;
+    const items = [];
+
+    for (const item of cart.items) {
+      const product = item.productId;
+      if (!product || !product.isListed) continue;
+
+      const quantity = item.quantity;
+      const basePrice = product.salePrice && product.salePrice < product.regularPrice
+        ? product.salePrice
+        : product.regularPrice;
+
+      const originalPrice = basePrice * quantity;
+      subtotal += originalPrice;
+
+      const { maxDiscount: offerDiscount } = getBestOffer(product, activeOffers, quantity);
+      totalOfferDiscount += offerDiscount;
+
+      items.push({
+        productId: product._id,
+        name: product.productName || 'Product',
+        price: basePrice,
+        quantity,
+        total: basePrice * quantity,
+        image: product.images?.[0] || '/images/default-product.png',
+        offerDiscount
+      });
+    }
+
+    // Coupon logic
+    let couponDiscount = 0;
+    if (cart.appliedCoupon) {
+      const coupon = await Coupon.findById(cart.appliedCoupon._id);
+      const isUsed = user.usedCoupons?.some(c => c.code === coupon.code);
+      if (coupon && coupon.isActive && coupon.expiry > now && !isUsed) {
+        const discountableAmount = subtotal - totalOfferDiscount;
+        if (coupon.discountType === 'percentage') {
+          couponDiscount = (discountableAmount * coupon.discountValue) / 100;
+          if (coupon.maxDiscount) {
+            couponDiscount = Math.min(couponDiscount, coupon.maxDiscount);
+          }
+        } else {
+          couponDiscount = Math.min(coupon.discountValue, discountableAmount);
+        }
+      }
+    }
+
+    const shipping = subtotal >= 1500 ? 0 : 40;
+    const totalDiscount = totalOfferDiscount + couponDiscount;
+    const finalTotal = Math.max(0, subtotal - totalDiscount + shipping);
 
     const cartData = {
       items,
-      subtotal: order.totalPrice + order.totalDiscount - order.shipping,
-      offerDiscount: order.totalOfferDiscount || 0,
-      couponDiscount: order.totalCouponDiscount || 0,
-      discount: order.totalDiscount,
-      shipping: order.shipping,
-      totalPrice: order.finalPrice,
-      appliedCoupon: order.appliedCoupon
+      subtotal,
+      offerDiscount: totalOfferDiscount,
+      couponDiscount,
+      discount: totalDiscount,
+      shipping,
+      totalPrice: finalTotal,
+      appliedCoupon: cart.appliedCoupon
     };
 
     return res.render('payment', {
@@ -173,16 +179,18 @@ const paymentMethod = async (req, res) => {
       address,
       RAZORPAY_KEY_ID: process.env.RAZORPAY_KEY_ID,
       razorpayOrderId: null,
-      amount: order.finalPrice * 100,
+      amount: finalTotal * 100,
       currency: 'INR',
-      orderId: order._id
+      orderId: null
     });
+
   } catch (error) {
-    console.error('Error in paymentMethod:', error);
+    console.error('❌ Error in paymentMethod:', error);
     req.flash('error', 'Something went wrong. Please try again');
     return res.redirect('/cart');
   }
 };
+
 
 
 
