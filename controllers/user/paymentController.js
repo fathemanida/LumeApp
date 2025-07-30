@@ -203,178 +203,182 @@ const createOrder = async (req, res) => {
     }
 
     const userId = req.session.user.id;
-    let { addressId, paymentMethod } = req.body;
-    
-    // Log the incoming payment method for debugging
-    console.log('Received payment method:', paymentMethod);
-    
-    // Normalize the payment method
-    paymentMethod = paymentMethod.trim().toLowerCase();
-    
-    // Map to valid payment methods
+    let { addressId, paymentMethod, orderId } = req.body;
+
+    paymentMethod = (paymentMethod || '').trim().toLowerCase();
     const validPaymentMethods = {
       'cod': 'COD',
       'razorpay': 'Razorpay',
       'wallet': 'Wallet',
       'upi': 'UPI'
     };
-    
+
     if (!(paymentMethod in validPaymentMethods)) {
-      console.log('Invalid payment method received:', paymentMethod);
       return res.status(400).json({ success: false, message: 'Invalid payment method' });
     }
-    
+
     paymentMethod = validPaymentMethods[paymentMethod];
-    console.log('Normalized payment method to:', paymentMethod);
 
     if (!addressId || !paymentMethod) {
       return res.status(400).json({ success: false, message: 'Address and payment method are required' });
     }
 
+    let order = null;
+    if (orderId) {
+      order = await Order.findById(orderId);
+      if (!order) {
+        return res.status(404).json({ success: false, message: 'Order not found for retry' });
+      }
+      order.paymentMethod = paymentMethod;
+      order.status = 'Pending';
+      order.paymentStatus = paymentMethod === 'COD' ? 'Pending' : 'Paid';
+      order.updatedAt = new Date();
+      await order.save();
+    }
 
-    console.log('Searching for cart with userId:', userId);
-    const cart = await Cart.findOne({ userId })
-      .populate({
-        path: 'items.productId',
-        select: 'productName salePrice regularPrice offer category quantity status images',
-        populate: [
-          {
-            path: 'offer',
-            select: 'isActive discountType discountValue name startDate expiryDate',
-            match: { isActive: true }
-          },
-          {
-            path: 'category',
-            select: 'name categoryOffer',
-            populate: {
-              path: 'categoryOffer',
-              select: 'active discountType discountValue name startDate expiryDate'
+    // For new order creation (no orderId), process cart
+    if (!order) {
+      const cart = await Cart.findOne({ userId })
+        .populate({
+          path: 'items.productId',
+          select: 'productName salePrice regularPrice offer category quantity status images',
+          populate: [
+            {
+              path: 'offer',
+              select: 'isActive discountType discountValue name startDate expiryDate',
+              match: { isActive: true }
+            },
+            {
+              path: 'category',
+              select: 'name categoryOffer',
+              populate: {
+                path: 'categoryOffer',
+                select: 'active discountType discountValue name startDate expiryDate'
+              }
             }
-          }
-        ]
-      })
-      .populate({
-        path: 'appliedCoupon',
-        select: 'code discountValue discountType maxDiscount minOrderAmount validTill'
-      })
-      .lean();
+          ]
+        })
+        .populate({
+          path: 'appliedCoupon',
+          select: 'code discountValue discountType maxDiscount minOrderAmount validTill'
+        })
+        .lean();
 
-    console.log('Found cart:', JSON.stringify(cart, null, 2));
-    
-    if (!cart) {
-      console.log('No cart found for user');
-      return res.status(400).json({ success: false, message: 'Your cart is empty' });
+      if (!cart || !cart.items?.length) {
+        return res.status(400).json({ success: false, message: 'Your cart is empty' });
+      }
+
+      const now = new Date();
+      let totalPrice = 0;
+      let totalOfferDiscount = 0;
+      let totalCouponDiscount = 0;
+
+      const processedItems = cart.items.map(item => {
+        const product = item.productId;
+        const quantity = item.quantity;
+
+        const basePrice = product.salePrice && product.salePrice < product.regularPrice
+          ? product.salePrice
+          : product.regularPrice;
+
+        const originalPrice = basePrice * quantity;
+
+        let productOfferDiscount = 0;
+        if (
+          product.offer?.isActive &&
+          (!product.offer.startDate || new Date(product.offer.startDate) <= now) &&
+          (!product.offer.expiryDate || new Date(product.offer.expiryDate) >= now)
+        ) {
+          productOfferDiscount = product.offer.discountType === 'percentage'
+            ? (originalPrice * product.offer.discountValue) / 100
+            : product.offer.discountValue * quantity;
+        }
+
+        let categoryOfferDiscount = 0;
+        if (
+          product.category?.categoryOffer?.active &&
+          (!product.category.categoryOffer.startDate || new Date(product.category.categoryOffer.startDate) <= now) &&
+          (!product.category.categoryOffer.expiryDate || new Date(product.category.categoryOffer.expiryDate) >= now)
+        ) {
+          categoryOfferDiscount = product.category.categoryOffer.discountType === 'percentage'
+            ? (originalPrice * product.category.categoryOffer.discountValue) / 100
+            : product.category.categoryOffer.discountValue * quantity;
+        }
+
+        const offerDiscount = Math.max(productOfferDiscount, categoryOfferDiscount);
+        const finalPrice = originalPrice - offerDiscount;
+
+        totalPrice += originalPrice;
+        totalOfferDiscount += offerDiscount;
+
+        return {
+          productId: product._id,
+          quantity,
+          price: basePrice,
+          originalPrice,
+          finalPrice,
+          status: 'Active'
+        };
+      });
+
+      const priceAfterOffer = totalPrice - totalOfferDiscount;
+
+      if (cart.appliedCoupon) {
+        totalCouponDiscount = cart.appliedCoupon.discountType === 'PERCENTAGE'
+          ? (priceAfterOffer * cart.appliedCoupon.discountValue) / 100
+          : cart.appliedCoupon.discountValue;
+
+        if (cart.appliedCoupon.maxDiscount) {
+          totalCouponDiscount = Math.min(totalCouponDiscount, cart.appliedCoupon.maxDiscount);
+        }
+      }
+
+      const shipping = totalPrice >= 1500 ? 0 : 40;
+      const finalAmount = Math.max(0, priceAfterOffer - totalCouponDiscount + shipping);
+
+      order = new Order({
+        userId,
+        items: processedItems,
+        totalAmount: finalAmount,
+        shipping,
+        paymentMethod,
+        status: paymentMethod === 'COD' ? 'Pending' : 'Processing',
+        paymentStatus: paymentMethod === 'COD' ? 'Pending' : 'Paid',
+        address: addressId,
+        couponDiscount: totalCouponDiscount,
+        offerDiscount: totalOfferDiscount,
+        subtotal: totalPrice
+      });
+
+      await order.save();
+
+      // Decrease product quantities
+      const bulkOps = cart.items.map(item => ({
+        updateOne: {
+          filter: { _id: item.productId._id },
+          update: { $inc: { quantity: -item.quantity } }
+        }
+      }));
+
+      if (bulkOps.length > 0) {
+        try {
+          await Product.bulkWrite(bulkOps, { ordered: false });
+        } catch (bulkWriteError) {
+          console.error('Error updating product quantities:', bulkWriteError);
+        }
+      }
+
+      // Clear cart
+      await Cart.findOneAndUpdate(
+        { userId },
+        { $set: { items: [], appliedCoupon: null, updatedAt: new Date() } }
+      );
     }
-    
-    if (!cart.items || cart.items.length === 0) {
-      console.log('Cart found but has no items');
-      return res.status(400).json({ success: false, message: 'Your cart is empty' });
-    }
 
-    let totalPrice = 0;
-    let totalOfferDiscount = 0;
-    let totalCouponDiscount = 0;
-    const now = new Date();
-
-    const processedItems = cart.items.map(item => {
-      const product = item.productId;
-      const quantity = item.quantity;
-
-      const basePrice = product.salePrice && product.salePrice < product.regularPrice
-        ? product.salePrice
-        : product.regularPrice;
-
-      const originalPrice = basePrice * quantity;
-
-      let productOfferDiscount = 0;
-      if (
-        product.offer?.isActive &&
-        (!product.offer.startDate || new Date(product.offer.startDate) <= now) &&
-        (!product.offer.expiryDate || new Date(product.offer.expiryDate) >= now)
-      ) {
-        productOfferDiscount = product.offer.discountType === 'percentage'
-          ? (originalPrice * product.offer.discountValue) / 100
-          : product.offer.discountValue * quantity;
-      }
-
-      let categoryOfferDiscount = 0;
-      if (
-        product.category?.categoryOffer?.active &&
-        (!product.category.categoryOffer.startDate || new Date(product.category.categoryOffer.startDate) <= now) &&
-        (!product.category.categoryOffer.expiryDate || new Date(product.category.categoryOffer.expiryDate) >= now)
-      ) {
-        categoryOfferDiscount = product.category.categoryOffer.discountType === 'percentage'
-          ? (originalPrice * product.category.categoryOffer.discountValue) / 100
-          : product.category.categoryOffer.discountValue * quantity;
-      }
-
-      const offerDiscount = Math.max(productOfferDiscount, categoryOfferDiscount);
-      const finalPrice = originalPrice - offerDiscount;
-
-      totalPrice += originalPrice;
-      totalOfferDiscount += offerDiscount;
-
-      return {
-        productId: product._id,
-        quantity,
-        price: basePrice,
-        originalPrice,
-        finalPrice,
-        status: 'Active'
-      };
-    });
-
-    const priceAfterOffer = totalPrice - totalOfferDiscount;
-
-    if (cart.appliedCoupon) {
-      totalCouponDiscount = cart.appliedCoupon.discountType === 'PERCENTAGE'
-        ? (priceAfterOffer * cart.appliedCoupon.discountValue) / 100
-        : cart.appliedCoupon.discountValue;
-
-      if (cart.appliedCoupon.maxDiscount) {
-        totalCouponDiscount = Math.min(totalCouponDiscount, cart.appliedCoupon.maxDiscount);
-      }
-    }
-
-    const shipping = totalPrice >= 1500 ? 0 : 40;
-    const finalAmount = Math.max(0, priceAfterOffer - totalCouponDiscount + shipping);
-
-    const orderData = {
-      userId,
-      items: processedItems,
-      totalAmount: finalAmount,
-      shipping,
-      paymentMethod,
-      status: 'Pending',
-      address: addressId,
-      couponDiscount: totalCouponDiscount,
-      offerDiscount: totalOfferDiscount,
-      subtotal: totalPrice
-    };
-
-    const order = new Order(orderData);
-    await order.save();
-
-    const bulkOps = cart.items.map(item => ({
-      updateOne: {
-        filter: { _id: item.productId._id },
-        update: { $inc: { quantity: -item.quantity } }
-      }
-    }));
-
-    if (bulkOps.length > 0) {
-      try {
-        await Product.bulkWrite(bulkOps, { ordered: false });
-      } catch (bulkWriteError) {
-        console.error('Error updating product quantities:', bulkWriteError);
-      }
-    }
-
-    
-
+    // Razorpay flow
     if (paymentMethod === 'Razorpay') {
       try {
-        const amountInPaise = Math.round(finalAmount * 100);
+        const amountInPaise = Math.round(order.totalAmount * 100);
         const razorpayOrder = await razorpay.orders.create({
           amount: amountInPaise,
           currency: 'INR',
@@ -397,31 +401,16 @@ const createOrder = async (req, res) => {
         console.error('Razorpay error:', razorpayError);
         return res.status(500).json({ success: false, message: 'Failed to create Razorpay order' });
       }
-    } else if (['COD', 'Wallet', 'UPI'].includes(paymentMethod)) {
-      order.paymentStatus = paymentMethod === 'COD' ? 'Pending' : 'Paid';
-      order.status = 'Processing';
-      await order.save();
-
-      // Clear the cart after successful order
-      await Cart.findOneAndUpdate(
-        { userId },
-        { $set: { items: [], appliedCoupon: null, updatedAt: new Date() } }
-      );
-
-      return res.json({
-        success: true,
-        orderId: order._id.toString(),
-        paymentMethod: paymentMethod,
-        amount: finalAmount,
-        redirect: `/payment-confirmation?orderId=${order._id}`
-      });
-    } else {
-      return res.status(400).json({ success: false, message: 'Invalid payment method' });
     }
-    await Cart.findOneAndUpdate(
-      { userId },
-      { $set: { items: [], appliedCoupon: null, updatedAt: new Date() } }
-    );
+
+    // Non-Razorpay: complete order
+    return res.json({
+      success: true,
+      orderId: order._id.toString(),
+      paymentMethod,
+      amount: order.totalAmount,
+      redirect: `/payment-confirmation?orderId=${order._id}`
+    });
 
   } catch (error) {
     console.error('Error in createOrder:', error);
