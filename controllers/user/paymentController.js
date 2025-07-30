@@ -365,12 +365,9 @@ const createOrder = async (req, res) => {
       }
     }
 
-    await Cart.findOneAndUpdate(
-      { userId },
-      { $set: { items: [], appliedCoupon: null, updatedAt: new Date() } }
-    );
+    
 
-    if (paymentMethod === 'RAZORPAY') {
+    if (paymentMethod === 'Razorpay') {
       try {
         const amountInPaise = Math.round(finalAmount * 100);
         const razorpayOrder = await razorpay.orders.create({
@@ -407,6 +404,10 @@ const createOrder = async (req, res) => {
     } else {
       return res.status(400).json({ success: false, message: 'Invalid payment method' });
     }
+    await Cart.findOneAndUpdate(
+      { userId },
+      { $set: { items: [], appliedCoupon: null, updatedAt: new Date() } }
+    );s
 
   } catch (error) {
     console.error('Error in createOrder:', error);
