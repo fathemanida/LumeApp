@@ -660,7 +660,7 @@
                                                 </button>
                                             <% } %>
                                             <% if (order.status === 'Failed') { %>
-                                                <form action="/payment/process" method="POST" style="display: inline;">
+                                                <form action="/proceed-payment" method="POST" style="display: inline;">
                                                     <input type="hidden" name="orderId" value="<%= order._id %>">
                                                     <button type="submit" class="btn-try-again" style="margin-left: 10px;">
                                                         <i class="fas fa-redo-alt"></i> Try Again
