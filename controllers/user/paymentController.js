@@ -441,12 +441,20 @@ const createOrder = async (req, res) => {
 const processPayment = async (req, res) => {
   try {
     console.log('====req got');
-    const { method, orderId, upiId, walletId } = req.body;
+    let { method, orderId, upiId, walletId } = req.body;
     const userId = req.session.user.id;
 
     if (!orderId) {
       return res.status(400).json({ success: false, message: 'Order ID is required' });
     }
+    
+    if (method) {
+      method = method.trim().toUpperCase();
+      if (method === 'RAZORPAY') {
+        method = 'Razorpay';
+      }
+    }
+    
     console.log('=====method,orderId,upiId,walletid', method, orderId, upiId, walletId);
 
     const order = await Order.findById(orderId)
