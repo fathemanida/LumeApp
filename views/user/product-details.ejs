@@ -469,6 +469,9 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
   <script>
+    // Initialize selectedSize at the top level scope
+    let selectedSize = null;
+    
     function showToast({ title, message, type, timer = 2000 }) {
       const toastEl = document.getElementById('notificationToast');
       const toastTitle = document.getElementById('toastTitle');
@@ -629,7 +632,6 @@
       }
     }
 
-    let selectedSize = null;
     const quantityInput = document.getElementById('quantity');
 
     function changeMainImage(imagePath) {
@@ -711,7 +713,7 @@ function decrementQuantity() {
             productId: productId,
             quantity: quantity,
             size: size,
-            buyNow: true // Flag to indicate this is a buy now action
+            buyNow: true
           })
         });
 
