@@ -55,22 +55,22 @@ const paymentMethod = async (req, res) => {
       const items = order.items.map(item => ({
         productId: item.productId._id,
         name: item.productId.productName,
-        price: item.price,
+        originalPrice: item.originalPrice,
         quantity: item.quantity,
-        total: item.total,
-        image: item.productId.images?.[0] || '/images/default-product.png',
+        finalPrice: item.finalPrice,
         offerDiscount: item.offerDiscount || 0
       }));
 console.log('===order',items);
       const cartData = {
         items,
-        subtotal: order.totalPrice + order.totalDiscount - order.shipping,
-        offerDiscount: order.totalOfferDiscount || 0,
-        couponDiscount: order.totalCouponDiscount || 0,
-        discount: order.totalDiscount,
+        subtotal: order.subtotal,
+        offerDiscount: order.offerDiscount || 0,
+        couponDiscount: order.couponDiscount || 0,
+        discount: order.offerDiscount+order.couponDiscount,
         shipping: order.shipping,
-        totalPrice: order.finalPrice,
-        couponApplied: order.couponApplied
+        totalPrice: order.totalAmount,
+        couponApplied: order.couponApplied,
+        
       };
 console.log('====cart data',cartData);
       return res.render('payment', {
