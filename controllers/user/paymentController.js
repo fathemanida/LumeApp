@@ -61,7 +61,7 @@ const paymentMethod = async (req, res) => {
         image: item.productId.images?.[0] || '/images/default-product.png',
         offerDiscount: item.offerDiscount || 0
       }));
-
+console.log('===order',items);
       const cartData = {
         items,
         subtotal: order.totalPrice + order.totalDiscount - order.shipping,
