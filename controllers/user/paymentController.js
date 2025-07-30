@@ -39,13 +39,11 @@ const paymentMethod = async (req, res) => {
       return res.redirect('/checkout');
     }
 
-    // Extract orderId based on method
     const orderId = req.method === 'POST' ? req.body.orderId : req.query.orderId;
     console.log('🧾 orderId:', orderId);
 
     let order;
 
-    // CASE 1: Retry Payment with Existing Failed Order
     if (orderId) {
       order = await Order.findById(orderId).populate('items.productId couponApplied');
 
@@ -74,7 +72,7 @@ const paymentMethod = async (req, res) => {
         totalPrice: order.finalPrice,
         couponApplied: order.couponApplied
       };
-
+console.log('====cart data',cartData);
       return res.render('payment', {
         user,
         cart: cartData,
@@ -87,7 +85,6 @@ const paymentMethod = async (req, res) => {
       });
     }
 
-    // CASE 2: Fresh Order from Cart
     const cart = await Cart.findOne({ userId })
       .populate({
         path: 'items.productId',
