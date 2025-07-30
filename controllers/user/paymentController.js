@@ -648,21 +648,26 @@ const paymentConfirmation = async (req, res) => {
         : 'Within 5-7 business days'
     };
 
+    // Convert order to plain object if it's a Mongoose document
+    const plainOrder = order.toObject ? order.toObject() : { ...order };
+    
+    // Ensure all required fields have default values
     const responseData = {
       user: req.session.user,
       order: {
-        ...order.toObject(), // Include all order fields
-        ...orderSummary,     // Include calculated summary
+        ...plainOrder,
+        ...orderSummary,
         items: formattedItems,
-        address: order.address,
-        canCancel: ['Pending', 'Processing', 'Confirmed'].includes(order.status),
-        canTrack: ['Processing', 'Shipped', 'Out for Delivery'].includes(order.status),
-        paymentDetails: order.paymentDetails || {},
-        // Ensure these fields are included for the template
-        totalAmount: order.totalAmount || totalAmount,
-        subtotal: subtotal,
-        discount: totalDiscount,
-        shipping: shipping
+        address: plainOrder.address || {},
+        canCancel: ['Pending', 'Processing', 'Confirmed'].includes(plainOrder.status || ''),
+        canTrack: ['Processing', 'Shipped', 'Out for Delivery'].includes(plainOrder.status || ''),
+        paymentDetails: plainOrder.paymentDetails || {},
+        totalAmount: plainOrder.totalAmount || totalAmount || 0,
+        subtotal: subtotal || 0,
+        discount: totalDiscount || 0,
+        shipping: shipping || 0,
+        paymentMethod: plainOrder.paymentMethod || 'Credit Card',
+        orderNumber: plainOrder.orderNumber || `ORD-${Date.now()}`
       },
       showSuccess: req.query.success === 'true',
       successMessage: 'Your order has been placed successfully!',
