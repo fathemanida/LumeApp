@@ -9,7 +9,7 @@ const fs = require('fs');
 // if (!fs.existsSync(helpersPath)) {
 //     console.error(`Helper module not found at: ${helpersPath}`);
 // }
-// const { calculateRefund, formatRefundDescription } = require(helpersPath);
+const { calculateRefund, formatRefundDescription } = require(helpersPath);
 
 const cancelOrReturnOrder = async (req, res) => {
   try {

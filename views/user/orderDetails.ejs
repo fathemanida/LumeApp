@@ -2143,7 +2143,11 @@
                 }
               </script>
   <script>
+    // Global modal state
+    let currentModal = null;
+
     document.addEventListener('DOMContentLoaded', function() {
+      // Initialize bulk selection functionality
       const checkboxes = document.querySelectorAll('.item-checkbox');
       const selectAllCheckbox = document.getElementById('selectAll');
       const bulkActions = document.getElementById('bulkActions');
@@ -2156,7 +2160,6 @@
         const hasSelectedItems = selectedItems.length > 0;
         
         bulkActions.style.display = hasSelectedItems ? 'flex' : 'none';
-        cancelSelectedBtn.disabled = !hasSelectedItems;
         selectedCount.textContent = `${selectedItems.length} ${selectedItems.length === 1 ? 'item' : 'items'} selected`;
         
         // Update select all checkbox state
@@ -2172,26 +2175,30 @@
       });
       
       // Handle select all
-      selectAllCheckbox.addEventListener('change', function() {
-        const isChecked = this.checked;
-        document.querySelectorAll('.item-checkbox').forEach(checkbox => {
-          checkbox.checked = isChecked;
+      if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', function() {
+          const isChecked = this.checked;
+          document.querySelectorAll('.item-checkbox').forEach(checkbox => {
+            checkbox.checked = isChecked;
+          });
+          updateBulkActions();
         });
-        updateBulkActions();
-      });
+      }
       
       // Handle cancel selected items
-      cancelSelectedBtn.addEventListener('click', function() {
-        const selectedItems = Array.from(document.querySelectorAll('.item-checkbox:checked'))
-          .map(checkbox => ({
-            orderId: checkbox.dataset.orderId,
-            productId: checkbox.dataset.productId
-          }));
-        
-        if (selectedItems.length > 0) {
-          openBulkCancelModal(selectedItems);
-        }
-      });
+      if (cancelSelectedBtn) {
+        cancelSelectedBtn.addEventListener('click', function() {
+          const selectedItems = Array.from(document.querySelectorAll('.item-checkbox:checked'))
+            .map(checkbox => ({
+              orderId: checkbox.dataset.orderId,
+              productId: checkbox.dataset.productId
+            }));
+          
+          if (selectedItems.length > 0) {
+            openBulkCancelModal(selectedItems);
+          }
+        });
+      }
       
       // Handle single item cancel
       document.querySelectorAll('.single-cancel-btn').forEach(btn => {
@@ -2202,23 +2209,34 @@
         });
       });
       
-      // Show bulk actions if there are selectable items
-      if (document.querySelector('.item-checkbox')) {
-        bulkActions.style.display = 'flex';
-      }
+      // Handle click outside modal to close
+      document.addEventListener('click', function(event) {
+        if (currentModal && event.target === currentModal) {
+          closeCurrentModal();
+        }
+      });
+      
+      // Handle escape key to close modal
+      document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && currentModal) {
+          closeCurrentModal();
+        }
+      });
     });
     
     // Function to open bulk cancel modal
     function openBulkCancelModal(items) {
+      closeCurrentModal(); // Close any open modals first
+      
       // Create modal HTML
       const modalHTML = `
-        <div class="modal" id="bulkCancelModal" style="display: block;">
+        <div class="modal" id="bulkCancelModal">
           <div class="modal-content">
-            <span class="close" onclick="closeModal('bulkCancelModal')">&times;</span>
+            <span class="close" onclick="closeCurrentModal()">&times;</span>
             <h3>Cancel Selected Items</h3>
             <p>Are you sure you want to cancel ${items.length} selected item(s)?</p>
             <div class="modal-actions">
-              <button class="btn btn-secondary" onclick="closeModal('bulkCancelModal')">No, Keep Items</button>
+              <button class="btn btn-secondary" onclick="closeCurrentModal()">No, Keep Items</button>
               <button class="btn btn-danger" onclick="confirmBulkCancel(${JSON.stringify(items).replace(/"/g, '&quot;')})">
                 Yes, Cancel Items
               </button>
@@ -2231,12 +2249,22 @@
       const modalContainer = document.createElement('div');
       modalContainer.innerHTML = modalHTML;
       document.body.appendChild(modalContainer);
+      currentModal = document.getElementById('bulkCancelModal');
+      currentModal.style.display = 'flex';
+    }
+    
+    // Function to close the currently open modal
+    function closeCurrentModal() {
+      if (currentModal) {
+        currentModal.style.display = 'none';
+        currentModal.remove();
+        currentModal = null;
+      }
     }
     
     // Function to confirm bulk cancel
     function confirmBulkCancel(items) {
-      // Close the modal
-      closeModal('bulkCancelModal');
+      closeCurrentModal();
       
       // Show loading state
       const toast = document.createElement('div');
@@ -2284,21 +2312,88 @@
       });
     }
     
-    // Function to close modal
+    // Function to handle single item cancellation
+    function openItemCancelModal(orderId, productId) {
+      closeCurrentModal(); // Close any open modals first
+      
+      // Create modal HTML for single item cancellation
+      const modalHTML = `
+        <div class="modal" id="singleCancelModal">
+          <div class="modal-content">
+            <span class="close" onclick="closeCurrentModal()">&times;</span>
+            <h3>Cancel Item</h3>
+            <p>Are you sure you want to cancel this item?</p>
+            <div class="modal-actions">
+              <button class="btn btn-secondary" onclick="closeCurrentModal()">No, Keep Item</button>
+              <button class="btn btn-danger" onclick="confirmSingleCancel('${orderId}', '${productId}')">
+                Yes, Cancel Item
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // Add modal to body
+      const modalContainer = document.createElement('div');
+      modalContainer.innerHTML = modalHTML;
+      document.body.appendChild(modalContainer);
+      currentModal = document.getElementById('singleCancelModal');
+      currentModal.style.display = 'flex';
+    }
+    
+    // Function to confirm single item cancellation
+    function confirmSingleCancel(orderId, productId) {
+      closeCurrentModal();
+      
+      // Show loading state
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.textContent = 'Processing cancellation...';
+      document.body.appendChild(toast);
+      
+      // Send request to cancel item
+      fetch(`/orders/${orderId}/cancel-item`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ productId })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          toast.textContent = 'Item has been cancelled successfully';
+          toast.style.background = '#4a6741';
+          setTimeout(() => window.location.reload(), 1500);
+        } else {
+          toast.textContent = data.message || 'Failed to cancel item';
+          toast.style.background = '#e74c3c';
+        }
+      })
+      .catch(error => {
+        console.error('Error cancelling item:', error);
+        toast.textContent = 'An error occurred while processing your request';
+        toast.style.background = '#e74c3c';
+      })
+      .finally(() => {
+        setTimeout(() => {
+          if (toast.parentNode) {
+            toast.parentNode.removeChild(toast);
+          }
+        }, 3000);
+      });
+    }
+    
+    // Close button handler for modals
     function closeModal(modalId) {
       const modal = document.getElementById(modalId);
       if (modal) {
+        modal.style.display = 'none';
         modal.remove();
+        if (currentModal && currentModal.id === modalId) {
+          currentModal = null;
+        }
       }
-    }
-    
-    // Function to handle single item cancellation (existing function)
-    function openItemCancelModal(orderId, productId) {
-      // This function should be implemented if not already present
-      // It should open a confirmation modal for a single item cancellation
-      // and call the appropriate API endpoint
-      console.log('Cancel item:', { orderId, productId });
-      // Your existing implementation here
     }
   </script>
   </body>
