@@ -12,6 +12,7 @@ const multer = require('multer');
 const path = require('path');
 const walletController = require('../controllers/user/walletController.js')
 const footerController=require('../controllers/user/footerController.js')
+const refundController=require('../controllers/user/refundController.js')
 
 
 const storage = multer.diskStorage({
@@ -145,8 +146,8 @@ router.get('/orders', userAuth.isLogin, orderController.orders);
 router.get('/orders/:orderId', userAuth.isLogin, orderController.orderDetails);
 router.post('/orders/:orderId/return', userAuth.isLogin, orderController.returnRequest);
 router.get('/orders/:orderId/invoice', userAuth.isLogin, orderController.downloadInvoice);
-router.post('/orders/:orderId/cancel', userAuth.isLogin, orderController.cancelOrder);
-router.post('/orders/:orderId/items/:itemId/cancel', userAuth.isLogin, orderController.cancelOrderItem);
+router.post('/orders/:orderId/cancel', userAuth.isLogin, refundController.cancelOrder);
+router.post('/orders/:orderId/items/:itemId/cancel', userAuth.isLogin, refundController.cancelOrder);
 
 // Wishlist routes
 router.post('/wishlist/add', userAuth.isLogin, wishlistController.addToWishlist);

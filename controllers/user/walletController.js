@@ -5,7 +5,6 @@ const Product = require('../../models/productSchema');
 const path = require('path');
 const fs = require('fs');
 
-// Construct absolute path to the helpers directory
 const helpersPath = path.join(process.cwd(), 'helpers', 'refundHelpers.js');
 if (!fs.existsSync(helpersPath)) {
     console.error(`Helper module not found at: ${helpersPath}`);
@@ -221,7 +220,7 @@ const getTransactions = async (req, res) => {
 
 const addRefund = async (req) => {
   try {
-    const userId = req.session?.user?._id;
+    const userId = req.session?.user?.id;
     if (!userId) throw new Error('Missing user session');
 
     let { amount, orderId, description } = req.body;
