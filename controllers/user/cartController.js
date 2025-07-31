@@ -217,7 +217,8 @@ const cart = async (req, res) => {
             path: "categoryOffer"
           }
         }
-      });
+      })
+      .populate('couponApplied');
 
     if (!cart || cart.items.length === 0) {
       return res.render("cart", {
@@ -324,12 +325,21 @@ const cart = async (req, res) => {
     cart.appliedCouponDetails = appliedCouponDetails;
     await cart.save(); 
 
+    // Get all active coupons that meet the minimum purchase requirement
     const availableCoupons = await Coupon.find({
       isActive: true,
       startDate: { $lte: now },
       endDate: { $gte: now },
-      minPurchase: { $lte: totalPrice - totalOfferDiscount },
+      minOrderAmount: { $lte: totalPrice - totalOfferDiscount },
+      $or: [
+        { usedBy: { $ne: userId } },
+        { usedBy: { $exists: false } }
+      ]
     }).lean();
+    
+    // Log for debugging
+    console.log('Available coupons:', availableCoupons.length);
+    console.log('Cart total after offers:', totalPrice - totalOfferDiscount);
 
     res.render("cart", {
       user,

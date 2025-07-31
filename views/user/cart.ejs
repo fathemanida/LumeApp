@@ -879,15 +879,18 @@
                         </div>
                         <div class="coupon-list" id="couponList" style="display: none;">
                             <% if (coupons && coupons.length > 0) { %>
-                                <% coupons.forEach(coupon => { %>
-                                    <div class="coupon-item <%= couponApplied && couponApplied.code === coupon.code ? 'applied' : '' %> <%= coupon.usedBy && coupon.usedBy.includes(user.id) ? 'used' : '' %>"
-                                        style="<%= coupon.usedBy && coupon.usedBy.includes(user.id) ? 'pointer-events: none; opacity: 0.7; cursor: not-allowed;' : '' %>"
-                                        onclick="<%= (!couponApplied && !(coupon.usedBy && coupon.usedBy.includes(user.id))) ? `selectCoupon('${coupon.code}')` : '' %>">
+                                <% coupons.forEach(coupon => { 
+                                    const isApplied = couponApplied && (couponApplied._id === coupon._id || couponApplied.code === coupon.code);
+                                    const isUsed = user.usedCoupons && user.usedCoupons.some(uc => uc.code === coupon.code);
+                                %>
+                                    <div class="coupon-item <%= isApplied ? 'applied' : '' %> <%= isUsed ? 'used' : '' %>"
+                                        style="<%= isUsed ? 'pointer-events: none; opacity: 0.7; cursor: not-allowed;' : '' %>"
+                                        onclick="<%= (!couponApplied && !isUsed) ? `selectCoupon('${coupon.code}')` : '' %>">
                                         <div class="d-flex align-items-center justify-content-between">
                                             <div class="coupon-code">
                                                 <i class="fas fa-tag"></i>
                                                 <%= coupon.code %>
-                                                <% if (coupon.usedBy && coupon.usedBy.includes(user.id)) { %>
+                                                <% if (isUsed) { %>
                                                     <span class="badge bg-secondary ms-2">Already Used</span>
                                                 <% } %>
                                             </div>
