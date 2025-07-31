@@ -217,8 +217,8 @@ const getTransactions = async (req, res) => {
 
 const addRefund = async (req) => {
   try {
-    const user = req.session.user
-    const userId=user.id
+    const userId = req.session.user
+    const user=userId.id
     console.log('===user',userId,user);
 
     if (!userId) throw new Error('Missing user session');

@@ -37,19 +37,33 @@
         .main-container {
             display: flex;
             flex: 1;
-            flex-direction: column;
+            flex-direction: row;
             margin-top: 70px; /* Space for fixed header */
             padding: 20px;
             width: 100%;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
             box-sizing: border-box;
+            gap: 30px;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            flex-shrink: 0;
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            height: fit-content;
         }
         
         /* Content Area */
         .content-area {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px 0;
+            flex: 1;
+            padding: 0;
+            background: transparent;
         }
 
         /* Elegant Sidebar */
@@ -188,9 +202,75 @@
             background-color: white;
             min-width: 700px; /* Ensures table is wider than screen on mobile */
         }
-        @media (max-width: 992px) {
+        @media (max-width: 991.98px) {
+            /* Desktop layout for tablets (768px and up) */
             .main-container {
-                padding: 15px;
+                flex-direction: column;
+                padding: 20px 15px;
+                margin-top: 70px;
+            }
+            
+            .content-area {
+                width: 100%;
+                max-width: 100%;
+                padding: 20px 0;
+            }
+            
+            .sidebar {
+                width: 100%;
+                position: static;
+                margin-bottom: 20px;
+                box-shadow: none;
+                padding: 0;
+            }
+            
+            .sidebar-nav {
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 5px;
+                margin-bottom: 10px;
+            }
+            
+            .sidebar-nav a {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+                white-space: nowrap;
+                border-radius: 4px;
+            }
+            
+            .sidebar-actions {
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 10px;
+                margin-top: 15px;
+                padding-top: 15px;
+                border-top: 1px solid var(--theme-border);
+            }
+            
+            .orders-table-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                margin: 0;
+                padding: 0;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+                border-radius: 8px;
+            }
+            
+            .orders-table {
+                min-width: 100%;
+            }
+            
+            .page-header {
+                flex-direction: row;
+                align-items: center;
+                gap: 20px;
+            }
+        }
+        
+        @media (max-width: 767.98px) {
+            /* Mobile layout (below 768px) */
+            .main-container {
+                padding: 15px 10px;
                 margin-top: 60px;
             }
             
@@ -198,75 +278,51 @@
                 padding: 15px 0;
             }
             
-            .orders-table-container {
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-                margin: 0 -15px;
-                padding: 0 15px;
-            }
-            
-            .orders-table {
-                min-width: 700px;
-            }
-            
-            .orders-table-container::after {
-                content: '';
-                position: absolute;
-                top: 0; 
-                right: 0; 
-                bottom: 0;
-                width: 30px;
-                pointer-events: none;
-                background: linear-gradient(to left, #fff 60%, rgba(255,255,255,0));
-                display: block;
-            }
-            
-            /* Sidebar styles for tablet */
             .sidebar {
                 position: fixed;
-                top: 70px;
+                top: 60px;
                 left: 0;
                 right: 0;
                 z-index: 1000;
-                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                background: white;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
                 padding: 10px 15px;
             }
             
             .sidebar-nav {
                 flex-direction: row;
-                flex-wrap: wrap;
-                gap: 5px;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                padding-bottom: 5px;
+                margin: 0 -15px;
+                padding: 0 15px 5px;
             }
             
             .sidebar-nav a {
-                padding: 0.5rem 0.75rem;
+                padding: 0.5rem 0.8rem;
                 font-size: 0.85rem;
                 white-space: nowrap;
-            }
-        }
-        
-        @media (max-width: 576px) {
-            .main-container {
-                padding: 10px;
-                margin-top: 120px; /* Extra space for the now two-line header */
+                border-radius: 4px;
+                flex-shrink: 0;
             }
             
-            .content-area {
-                padding: 10px 0;
+            .sidebar-actions {
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 8px;
+                margin-top: 10px;
+                padding-top: 10px;
             }
             
-            .sidebar {
-                top: 60px;
-                padding: 8px 10px;
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
             }
             
-            .sidebar-nav a {
-                padding: 0.4rem 0.6rem;
-                font-size: 0.8rem;
-            }
-            
-            .sidebar-nav a i {
-                margin-right: 4px;
+            .page-title {
+                font-size: 1.75rem;
             }
         }
 
