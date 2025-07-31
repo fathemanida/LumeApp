@@ -502,7 +502,7 @@ const processPayment = async (req, res) => {
           wallet.balance -= order.totalAmount;
           wallet.transactions.push({
             amount: order.totalAmount,
-            type: 'debit',
+            type: 'DEBIT',
             description: `Payment for Order #${order.orderNumber}`,
             orderId: order._id,
             status: 'completed'

@@ -383,7 +383,7 @@
                                               </div>
                                           </td>
                                           <td><%= transaction && transaction.createdAt ? new Date(transaction.createdAt).toLocaleDateString() : 'N/A' %></td>
-                                          <td class="transaction-amount <%= transaction && transaction.type === 'CREDIT' ? 'credit' : 'debit' %>">
+                                          <td class="transaction-amount <%= transaction && transaction.type === 'CREDIT' ? 'CREDIT' : 'DEBIT' %>">
                                               <% if (transaction && transaction.type === 'CREDIT') { %>+<% } else { %>-<% } %>
                                               ₹<%= transaction && transaction.amount ? transaction.amount.toFixed(2) : '0.00' %>
                                           </td>
