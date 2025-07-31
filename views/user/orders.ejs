@@ -38,6 +38,18 @@
             display: flex;
             flex: 1;
             flex-direction: column;
+            margin-top: 70px; /* Space for fixed header */
+            padding: 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        /* Content Area */
+        .content-area {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 0;
         }
 
         /* Elegant Sidebar */
@@ -176,18 +188,85 @@
             background-color: white;
             min-width: 700px; /* Ensures table is wider than screen on mobile */
         }
-        @media (max-width: 768px) {
+        @media (max-width: 992px) {
+            .main-container {
+                padding: 15px;
+                margin-top: 60px;
+            }
+            
+            .content-area {
+                padding: 15px 0;
+            }
+            
+            .orders-table-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                margin: 0 -15px;
+                padding: 0 15px;
+            }
+            
             .orders-table {
                 min-width: 700px;
             }
+            
             .orders-table-container::after {
                 content: '';
                 position: absolute;
-                top: 0; right: 0; bottom: 0;
+                top: 0; 
+                right: 0; 
+                bottom: 0;
                 width: 30px;
                 pointer-events: none;
                 background: linear-gradient(to left, #fff 60%, rgba(255,255,255,0));
                 display: block;
+            }
+            
+            /* Sidebar styles for tablet */
+            .sidebar {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                padding: 10px 15px;
+            }
+            
+            .sidebar-nav {
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 5px;
+            }
+            
+            .sidebar-nav a {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.85rem;
+                white-space: nowrap;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .main-container {
+                padding: 10px;
+                margin-top: 120px; /* Extra space for the now two-line header */
+            }
+            
+            .content-area {
+                padding: 10px 0;
+            }
+            
+            .sidebar {
+                top: 60px;
+                padding: 8px 10px;
+            }
+            
+            .sidebar-nav a {
+                padding: 0.4rem 0.6rem;
+                font-size: 0.8rem;
+            }
+            
+            .sidebar-nav a i {
+                margin-right: 4px;
             }
         }
 

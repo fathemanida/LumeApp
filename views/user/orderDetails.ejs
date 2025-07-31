@@ -191,6 +191,8 @@
       display: flex;
       flex: 1;
       margin-top: 70px;
+      position: relative;
+      width: 100%;
     }
 
     /* Elegant Sidebar */
@@ -201,6 +203,41 @@
       border-right: 1px solid var(--border-color);
       display: flex;
       flex-direction: column;
+      position: fixed;
+      height: calc(100vh - 70px);
+      overflow-y: auto;
+      z-index: 900;
+      transition: transform 0.3s ease-in-out;
+    }
+
+    /* Mobile menu toggle button */
+    .menu-toggle {
+      display: none;
+      position: fixed;
+      top: 80px;
+      left: 20px;
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 8px 12px;
+      z-index: 1000;
+      cursor: pointer;
+    }
+
+    .menu-toggle i {
+      margin-right: 5px;
+    }
+
+    /* Overlay for mobile */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 899;
     }
 
     .sidebar-title {
@@ -298,9 +335,11 @@
     /* Content Area */
     .content-area {
       flex: 1;
+      margin-left: 280px;
       padding: 2rem 3rem;
-      width: 100%;
+      width: calc(100% - 280px);
       box-sizing: border-box;
+      transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out;
     }
 
     .page-title {
@@ -958,7 +997,36 @@
       transform: translateY(-2px);
     }
 
-    /* Responsive */
+    /* Responsive Styles */
+    @media (max-width: 1200px) {
+      .content-area {
+        padding: 1.5rem;
+      }
+    }
+
+    @media (max-width: 992px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      
+      .sidebar.active {
+        transform: translateX(0);
+      }
+      
+      .content-area {
+        margin-left: 0;
+        width: 100%;
+      }
+      
+      .menu-toggle {
+        display: block;
+      }
+      
+      .sidebar-overlay.active {
+        display: block;
+      }
+    }
+
     @media (max-width: 768px) {
       .content-area {
         padding: 1.5rem;
@@ -1273,6 +1341,14 @@
 
   <!-- Navbar -->
   <%-include('../partials/user/header.ejs') %>
+  
+  <!-- Mobile Menu Toggle -->
+  <button class="menu-toggle" id="menuToggle">
+    <i class="fas fa-bars"></i> Menu
+  </button>
+  
+  <!-- Sidebar Overlay -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
   
   <!-- Cancel Item Modal -->
   <div class="modal fade" id="cancelItemModal" tabindex="-1" aria-labelledby="cancelItemModalLabel" aria-hidden="true">
@@ -2425,6 +2501,57 @@
     }
   </script>
   <script>
+    // Function to open the cancel item modal
+    function openCancelItemModal(orderId, productId) {
+      // Set the order and product IDs in the form
+      document.getElementById('cancelItemOrderId').value = orderId;
+      document.getElementById('cancelItemProductId').value = productId;
+      
+      // Reset the form
+      document.getElementById('cancelReason').value = '';
+      document.getElementById('cancelOtherReason').value = '';
+      document.getElementById('cancelOtherReasonContainer').style.display = 'none';
+      
+      // Initialize the modal
+      const modal = new bootstrap.Modal(document.getElementById('cancelItemModal'));
+      
+      // Show the modal
+      modal.show();
+    }
+    
+    // Mobile menu toggle functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const menuToggle = document.getElementById('menuToggle');
+      const sidebar = document.querySelector('.sidebar');
+      const sidebarOverlay = document.getElementById('sidebarOverlay');
+      
+      if (menuToggle && sidebar && sidebarOverlay) {
+        // Toggle sidebar when menu button is clicked
+        menuToggle.addEventListener('click', function(e) {
+          e.stopPropagation();
+          sidebar.classList.toggle('active');
+          sidebarOverlay.classList.toggle('active');
+        });
+        
+        // Close sidebar when clicking outside
+        sidebarOverlay.addEventListener('click', function() {
+          sidebar.classList.remove('active');
+          this.classList.remove('active');
+        });
+        
+        // Close sidebar when clicking on a link
+        const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
+        sidebarLinks.forEach(link => {
+          link.addEventListener('click', function() {
+            if (window.innerWidth <= 992) {
+              sidebar.classList.remove('active');
+              sidebarOverlay.classList.remove('active');
+            }
+          });
+        });
+      }
+    });
+    
     // Function to open the cancel item modal
     function openCancelItemModal(orderId, productId) {
       const modal = new bootstrap.Modal(document.getElementById('cancelItemModal'));
