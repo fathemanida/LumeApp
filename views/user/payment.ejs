@@ -696,7 +696,6 @@ html, body {
             console.log('Creating order with method:', method, 'and address:', addressId);
             
             try {
-                // Include orderId from URL params if available
                 const urlParams = new URLSearchParams(window.location.search);
                 const orderId = urlParams.get('orderId');
                 
@@ -705,7 +704,6 @@ html, body {
                     paymentMethod: method
                 };
                 
-                // Add orderId to request if it exists in URL
                 if (orderId) {
                     requestBody.orderId = orderId;
                 }
@@ -759,12 +757,40 @@ html, body {
                 
                 console.log('Order created successfully with ID:', orderId, 'Method:', method);
                 
-                if (method === 'COD' || method === 'Wallet') {
-                    console.log('Redirecting to confirmation for', method, 'order');
-                    if (loadingOverlay) loadingOverlay.style.display = 'none';
-                    setTimeout(() => {
+                // Handle direct confirmation methods (COD/Wallet)
+                if (method === 'cod' || method === 'wallet') {
+                    console.log('Processing direct payment for:', method, 'order');
+                    const payload = { 
+                        method: method === 'cod' ? 'COD' : 'Wallet',
+                        addressId: '<%= address._id %>',
+                        orderId: orderId
+                    };
+                    
+                    if (method === 'wallet') {
+                        const walletId = document.getElementById('walletId')?.value;
+                        if (!walletId) {
+                            throw new Error('Please select a wallet');
+                        }
+                        payload.walletId = walletId;
+                    }
+                    
+                    // Process the payment
+                    const res = await fetch('/payment/process', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    const result = await res.json();
+                    if (!res.ok) {
+                        throw new Error(result.message || 'Payment processing failed');
+                    }
+                    
+                    if (result.redirect) {
+                        window.location.href = result.redirect;
+                    } else {
                         window.location.href = `/payment-confirmation?orderId=${orderId}`;
-                    }, 100);
+                    }
                     return;
                 }
                 

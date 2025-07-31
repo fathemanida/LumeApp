@@ -433,10 +433,15 @@ const processPayment = async (req, res) => {
     }
     
     if (method) {
-      method = method.trim().toUpperCase();
-      if (method === 'RAZORPAY') {
-        method = 'Razorpay';
-      }
+      method = method.trim().toLowerCase();
+      // Map to the correct case used in the application
+      const methodMap = {
+        'cod': 'COD',
+        'razorpay': 'Razorpay',
+        'wallet': 'Wallet',
+        'upi': 'UPI'
+      };
+      method = methodMap[method] || method;
     }
     
     console.log('=====method,orderId,upiId,walletid', method, orderId, upiId, walletId);
@@ -467,6 +472,7 @@ const processPayment = async (req, res) => {
       if (!order.razorpayOrderId) {
         return res.status(400).json({ success: false, message: 'Invalid payment method for this order' });
       }
+      console.log('===razorpay');
 
       return res.json({
         success: true,
@@ -477,26 +483,72 @@ const processPayment = async (req, res) => {
         key: process.env.RAZORPAY_KEY_ID
       });
     } else if (method === 'COD' || method === 'Wallet' || method === 'UPI') {
-      order.paymentStatus = method === 'COD' ? 'Pending' : 'Paid';
-      order.status = 'Processing';
-      console.log('======else if');
-      if (method === 'UPI' && upiId) {
-        order.paymentDetails = { upiId };
-      } else if (method === 'Wallet' && walletId) {
-        console.log('===wallt');
-        order.paymentDetails = { walletId };
+      try {
+        // Verify wallet balance if payment method is Wallet
+        if (method === 'Wallet') {
+          if (!walletId) {
+            return res.status(400).json({ 
+              success: false, 
+              message: 'Wallet ID is required for wallet payment' 
+            });
+          }
+          
+          // Get user's wallet and verify balance
+          const wallet = await Wallet.findOne({ userId });
+          if (!wallet || wallet.balance < order.totalAmount) {
+            return res.status(400).json({ 
+              success: false, 
+              message: 'Insufficient wallet balance' 
+            });
+          }
+          
+          // Deduct amount from wallet
+          wallet.balance -= order.totalAmount;
+          wallet.transactions.push({
+            amount: order.totalAmount,
+            type: 'debit',
+            description: `Payment for Order #${order.orderNumber}`,
+            orderId: order._id,
+            status: 'completed'
+          });
+          await wallet.save();
+          
+          order.paymentStatus = 'Paid';
+          order.paymentDetails = { 
+            walletId,
+            transactionId: `WALLET-${Date.now()}`,
+            amount: order.totalAmount
+          };
+        } else if (method === 'UPI' && upiId) {
+          order.paymentStatus = 'Paid';
+          order.paymentDetails = { upiId };
+        } else if (method === 'COD') {
+          order.paymentStatus = 'Pending';
+          order.paymentDetails = { method: 'Cash on Delivery' };
+        }
+        
+        order.status = 'Processing';
+        order.paymentMethod = method;
+        await order.save();
+
+        // Clear the user's cart
+        await Cart.findOneAndUpdate(
+          { userId },
+          { $set: { items: [], appliedCoupon: null, updatedAt: new Date() } }
+        );
+
+        return res.json({
+          success: true,
+          redirect: `/payment-confirmation?orderId=${order._id}`
+        });
+      } catch (error) {
+        console.error('Error processing payment:', error);
+        return res.status(500).json({
+          success: false,
+          message: 'Error processing payment',
+          error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
       }
-      
-      await order.save();
-
-      await Cart.findOneAndUpdate(
-        { userId },
-        { $set: { items: [], appliedCoupon: null, updatedAt: new Date() } }
-      );
-
-      return res.json({
-        success: true,
-        redirect: `/payment-confirmation?orderId=${order._id}`
       });
     } else {
       return res.status(400).json({ success: false, message: 'Invalid payment method' });
@@ -632,10 +684,8 @@ const paymentConfirmation = async (req, res) => {
         : 'Within 5-7 business days'
     };
 
-    // Convert order to plain object if it's a Mongoose document
     const plainOrder = order.toObject ? order.toObject() : { ...order };
     
-    // Ensure all required fields have default values
     const responseData = {
       user: req.session.user,
       order: {
