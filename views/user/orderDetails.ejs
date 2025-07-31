@@ -1274,6 +1274,44 @@
   <!-- Navbar -->
   <%-include('../partials/user/header.ejs') %>
   
+  <!-- Cancel Item Modal -->
+  <div class="modal fade" id="cancelItemModal" tabindex="-1" aria-labelledby="cancelItemModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="cancelItemModalLabel">Cancel Item</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="cancelItemForm" onsubmit="submitCancelItem(event)">
+          <input type="hidden" id="cancelItemOrderId" name="orderId">
+          <input type="hidden" id="cancelItemProductId" name="productId">
+          <div class="modal-body">
+            <p>Are you sure you want to cancel this item?</p>
+            <div class="mb-3">
+              <label for="cancelReason" class="form-label">Reason for cancellation</label>
+              <select class="form-select" id="cancelReason" name="reason" required>
+                <option value="" selected disabled>Select a reason</option>
+                <option value="Ordered by mistake">Ordered by mistake</option>
+                <option value="Found better price elsewhere">Found better price elsewhere</option>
+                <option value="Item not required anymore">Item not required anymore</option>
+                <option value="Shipping takes too long">Shipping takes too long</option>
+                <option value="Other">Other (please specify)</option>
+              </select>
+            </div>
+            <div class="mb-3" id="cancelOtherReasonContainer" style="display: none;">
+              <label for="cancelOtherReason" class="form-label">Please specify</label>
+              <textarea class="form-control" id="cancelOtherReason" name="otherReason" rows="2"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-danger">Confirm Cancellation</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
   <!-- Cancel Items Modal -->
   <div class="modal fade" id="cancelItemsModal" tabindex="-1" aria-labelledby="cancelItemsModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -1594,15 +1632,7 @@
           <td>
 <div class="item-actions">
   <button class="action-btn cancel-btn"
-    onclick="openCancelModal('<%= order._id %>', [
-      { 
-        productId: '<%= item.productId %>', 
-        name: '<%= item.name.replace(/'/g, "\\'").replace(/"/g, '&quot;') %>',
-        image: '<%= item.image %>',
-        quantity: <%= item.quantity %>,
-        price: <%= item.discountedPrice || item.price %>
-      }
-    ])"
+    onclick="openCancelItemModal('<%= order._id %>', '<%= item.productId %>')"
     title="Cancel this item">
     <i class="fas fa-times"></i> Cancel
   </button>
@@ -2361,6 +2391,105 @@
         }
       } catch (error) {
         console.error('Error cancelling items:', error);
+        showToast('error', 'Error', 'An error occurred while processing your request');
+      }
+    }
+    
+    // Helper function to show toast messages
+    function showToast(type, title, message) {
+      const toastContainer = document.getElementById('toastContainer');
+      const toastId = 'toast-' + Date.now();
+      const toast = document.createElement('div');
+      toast.id = toastId;
+      toast.className = `toast align-items-center text-white bg-${type} border-0`;
+      toast.setAttribute('role', 'alert');
+      toast.setAttribute('aria-live', 'assertive');
+      toast.setAttribute('aria-atomic', 'true');
+      toast.innerHTML = `
+        <div class="d-flex">
+          <div class="toast-body">
+            <strong>${title}</strong><br>${message}
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      `;
+      
+      toastContainer.appendChild(toast);
+      const bsToast = new bootstrap.Toast(toast);
+      bsToast.show();
+      
+      // Remove toast after it's hidden
+      toast.addEventListener('hidden.bs.toast', () => {
+        toast.remove();
+      });
+    }
+  </script>
+  <script>
+    // Function to open the cancel item modal
+    function openCancelItemModal(orderId, productId) {
+      const modal = new bootstrap.Modal(document.getElementById('cancelItemModal'));
+      
+      // Set the order and product IDs
+      document.getElementById('cancelItemOrderId').value = orderId;
+      document.getElementById('cancelItemProductId').value = productId;
+      
+      // Reset form
+      document.getElementById('cancelReason').value = '';
+      document.getElementById('cancelOtherReason').value = '';
+      document.getElementById('cancelOtherReasonContainer').style.display = 'none';
+      
+      // Toggle other reason field based on selection
+      document.getElementById('cancelReason').addEventListener('change', function() {
+        const otherReasonContainer = document.getElementById('cancelOtherReasonContainer');
+        otherReasonContainer.style.display = this.value === 'Other' ? 'block' : 'none';
+        if (this.value !== 'Other') {
+          document.getElementById('cancelOtherReason').value = '';
+        }
+      });
+      
+      // Show the modal
+      modal.show();
+    }
+    
+    // Function to submit the cancellation form
+    async function submitCancelItem(event) {
+      event.preventDefault();
+      
+      const orderId = document.getElementById('cancelItemOrderId').value;
+      const productId = document.getElementById('cancelItemProductId').value;
+      const reason = document.getElementById('cancelReason').value === 'Other' 
+        ? document.getElementById('cancelOtherReason').value 
+        : document.getElementById('cancelReason').value;
+      
+      if (!reason.trim()) {
+        showToast('warning', 'Missing reason', 'Please provide a reason for cancellation');
+        return;
+      }
+      
+      try {
+        const response = await fetch(`/orders/${orderId}/items/${productId}/cancel`, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: JSON.stringify({ reason })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          showToast('success', 'Success', 'Item has been cancelled successfully');
+          // Close the modal
+          const modal = bootstrap.Modal.getInstance(document.getElementById('cancelItemModal'));
+          modal.hide();
+          // Reload the page after a short delay
+          setTimeout(() => window.location.reload(), 1500);
+        } else {
+          showToast('error', 'Error', data.message || 'Failed to cancel item');
+        }
+      } catch (error) {
+        console.error('Error cancelling item:', error);
         showToast('error', 'Error', 'An error occurred while processing your request');
       }
     }
