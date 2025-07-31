@@ -220,9 +220,9 @@ const getTransactions = async (req, res) => {
 
 const addRefund = async (req) => {
   try {
-    const userId = req.session?.user?.id;
+    const userId = req.session.user.id;
     if (!userId) throw new Error('Missing user session');
-
+console.log('===user',userId);
     let { amount, orderId, description } = req.body;
 
     amount = Number(amount);
@@ -248,9 +248,11 @@ const addRefund = async (req) => {
         transactions: [transaction]
       });
     } else {
+      console.log('===balance before',wallet.balance);
       wallet.balance += amount;
       wallet.transactions.push(transaction);
     }
+    console.log('===walletBalance',wallet.balance);
 
     await wallet.save();
 
