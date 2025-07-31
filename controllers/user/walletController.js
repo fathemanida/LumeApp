@@ -5,10 +5,7 @@ const Product = require('../../models/productSchema');
 const path = require('path');
 const fs = require('fs');
 
-// const helpersPath = path.join(process.cwd(), 'helpers', 'refundHelpers.js');
-// if (!fs.existsSync(helpersPath)) {
-//     console.error(`Helper module not found at: ${helpersPath}`);
-// }
+
 const { calculateRefund, formatRefundDescription } = require('../../helpers/refundHelpers');
 
 const cancelOrReturnOrder = async (req, res) => {

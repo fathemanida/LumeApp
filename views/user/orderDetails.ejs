@@ -1265,92 +1265,6 @@
       }
     }
   </style>
-  <style>
-    /* Bulk actions styles */
-    #bulkActions {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-left: auto;
-    }
-    
-    #cancelSelectedBtn {
-      white-space: nowrap;
-    }
-    
-    .order-item:hover {
-      background-color: rgba(0, 0, 0, 0.02);
-    }
-    
-    /* Modal styles */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0,0,0,0.5);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    
-    .modal-content {
-      background: white;
-      padding: 2rem;
-      border-radius: 8px;
-      position: relative;
-      max-width: 500px;
-      width: 90%;
-    }
-    
-    .close {
-      position: absolute;
-      right: 1rem;
-      top: 1rem;
-      font-size: 1.5rem;
-      cursor: pointer;
-    }
-    
-    .modal-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 1rem;
-      margin-top: 1.5rem;
-    }
-    
-    .btn {
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: 500;
-      border: none;
-    }
-    
-    .btn-secondary {
-      background: #f0f0f0;
-      border: 1px solid #ddd;
-    }
-    
-    .btn-danger {
-      background: #e74c3c;
-      color: white;
-    }
-    
-    .toast {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      padding: 1rem;
-      background: #4a6741;
-      color: white;
-      border-radius: 4px;
-      z-index: 1000;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
-  </style>
 </head>
 
 <body>
@@ -1359,6 +1273,46 @@
 
   <!-- Navbar -->
   <%-include('../partials/user/header.ejs') %>
+  
+  <!-- Cancel Items Modal -->
+  <div class="modal fade" id="cancelItemsModal" tabindex="-1" aria-labelledby="cancelItemsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="cancelItemsModalLabel">Cancel Items</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="cancelItemsForm" onsubmit="submitCancelItems(event)">
+          <input type="hidden" id="cancelOrderId" name="orderId">
+          <div class="modal-body">
+            <p>Select items you want to cancel:</p>
+            <div class="mb-3" id="cancelItemsList">
+              <!-- Items will be populated by JavaScript -->
+            </div>
+            <div class="mb-3">
+              <label for="cancelReason" class="form-label">Reason for cancellation</label>
+              <select class="form-select" id="cancelReason" name="reason" required>
+                <option value="" selected disabled>Select a reason</option>
+                <option value="Ordered by mistake">Ordered by mistake</option>
+                <option value="Found better price elsewhere">Found better price elsewhere</option>
+                <option value="Item not required anymore">Item not required anymore</option>
+                <option value="Shipping takes too long">Shipping takes too long</option>
+                <option value="Other">Other (please specify)</option>
+              </select>
+            </div>
+            <div class="mb-3" id="otherReasonContainer" style="display: none;">
+              <label for="otherReason" class="form-label">Please specify</label>
+              <textarea class="form-control" id="otherReason" name="otherReason" rows="2"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-danger">Cancel Selected Items</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 
     <% if (locals.user) { %>
       <div class="main-container">
@@ -1541,24 +1495,11 @@
 
           <!-- Ordered Items Table -->
           <div class="order-details-container" style="margin-top:2rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-              <h3 style="font-size:1.1rem; color:var(--muted-green); margin: 0;">Ordered Items</h3>
-              <div id="bulkActions" style="display: none;">
-                <button id="cancelSelectedBtn" class="action-btn cancel-btn" style="margin: 0;">
-                  <i class="fas fa-times"></i> Cancel Selected Items
-                </button>
-                <span id="selectedCount" style="margin-left: 1rem; color: var(--muted-green); font-weight: 500;">
-                  0 items selected
-                </span>
-              </div>
-            </div>
+            <h3 style="font-size:1.1rem; color:var(--muted-green); margin-bottom:1rem;">Ordered Items</h3>
             <div class="table-responsive-order-items" style="width:100%;overflow-x:auto;">
               <table class="items-table">
     <thead>
       <tr>
-        <th style="width: 40px;">
-          <input type="checkbox" id="selectAll" style="width: 18px; height: 18px; cursor: pointer;">
-        </th>
         <th>Product</th>
         <th>Size</th>
         <th>Qty</th>
@@ -1569,16 +1510,8 @@
       </tr>
     </thead>
     <tbody>
-      <% order.items.forEach(item=> { 
-        const isCancellable = !['Cancelled', 'Returned', 'Return Requested', 'Delivered'].includes(item.status);
-      %>
-        <tr class="order-item" data-order-id="<%= order._id %>" data-product-id="<%= item.productId %>">
-          <td>
-            <% if (isCancellable) { %>
-              <input type="checkbox" class="item-checkbox" style="width: 18px; height: 18px; cursor: pointer;"
-                     data-order-id="<%= order._id %>" 
-                     data-product-id="<%= item.productId %>">
-            <% } %>
+      <% order.items.forEach(item=> { %>
+        <tr>
           <td>
             <div style="display: flex; align-items: center; gap: 1rem;">
               <img src="/uploads/product/<%= item.image %>" alt="<%= item.name %>" class="item-image">
@@ -1619,24 +1552,29 @@
             </span>
           </td>
           <td>
-            <div class="item-actions">
-              <% if (isCancellable) { %>
-                <button class="action-btn cancel-btn single-cancel-btn"
-                  data-order-id="<%= order._id %>"
-                  data-product-id="<%= item.productId %>"
-                  title="Cancel this item">
-                  <i class="fas fa-times"></i> Cancel
-                </button>
-              <% } %>
+<div class="item-actions">
+  <button class="action-btn cancel-btn"
+    onclick="openCancelModal('<%= order._id %>', [
+      { 
+        productId: '<%= item.productId %>', 
+        name: '<%= item.name.replace(/'/g, "\\'").replace(/"/g, '&quot;') %>',
+        image: '<%= item.image %>',
+        quantity: <%= item.quantity %>,
+        price: <%= item.discountedPrice || item.price %>
+      }
+    ])"
+    title="Cancel this item">
+    <i class="fas fa-times"></i> Cancel
+  </button>
 
-              <% if (item.status === 'Delivered') { %>
-                <button class="action-btn return-btn" 
-                  onclick="openReturnModal('<%= order._id %>', '<%= item.productId %>')"
-                  title="Request Return">
-                  <i class="fas fa-undo"></i> Return
-                </button>
-              <% } %>
-            </div>
+  <button class="action-btn return-btn" 
+    onclick="openReturnModal('<%= order._id %>', '<%= item.productId %>')"
+    title="Request Return">
+    <i class="fas fa-undo"></i> Return
+  </button>
+</div>
+
+
           </td>
         </tr>
       <% }) %>
@@ -2143,258 +2081,142 @@
                 }
               </script>
   <script>
-    // Global modal state
-    let currentModal = null;
-
-    document.addEventListener('DOMContentLoaded', function() {
-      // Initialize bulk selection functionality
-      const checkboxes = document.querySelectorAll('.item-checkbox');
-      const selectAllCheckbox = document.getElementById('selectAll');
-      const bulkActions = document.getElementById('bulkActions');
-      const cancelSelectedBtn = document.getElementById('cancelSelectedBtn');
-      const selectedCount = document.getElementById('selectedCount');
+    // Function to open the cancel modal with item selection
+    function openCancelModal(orderId, items) {
+      const modal = new bootstrap.Modal(document.getElementById('cancelItemsModal'));
+      const itemsList = document.getElementById('cancelItemsList');
       
-      // Toggle bulk actions based on selection
-      function updateBulkActions() {
-        const selectedItems = document.querySelectorAll('.item-checkbox:checked');
-        const hasSelectedItems = selectedItems.length > 0;
-        
-        bulkActions.style.display = hasSelectedItems ? 'flex' : 'none';
-        selectedCount.textContent = `${selectedItems.length} ${selectedItems.length === 1 ? 'item' : 'items'} selected`;
-        
-        // Update select all checkbox state
-        const allCheckboxes = document.querySelectorAll('.item-checkbox');
-        const allChecked = allCheckboxes.length > 0 && selectedItems.length === allCheckboxes.length;
-        selectAllCheckbox.checked = allChecked;
-        selectAllCheckbox.indeterminate = selectedItems.length > 0 && !allChecked;
-      }
+      // Set the order ID
+      document.getElementById('cancelOrderId').value = orderId;
       
-      // Handle individual checkbox click
-      checkboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', updateBulkActions);
-      });
+      // Clear previous items
+      itemsList.innerHTML = '';
       
-      // Handle select all
-      if (selectAllCheckbox) {
-        selectAllCheckbox.addEventListener('change', function() {
-          const isChecked = this.checked;
-          document.querySelectorAll('.item-checkbox').forEach(checkbox => {
-            checkbox.checked = isChecked;
-          });
-          updateBulkActions();
-        });
-      }
-      
-      // Handle cancel selected items
-      if (cancelSelectedBtn) {
-        cancelSelectedBtn.addEventListener('click', function() {
-          const selectedItems = Array.from(document.querySelectorAll('.item-checkbox:checked'))
-            .map(checkbox => ({
-              orderId: checkbox.dataset.orderId,
-              productId: checkbox.dataset.productId
-            }));
-          
-          if (selectedItems.length > 0) {
-            openBulkCancelModal(selectedItems);
-          }
-        });
-      }
-      
-      // Handle single item cancel
-      document.querySelectorAll('.single-cancel-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-          const orderId = this.dataset.orderId;
-          const productId = this.dataset.productId;
-          openItemCancelModal(orderId, productId);
-        });
-      });
-      
-      // Handle click outside modal to close
-      document.addEventListener('click', function(event) {
-        if (currentModal && event.target === currentModal) {
-          closeCurrentModal();
-        }
-      });
-      
-      // Handle escape key to close modal
-      document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape' && currentModal) {
-          closeCurrentModal();
-        }
-      });
-    });
-    
-    // Function to open bulk cancel modal
-    function openBulkCancelModal(items) {
-      closeCurrentModal(); // Close any open modals first
-      
-      // Create modal HTML
-      const modalHTML = `
-        <div class="modal" id="bulkCancelModal">
-          <div class="modal-content">
-            <span class="close" onclick="closeCurrentModal()">&times;</span>
-            <h3>Cancel Selected Items</h3>
-            <p>Are you sure you want to cancel ${items.length} selected item(s)?</p>
-            <div class="modal-actions">
-              <button class="btn btn-secondary" onclick="closeCurrentModal()">No, Keep Items</button>
-              <button class="btn btn-danger" onclick="confirmBulkCancel(${JSON.stringify(items).replace(/"/g, '&quot;')})">
-                Yes, Cancel Items
-              </button>
+      // Add items to the list with checkboxes
+      items.forEach((item, index) => {
+        const itemElement = document.createElement('div');
+        itemElement.className = 'form-check mb-2';
+        itemElement.innerHTML = `
+          <div class="d-flex align-items-center p-2 border rounded">
+            <input class="form-check-input me-3" type="checkbox" 
+                   id="item-${index}" 
+                   name="items" 
+                   value="${item.productId}" 
+                   checked>
+            <img src="/uploads/product/${item.image}" 
+                 alt="${item.name}" 
+                 style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;">
+            <div>
+              <label class="form-check-label" for="item-${index}">
+                ${item.name}
+              </label>
+              <div class="text-muted small">
+                Qty: ${item.quantity} | 
+                Price: ₹${item.price.toFixed(2)}
+              </div>
             </div>
           </div>
-        </div>
-      `;
+        `;
+        itemsList.appendChild(itemElement);
+      });
       
-      // Add modal to body
-      const modalContainer = document.createElement('div');
-      modalContainer.innerHTML = modalHTML;
-      document.body.appendChild(modalContainer);
-      currentModal = document.getElementById('bulkCancelModal');
-      currentModal.style.display = 'flex';
+      // Show the modal
+      modal.show();
+      
+      // Toggle other reason field based on selection
+      document.getElementById('cancelReason').addEventListener('change', function() {
+        const otherReasonContainer = document.getElementById('otherReasonContainer');
+        otherReasonContainer.style.display = this.value === 'Other' ? 'block' : 'none';
+        if (this.value !== 'Other') {
+          document.getElementById('otherReason').value = '';
+        }
+      });
     }
     
-    // Function to close the currently open modal
-    function closeCurrentModal() {
-      if (currentModal) {
-        currentModal.style.display = 'none';
-        currentModal.remove();
-        currentModal = null;
+    // Function to submit the cancellation form
+    async function submitCancelItems(event) {
+      event.preventDefault();
+      
+      const form = event.target;
+      const orderId = form.orderId.value;
+      const reason = form.reason.value === 'Other' 
+        ? form.otherReason.value 
+        : form.reason.value;
+      
+      // Get selected items
+      const selectedItems = Array.from(document.querySelectorAll('input[name="items"]:checked'))
+        .map(checkbox => checkbox.value);
+      
+      if (selectedItems.length === 0) {
+        showToast('warning', 'No items selected', 'Please select at least one item to cancel');
+        return;
       }
-    }
-    
-    // Function to confirm bulk cancel
-    function confirmBulkCancel(items) {
-      closeCurrentModal();
       
-      // Show loading state
-      const toast = document.createElement('div');
-      toast.className = 'toast';
-      toast.textContent = 'Processing cancellation...';
-      document.body.appendChild(toast);
+      if (!reason.trim()) {
+        showToast('warning', 'Missing reason', 'Please provide a reason for cancellation');
+        return;
+      }
       
-      // Send request to cancel items
-      fetch('/orders/cancel-items', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ items })
-      })
-      .then(response => response.json())
-      .then(data => {
+      try {
+        const response = await fetch(`/orders/${orderId}/items/cancel`, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: JSON.stringify({
+            items: selectedItems,
+            reason: reason
+          })
+        });
+        
+        const data = await response.json();
+        
         if (data.success) {
-          // Show success message
-          toast.textContent = 'Selected items have been cancelled successfully';
-          toast.style.background = '#4a6741';
-          
+          showToast('success', 'Success', 'Selected items have been cancelled successfully');
+          // Close the modal
+          const modal = bootstrap.Modal.getInstance(document.getElementById('cancelItemsModal'));
+          modal.hide();
           // Reload the page after a short delay
-          setTimeout(() => {
-            window.location.reload();
-          }, 1500);
-        } else {
-          // Show error message
-          toast.textContent = data.message || 'Failed to cancel items';
-          toast.style.background = '#e74c3c';
-        }
-      })
-      .catch(error => {
-        console.error('Error cancelling items:', error);
-        toast.textContent = 'An error occurred while processing your request';
-        toast.style.background = '#e74c3c';
-      })
-      .finally(() => {
-        // Remove toast after 3 seconds
-        setTimeout(() => {
-          if (toast.parentNode) {
-            toast.parentNode.removeChild(toast);
-          }
-        }, 3000);
-      });
-    }
-    
-    // Function to handle single item cancellation
-    function openItemCancelModal(orderId, productId) {
-      closeCurrentModal(); // Close any open modals first
-      
-      // Create modal HTML for single item cancellation
-      const modalHTML = `
-        <div class="modal" id="singleCancelModal">
-          <div class="modal-content">
-            <span class="close" onclick="closeCurrentModal()">&times;</span>
-            <h3>Cancel Item</h3>
-            <p>Are you sure you want to cancel this item?</p>
-            <div class="modal-actions">
-              <button class="btn btn-secondary" onclick="closeCurrentModal()">No, Keep Item</button>
-              <button class="btn btn-danger" onclick="confirmSingleCancel('${orderId}', '${productId}')">
-                Yes, Cancel Item
-              </button>
-            </div>
-          </div>
-        </div>
-      `;
-      
-      // Add modal to body
-      const modalContainer = document.createElement('div');
-      modalContainer.innerHTML = modalHTML;
-      document.body.appendChild(modalContainer);
-      currentModal = document.getElementById('singleCancelModal');
-      currentModal.style.display = 'flex';
-    }
-    
-    // Function to confirm single item cancellation
-    function confirmSingleCancel(orderId, productId) {
-      closeCurrentModal();
-      
-      // Show loading state
-      const toast = document.createElement('div');
-      toast.className = 'toast';
-      toast.textContent = 'Processing cancellation...';
-      document.body.appendChild(toast);
-      
-      // Send request to cancel item
-      fetch(`/orders/${orderId}/cancel-item`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ productId })
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          toast.textContent = 'Item has been cancelled successfully';
-          toast.style.background = '#4a6741';
           setTimeout(() => window.location.reload(), 1500);
         } else {
-          toast.textContent = data.message || 'Failed to cancel item';
-          toast.style.background = '#e74c3c';
+          showToast('error', 'Error', data.message || 'Failed to cancel items');
         }
-      })
-      .catch(error => {
-        console.error('Error cancelling item:', error);
-        toast.textContent = 'An error occurred while processing your request';
-        toast.style.background = '#e74c3c';
-      })
-      .finally(() => {
-        setTimeout(() => {
-          if (toast.parentNode) {
-            toast.parentNode.removeChild(toast);
-          }
-        }, 3000);
-      });
-    }
-    
-    // Close button handler for modals
-    function closeModal(modalId) {
-      const modal = document.getElementById(modalId);
-      if (modal) {
-        modal.style.display = 'none';
-        modal.remove();
-        if (currentModal && currentModal.id === modalId) {
-          currentModal = null;
-        }
+      } catch (error) {
+        console.error('Error cancelling items:', error);
+        showToast('error', 'Error', 'An error occurred while processing your request');
       }
     }
+    
+    // Helper function to show toast messages
+    function showToast(type, title, message) {
+      const toastContainer = document.getElementById('toastContainer');
+      const toastId = 'toast-' + Date.now();
+      const toast = document.createElement('div');
+      toast.id = toastId;
+      toast.className = `toast align-items-center text-white bg-${type} border-0`;
+      toast.setAttribute('role', 'alert');
+      toast.setAttribute('aria-live', 'assertive');
+      toast.setAttribute('aria-atomic', 'true');
+      toast.innerHTML = `
+        <div class="d-flex">
+          <div class="toast-body">
+            <strong>${title}</strong><br>${message}
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      `;
+      
+      toastContainer.appendChild(toast);
+      const bsToast = new bootstrap.Toast(toast);
+      bsToast.show();
+      
+      // Remove toast after it's hidden
+      toast.addEventListener('hidden.bs.toast', () => {
+        toast.remove();
+      });
+    }
   </script>
-  </body>
+</body>
+
 </html>
