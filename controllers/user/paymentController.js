@@ -434,7 +434,6 @@ const processPayment = async (req, res) => {
     
     if (method) {
       method = method.trim().toLowerCase();
-      // Map to the correct case used in the application
       const methodMap = {
         'cod': 'COD',
         'razorpay': 'Razorpay',
@@ -484,7 +483,6 @@ const processPayment = async (req, res) => {
       });
     } else if (method === 'COD' || method === 'Wallet' || method === 'UPI') {
       try {
-        // Verify wallet balance if payment method is Wallet
         if (method === 'Wallet') {
           if (!walletId) {
             return res.status(400).json({ 
@@ -493,7 +491,6 @@ const processPayment = async (req, res) => {
             });
           }
           
-          // Get user's wallet and verify balance
           const wallet = await Wallet.findOne({ userId });
           if (!wallet || wallet.balance < order.totalAmount) {
             return res.status(400).json({ 
@@ -502,7 +499,6 @@ const processPayment = async (req, res) => {
             });
           }
           
-          // Deduct amount from wallet
           wallet.balance -= order.totalAmount;
           wallet.transactions.push({
             amount: order.totalAmount,
@@ -535,7 +531,7 @@ const processPayment = async (req, res) => {
         await Cart.findOneAndUpdate(
           { userId },
           { $set: { items: [], appliedCoupon: null, updatedAt: new Date() } }
-        );
+        )
 
         return res.json({
           success: true,
@@ -549,7 +545,6 @@ const processPayment = async (req, res) => {
           error: process.env.NODE_ENV === 'development' ? error.message : undefined
         });
       }
-      });
     } else {
       return res.status(400).json({ success: false, message: 'Invalid payment method' });
     }
