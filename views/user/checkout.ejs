@@ -303,6 +303,108 @@
       opacity: 0.7;
       cursor: not-allowed;
     }
+     .coupon-section {
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border-color);
+    }
+    .coupon-title {
+      font-family: 'Aboreto', cursive;
+      color: var(--darker-text);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      font-weight: 400;
+      margin-bottom: 1rem;
+      font-size: clamp(1rem, 3vw, 1.2rem);
+    }
+    .coupon-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .coupon-item {
+      background: var(--light-bg);
+      border: 2px dashed var(--soft-beige);
+      border-radius: 0;
+      padding: 1rem;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .coupon-item:hover:not(.applied):not(.used) {
+      transform: translateY(-2px);
+      border-color: var(--muted-green);
+    }
+    .coupon-code {
+      font-family: 'Aboreto', cursive;
+      color: var(--darker-text);
+      font-size: clamp(1rem, 3vw, 1.2rem);
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .coupon-code i {
+      color: var(--soft-beige);
+    }
+    .coupon-details {
+      color: var(--dark-text);
+      font-size: clamp(0.9rem, 2.5vw, 1rem);
+    }
+    .coupon-discount {
+      color: var(--offer-red);
+      font-weight: 600;
+    }
+    .coupon-min-order {
+      color: var(--soft-beige);
+      font-size: clamp(0.8rem, 2vw, 0.9rem);
+      margin-top: 0.5rem;
+    }
+    .coupon-expiry {
+      color: #666;
+      font-size: clamp(0.8rem, 2vw, 0.9rem);
+      margin-top: 0.5rem;
+    }
+    .copy-coupon-btn {
+      background: var(--darker-text);
+      border: none;
+      color: white;
+      width: clamp(36px, 8vw, 40px);
+      height: clamp(36px, 8vw, 40px);
+      border-radius: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    .copy-coupon-btn:hover {
+      background: var(--muted-green);
+      transform: translateY(-1px);
+    }
+    .apply-coupon-btn {
+      background: var(--darker-text);
+      border: none;
+      color: white;
+      width: clamp(40px, 10vw, 48px);
+      height: clamp(40px, 10vw, 48px);
+      border-radius: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    .apply-coupon-btn:hover:not(:disabled) {
+      background: var(--muted-green);
+      transform: translateY(-1px);
+    }
+    .apply-coupon-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      background: #ccc;
+    }
     .stock-info {
       margin-top: 0.75rem;
       font-size: clamp(0.8rem, 2vw, 0.9rem);
