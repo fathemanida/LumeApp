@@ -63,7 +63,7 @@ const cancelOrder = async (req, res) => {
       refundAmount -= order.coupon.discountAmount;
     }
 
-    order.status = isFullCancel ? "CANCELLED" : "PARTIALLY_CANCELLED";
+    order.status = isFullCancel ? "Cancelled" : "Partialy Cancelled";
 
     if (order.paymentMethod !== "COD" && refundAmount > 0) {
       await addRefund({
@@ -97,7 +97,7 @@ const returnOrder = async (req, res) => {
     const order = await Order.findOne({ _id: orderId, userId });
     if (!order) return res.status(404).json({ success: false, message: "Order not found" });
 
-    if (order.status !== "DELIVERED")
+    if (order.status !== "Delivered")
       return res.status(400).json({ success: false, message: "Only delivered orders can be returned" });
 
     const isFullReturn = itemsToReturn.length === 0 || itemsToReturn.length === order.items.length;
@@ -119,7 +119,7 @@ const returnOrder = async (req, res) => {
         }
 
         refundAmount += totalPerItem;
-        item.status = 'RETURNED';
+        item.status = 'Returned';
         returnedItems.push(item);
 
         await Product.updateOne({ _id: item.productId }, { $inc: { stock: item.quantity } });
