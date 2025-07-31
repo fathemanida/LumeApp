@@ -696,13 +696,24 @@ html, body {
             console.log('Creating order with method:', method, 'and address:', addressId);
             
             try {
+                // Include orderId from URL params if available
+                const urlParams = new URLSearchParams(window.location.search);
+                const orderId = urlParams.get('orderId');
+                
+                const requestBody = {
+                    addressId: addressId,
+                    paymentMethod: method
+                };
+                
+                // Add orderId to request if it exists in URL
+                if (orderId) {
+                    requestBody.orderId = orderId;
+                }
+                
                 const response = await fetch('/create-order', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        addressId: addressId,
-                        paymentMethod: method
-                    })
+                    body: JSON.stringify(requestBody)
                 });
                 
                 const data = await response.json();
@@ -731,6 +742,10 @@ html, body {
 
             const method = document.querySelector('input[name="paymentMethod"]:checked').value;
             const loadingOverlay = document.getElementById('loadingOverlay');
+            
+            // Get orderId from URL if it exists
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderId = urlParams.get('orderId');
 
             if (loadingOverlay) loadingOverlay.style.display = 'flex';
 
@@ -756,8 +771,13 @@ html, body {
                 const payload = { 
                     method, 
                     addressId: '<%= address._id %>',
-                    orderId: orderId 
+                    orderId: orderId || null
                 };
+                
+                // If we have an orderId from URL, include it in the payload
+                if (orderId) {
+                    payload.orderId = orderId;
+                }
 
                 if (method === 'upi') {
                     const upiId = document.getElementById('upiId').value;

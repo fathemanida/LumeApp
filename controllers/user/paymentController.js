@@ -237,7 +237,6 @@ const createOrder = async (req, res) => {
       await order.save();
     }
 
-    // For new order creation (no orderId), process cart
     if (!order) {
       const cart = await Cart.findOne({ userId })
         .populate({
@@ -353,7 +352,6 @@ const createOrder = async (req, res) => {
 
       await order.save();
 
-      // Decrease product quantities
       const bulkOps = cart.items.map(item => ({
         updateOne: {
           filter: { _id: item.productId._id },
@@ -369,14 +367,12 @@ const createOrder = async (req, res) => {
         }
       }
 
-      // Clear cart
       await Cart.findOneAndUpdate(
         { userId },
         { $set: { items: [], appliedCoupon: null, updatedAt: new Date() } }
       );
     }
 
-    // Razorpay flow
     if (paymentMethod === 'Razorpay') {
       try {
         const amountInPaise = Math.round(order.totalAmount * 100);
@@ -404,7 +400,6 @@ const createOrder = async (req, res) => {
       }
     }
 
-    // Non-Razorpay: complete order
     return res.json({
       success: true,
       orderId: order._id.toString(),

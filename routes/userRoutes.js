@@ -132,12 +132,9 @@ router.post('/remove-coupon',userAuth.isLogin, cartController.removeCoupon);
 
 router.get('/checkout',userAuth.isLogin,cartController.getCheckout)
 
-//ordercreating///
-router.get('/proceed-payment',userAuth.isLogin,paymentController.paymentMethod)
-
-router.post('/create-order',userAuth.isLogin,paymentController.createOrder)
-
 // Payment routes
+router.get('/proceed-payment', userAuth.isLogin, paymentController.paymentMethod);
+router.post('/create-order', userAuth.isLogin, paymentController.createOrder);
 router.post('/payment/process', userAuth.isLogin, paymentController.processPayment);
 router.get('/payment-confirmation', userAuth.isLogin, paymentController.paymentConfirmation);
 router.post('/verify-payment', userAuth.isLogin, paymentController.verifyPayment);
