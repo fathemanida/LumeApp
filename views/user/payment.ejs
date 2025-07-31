@@ -757,7 +757,6 @@ html, body {
                 
                 console.log('Order created successfully with ID:', orderId, 'Method:', method);
                 
-                // Handle direct confirmation methods (COD/Wallet)
                 if (method === 'cod' || method === 'wallet') {
                     console.log('Processing direct payment for:', method, 'order');
                     const payload = { 
@@ -774,7 +773,6 @@ html, body {
                         payload.walletId = walletId;
                     }
                     
-                    // Process the payment
                     const res = await fetch('/payment/process', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -800,7 +798,6 @@ html, body {
                     orderId: orderId || null
                 };
                 
-                // If we have an orderId from URL, include it in the payload
                 if (orderId) {
                     payload.orderId = orderId;
                 }
@@ -838,70 +835,98 @@ html, body {
 
                 const data = responseData;
 
+        console.log('Payment response data:', data);
+        
         if (data.razorpayOrderId) {
-            console.log('razorpay');
-            const options = {
-                key: "<%= RAZORPAY_KEY_ID %>",
-                amount: data.amount,
-                currency: data.currency,
-                name: "Lume",
-                description: "Order Payment",
-                order_id: data.razorpayOrderId,
-                handler: async function (response) {
-                    try {
-                        const verifyRes = await fetch('/verify-payment', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                razorpay_payment_id: response.razorpay_payment_id,
-                                razorpay_order_id: response.razorpay_order_id,
-                                razorpay_signature: response.razorpay_signature,
-                                orderId: data.orderId,
-                                addressId: addressId
-                            })
-                        });
-                        if (!verifyRes.ok) {
-                            const errorData = await verifyRes.json();
-                            throw new Error(errorData.message || `HTTP error! status: ${verifyRes.status}`);
+            console.log('Initializing Razorpay with order ID:', data.razorpayOrderId);
+            
+            try {
+                const options = {
+                    key: "<%= RAZORPAY_KEY_ID %>",
+                    amount: data.amount,
+                    currency: data.currency || 'INR',
+                    name: "Lume",
+                    description: "Order Payment",
+                    order_id: data.razorpayOrderId,
+                    handler: async function (response) {
+                        console.log('Razorpay payment successful:', response);
+                        try {
+                            const verifyRes = await fetch('/verify-payment', {
+                                method: 'POST',
+                                headers: { 
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-Token': '<%= csrfToken %>'
+                                },
+                                body: JSON.stringify({
+                                    razorpay_payment_id: response.razorpay_payment_id,
+                                    razorpay_order_id: response.razorpay_order_id,
+                                    razorpay_signature: response.razorpay_signature,
+                                    orderId: data.orderId,
+                                    addressId: '<%= address._id %>'
+                                })
+                            });
+                            
+                            if (!verifyRes.ok) {
+                                const errorData = await verifyRes.json().catch(() => ({}));
+                                throw new Error(errorData.message || `HTTP error! status: ${verifyRes.status}`);
+                            }
+                            
+                            const verifyData = await verifyRes.json();
+                            console.log('Verification response:', verifyData);
+                            
+                            if (verifyData.redirect) {
+                                window.location.href = verifyData.redirect;
+                            } else {
+                                window.location.href = `/payment-confirmation?orderId=${data.orderId}`;
+                            }
+                        } catch (error) {
+                            console.error('Payment verification failed:', error);
+                            window.location.href = `/payment-failed?orderId=${data.orderId}&error=${encodeURIComponent(error.message || 'Payment verification failed')}`;
                         }
-                        const verifyData = await verifyRes.json();
-                        if (verifyData.redirect) {
-                            window.location.href = verifyData.redirect;
+                    },
+                    prefill: {
+                        name: "<%= user.name %>",
+                        email: "<%= user.email %>",
+                        contact: "<%= user.phone %>"
+                    },
+                    theme: { 
+                        color: "#D4B996"
+                    },
+                    modal: {
+                        ondismiss: function() {
+                            console.log('Payment modal dismissed by user');
+                            window.location.href = `/payment-failed?orderId=${data.orderId}&error=Payment cancelled by user`;
                         }
-                    } catch (error) {
-                        window.location.href = `/payment-failed?orderId=${data.orderId}&error=${encodeURIComponent(error.message)}`;
                     }
-                },
-                prefill: {
-                    name: "<%= user.name %>",
-                    email: "<%= user.email %>",
-                    contact: "<%= user.phone %>"
-                },
-                theme: { color: "#D4B996" },
-                modal: {
-                    ondismiss: function () {
-                        window.location.href = `/payment-failed?orderId=${data.orderId}&error=Payment cancelled by user`;
-                    }
-                }
-            };
+                };
 
-            const rzp = new Razorpay(options);
-            rzp.on('payment.failed', function (response) {
-                window.location.href = `/payment-failed?orderId=${data.orderId}&error=${encodeURIComponent(response.error.description || 'Payment failed')}`;
-            });
-            rzp.open();
-        } else if (data.redirect) {
-            console.log('redirect');
-            window.location.href = data.redirect;
-        } else {
-            if (data.success) {
-                console.log('success');
-                window.location.href = data.redirect || `/payment-confirmation?orderId=${orderId}`;
-            } else {
-                console.log('failed');
-                let errorMessage = data.message || "Payment processing failed";
-                throw new Error(errorMessage);
+                console.log('Razorpay options:', options);
+                
+                const rzp = new Razorpay(options);
+                
+                rzp.on('payment.failed', function(response) {
+                    console.error('Razorpay payment failed:', response.error);
+                    const errorMsg = response.error.description || 'Payment was not successful';
+                    window.location.href = `/payment-failed?orderId=${data.orderId}&error=${encodeURIComponent(errorMsg)}`;
+                });
+                
+                rzp.open();
+                
+            } catch (error) {
+                console.error('Error initializing Razorpay:', error);
+                window.location.href = `/payment-failed?orderId=${data.orderId}&error=${encodeURIComponent('Failed to initialize payment')}`;
             }
+            
+        } else if (data.redirect) {
+            console.log('Redirecting to:', data.redirect);
+            window.location.href = data.redirect;
+        } else if (data.success) {
+            console.log('Payment successful, redirecting to confirmation');
+            window.location.href = `/payment-confirmation?orderId=${data.orderId || orderId}`;
+        } else {
+            console.error('Unexpected response format:', data);
+            const errorMessage = data.message || "Payment processing failed";
+            throw new Error(errorMessage);
         }
 
     } catch (error) {

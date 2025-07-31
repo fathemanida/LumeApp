@@ -527,7 +527,6 @@ const processPayment = async (req, res) => {
         order.paymentMethod = method;
         await order.save();
 
-        // Clear the user's cart
         await Cart.findOneAndUpdate(
           { userId },
           { $set: { items: [], couponApplied: null, updatedAt: new Date() } }
