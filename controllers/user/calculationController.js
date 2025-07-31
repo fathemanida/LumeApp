@@ -70,8 +70,8 @@ const calculateCartTotals = async (cart) => {
     totalOfferDiscount += offerDiscount;
   });
 
-  if (cart.appliedCoupon) {
-    const coupon = cart.appliedCoupon;
+  if (cart.couponApplied) {
+    const coupon = cart.couponApplied;
     if (coupon.discountType === 'percentage') {
       totalCouponDiscount = (totalPrice * coupon.discountValue) / 100;
       if (coupon.maxDiscount) {

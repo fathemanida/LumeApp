@@ -65,11 +65,11 @@ function calculateCartTotals(cart) {
   const priceAfterOffer = totalPrice - totalOfferDiscount;
 
   if (
-    cart.appliedCoupon &&
-    cart.appliedCoupon.expiryDate &&
-    new Date(cart.appliedCoupon.expiryDate) > currentTime
+    cart.couponApplied &&
+    cart.couponApplied.expiryDate &&
+    new Date(cart.couponApplied.expiryDate) > currentTime
   ) {
-    const coupon = cart.appliedCoupon;
+    const coupon = cart.couponApplied;
 
     if (coupon.discountType === 'PERCENTAGE') {
       totalCouponDiscount = (priceAfterOffer * coupon.discountValue) / 100;
@@ -80,7 +80,7 @@ function calculateCartTotals(cart) {
       totalCouponDiscount = coupon.discountValue;
     }
   } else {
-    cart.appliedCoupon = null; 
+    cart.couponApplied = null; 
   }
 
   const shipping = totalPrice >= 1500 ? 0 : 40;
@@ -92,8 +92,8 @@ function calculateCartTotals(cart) {
     const priceAfterOfferPerItem = item.originalPrice - item.offerDiscount;
     let itemCouponDiscount = 0;
 
-    if (cart.appliedCoupon && cart.appliedCoupon.discountType === 'PERCENTAGE') {
-      itemCouponDiscount = (priceAfterOfferPerItem * cart.appliedCoupon.discountValue) / 100;
+    if (cart.couponApplied && cart.couponApplied.discountType === 'PERCENTAGE') {
+      itemCouponDiscount = (priceAfterOfferPerItem * cart.couponApplied.discountValue) / 100;
     }
 
     item.couponDiscount = itemCouponDiscount;

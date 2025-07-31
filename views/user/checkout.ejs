@@ -520,20 +520,20 @@
                            <div class="coupon-section">
                         <h4 class="coupon-title">Apply Coupon</h4>
                         <div class="coupon-input-group">
-                            <input type="text" class="coupon-input" id="couponCode" placeholder="Enter coupon code" <%= appliedCoupon ? 'disabled' : '' %>>
-                            <button class="apply-coupon-btn" onclick="applyCoupon()" <%= appliedCoupon ? 'disabled' : '' %>>
+                            <input type="text" class="coupon-input" id="couponCode" placeholder="Enter coupon code" <%= couponApplied ? 'disabled' : '' %>>
+                            <button class="apply-coupon-btn" onclick="applyCoupon()" <%= couponApplied ? 'disabled' : '' %>>
                                 <i class="fas fa-check"></i>
                             </button>
                         </div>
-                        <% if (appliedCoupon) { %>
+                        <% if (couponApplied) { %>
                             <div class="applied-coupon">
                                 <div class="d-flex align-items-center justify-content-between">
                                     <div class="d-flex align-items-center gap-2">
                                         <span class="text-success">Coupon Applied:</span>
-                                        <span class="coupon-code"><i class="fas fa-tag"></i> <%= appliedCoupon.code %></span>
-                                        <span class="text-success">(<%= appliedCoupon.discountType === 'percentage' ? 
-                                            `${appliedCoupon.discountValue}% off` : 
-                                            `₹${appliedCoupon.discountValue} off` %>)</span>
+                                        <span class="coupon-code"><i class="fas fa-tag"></i> <%= couponApplied.code %></span>
+                                        <span class="text-success">(<%= couponApplied.discountType === 'percentage' ? 
+                                            `${couponApplied.discountValue}% off` : 
+                                            `₹${couponApplied.discountValue} off` %>)</span>
                                     </div>
                                     <button class="remove-coupon-btn" onclick="removeCoupon()" title="Remove coupon">
                                         <i class="fas fa-times"></i>
@@ -556,9 +556,9 @@
                         <div class="coupon-list" id="couponList" style="display: none;">
                             <% if (coupons && coupons.length > 0) { %>
                                 <% coupons.forEach(coupon => { %>
-                                    <div class="coupon-item <%= appliedCoupon && appliedCoupon.code === coupon.code ? 'applied' : '' %> <%= coupon.usedBy && coupon.usedBy.includes(user.id) ? 'used' : '' %>"
+                                    <div class="coupon-item <%= couponApplied && couponApplied.code === coupon.code ? 'applied' : '' %> <%= coupon.usedBy && coupon.usedBy.includes(user.id) ? 'used' : '' %>"
                                         style="<%= coupon.usedBy && coupon.usedBy.includes(user.id) ? 'pointer-events: none; opacity: 0.7; cursor: not-allowed;' : '' %>"
-                                        onclick="<%= (!appliedCoupon && !(coupon.usedBy && coupon.usedBy.includes(user.id))) ? `selectCoupon('${coupon.code}')` : '' %>">
+                                        onclick="<%= (!couponApplied && !(coupon.usedBy && coupon.usedBy.includes(user.id))) ? `selectCoupon('${coupon.code}')` : '' %>">
                                         <div class="d-flex align-items-center justify-content-between">
                                             <div class="coupon-code">
                                                 <i class="fas fa-tag"></i>

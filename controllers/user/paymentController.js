@@ -259,7 +259,7 @@ const createOrder = async (req, res) => {
           ]
         })
         .populate({
-          path: 'appliedCoupon',
+          path: 'couponApplied',
           select: 'code discountValue discountType maxDiscount minOrderAmount validTill'
         })
         .lean();
@@ -323,13 +323,13 @@ const createOrder = async (req, res) => {
 
       const priceAfterOffer = totalPrice - totalOfferDiscount;
 
-      if (cart.appliedCoupon) {
-        totalCouponDiscount = cart.appliedCoupon.discountType === 'PERCENTAGE'
-          ? (priceAfterOffer * cart.appliedCoupon.discountValue) / 100
-          : cart.appliedCoupon.discountValue;
+      if (cart.couponApplied) {
+        totalCouponDiscount = cart.couponApplied.discountType === 'PERCENTAGE'
+          ? (priceAfterOffer * cart.couponApplied.discountValue) / 100
+          : cart.couponApplied.discountValue;
 
-        if (cart.appliedCoupon.maxDiscount) {
-          totalCouponDiscount = Math.min(totalCouponDiscount, cart.appliedCoupon.maxDiscount);
+        if (cart.couponApplied.maxDiscount) {
+          totalCouponDiscount = Math.min(totalCouponDiscount, cart.couponApplied.maxDiscount);
         }
       }
 
@@ -369,7 +369,7 @@ const createOrder = async (req, res) => {
 
       await Cart.findOneAndUpdate(
         { userId },
-        { $set: { items: [], appliedCoupon: null, updatedAt: new Date() } }
+        { $set: { items: [], couponApplied: null, updatedAt: new Date() } }
       );
     }
 
@@ -530,7 +530,7 @@ const processPayment = async (req, res) => {
         // Clear the user's cart
         await Cart.findOneAndUpdate(
           { userId },
-          { $set: { items: [], appliedCoupon: null, updatedAt: new Date() } }
+          { $set: { items: [], couponApplied: null, updatedAt: new Date() } }
         )
 
         return res.json({
@@ -763,7 +763,7 @@ const verifyPayment = async (req, res) => {
     }
 
     const order = await Order.findById(orderId)
-      .populate('appliedCoupon')
+      .populate('couponApplied')
       .populate('userId');
 
     if (!order) {
@@ -816,9 +816,9 @@ const verifyPayment = async (req, res) => {
     await order.save();
     console.log('Order updated successfully:', order._id);
 
-    if (order.appliedCoupon) {
+    if (order.couponApplied) {
       try {
-        const { code, _id: couponId } = order.appliedCoupon;
+        const { code, _id: couponId } = order.couponApplied;
 
         await User.findByIdAndUpdate(
           order.userId,
@@ -853,7 +853,7 @@ const verifyPayment = async (req, res) => {
           $set: {
             items: [],
             discount: 0,
-            appliedCoupon: null,
+            couponApplied: null,
             updatedAt: new Date()
           }
         }
