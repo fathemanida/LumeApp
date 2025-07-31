@@ -15,7 +15,7 @@ const { addRefund } = require('./walletController.js');
 
 const cancelOrder = async (req, res) => {
   try {
-    const userId = req.session.user_id;
+    const userId = req.session.user.id;
     const { orderId } = req.params;
     const { itemsToCancel = [] } = req.body;
 
@@ -90,7 +90,7 @@ const cancelOrder = async (req, res) => {
 
 const returnOrder = async (req, res) => {
   try {
-    const userId = req.session.user_id;
+    const userId = req.session.user.id;
     const { orderId } = req.params;
     const { itemsToReturn = [] } = req.body;
 
