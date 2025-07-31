@@ -18,7 +18,7 @@ const cartSchema = new mongoose.Schema({
   status: { type: String, default: "In Cart    " }
 }],
 
-  appliedCoupon: {
+  couponApplied: {
     type: Schema.Types.ObjectId,
     ref: 'Coupon'
   },
