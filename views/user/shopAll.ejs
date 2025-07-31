@@ -409,18 +409,29 @@
     .filter-btn {
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 0.5rem;
-      font-size: 1rem;
+      font-size: 0.9rem;
       font-weight: 500;
-      border-radius: 6px;
-      padding: 0.4rem 1.2rem;
-      margin-bottom: 1rem;
+      border-radius: 4px;
+      padding: 0.5rem 1.2rem;
+      margin-bottom: 1.5rem;
+      background-color: var(--muted-green);
+      color: white;
+      border: 1px solid var(--muted-green);
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
-    @media (min-width: 768px) {
-      .filter-btn {
-        display: none;
-      }
+    .filter-btn:hover {
+      background-color: var(--darker-text);
+      border-color: var(--darker-text);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
+    .filter-btn i {
+      font-size: 0.9rem;
     }
 
     .main-content-container {
@@ -570,9 +581,10 @@
   <div class="container-fluid py-4 main-content-container">
     <div class="row">
       <div class="col-12">
-        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
-          <button id="filterToggleBtn" class="btn btn-outline-dark filter-btn" type="button">
-            <i class="fas fa-filter"></i> Filter
+        <!-- Filter Button - Visible on all screen sizes -->
+        <div class="text-center mb-4">
+          <button id="filterToggleBtn" class="filter-btn" type="button">
+            <i class="fas fa-filter"></i> Filter Products
           </button>
         </div>
         <div id="productsGrid">
