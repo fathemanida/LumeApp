@@ -12,7 +12,6 @@ const path = require('path');
 const router = require('../../routes/userRoutes');
 const crypto = require('crypto');
 const Coupon = require('../../models/couponSchema');
-const calculateCartTotals = require('../../helpers/calculateTotal');
 const Wallet = require('../../models/walletSchema');
 const Razorpay = require('razorpay');
 const Offer = require('../../models/offerSchema');
