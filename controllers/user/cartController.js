@@ -229,7 +229,7 @@ const cart = async (req, res) => {
         shipping: 0,
         finalPrice: 0,
         coupons: [],
-        appliedCoupon: null,
+        couponApplied: null,
         discount: 0,
       });
     }
@@ -291,12 +291,12 @@ const cart = async (req, res) => {
     }
 
     let totalCouponDiscount = 0;
-    let appliedCoupon = cart.appliedCoupon;
+    let couponApplied = cart.couponApplied;
     let appliedCouponDetails = null;
 
-    if (appliedCoupon) {
+    if (couponApplied) {
       const coupon = await Coupon.findOne({
-        _id: appliedCoupon,
+        _id: couponApplied,
         isActive: true,
         startDate: { $lte: now },
         endDate: { $gte: now },
@@ -313,7 +313,7 @@ const cart = async (req, res) => {
 
         appliedCouponDetails = coupon;
       } else {
-        cart.appliedCoupon = null;
+        cart.couponApplied = null;
       }
     }
 
@@ -340,7 +340,7 @@ const cart = async (req, res) => {
       shipping,
       finalPrice,
       coupons: availableCoupons,
-      appliedCoupon: appliedCoupon,
+      couponApplied: couponApplied,
       discount: totalCouponDiscount,
     });
   } catch (err) {
@@ -638,7 +638,7 @@ const getCheckout = async (req, res) => {
           { path: "category", populate: { path: "categoryOffer" } },
         ],
       })
-      .populate("appliedCoupon");
+      .populate("couponApplied");
 
     const now = new Date();
 
@@ -666,7 +666,7 @@ const getCheckout = async (req, res) => {
         shipping: 0,
         finalPrice: 0,
         addresses: [],
-        appliedCoupon: null,
+        couponApplied: null,
         coupons: [],
         offerExpiryTime: null,
       });
@@ -705,8 +705,8 @@ const getCheckout = async (req, res) => {
       totalOfferDiscount += maxDiscount;
     });
 
-    if (cart.appliedCoupon) {
-      const coupon = cart.appliedCoupon;
+    if (cart.couponApplied) {
+      const coupon = cart.couponApplied;
       const priceAfterOffer = totalPrice - totalOfferDiscount;
       if (coupon.discountType === "PERCENTAGE") {
         totalCouponDiscount = (priceAfterOffer * coupon.discountValue) / 100;
@@ -728,13 +728,13 @@ const getCheckout = async (req, res) => {
     cart.items.forEach((item) => {
       let itemCouponDiscount = 0;
       if (
-        cart.appliedCoupon &&
-        cart.appliedCoupon.discountType === "PERCENTAGE"
+        cart.couponApplied &&
+        cart.couponApplied.discountType === "PERCENTAGE"
       ) {
         itemCouponDiscount =
           (item.originalPrice - item.offerDiscount) *
-          (cart.appliedCoupon.discountValue / 100);
-      } else if (cart.appliedCoupon) {
+          (cart.couponApplied.discountValue / 100);
+      } else if (cart.couponApplied) {
         itemCouponDiscount = 0;
       }
       item.couponDiscount = itemCouponDiscount;
@@ -742,7 +742,6 @@ const getCheckout = async (req, res) => {
         item.originalPrice - item.offerDiscount - itemCouponDiscount;
     });
 
-    // 🔥 Determine the nearest offer/coupon expiry time
     const allExpiryDates = [
       ...offers.map((o) => o.endDate),
       ...coupons.map((c) => c.expiryDate),
@@ -761,7 +760,7 @@ const getCheckout = async (req, res) => {
       shipping,
       finalPrice,
       addresses,
-      appliedCoupon: cart.appliedCoupon,
+      couponApplied: cart.couponApplied,
       coupons,
       offerExpiryTime: nearestExpiry, 
     });
@@ -864,7 +863,7 @@ const applyCoupon = async (req, res) => {
       couponDiscount = coupon.discountValue;
     }
 
-    cart.appliedCoupon = coupon._id;
+    cart.couponApplied = coupon._id;
     cart.appliedCouponDetails = coupon;
     cart.discount = couponDiscount;
     await cart.save();
@@ -923,7 +922,7 @@ const removeCoupon = async (req, res) => {
         path: "items.productId",
         select: "productName regularPrice salePrice stock",
       })
-      .populate("appliedCoupon");
+      .populate("couponApplied");
 
     if (!cart) {
       return res.status(404).json({
@@ -943,10 +942,10 @@ const removeCoupon = async (req, res) => {
       return total + price * item.quantity;
     }, 0);
 
-    const couponId = cart.appliedCoupon?._id;
-    const couponCode = cart.appliedCoupon?.code;
+    const couponId = cart.couponApplied?._id;
+    const couponCode = cart.couponApplied?.code;
 
-    cart.appliedCoupon = null;
+    cart.couponApplied = null;
     cart.appliedCouponDetails = null;
     cart.discount = 0;
     await cart.save();
