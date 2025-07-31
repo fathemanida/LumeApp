@@ -19,8 +19,11 @@ const cancelOrder = async (req, res) => {
     const { orderId } = req.params;
     const { itemsToCancel = [] } = req.body;
 
-    const order = await Order.findOne({ _id: orderId, userId });
-    if (!order) return res.status(404).json({ success: false, message: "Order not found" });
+ const order = await Order.findOne({ _id: orderId, userId })
+      .populate('items.productId')
+      .populate('address');
+      
+      if (!order) return res.status(404).json({ success: false, message: "Order not found" });
 
     if (["Shipped", "Delivered"].includes(order.status))
       return res.status(400).json({ success: false, message: "Cannot cancel after shipping" });
@@ -62,7 +65,7 @@ const cancelOrder = async (req, res) => {
     ) {
       refundAmount -= order.coupon.discountAmount;
     }
-
+    
     order.status = isFullCancel ? "Cancelled" : "Partialy Cancelled";
 
     if (order.paymentMethod !== "COD" && refundAmount > 0) {

@@ -1265,6 +1265,92 @@
       }
     }
   </style>
+  <style>
+    /* Bulk actions styles */
+    #bulkActions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-left: auto;
+    }
+    
+    #cancelSelectedBtn {
+      white-space: nowrap;
+    }
+    
+    .order-item:hover {
+      background-color: rgba(0, 0, 0, 0.02);
+    }
+    
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      position: relative;
+      max-width: 500px;
+      width: 90%;
+    }
+    
+    .close {
+      position: absolute;
+      right: 1rem;
+      top: 1rem;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    
+    .btn {
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      border: none;
+    }
+    
+    .btn-secondary {
+      background: #f0f0f0;
+      border: 1px solid #ddd;
+    }
+    
+    .btn-danger {
+      background: #e74c3c;
+      color: white;
+    }
+    
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 1rem;
+      background: #4a6741;
+      color: white;
+      border-radius: 4px;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+  </style>
 </head>
 
 <body>
@@ -1455,11 +1541,24 @@
 
           <!-- Ordered Items Table -->
           <div class="order-details-container" style="margin-top:2rem;">
-            <h3 style="font-size:1.1rem; color:var(--muted-green); margin-bottom:1rem;">Ordered Items</h3>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <h3 style="font-size:1.1rem; color:var(--muted-green); margin: 0;">Ordered Items</h3>
+              <div id="bulkActions" style="display: none;">
+                <button id="cancelSelectedBtn" class="action-btn cancel-btn" style="margin: 0;">
+                  <i class="fas fa-times"></i> Cancel Selected Items
+                </button>
+                <span id="selectedCount" style="margin-left: 1rem; color: var(--muted-green); font-weight: 500;">
+                  0 items selected
+                </span>
+              </div>
+            </div>
             <div class="table-responsive-order-items" style="width:100%;overflow-x:auto;">
               <table class="items-table">
     <thead>
       <tr>
+        <th style="width: 40px;">
+          <input type="checkbox" id="selectAll" style="width: 18px; height: 18px; cursor: pointer;">
+        </th>
         <th>Product</th>
         <th>Size</th>
         <th>Qty</th>
@@ -1470,8 +1569,16 @@
       </tr>
     </thead>
     <tbody>
-      <% order.items.forEach(item=> { %>
-        <tr>
+      <% order.items.forEach(item=> { 
+        const isCancellable = !['Cancelled', 'Returned', 'Return Requested', 'Delivered'].includes(item.status);
+      %>
+        <tr class="order-item" data-order-id="<%= order._id %>" data-product-id="<%= item.productId %>">
+          <td>
+            <% if (isCancellable) { %>
+              <input type="checkbox" class="item-checkbox" style="width: 18px; height: 18px; cursor: pointer;"
+                     data-order-id="<%= order._id %>" 
+                     data-product-id="<%= item.productId %>">
+            <% } %>
           <td>
             <div style="display: flex; align-items: center; gap: 1rem;">
               <img src="/uploads/product/<%= item.image %>" alt="<%= item.name %>" class="item-image">
@@ -1512,21 +1619,24 @@
             </span>
           </td>
           <td>
-<div class="item-actions">
-  <button class="action-btn cancel-btn"
-    onclick="openItemCancelModal('<%= order._id %>','<%= item.productId %>')"
-    title="Cancel this item">
-    <i class="fas fa-times"></i> Cancel
-  </button>
+            <div class="item-actions">
+              <% if (isCancellable) { %>
+                <button class="action-btn cancel-btn single-cancel-btn"
+                  data-order-id="<%= order._id %>"
+                  data-product-id="<%= item.productId %>"
+                  title="Cancel this item">
+                  <i class="fas fa-times"></i> Cancel
+                </button>
+              <% } %>
 
-  <button class="action-btn return-btn" 
-    onclick="openReturnModal('<%= order._id %>', '<%= item.productId %>')"
-    title="Request Return">
-    <i class="fas fa-undo"></i> Return
-  </button>
-</div>
-
-
+              <% if (item.status === 'Delivered') { %>
+                <button class="action-btn return-btn" 
+                  onclick="openReturnModal('<%= order._id %>', '<%= item.productId %>')"
+                  title="Request Return">
+                  <i class="fas fa-undo"></i> Return
+                </button>
+              <% } %>
+            </div>
           </td>
         </tr>
       <% }) %>
@@ -2032,6 +2142,164 @@
                   }
                 }
               </script>
-</body>
-
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const checkboxes = document.querySelectorAll('.item-checkbox');
+      const selectAllCheckbox = document.getElementById('selectAll');
+      const bulkActions = document.getElementById('bulkActions');
+      const cancelSelectedBtn = document.getElementById('cancelSelectedBtn');
+      const selectedCount = document.getElementById('selectedCount');
+      
+      // Toggle bulk actions based on selection
+      function updateBulkActions() {
+        const selectedItems = document.querySelectorAll('.item-checkbox:checked');
+        const hasSelectedItems = selectedItems.length > 0;
+        
+        bulkActions.style.display = hasSelectedItems ? 'flex' : 'none';
+        cancelSelectedBtn.disabled = !hasSelectedItems;
+        selectedCount.textContent = `${selectedItems.length} ${selectedItems.length === 1 ? 'item' : 'items'} selected`;
+        
+        // Update select all checkbox state
+        const allCheckboxes = document.querySelectorAll('.item-checkbox');
+        const allChecked = allCheckboxes.length > 0 && selectedItems.length === allCheckboxes.length;
+        selectAllCheckbox.checked = allChecked;
+        selectAllCheckbox.indeterminate = selectedItems.length > 0 && !allChecked;
+      }
+      
+      // Handle individual checkbox click
+      checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateBulkActions);
+      });
+      
+      // Handle select all
+      selectAllCheckbox.addEventListener('change', function() {
+        const isChecked = this.checked;
+        document.querySelectorAll('.item-checkbox').forEach(checkbox => {
+          checkbox.checked = isChecked;
+        });
+        updateBulkActions();
+      });
+      
+      // Handle cancel selected items
+      cancelSelectedBtn.addEventListener('click', function() {
+        const selectedItems = Array.from(document.querySelectorAll('.item-checkbox:checked'))
+          .map(checkbox => ({
+            orderId: checkbox.dataset.orderId,
+            productId: checkbox.dataset.productId
+          }));
+        
+        if (selectedItems.length > 0) {
+          openBulkCancelModal(selectedItems);
+        }
+      });
+      
+      // Handle single item cancel
+      document.querySelectorAll('.single-cancel-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const orderId = this.dataset.orderId;
+          const productId = this.dataset.productId;
+          openItemCancelModal(orderId, productId);
+        });
+      });
+      
+      // Show bulk actions if there are selectable items
+      if (document.querySelector('.item-checkbox')) {
+        bulkActions.style.display = 'flex';
+      }
+    });
+    
+    // Function to open bulk cancel modal
+    function openBulkCancelModal(items) {
+      // Create modal HTML
+      const modalHTML = `
+        <div class="modal" id="bulkCancelModal" style="display: block;">
+          <div class="modal-content">
+            <span class="close" onclick="closeModal('bulkCancelModal')">&times;</span>
+            <h3>Cancel Selected Items</h3>
+            <p>Are you sure you want to cancel ${items.length} selected item(s)?</p>
+            <div class="modal-actions">
+              <button class="btn btn-secondary" onclick="closeModal('bulkCancelModal')">No, Keep Items</button>
+              <button class="btn btn-danger" onclick="confirmBulkCancel(${JSON.stringify(items).replace(/"/g, '&quot;')})">
+                Yes, Cancel Items
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // Add modal to body
+      const modalContainer = document.createElement('div');
+      modalContainer.innerHTML = modalHTML;
+      document.body.appendChild(modalContainer);
+    }
+    
+    // Function to confirm bulk cancel
+    function confirmBulkCancel(items) {
+      // Close the modal
+      closeModal('bulkCancelModal');
+      
+      // Show loading state
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.textContent = 'Processing cancellation...';
+      document.body.appendChild(toast);
+      
+      // Send request to cancel items
+      fetch('/orders/cancel-items', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ items })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Show success message
+          toast.textContent = 'Selected items have been cancelled successfully';
+          toast.style.background = '#4a6741';
+          
+          // Reload the page after a short delay
+          setTimeout(() => {
+            window.location.reload();
+          }, 1500);
+        } else {
+          // Show error message
+          toast.textContent = data.message || 'Failed to cancel items';
+          toast.style.background = '#e74c3c';
+        }
+      })
+      .catch(error => {
+        console.error('Error cancelling items:', error);
+        toast.textContent = 'An error occurred while processing your request';
+        toast.style.background = '#e74c3c';
+      })
+      .finally(() => {
+        // Remove toast after 3 seconds
+        setTimeout(() => {
+          if (toast.parentNode) {
+            toast.parentNode.removeChild(toast);
+          }
+        }, 3000);
+      });
+    }
+    
+    // Function to close modal
+    function closeModal(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.remove();
+      }
+    }
+    
+    // Function to handle single item cancellation (existing function)
+    function openItemCancelModal(orderId, productId) {
+      // This function should be implemented if not already present
+      // It should open a confirmation modal for a single item cancellation
+      // and call the appropriate API endpoint
+      console.log('Cancel item:', { orderId, productId });
+      // Your existing implementation here
+    }
+  </script>
+  </body>
 </html>

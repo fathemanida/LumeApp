@@ -5,167 +5,167 @@ const Product = require('../../models/productSchema');
 const path = require('path');
 const fs = require('fs');
 
-const helpersPath = path.join(process.cwd(), 'helpers', 'refundHelpers.js');
-if (!fs.existsSync(helpersPath)) {
-    console.error(`Helper module not found at: ${helpersPath}`);
-}
-const { calculateRefund, formatRefundDescription } = require(helpersPath);
+// const helpersPath = path.join(process.cwd(), 'helpers', 'refundHelpers.js');
+// if (!fs.existsSync(helpersPath)) {
+//     console.error(`Helper module not found at: ${helpersPath}`);
+// }
+// const { calculateRefund, formatRefundDescription } = require(helpersPath);
 
-const cancelOrReturnOrder = async (req, res) => {
-  try {
-    const { orderId, actionType } = req.body; 
+// const cancelOrReturnOrder = async (req, res) => {
+//   try {
+//     const { orderId, actionType } = req.body; 
 
-    const order = await Order.findById(orderId).populate('items.productId');
+//     const order = await Order.findById(orderId).populate('items.productId');
 
-    if (!order || order.status === 'Cancelled' || order.status === 'Returned') {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid or already processed order'
-      });
-    }
+//     if (!order || order.status === 'Cancelled' || order.status === 'Returned') {
+//       return res.status(400).json({
+//         success: false,
+//         message: 'Invalid or already processed order'
+//       });
+//     }
 
-    if (actionType === 'cancel') {
-        if (order.status === 'Shipped' || order.status === 'Delivered') {
-            return res.status(400).json({ success: false, message: 'Cannot cancel order at this stage.' });
-        }
+//     if (actionType === 'cancel') {
+//         if (order.status === 'Shipped' || order.status === 'Delivered') {
+//             return res.status(400).json({ success: false, message: 'Cannot cancel order at this stage.' });
+//         }
         
-      if (order.paymentMethod !== 'COD') {
-        const refundBreakdown = await calculateRefund(order, [], 'cancellation');
+//       if (order.paymentMethod !== 'COD') {
+//         const refundBreakdown = await calculateRefund(order, [], 'cancellation');
         
-        let wallet = await Wallet.findOne({ userId: order.userId });
+//         let wallet = await Wallet.findOne({ userId: order.userId });
         
-        if (!wallet) {
-          wallet = new Wallet({ 
-            userId: order.userId, 
-            balance: 0, 
-            transactions: [] 
-          });
-        }
+//         if (!wallet) {
+//           wallet = new Wallet({ 
+//             userId: order.userId, 
+//             balance: 0, 
+//             transactions: [] 
+//           });
+//         }
 
-        const transaction = {
-          type: 'CREDIT',
-          amount: refundBreakdown.totalRefund,
-          description: formatRefundDescription(refundBreakdown),
-          orderId: order._id,
-          status: 'COMPLETED',
-          createdAt: new Date(),
-          refundBreakdown: refundBreakdown
-        };
+//         const transaction = {
+//           type: 'CREDIT',
+//           amount: refundBreakdown.totalRefund,
+//           description: formatRefundDescription(refundBreakdown),
+//           orderId: order._id,
+//           status: 'COMPLETED',
+//           createdAt: new Date(),
+//           refundBreakdown: refundBreakdown
+//         };
 
-        wallet.balance += refundBreakdown.totalRefund;
-        wallet.transactions.push(transaction);
-        await wallet.save();
+//         wallet.balance += refundBreakdown.totalRefund;
+//         wallet.transactions.push(transaction);
+//         await wallet.save();
 
-        await User.findByIdAndUpdate(order.userId, { wallet: wallet._id });
-      } 
+//         await User.findByIdAndUpdate(order.userId, { wallet: wallet._id });
+//       } 
       
-      for (const item of order.items) {
-        const product = item.productId;
-        if (product) {
-            const newStock = product.quantity + item.quantity;
-            await Product.findByIdAndUpdate(product._id, {
-                quantity: newStock,
-                status: newStock > 0 ? 'Available' : 'Out of Stock'
-            });
-        }
-      }
+//       for (const item of order.items) {
+//         const product = item.productId;
+//         if (product) {
+//             const newStock = product.quantity + item.quantity;
+//             await Product.findByIdAndUpdate(product._id, {
+//                 quantity: newStock,
+//                 status: newStock > 0 ? 'Available' : 'Out of Stock'
+//             });
+//         }
+//       }
       
-      order.status = 'Cancelled';
-      await order.save();
+//       order.status = 'Cancelled';
+//       await order.save();
 
-      return res.status(200).json({
-          success: true,
-          message: 'Order cancelled successfully'
-      });
-    }
+//       return res.status(200).json({
+//           success: true,
+//           message: 'Order cancelled successfully'
+//       });
+//     }
 
-    if (actionType === 'return') {
-        if (order.status !== 'Delivered') {
-            return res.status(400).json({ success: false, message: 'Only delivered orders can be returned.' });
-        }
-      order.status = 'Return Requested';
-      await order.save();
+//     if (actionType === 'return') {
+//         if (order.status !== 'Delivered') {
+//             return res.status(400).json({ success: false, message: 'Only delivered orders can be returned.' });
+//         }
+//       order.status = 'Return Requested';
+//       await order.save();
 
-      return res.status(200).json({
-        success: true,
-        message: 'Return request submitted. Refund will be processed after admin confirmation.'
-      });
-    }
+//       return res.status(200).json({
+//         success: true,
+//         message: 'Return request submitted. Refund will be processed after admin confirmation.'
+//       });
+//     }
 
-  } catch (error) {
-    console.error('Error in cancelOrReturnOrder:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Something went wrong while processing your request.'
-    });
-  }
-};
+//   } catch (error) {
+//     console.error('Error in cancelOrReturnOrder:', error);
+//     res.status(500).json({
+//       success: false,
+//       message: 'Something went wrong while processing your request.'
+//     });
+//   }
+// };
 
-const processReturnRefund = async (req, res) => {
-  try {
-    const { orderId } = req.body;
+// const processReturnRefund = async (req, res) => {
+//   try {
+//     const { orderId } = req.body;
 
-    if (!req.session.user || !req.session.user.isAdmin) {
-      return res.status(403).json({
-        success: false,
-        message: 'Unauthorized access'
-      });
-    }
+//     if (!req.session.user || !req.session.user.isAdmin) {
+//       return res.status(403).json({
+//         success: false,
+//         message: 'Unauthorized access'
+//       });
+//     }
 
-    const order = await Order.findById(orderId).populate('items.productId');
+//     const order = await Order.findById(orderId).populate('items.productId');
 
-    if (!order || order.status !== 'Return Requested') {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid order or return not requested'
-      });
-    }
+//     if (!order || order.status !== 'Return Requested') {
+//       return res.status(400).json({
+//         success: false,
+//         message: 'Invalid order or return not requested'
+//       });
+//     }
 
-    const refundBreakdown = await calculateRefund(order, [], 'return');
+//     const refundBreakdown = await calculateRefund(order, [], 'return');
     
-    let wallet = await Wallet.findOne({ userId: order.userId });
+//     let wallet = await Wallet.findOne({ userId: order.userId });
     
-    if (!wallet) {
-      wallet = new Wallet({ 
-        userId: order.userId, 
-        balance: 0, 
-        transactions: [] 
-      });
-    }
+//     if (!wallet) {
+//       wallet = new Wallet({ 
+//         userId: order.userId, 
+//         balance: 0, 
+//         transactions: [] 
+//       });
+//     }
 
-    const transaction = {
-      type: 'CREDIT',
-      amount: refundBreakdown.totalRefund,
-      description: formatRefundDescription(refundBreakdown),
-      orderId: order._id,
-      status: 'COMPLETED',
-      createdAt: new Date(),
-      refundBreakdown: refundBreakdown 
-    };
+//     const transaction = {
+//       type: 'CREDIT',
+//       amount: refundBreakdown.totalRefund,
+//       description: formatRefundDescription(refundBreakdown),
+//       orderId: order._id,
+//       status: 'COMPLETED',
+//       createdAt: new Date(),
+//       refundBreakdown: refundBreakdown 
+//     };
 
-    wallet.balance += refundBreakdown.totalRefund;
-    wallet.transactions.push(transaction);
-    await wallet.save();
+//     wallet.balance += refundBreakdown.totalRefund;
+//     wallet.transactions.push(transaction);
+//     await wallet.save();
 
-    await User.findByIdAndUpdate(order.userId, { wallet: wallet._id });
+//     await User.findByIdAndUpdate(order.userId, { wallet: wallet._id });
 
-    order.status = 'Returned';
-    await order.save();
+//     order.status = 'Returned';
+//     await order.save();
 
-    res.status(200).json({
-      success: true,
-      message: 'Return processed and refund completed successfully',
-      refundAmount: refundAmount
-    });
+//     res.status(200).json({
+//       success: true,
+//       message: 'Return processed and refund completed successfully',
+//       refundAmount: refundAmount
+//     });
 
-  } catch (error) {
-    console.error('Error in processReturnRefund:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Something went wrong while processing the return'
-    });
-  }
-};
+//   } catch (error) {
+//     console.error('Error in processReturnRefund:', error);
+//     res.status(500).json({
+//       success: false,
+//       message: 'Something went wrong while processing the return'
+//     });
+//   }
+// };
 
 const getWallet = async (req, res) => {
   try {
@@ -202,7 +202,7 @@ const getWallet = async (req, res) => {
 
 const getTransactions = async (req, res) => {
   try {
-    const userId = req.session.user._id;
+    const userId = req.session.user.id;
 
     const wallet = await Wallet.findOne({ userId });
 
@@ -220,9 +220,11 @@ const getTransactions = async (req, res) => {
 
 const addRefund = async (req) => {
   try {
-    const userId = req.session.user.id;
+    const user = req.session.user
+    const userId=user.id
+    console.log('===user',userId,user);
+
     if (!userId) throw new Error('Missing user session');
-console.log('===user',userId);
     let { amount, orderId, description } = req.body;
 
     amount = Number(amount);
@@ -269,7 +271,6 @@ module.exports = {
     getWallet,
     getTransactions,
     addRefund,
-    cancelOrReturnOrder,
-    processReturnRefund,
-    addRefund
+    // cancelOrReturnOrder,
+    // processReturnRefund,
 };
