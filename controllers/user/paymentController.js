@@ -505,7 +505,7 @@ const processPayment = async (req, res) => {
             type: 'DEBIT',
             description: `Payment for Order #${order.orderNumber}`,
             orderId: order._id,
-            status: 'completed'
+            status: 'COMPLETED'
           });
           await wallet.save();
           
@@ -797,7 +797,7 @@ const verifyPayment = async (req, res) => {
         verifiedAt: new Date()
       },
       method: 'Razorpay',
-      status: 'Completed',
+      status: 'COMPLTED',
       amount: order.totalAmount,
       currency: 'INR',
       paidAt: new Date()
