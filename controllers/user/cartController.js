@@ -942,56 +942,59 @@ const removeCoupon = async (req, res) => {
     }
 
     const totalPrice = cart.items.reduce((total, item) => {
-      if (!item.productId) {
-        return total;
-      }
+      if (!item.productId) return total;
+
       const price =
         item.productId.salePrice <= item.productId.regularPrice
           ? item.productId.salePrice
           : item.productId.regularPrice;
+
       return total + price * item.quantity;
     }, 0);
 
     const couponId = cart.couponApplied?._id;
-    const couponCode = cart.couponApplied?.code;
+    const couponCode = cart.couponApplied?.code?.toUpperCase();
 
     cart.couponApplied = null;
     cart.appliedCouponDetails = null;
     cart.discount = 0;
-    await cart.save();
 
     if (couponId) {
-      await Coupon.findByIdAndUpdate(couponId, { $pull: { usedBy: userId } });
+      await Coupon.findByIdAndUpdate(couponId, {
+        $pull: { usedBy: userId },
+      });
     }
 
     if (couponCode) {
       await User.findByIdAndUpdate(userId, {
-        $pull: { usedCoupons: { code: couponCode.toUpperCase() } },
+        $pull: { usedCoupons: { code: couponCode } },
       });
     }
 
     const shipping = totalPrice >= 1500 ? 0 : 40;
     const finalPrice = totalPrice + shipping;
+    await cart.save();
 
-    res.json({
+    return res.json({
       success: true,
       message: "Coupon removed successfully",
       totals: {
         subtotal: totalPrice,
-        shipping: shipping,
+        shipping,
         discount: 0,
-        finalPrice: finalPrice,
+        finalPrice,
       },
     });
   } catch (error) {
     console.error("Error removing coupon:", error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "Error removing coupon",
       error: error.message,
     });
   }
 };
+
 
 // const placeOrder = async (req, res) => {
 //   console.log("sdffhgvmbgfgsdfadgfdhgmhvfgdsdggfh");
