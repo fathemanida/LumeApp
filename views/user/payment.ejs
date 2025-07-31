@@ -854,8 +854,7 @@ html, body {
                             const verifyRes = await fetch('/verify-payment', {
                                 method: 'POST',
                                 headers: { 
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-Token': '<%= csrfToken %>'
+                                    'Content-Type': 'application/json'
                                 },
                                 body: JSON.stringify({
                                     razorpay_payment_id: response.razorpay_payment_id,
