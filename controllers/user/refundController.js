@@ -19,6 +19,9 @@ const cancelOrder = async (req, res) => {
     const { orderId } = req.params;
     const { itemsToCancel = [] } = req.body;
 
+    console.log('=====orderid',orderId);
+    console.log('=====items',itemsToCancel);
+
     const order = await Order.findOne({ _id: orderId, userId })
       .populate('items.productId')
       .populate('address');
