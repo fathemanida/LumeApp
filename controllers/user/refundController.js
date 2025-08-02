@@ -65,9 +65,10 @@ const cancelOrder = async (req, res) => {
 
     // Process cancellation for items that need to be cancelled
     for (let item of order.items) {
-      const isCancelled = isFullCancel || itemsToCancel.includes(item._id.toString());
+      // Check if this specific item should be cancelled
+      const shouldCancel = isFullCancel || itemsToCancel.some(id => id === item._id.toString() || id === item.productId?._id?.toString());
 
-      if (isCancelled) {
+      if (shouldCancel) {
         let totalPerItem = item.finalPrice * item.quantity;
 
         if (item.couponDiscountPerUnit) {

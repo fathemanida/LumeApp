@@ -1461,9 +1461,10 @@
                       <td>
                         <div class="item-actions">
                           <button class="action-btn cancel-btn"
-                            onclick="openCancelModal('<%= order._id %>', '<%= item.productId %>')"
-                            title="Cancel this item">
-                            <i class="fas fa-times"></i> Cancel
+                            onclick="openCancelModal('<%= order._id %>', '<%= item._id %>')"
+                            title="Cancel this item" <%= item.status === 'Cancelled' ? 'disabled' : '' %>
+                            style="<%= item.status === 'Cancelled' ? 'opacity: 0.6; cursor: not-allowed;' : '' %>">
+                            <i class="fas fa-times"></i> <%= item.status === 'Cancelled' ? 'Cancelled' : 'Cancel' %>
                           </button>
 
                           <button class="action-btn return-btn"
