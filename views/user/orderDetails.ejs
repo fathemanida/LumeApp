@@ -1709,15 +1709,6 @@
               });
             });
          
-  // Function to close the cancel modal
-  function closeCancelModal() {
-    const modalElement = document.getElementById('cancelModal');
-    const modal = bootstrap.Modal.getInstance(modalElement);
-    if (modal) {
-      modal.hide();
-    }
-  }
-
   // Open modal with order ID
   function openCancelModal(orderId) {
     document.getElementById('cancelOrderId').value = orderId;
@@ -1743,7 +1734,7 @@
     const description = document.getElementById('cancelDescription').value;
     const selectedItemCheckboxes = document.querySelectorAll('.cancel-item-checkbox:checked');
     const cancelItems = Array.from(selectedItemCheckboxes).map(cb => cb.value);
-console.log(object);
+console.log('cancel item',cancelItems);
     if (!reason) {
       showToast('Please select a reason for cancellation.', 'danger');
       return;
@@ -1769,28 +1760,16 @@ console.log(object);
           reason,
           description,
           orderId
-        }),
-        credentials: 'include' // Ensure cookies are sent with the request
+        })
       });
 
-      const result = await response.json().catch(() => ({}));
-      
-      console.log('Server response:', {
-        status: response.status,
-        statusText: response.statusText,
-        result: result
-      });
-      
-      // Close the modal on success
-      if (response.ok) {
-        closeCancelModal();
-      }
+      const result = await response.json();
 
       if (response.ok) {
         showToast(result.message || 'Cancelled successfully.', 'success');
         setTimeout(() => location.reload(), 1500);
       } else {
-        showToast(result.message || `Cancellation failed: ${response.statusText}`, 'danger');
+        showToast(result.message || 'Cancellation failed.', 'danger');
       }
     } catch (error) {
       console.error('Cancellation error:', error);
