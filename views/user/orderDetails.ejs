@@ -1472,12 +1472,19 @@
                           ₹<%= itemTotal.toFixed(2) %>
                       </td>
                       <td>
-                        <% const status=item.status || 'Active' ; const statusClass={ 'Active' : 'status-active'
-                          , 'Cancelled' : 'status-cancelled' , 'Returned' : 'status-returned' , 'Return Requested'
-                          : 'status-requested' , 'Delivered' : 'status-delivered' }[status] || 'status-other' ; %>
-                          <span class="status-badge <%= statusClass %>">
-                            <%= status %>
-                          </span>
+                        <% 
+                          const status = item.status || 'Active';
+                          const statusClass = {
+                            'Active': 'status-active',
+                            'Cancelled': 'status-cancelled',
+                            'Returned': 'status-returned',
+                            'Return Requested': 'status-requested',
+                            'Delivered': 'status-delivered'
+                          }[status] || 'status-other';
+                        %>
+                        <span class="status-badge <%= statusClass %>">
+                          <%= status %>
+                        </span>
                       </td>
                       <td>
                         <div class="item-actions">
