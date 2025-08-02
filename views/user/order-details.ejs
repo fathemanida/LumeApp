@@ -349,14 +349,18 @@
                                     </td>
                                     <td class="text-center">
                                         <% if (canCancelItem) { %>
-                                            <button class="btn btn-sm btn-outline-danger me-2" 
-                                                onclick="showCancelModal('<%= item._id %>', `<%= item.productId.productName.replace(/'/g, '\\'') %>`, 'item')">
+                                            <button class="btn btn-sm btn-outline-danger me-2 cancel-item-btn"
+                                                data-item-id="<%= item._id %>"
+                                                data-item-name="<%= item.productId.productName.replace(/"/g, '&quot;') %>"
+                                                data-type="item">
                                                 <i class="fas fa-times"></i> Cancel
                                             </button>
                                         <% } %>
                                         <% if (canReturnItem) { %>
-                                            <button class="btn btn-sm btn-outline-warning" 
-                                                onclick="showReturnModal('<%= item._id %>', `<%= item.productId.productName.replace(/'/g, '\\'') %>`, 'item')">
+                                            <button class="btn btn-sm btn-outline-warning return-item-btn"
+                                                data-item-id="<%= item._id %>"
+                                                data-item-name="<%= item.productId.productName.replace(/"/g, '&quot;') %>"
+                                                data-type="item">
                                                 <i class="fas fa-undo"></i> Return
                                             </button>
                                         <% } %>
@@ -447,14 +451,18 @@
                     <% const canCancelOrder = !['cancelled', 'shipped', 'delivered'].includes(order.status.toLowerCase()); %>
                     <% const canReturnOrder = order.status.toLowerCase() === 'delivered' && !order.isReturned; %>
                     <% if (canCancelOrder) { %>
-                        <button class="btn btn-outline-danger me-2" 
-                            onclick="showCancelModal('<%= order._id %>', 'Order #<%= order.orderId %>', 'order')">
+                        <button class="btn btn-outline-danger me-2 cancel-order-btn"
+                            data-item-id="<%= order._id %>"
+                            data-item-name="Order #<%= order.orderId %>"
+                            data-type="order">
                             <i class="fas fa-times-circle me-2"></i>Cancel Order
                         </button>
                     <% } %>
                     <% if (canReturnOrder) { %>
-                        <button class="btn btn-outline-warning" 
-                            onclick="showReturnModal('<%= order._id %>', 'Order #<%= order.orderId %>', 'order')">
+                        <button class="btn btn-outline-warning return-order-btn"
+                            data-item-id="<%= order._id %>"
+                            data-item-name="Order #<%= order.orderId %>"
+                            data-type="order">
                             <i class="fas fa-undo me-2"></i>Request Return
                         </button>
                     <% } %>
@@ -688,6 +696,29 @@
         }
     </script>
     <script>
+        // Add event listeners when the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle cancel item buttons
+            document.querySelectorAll('.cancel-item-btn, .cancel-order-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const itemId = this.getAttribute('data-item-id');
+                    const itemName = this.getAttribute('data-item-name');
+                    const type = this.getAttribute('data-type') || 'item';
+                    showCancelModal(itemId, itemName, type);
+                });
+            });
+
+            // Handle return item buttons
+            document.querySelectorAll('.return-item-btn, .return-order-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const itemId = this.getAttribute('data-item-id');
+                    const itemName = this.getAttribute('data-item-name');
+                    const type = this.getAttribute('data-type') || 'item';
+                    showReturnModal(itemId, itemName, type);
+                });
+            });
+        });
+
         // Function to show toast messages
         function showToast(message, isSuccess = true) {
             Toastify({
