@@ -17,10 +17,12 @@ const cancelOrder = async (req, res) => {
   try {
     const userId = req.session.user.id;
     const { orderId } = req.params;
-    const { itemsToCancel = [] } = req.body;
+    const { itemId } = req.query;
+    const itemsToCancel = itemId ? [itemId] : [];
 
-    console.log('=====orderid',orderId);
-    console.log('=====items',itemsToCancel);
+    console.log('=====orderid', orderId);
+    console.log('=====itemId from query', itemId);
+    console.log('=====itemsToCancel', itemsToCancel);
 
     const order = await Order.findOne({ _id: orderId, userId })
       .populate('items.productId')
