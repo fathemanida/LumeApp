@@ -1906,7 +1906,7 @@
             }
 
             try {
-              const response = await fetch(`/orders/${orderId}/cancel-items`, {
+              const response = await fetch(`/orders/${orderId}/cancel`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
