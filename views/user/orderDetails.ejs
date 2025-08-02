@@ -210,128 +210,7 @@
       transition: transform 0.3s ease-in-out;
     }
 
-    /* Mobile menu toggle button */
-    .menu-toggle {
-      display: none;
-      position: fixed;
-      top: 80px;
-      left: 20px;
-      background: white;
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-      padding: 8px 12px;
-      z-index: 1000;
-      cursor: pointer;
-    }
-
-    .menu-toggle i {
-      margin-right: 5px;
-    }
-
-    /* Overlay for mobile */
-    .sidebar-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: rgba(0, 0, 0, 0.5);
-      z-index: 899;
-    }
-
-    .sidebar-title {
-      font-family: 'Aboreto', cursive;
-      font-size: 1.5rem;
-      color: var(--muted-green);
-      margin-bottom: 2rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid var(--border-color);
-      letter-spacing: 1px;
-    }
-
-    .sidebar-nav {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      flex: 1;
-    }
-
-    .sidebar-nav a {
-      color: var(--dark-text);
-      text-decoration: none;
-      padding: 0.75rem 1rem;
-      border-radius: 4px;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      font-size: 0.95rem;
-    }
-
-    .sidebar-nav a i {
-      width: 20px;
-      text-align: center;
-      color: var(--muted-green);
-    }
-
-    .sidebar-nav a:hover {
-      background-color: rgba(169, 186, 157, 0.1);
-      color: var(--muted-green);
-      transform: translateX(4px);
-    }
-
-    .sidebar-nav a.active {
-      background-color: rgba(169, 186, 157, 0.2);
-      color: var(--muted-green);
-      font-weight: 500;
-      border-left: 3px solid var(--muted-green);
-    }
-
-    .sidebar-actions {
-      margin-top: auto;
-      padding-top: 1.5rem;
-      border-top: 1px solid var(--border-color);
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-
-    .sidebar-actions button {
-      padding: 0.75rem;
-      border-radius: 4px;
-      border: none;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-family: 'Jost', sans-serif;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-    }
-
-    .logout-btn {
-      background-color: rgba(169, 186, 157, 0.1);
-      color: var(--dark-text);
-      border: 1px solid var(--border-color);
-    }
-
-    .logout-btn:hover {
-      background-color: rgba(169, 186, 157, 0.2);
-      border-color: var(--muted-green);
-    }
-
-    .delete-btn {
-      background-color: transparent;
-      color: #ff6b6b;
-      border: 1px solid #ff6b6b;
-    }
-
-    .delete-btn:hover {
-      background-color: rgba(255, 107, 107, 0.1);
-    }
-
+    
     /* Content Area */
     .content-area {
       flex: 1;
@@ -899,26 +778,14 @@
     }
 
     @media (max-width: 992px) {
-      .sidebar {
-        transform: translateX(-100%);
-      }
-
-      .sidebar.active {
-        transform: translateX(0);
-      }
-
+    
       .content-area {
         margin-left: 0;
         width: 100%;
       }
 
-      .menu-toggle {
-        display: block;
-      }
 
-      .sidebar-overlay.active {
-        display: block;
-      }
+      
     }
 
     @media (max-width: 768px) {
@@ -991,60 +858,7 @@
       transition: background-color 0.3s ease;
     }
 
-    /* Footer */
-    footer {
-      background-color: var(--soft-beige);
-      color: white;
-      padding: 40px 0;
-      font-family: 'Jost', sans-serif;
-      line-height: 1.6;
-    }
-
-    .footer-container {
-      display: flex;
-      justify-content: center;
-      gap: 120px;
-      padding: 0 20px;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .footer-column h3 {
-      font-family: 'Aboreto', cursive;
-      font-size: 1rem;
-      margin-bottom: 15px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-    }
-
-    .footer-column ul {
-      list-style: none;
-      padding: 0;
-      font-size: 0.9rem;
-    }
-
-    .footer-column li {
-      margin-bottom: 8px;
-    }
-
-    .footer-column a {
-      color: white;
-      text-decoration: none;
-      transition: color 0.3s ease;
-    }
-
-    .footer-column a:hover {
-      color: var(--light-bg);
-    }
-
-    .footer-bottom {
-      text-align: center;
-      font-size: 0.8rem;
-      padding-top: 30px;
-      margin-top: 30px;
-      border-top: 1px solid rgba(255, 255, 255, 0.2);
-      color: rgba(255, 255, 255, 0.7);
-    }
+  
 
 
 
@@ -1235,13 +1049,7 @@
 
   <!-- Navbar -->
 
-    <!-- Mobile Menu Toggle -->
-    <button class="menu-toggle" id="menuToggle">
-      <i class="fas fa-bars"></i> Menu
-    </button>
-
-    <!-- Sidebar Overlay -->
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+ 
 
 
 
@@ -1732,55 +1540,59 @@
           </div>
         </div>
 
-        <!-- Cancellation Modal (single or multiple items) -->
-        <div id="cancelModal" class="modal">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h3>Cancel Item(s)</h3>
-              <span class="close" onclick="closeCancelModal()">×</span>
-            </div>
-            <div class="modal-body">
-              <form id="cancelForm" onsubmit="submitCancel(event)">
-                <input type="hidden" id="cancelOrderId">
-                <div class="form-group">
-                  <label for="cancelItems">Select Item(s) to Cancel:</label>
-                  <div id="cancelItemsList">
-                    <% order.items.forEach(item=> { %>
-                      <div class="form-check" style="margin-bottom:8px;">
-                        <input type="checkbox" id="cancel_item_<%= item._id %>" name="cancelItems"
-                          value="<%= item._id %>" class="form-check-input cancel-item-checkbox">
-                        <label class="form-check-label" for="cancel_item_<%= item.productId %>">
-                          <%= item.name %> (Quantity: <%= item.quantity %>)
-                        </label>
-                      </div>
-                      <% }) %>
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label for="cancelReason">Reason for Cancellation:</label>
-                  <select id="cancelReason" required class="form-control">
-                    <option value="">Select a reason</option>
-                    <option value="ordered_by_mistake">Ordered by Mistake</option>
-                    <option value="change_of_mind">Change of Mind</option>
-                    <option value="found_cheaper_elsewhere">Found Cheaper Elsewhere</option>
-                    <option value="shipping_too_long">Shipping Takes Too Long</option>
-                    <option value="other">Other</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label for="cancelDescription">Additional Details:</label>
-                  <textarea id="cancelDescription" name="cancelDescription"
-                    placeholder="Please provide more details about your cancellation request..."
-                    class="form-control"></textarea>
-                </div>
-                <div class="modal-actions">
-                  <button type="button" class="cancel-modal-btn" onclick="closeCancelModal()">Close</button>
-                  <button type="submit" class="confirm-cancel-btn">Confirm Cancellation</button>
-                </div>
-              </form>
-            </div>
+
+        <!-- Cancel Modal -->
+<div id="cancelModal" class="modal fade" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="cancelForm" onsubmit="submitCancel(event)">
+        <div class="modal-header">
+          <h5 class="modal-title" id="cancelModalLabel">Cancel Item(s)</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="cancelOrderId" name="orderId" />
+          <div id="cancelItemsList">
+            <% order.items.forEach(item => { %>
+              <div class="form-check mb-2">
+                <input class="form-check-input cancel-item-checkbox" type="checkbox" value="<%= item._id %>" id="cancel_item_<%= item._id %>" name="cancelItems">
+                <label class="form-check-label" for="cancel_item_<%= item._id %>">
+                  <%= item.name %> (Qty: <%= item.quantity %>)
+                </label>
+              </div>
+            <% }) %>
+          </div>
+
+          <div class="mb-3">
+            <label for="cancelReason" class="form-label">Reason for Cancellation:</label>
+            <select id="cancelReason" class="form-select" required>
+              <option value="">-- Select a reason --</option>
+              <option value="ordered_by_mistake">Ordered by Mistake</option>
+              <option value="change_of_mind">Change of Mind</option>
+              <option value="found_cheaper_elsewhere">Found Cheaper Elsewhere</option>
+              <option value="shipping_too_long">Shipping Takes Too Long</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="cancelDescription" class="form-label">Additional Details:</label>
+            <textarea id="cancelDescription" class="form-control" rows="3" placeholder="Add any details..."></textarea>
           </div>
         </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-danger">Confirm Cancellation</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div id="toastContainer" style="position: fixed; top: 10px; right: 10px; z-index: 1055;"></div>
+
+
 
         <script>
           // Toast Container and Functions
@@ -1868,121 +1680,9 @@
             }
           }
 
-          // Cancellation Modal Functions
-          function openCancelModal(orderId, productId) {
-            document.getElementById('cancelOrderId').value = orderId;
-            document.getElementById('cancelReason').value = '';
-            document.getElementById('cancelDescription').value = '';
-            // Uncheck all
-            document.querySelectorAll('.cancel-item-checkbox').forEach(cb => cb.checked = false);
-            // Pre-select if productId is provided
-            if (productId) {
-              const cb = document.getElementById('cancel_item_' + productId);
-              if (cb) cb.checked = true;
-            }
-            document.getElementById('cancelModal').classList.add('show');
-          }
+          
 
-          function closeCancelModal() {
-            document.getElementById('cancelModal').classList.remove('show');
-          }
-
-          async function submitCancel(event) {
-            event.preventDefault();
-            const orderId = document.getElementById('cancelOrderId').value;
-            const reason = document.getElementById('cancelReason').value;
-            const description = document.getElementById('cancelDescription').value.trim();
-            const selectedItems = Array.from(document.querySelectorAll('input[name="cancelItems"]:checked'))
-              .map(cb => cb.value);
-
-            if (!selectedItems.length) {
-              showToast('warning', 'Warning', 'Please select at least one item to cancel');
-              return;
-            }
-            if (!reason) {
-              showToast('warning', 'Warning', 'Please select a cancellation reason');
-              return;
-            }
-
-            try {
-              const response = await fetch(`/orders/${orderId}/cancel`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  itemsToCancel: selectedItems, // <-- always send as array
-                  reason,
-                  description
-                })
-              });
-              const data = await response.json();
-              if (data.success) {
-                showToast('success', 'Success', 'Item(s) cancelled successfully');
-                closeCancelModal();
-                setTimeout(() => window.location.reload(), 1500);
-              } else {
-                showToast('error', 'Error', data.message || 'Failed to cancel item(s)');
-              }
-            } catch (error) {
-              console.error('Error cancelling item(s):', error);
-              showToast('error', 'Error', 'An error occurred while cancelling the item(s)');
-            }
-          }
-
-          // Toast Notification System
-          function showToast(type, title, message) {
-            const toastContainer = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-
-            const icon = type === 'success' ? 'check-circle' :
-              type === 'error' ? 'times-circle' : 'exclamation-circle';
-
-            toast.innerHTML = `
-      <i class="fas fa-${icon} toast-icon"></i>
-      <div class="toast-content">
-        <div class="toast-title">${title}</div>
-        <div class="toast-message">${message}</div>
-      </div>
-      <i class="fas fa-times toast-close" onclick="this.parentElement.remove()"></i>
-    `;
-
-            toastContainer.appendChild(toast);
-
-            setTimeout(() => {
-              toast.style.animation = 'slideOut 0.3s ease-in-out forwards';
-              setTimeout(() => toast.remove(), 300);
-            }, 5000);
-          }
-
-          // Mobile Menu Toggle
-          document.addEventListener('DOMContentLoaded', function () {
-            const menuToggle = document.getElementById('menuToggle');
-            const sidebar = document.querySelector('.sidebar');
-            const sidebarOverlay = document.getElementById('sidebarOverlay');
-
-            if (menuToggle && sidebar && sidebarOverlay) {
-              menuToggle.addEventListener('click', function (e) {
-                e.stopPropagation();
-                sidebar.classList.toggle('active');
-                sidebarOverlay.classList.toggle('active');
-              });
-
-              sidebarOverlay.addEventListener('click', function () {
-                sidebar.classList.remove('active');
-                this.classList.remove('active');
-              });
-
-              const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
-              sidebarLinks.forEach(link => {
-                link.addEventListener('click', function () {
-                  if (window.innerWidth <= 992) {
-                    sidebar.classList.remove('active');
-                    sidebarOverlay.classList.remove('active');
-                  }
-                });
-              });
-            }
-
+         
             // Initialize event listeners for return checkboxes
             document.querySelectorAll('.return-item-checkbox').forEach(checkbox => {
               checkbox.addEventListener('change', function () {
@@ -1992,7 +1692,74 @@
                 }
               });
             });
-          });
+         
+  // Open modal with order ID
+  function openCancelModal(orderId) {
+    document.getElementById('cancelOrderId').value = orderId;
+
+    // Clear selections and reason
+    document.querySelectorAll('.cancel-item-checkbox').forEach(cb => cb.checked = false);
+    document.getElementById('cancelReason').value = '';
+    document.getElementById('cancelDescription').value = '';
+
+    const modal = new bootstrap.Modal(document.getElementById('cancelModal'));
+    modal.show();
+  }
+
+  async function submitCancel(event) {
+    event.preventDefault();
+
+    const orderId = document.getElementById('cancelOrderId').value;
+    const reason = document.getElementById('cancelReason').value;
+    const description = document.getElementById('cancelDescription').value;
+    const selectedItemCheckboxes = document.querySelectorAll('.cancel-item-checkbox:checked');
+    const cancelItems = Array.from(selectedItemCheckboxes).map(cb => cb.value);
+
+    if (!reason) {
+      showToast('Please select a reason for cancellation.', 'danger');
+      return;
+    }
+
+    try {
+      const response = await fetch(`/orders/${orderId}/cancel`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          cancelItems, 
+          reason,
+          description
+        })
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        showToast(result.message || 'Cancelled successfully.', 'success');
+        setTimeout(() => location.reload(), 1500);
+      } else {
+        showToast(result.message || 'Cancellation failed.', 'danger');
+      }
+    } catch (error) {
+      console.error('Cancellation error:', error);
+      showToast('Something went wrong. Please try again.', 'danger');
+    }
+
+    const modal = bootstrap.Modal.getInstance(document.getElementById('cancelModal'));
+    modal.hide();
+  }
+
+  function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `alert alert-${type} fade show`;
+    toast.textContent = message;
+
+    document.getElementById('toastContainer').appendChild(toast);
+
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 500);
+    }, 3000);
+  }
 
         </script>
 
@@ -2001,422 +1768,9 @@
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-        <script>
-          // Function to open cancel modal and store order and item IDs
-          function openCancelModal(orderId, itemId) {
-            console.log('Opening cancel modal for order:', orderId, 'item:', itemId);
-            // Store the order ID and item ID in the modal
-            document.getElementById('cancelOrderId').value = orderId;
-            document.getElementById('cancelItemId').value = itemId;
 
-            // Reset the reason textarea
-            document.getElementById('cancelReason').value = '';
+        
 
-            // Show the modal
-            const cancelModal = new bootstrap.Modal(document.getElementById('cancelModal'));
-            cancelModal.show();
-          }
-
-          // Function to handle cancel confirmation
-          async function confirmCancel() {
-            const orderId = document.getElementById('cancelOrderId').value;
-            const itemId = document.getElementById('cancelItemId').value;
-            const reason = document.getElementById('cancelReason').value;
-
-            if (!reason) {
-              alert('Please provide a reason for cancellation');
-              return;
-            }
-
-            try {
-              console.log('Sending cancel request for order:', orderId, 'item:', itemId, 'reason:', reason);
-              const response = await fetch(`/orders/${orderId}/cancel?itemId=${encodeURIComponent(itemId)}&reason=${encodeURIComponent(reason)}`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                }
-              });
-
-              const data = await response.json();
-
-              if (response.ok) {
-                // Show success message
-                showToast('Item cancelled successfully', 'success');
-                // Reload the page after a short delay
-                setTimeout(() => window.location.reload(), 1500);
-              } else {
-                // Show error message
-                showToast(data.message || 'Failed to cancel item', 'error');
-              }
-            } catch (error) {
-              console.error('Error cancelling item:', error);
-              showToast('An error occurred while processing your request', 'error');
-            } finally {
-              // Hide the modal
-              const cancelModal = bootstrap.Modal.getInstance(document.getElementById('cancelModal'));
-              if (cancelModal) {
-                cancelModal.hide();
-              }
-            }
-          }
-
-          // Function to show toast messages
-          function showToast(message, type = 'info') {
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.textContent = message;
-            document.getElementById('toastContainer').appendChild(toast);
-
-            // Show the toast
-            setTimeout(() => toast.classList.add('show'), 100);
-
-            // Remove the toast after 3 seconds
-            setTimeout(() => {
-              toast.classList.remove('show');
-              setTimeout(() => toast.remove(), 300);
-            }, 3000);
-          }
-        </script>
-
-        <!-- Cancel Confirmation Modal -->
-        <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="cancelModalLabel">Cancel Item</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                <input type="hidden" id="cancelOrderId">
-                <input type="hidden" id="cancelItemId">
-                <div class="mb-3">
-                  <label for="cancelReason" class="form-label">Reason for cancellation</label>
-                  <textarea class="form-control" id="cancelReason" rows="3" required></textarea>
-                </div>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-danger" onclick="confirmCancel()">Confirm Cancellation</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <style>
-          /* Toast styles */
-          .toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1100;
-          }
-
-          .toast {
-            background: #fff;
-            border-radius: 4px;
-            padding: 12px 20px;
-            margin-bottom: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
-            max-width: 300px;
-          }
-
-          .toast.show {
-            opacity: 1;
-          }
-
-          .toast.success {
-            border-left: 4px solid #28a745;
-          }
-
-          .toast.error {
-            border-left: 4px solid #dc3545;
-          }
-
-          .toast.info {
-            border-left: 4px solid #17a2b8;
-          }
-        </style>
-
-        <script>
-          // Function to open cancel modal and store order and item IDs
-          function openCancelModal(orderId, itemId) {
-            console.log('Opening cancel modal for order:', orderId, 'item:', itemId);
-            // Store the order ID and item ID in the modal
-            document.getElementById('cancelOrderId').value = orderId;
-            document.getElementById('cancelItemId').value = itemId;
-
-            // Show the modal
-            const cancelModal = new bootstrap.Modal(document.getElementById('cancelModal'));
-            cancelModal.show();
-          }
-
-          // Function to handle cancel confirmation
-          async function confirmCancel() {
-            const orderId = document.getElementById('cancelOrderId').value;
-            const itemId = document.getElementById('cancelItemId').value;
-            const reason = document.getElementById('cancelReason').value;
-
-            if (!reason) {
-              alert('Please provide a reason for cancellation');
-              return;
-            }
-
-            try {
-              console.log('Sending cancel request for order:', orderId, 'item:', itemId);
-              const response = await fetch(`/orders/${orderId}/cancel?itemId=${encodeURIComponent(itemId)}&reason=${encodeURIComponent(reason)}`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                }
-              });
-
-              const data = await response.json();
-
-              if (response.ok) {
-                // Show success message
-                showToast('Item cancelled successfully', 'success');
-                // Reload the page after a short delay
-                setTimeout(() => window.location.reload(), 1500);
-              } else {
-                // Show error message
-                showToast(data.message || 'Failed to cancel item', 'error');
-              }
-            } catch (error) {
-              console.error('Error cancelling item:', error);
-              showToast('An error occurred while processing your request', 'error');
-            } finally {
-              // Hide the modal
-              const cancelModal = bootstrap.Modal.getInstance(document.getElementById('cancelModal'));
-              if (cancelModal) {
-                cancelModal.hide();
-              }
-            }
-          }
-
-          // Function to show toast messages
-          function showToast(message, type = 'info') {
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.textContent = message;
-            document.getElementById('toastContainer').appendChild(toast);
-
-            // Show the toast
-            setTimeout(() => toast.classList.add('show'), 100);
-
-            // Remove the toast after 3 seconds
-            setTimeout(() => {
-              toast.classList.remove('show');
-              setTimeout(() => toast.remove(), 300);
-            }, 3000);
-          }
-        </script>
-
-        <!-- Cancel Confirmation Modal -->
-        <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="cancelModalLabel">Cancel Item</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                <input type="hidden" id="cancelOrderId">
-                <input type="hidden" id="cancelItemId">
-                <div class="mb-3">
-                  <label for="cancelReason" class="form-label">Reason for cancellation</label>
-                  <textarea class="form-control" id="cancelReason" rows="3" required></textarea>
-                </div>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-danger" onclick="confirmCancel()">Confirm Cancellation</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <style>
-          /* Toast styles */
-          .toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1100;
-          }
-
-          .toast {
-            background: #fff;
-            border-radius: 4px;
-            padding: 12px 20px;
-            margin-bottom: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
-            max-width: 300px;
-          }
-
-          .toast.show {
-            opacity: 1;
-          }
-
-          .toast.success {
-            border-left: 4px solid #28a745;
-          }
-
-          .toast.error {
-            border-left: 4px solid #dc3545;
-          }
-
-          .toast.info {
-            border-left: 4px solid #17a2b8;
-          }
-        </style>
-
-        <script>
-          // Function to open cancel modal
-          function openCancelModal(orderId, itemId) {
-            console.log('Opening cancel modal for order:', orderId, 'item:', itemId);
-            // Store the order ID and item ID in hidden fields
-            document.getElementById('cancelOrderId').value = orderId;
-            document.getElementById('cancelItemId').value = itemId;
-
-            // Show the modal
-            const cancelModal = new bootstrap.Modal(document.getElementById('cancelModal'));
-            cancelModal.show();
-          }
-
-          // Function to handle cancel confirmation
-          async function confirmCancel() {
-            const orderId = document.getElementById('cancelOrderId').value;
-            const itemId = document.getElementById('cancelItemId').value;
-            const reason = document.getElementById('cancelReason').value;
-
-            if (!reason) {
-              alert('Please provide a reason for cancellation');
-              return;
-            }
-
-            try {
-              console.log('Sending cancel request for order:', orderId, 'item:', itemId);
-              const response = await fetch(`/orders/${orderId}/cancel?itemId=${encodeURIComponent(itemId)}&reason=${encodeURIComponent(reason)}`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                }
-              });
-
-              const data = await response.json();
-
-              if (response.ok) {
-                // Show success message
-                showToast('Item cancelled successfully', 'success');
-                // Reload the page after a short delay
-                setTimeout(() => window.location.reload(), 1500);
-              } else {
-                // Show error message
-                showToast(data.message || 'Failed to cancel item', 'error');
-              }
-            } catch (error) {
-              console.error('Error cancelling item:', error);
-              showToast('An error occurred while processing your request', 'error');
-            } finally {
-              // Hide the modal
-              const cancelModal = bootstrap.Modal.getInstance(document.getElementById('cancelModal'));
-              if (cancelModal) {
-                cancelModal.hide();
-              }
-            }
-          }
-
-          // Function to show toast messages
-          function showToast(message, type = 'info') {
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.textContent = message;
-            document.getElementById('toastContainer').appendChild(toast);
-
-            // Show the toast
-            setTimeout(() => toast.classList.add('show'), 100);
-
-            // Remove the toast after 3 seconds
-            setTimeout(() => {
-              toast.classList.remove('show');
-              setTimeout(() => toast.remove(), 300);
-            }, 3000);
-          }
-
-          // Initialize tooltips
-          document.addEventListener('DOMContentLoaded', function () {
-            // Initialize any tooltips if needed
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-              return new bootstrap.Tooltip(tooltipTriggerEl);
-            });
-          });
-        </script>
-
-        <!-- Cancel Confirmation Modal -->
-        <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="cancelModalLabel">Cancel Item</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                <input type="hidden" id="cancelOrderId">
-                <input type="hidden" id="cancelItemId">
-                <div class="mb-3">
-                  <label for="cancelReason" class="form-label">Reason for cancellation</label>
-                  <textarea class="form-control" id="cancelReason" rows="3" required></textarea>
-                </div>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-danger" onclick="confirmCancel()">Confirm Cancellation</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <style>
-          /* Toast styles */
-          .toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1100;
-          }
-
-          .toast {
-            background: #fff;
-            border-radius: 4px;
-            padding: 12px 20px;
-            margin-bottom: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
-            max-width: 300px;
-          }
-
-          .toast.show {
-            opacity: 1;
-          }
-
-          .toast.success {
-            border-left: 4px solid #28a745;
-          }
-
-          .toast.error {
-            border-left: 4px solid #dc3545;
-          }
-
-          .toast.info {
-            border-left: 4px solid #17a2b8;
-          }
-        </style>
 </body>
 
 </html>
