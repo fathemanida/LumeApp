@@ -1228,7 +1228,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <% if(item) {%>
+                  <% order.items.forEach(item=> { %>
                     <tr>
                       <td>
                         <div style="display: flex; align-items: center; gap: 1rem;">
@@ -1283,7 +1283,7 @@
 
                       </td>
                     </tr>
-                    <% } %>
+                    <% }) %>
                 </tbody>
               </table>
 
