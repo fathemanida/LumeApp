@@ -278,14 +278,26 @@
         productGrid.parentElement.insertBefore(productSearch, productGrid);
 
         // Validate discount value
+       // Show toast message
+       function showToast(message, isSuccess = true) {
+           Toastify({
+               text: message,
+               duration: 3000,
+               gravity: "top",
+               position: 'right',
+               backgroundColor: isSuccess ? "#28a745" : "#dc3545",
+               stopOnFocus: true
+           }).showToast();
+       }
+
        function validateTextField(input, fieldName) {
-    if (!input.value.trim()) {
-        alert(`${fieldName} is required`);
-        input.focus();
-        return false;
-    }
-    return true;
-}
+           if (!input.value.trim()) {
+               showToast(`${fieldName} is required`, false);
+               input.focus();
+               return false;
+           }
+           return true;
+       }
 const offerNameInput = document.getElementById('offer-name');
 const offerCodeInput = document.getElementById('offer-code');
 const startDateInput = document.getElementById('start-date');
@@ -346,7 +358,7 @@ function validateDates() {
 function validateApplicableOn() {
     const value = applicableOnSelect.value;
     if (!value) {
-        alert('Please select where the offer is applicable');
+        showToast('Please select where the offer is applicable', false);
         applicableOnSelect.focus();
         return false;
     }

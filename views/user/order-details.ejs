@@ -220,87 +220,7 @@
             const canCancelOrder = !['cancelled', 'shipped', 'delivered'].includes(order.status.toLowerCase());
             const canReturnOrder = order.status.toLowerCase() === 'delivered' && !order.isReturned;
         %>
-            <!-- Order Summary -->
-            <div class="order-summary-card">
-                <h3 class="mb-4">Order Summary</h3>
-                <div class="summary-grid">
-                    <div class="summary-item">
-                        <div class="summary-label">Order ID</div>
-                        <div class="summary-value"><%= order.orderId %></div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="summary-label">Order Date</div>
-                        <div class="summary-value"><%= new Date(order.createdOn).toLocaleDateString() %></div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="summary-label">Status</div>
-                        <div class="summary-value">
-                            <span class="status-badge status-<%= order.status.toLowerCase() %>">
-                                <%= order.status %>
-                            </span>
-                        </div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="summary-label">Payment Method</div>
-                        <div class="summary-value"><%= order.paymentMethod %></div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="summary-label">Payment Status</div>
-                        <div class="summary-value"><%= order.paymentStatus === 'Paid' ? 'Paid' : 'COD' %></div>
-                    </div>
-                </div>
 
-                <div class="mt-4">
-                    <div class="summary-label">Shipping Address</div>
-                    <div class="summary-value">
-                        <%= order.address.name %><br>
-                        <%= order.address.address %>, <%= order.address.locality %><br>
-                        <%= order.address.city %>, <%= order.address.state %> - <%= order.address.pincode %><br>
-                        Phone: <%= order.address.phone %>
-                    </div>
-                </div>
-
-                <div class="mt-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5>Order Total</h5>
-                        <div class="text-end">
-                            <div class="text-muted">
-                                <span>Items Total: </span>
-                                <span>₹<%= order.itemsTotal %></span>
-                            </div>
-                            <% if (order.discount > 0) { %>
-                                <div class="text-muted">
-                                    <span>Discount: </span>
-                                    <span>-₹<%= order.discount %></span>
-                                </div>
-                            <% } %>
-                            <div class="fw-bold mt-1">
-                                <span>Total: </span>
-                                <span>₹<%= order.totalAmount %></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Order Level Actions -->
-                <div class="order-actions mt-4">
-                    <% if (canCancelOrder) { %>
-                        <button class="btn btn-danger" onclick="cancelOrder()">
-                            <i class="fas fa-times me-2"></i>Cancel Order
-                        </button>
-                    <% } %>
-                    
-                    <% if (canReturnOrder) { %>
-                        <button class="btn btn-success" onclick="returnOrder()">
-                            <i class="fas fa-undo me-2"></i>Return Order
-                        </button>
-                    <% } %>
-                    
-                    <a href="/orders/invoice/<%= order._id %>" class="btn btn-outline-dark">
-                        <i class="fas fa-download me-2"></i>Download Invoice
-                    </a>
-                </div>
-            </div>
 
             <!-- Order Items -->
             <div class="order-items">
@@ -338,7 +258,7 @@
                                         <% if (item.originalPrice > item.price) { %>
                                             <span class="price-original">₹<%= item.originalPrice %></span>
                                         <% } %>
-                                        <span class="price-discounted">₹<%= item.price %></span>
+                                        <span class="price-discounted">₹<%= item.finalPrice %></span>
                                     </td>
                                     <td><%= item.quantity %></td>
                                     <td>₹<%= (item.price * item.quantity).toFixed(2) %></td>
@@ -589,7 +509,7 @@
             const finalReason = reason === 'Other' ? otherReason : reason;
             
             if (!reason) {
-                alert('Please select a reason for cancellation');
+                showToast('Please select a reason for cancellation', false);
                 return;
             }
 
@@ -629,7 +549,7 @@
             const finalReason = reason === 'Other' ? otherReason : reason;
             
             if (!reason) {
-                alert('Please select a reason for return');
+                showToast('Please select a reason for return', false);
                 return;
             }
 

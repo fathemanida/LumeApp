@@ -294,17 +294,25 @@ const cancelOrder = async (req, res) => {
 
         // Add refund to wallet if payment was made online
         if (order.paymentMethod !== 'COD' && order.paymentStatus === 'Paid') {
-            const refundAmount = order.totalAmount;
+            // Calculate total refund amount as sum of final prices of all items
+            const refundAmount = order.items.reduce((total, item) => {
+                return total + (item.finalPrice || item.price) * item.quantity;
+            }, 0);
+            
             await walletController.addRefund({
                 session: { user: { id: userId } },
                 body: { 
                     orderId, 
                     amount: refundAmount, 
                     reason: `Order cancellation: ${reason}`,
-                    notes: notes
+                    notes: `Refund for ${order.items.length} items: ${notes}`
                 }
             }, {
-                json: () => {}
+                json: (data) => {
+                    if (!data.success) {
+                        console.error('Failed to process refund:', data.message);
+                    }
+                }
             });
         }
 
@@ -373,7 +381,7 @@ const cancelOrderItem = async (req, res) => {
 
         // Add refund to wallet if payment was made online
         if (order.paymentMethod !== 'COD' && order.paymentStatus === 'Paid') {
-            const refundAmount = item.price * item.quantity;
+            const refundAmount = (item.finalPrice || item.price) * item.quantity;
             await walletController.addRefund({
                 session: { user: { id: userId } },
                 body: { 
@@ -381,7 +389,7 @@ const cancelOrderItem = async (req, res) => {
                     itemId,
                     amount: refundAmount, 
                     reason: `Item cancellation: ${reason}`,
-                    notes: notes
+                    notes: `Refund for ${item.quantity} x ${item.productName}: ${notes}`
                 }
             }, {
                 json: (data) => {
@@ -453,13 +461,18 @@ const returnOrder = async (req, res) => {
 
         // Process refund if payment was made online
         if (order.paymentMethod !== 'COD' && order.paymentStatus === 'Paid') {
+            // Calculate total refund amount as sum of final prices of all items
+            const refundAmount = order.items.reduce((total, item) => {
+                return total + (item.finalPrice || item.price) * item.quantity;
+            }, 0);
+            
             await walletController.addRefund({
                 session: { user: { id: userId } },
                 body: { 
                     orderId, 
-                    amount: order.totalAmount, 
+                    amount: refundAmount, 
                     reason: `Order return: ${reason}`,
-                    notes: notes
+                    notes: `Refund for ${order.items.length} returned items: ${notes}`
                 }
             }, {
                 json: (data) => {
@@ -543,7 +556,7 @@ const returnOrderItem = async (req, res) => {
 
         // Add refund to wallet if payment was made online
         if (order.paymentMethod !== 'COD' && order.paymentStatus === 'Paid') {
-            const refundAmount = item.price * item.quantity;
+            const refundAmount = (item.finalPrice || item.price) * item.quantity;
             await walletController.addRefund({
                 session: { user: { id: userId } },
                 body: { 
@@ -551,7 +564,7 @@ const returnOrderItem = async (req, res) => {
                     itemId,
                     amount: refundAmount, 
                     reason: `Item return: ${reason}`,
-                    notes: notes
+                    notes: `Refund for ${item.quantity} x ${item.productName}: ${notes}`
                 }
             }, {
                 json: (data) => {
