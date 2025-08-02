@@ -1924,18 +1924,25 @@
             });
           }
 
-          // Add this function to fix the ReferenceError for cancel item button
+          // Fix for openCancelItemModal: check if elements exist before setting their value
           function openCancelItemModal(orderId, productId) {
-            // Show the single item cancel modal
-            document.getElementById('cancelItemOrderId').value = orderId;
-            document.getElementById('cancelItemProductId').value = productId;
-            // Reset reason fields
-            document.getElementById('cancelReason').value = '';
-            document.getElementById('cancelOtherReason').value = '';
-            document.getElementById('cancelOtherReasonContainer').style.display = 'none';
+            const orderIdInput = document.getElementById('cancelItemOrderId');
+            const productIdInput = document.getElementById('cancelItemProductId');
+            if (orderIdInput) orderIdInput.value = orderId;
+            if (productIdInput) productIdInput.value = productId;
+            // Reset reason fields if present
+            const cancelReason = document.getElementById('cancelReason');
+            if (cancelReason) cancelReason.value = '';
+            const cancelOtherReason = document.getElementById('cancelOtherReason');
+            if (cancelOtherReason) cancelOtherReason.value = '';
+            const cancelOtherReasonContainer = document.getElementById('cancelOtherReasonContainer');
+            if (cancelOtherReasonContainer) cancelOtherReasonContainer.style.display = 'none';
             // Show modal (Bootstrap 5)
-            const modal = new bootstrap.Modal(document.getElementById('cancelItemModal'));
-            modal.show();
+            const modalEl = document.getElementById('cancelItemModal');
+            if (modalEl) {
+              const modal = new bootstrap.Modal(modalEl);
+              modal.show();
+            }
           }
 
           // Show/hide "Other" reason textarea for cancel item modal
