@@ -1257,57 +1257,36 @@
 
           <div class="order-tracking-stepper" style="margin-bottom:2.5rem;">
             <div class="stepper-row">
-              <% 
-                const allStatuses = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Returned', 'Return Requested', 'Return Rejected', 'Failed'];
-                const statusIcons = {
-                  'Pending': 'fa-clock',
-                  'Processing': 'fa-cogs',
-                  'Shipped': 'fa-truck',
-                  'Delivered': 'fa-box-open',
-                  'Cancelled': 'fa-times-circle',
-                  'Returned': 'fa-undo',
-                  'Return Requested': 'fa-undo-alt',
-                  'Return Rejected': 'fa-ban',
-                  'Failed': 'fa-exclamation-triangle'
-                };
-                
-                let statusPath = [];
-                if (order.status === 'Pending') {
-                  statusPath = ['Pending'];
-                } else if (order.status === 'Processing') {
-                  statusPath = ['Pending', 'Processing'];
-                } else if (order.status === 'Shipped') {
-                  statusPath = ['Pending', 'Processing', 'Shipped'];
-                } else if (order.status === 'Delivered') {
-                  statusPath = ['Pending', 'Processing', 'Shipped', 'Delivered'];
-                } else if (order.status === 'Cancelled') {
-                  statusPath = ['Pending', 'Processing', 'Cancelled'];
-                } else if (order.status === 'Return Requested') {
-                  statusPath = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Return Requested'];
-                } else if (order.status === 'Return Rejected') {
-                  statusPath = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Return Requested', 'Return Rejected'];
-                } else if (order.status === 'Returned') {
-                  statusPath = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Returned'];
-                } else if (order.status === 'Failed') {
-                  statusPath = ['Pending', 'Failed'];
-                }
-                
-                const currentIndex = statusPath.length - 1;
-              %>
-              <% statusPath.forEach((status, idx) => { %>
-                <div class="stepper-step <%= idx < currentIndex ? 'done' : (idx === currentIndex ? 'active' : '') %>">
-                  <div class="stepper-icon">
-                    <i class="fas <%= statusIcons[status] %>"></i>
-                  </div>
-                  <div class="stepper-label">
-                    <%= status %>
-                  </div>
-                  <% if (idx < statusPath.length - 1) { %>
-                    <div class="stepper-line <%= idx < currentIndex ? 'stepper-line-done' : (idx === currentIndex ? 'stepper-line-active' : '') %>">
+              <% const allStatuses=['Pending', 'Processing' , 'Shipped' , 'Delivered' , 'Cancelled' , 'Returned'
+                , 'Return Requested' , 'Return Rejected' , 'Failed' ]; const statusIcons={ 'Pending' : 'fa-clock'
+                , 'Processing' : 'fa-cogs' , 'Shipped' : 'fa-truck' , 'Delivered' : 'fa-box-open' , 'Cancelled'
+                : 'fa-times-circle' , 'Returned' : 'fa-undo' , 'Return Requested' : 'fa-undo-alt' , 'Return Rejected'
+                : 'fa-ban' , 'Failed' : 'fa-exclamation-triangle' }; let statusPath=[]; if (order.status==='Pending' ) {
+                statusPath=['Pending']; } else if (order.status==='Processing' ) { statusPath=['Pending', 'Processing'
+                ]; } else if (order.status==='Shipped' ) { statusPath=['Pending', 'Processing' , 'Shipped' ]; } else if
+                (order.status==='Delivered' ) { statusPath=['Pending', 'Processing' , 'Shipped' , 'Delivered' ]; } else
+                if (order.status==='Cancelled' ) { statusPath=['Pending', 'Processing' , 'Cancelled' ]; } else if
+                (order.status==='Return Requested' ) { statusPath=['Pending', 'Processing' , 'Shipped' , 'Delivered'
+                , 'Return Requested' ]; } else if (order.status==='Return Rejected' ) {
+                statusPath=['Pending', 'Processing' , 'Shipped' , 'Delivered' , 'Return Requested' , 'Return Rejected'
+                ]; } else if (order.status==='Returned' ) { statusPath=['Pending', 'Processing' , 'Shipped'
+                , 'Delivered' , 'Returned' ]; } else if (order.status==='Failed' ) { statusPath=['Pending', 'Failed' ];
+                } const currentIndex=statusPath.length - 1; %>
+                <% statusPath.forEach((status, idx)=> { %>
+                  <div class="stepper-step <%= idx < currentIndex ? 'done' : (idx === currentIndex ? 'active' : '') %>">
+                    <div class="stepper-icon">
+                      <i class="fas <%= statusIcons[status] %>"></i>
                     </div>
-                  <% } %>
-                </div>
-              <% }); %>
+                    <div class="stepper-label">
+                      <%= status %>
+                    </div>
+                    <% if (idx < statusPath.length - 1) { %>
+                      <div
+                        class="stepper-line <%= idx < currentIndex ? 'stepper-line-done' : (idx === currentIndex ? 'stepper-line-active' : '') %>">
+                      </div>
+                      <% } %>
+                  </div>
+                  <% }) %>
             </div>
           </div>
           <style>
@@ -1472,19 +1451,12 @@
                           ₹<%= itemTotal.toFixed(2) %>
                       </td>
                       <td>
-                        <% 
-                          const status = item.status || 'Active';
-                          const statusClass = {
-                            'Active': 'status-active',
-                            'Cancelled': 'status-cancelled',
-                            'Returned': 'status-returned',
-                            'Return Requested': 'status-requested',
-                            'Delivered': 'status-delivered'
-                          }[status] || 'status-other';
-                        %>
-                        <span class="status-badge <%= statusClass %>">
-                          <%= status %>
-                        </span>
+                        <% const status=item.status || 'Active' ; const statusClass={ 'Active' : 'status-active'
+                          , 'Cancelled' : 'status-cancelled' , 'Returned' : 'status-returned' , 'Return Requested'
+                          : 'status-requested' , 'Delivered' : 'status-delivered' }[status] || 'status-other' ; %>
+                          <span class="status-badge <%= statusClass %>">
+                            <%= status %>
+                          </span>
                       </td>
                       <td>
                         <div class="item-actions">
@@ -1645,38 +1617,25 @@
                 <div style="color:#444; font-size:0.98rem;">Current Status: <%= order.status %><br>Order Created At: <%=
                       order.createdOn %>
                 </div>
-               <h3 style="font-size:1rem; color:var(--muted-green); margin-top:1.5rem;">Payment Details</h3>
-<div style="color:#444; font-size:0.98rem;">
-    Payment Method: <%= order.paymentMethod %><br>
-    <% 
-        let paymentStatus = 'Paid';
-        let paymentDate = order.paidAt || order.createdOn;
-        let showPaymentDate = true;
-
-        if (order.paymentMethod === 'COD') {
-            paymentStatus = 'Pending';
-            showPaymentDate = false;
-        } else if (['Returned', 'Cancelled'].includes(order.status) && ['Razorpay', 'Wallet'].includes(order.paymentMethod)) {
-            paymentStatus = 'Refunded';
-            if (order.walletTransaction && order.walletTransaction.type === 'CREDIT') {
-                paymentDate = order.walletTransaction.createdAt;
-            }
-        } else if (order.walletTransaction) {
-            paymentStatus = order.walletTransaction.status === 'COMPLETED' ? 'Paid' : order.walletTransaction.status;
-            paymentDate = order.walletTransaction.createdAt;
-        } else {
-            paymentStatus = order.paymentStatus || 'Paid';
-        }
-    %>
-    Status: <%= paymentStatus %>
-    <% if (showPaymentDate) { %><br>
-        <%= paymentStatus === 'Refunded' ? 'Refunded At' : 'Paid At' %>: <%= paymentDate %>
-    <% } %>
-    <% if (order.walletTransaction && order.walletTransaction.description) { %><br>
-        Details: <%= order.walletTransaction.description %>
-    <% } %>
-</div>
-
+                <h3 style="font-size:1rem; color:var(--muted-green); margin-top:1.5rem;">Payment Details</h3>
+                <div style="color:#444; font-size:0.98rem;">Payment Method: <%= order.paymentMethod %><br>
+                    <% let paymentStatus='Paid' ; let paymentDate=order.paidAt || order.createdOn; let
+                      showPaymentDate=true; if (order.paymentMethod==='COD' ) { paymentStatus='Pending' ;
+                      showPaymentDate=false; } else if (['Returned', 'Cancelled' ].includes(order.status) &&
+                      ['Razorpay', 'Wallet' ].includes(order.paymentMethod)) { paymentStatus='Refunded' ; if
+                      (order.walletTransaction && order.walletTransaction.type==='CREDIT' ) {
+                      paymentDate=order.walletTransaction.createdAt; } } else if (order.walletTransaction) {
+                      paymentStatus=order.walletTransaction.status==='COMPLETED' ? 'Paid' :
+                      order.walletTransaction.status; paymentDate=order.walletTransaction.createdAt; } else {
+                      paymentStatus=order.paymentStatus || 'Paid' ; } %>
+                      Status: <%= paymentStatus %>
+                        <% if (showPaymentDate) { %><br>
+                          <%= paymentStatus==='Refunded' ? 'Refunded At' : 'Paid At' %>: <%= paymentDate %>
+                              <% } %>
+                                <% if (order.walletTransaction && order.walletTransaction.description) { %><br>Details:
+                                  <%= order.walletTransaction.description %>
+                                    <% } %>
+                </div>
               </div>
             </div>
             <div class="order-total-amount"
@@ -1715,60 +1674,19 @@
               <h2>Welcome to LUME</h2>
               <p>Please log in to view your order details.</p>
               <a href="/login" class="login-btn">Login Now</a>
+            </div>
           </div>
           <% } %>
-  </div>
-  <div style="margin-top:0.5rem; font-weight:600; color:var(--dark-text); font-size:1.15rem;">
-    Total Amount: ₹<%= order.totalAmount?.toFixed(2) %>
-  </div>
-</div>
-<!-- Action Buttons -->
-<div class="order-actions-bottom"
-  style="display:flex; justify-content:center; align-items:center; gap:1rem; margin-top:2rem;">
-  <% if (order.status==='Pending' || order.status==='Processing' ) { %>
-    </button>
-    <% } %>
-      <a href="/orders" class="back-btn">Back to Orders</a>
-      <a href="/orders/<%= order._id %>/invoice" class="download-btn"> <i class="fas fa-file-invoice"></i>
-        Download Invoice</a>
-</div>
-</div>
-</div>
-<% } else { %>
-  <div class="content-area">
-    <div class="no-order">
-      <h2>Welcome to LUME</h2>
-      <p>Please log in to view your order details.</p>
-      <a href="/login" class="login-btn">Login Now</a>
-    </div>
-  </div>
-  <% } %>
-</div>
+      </div>
 
-<!-- Footer -->
+      <!-- Footer -->
 <%- include('../partials/user/fooret.ejs') %>
 
-<!-- Return Request Modal -->
-<div id="returnModal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3>Request Return</h3>
-      <span class="close" onclick="closeReturnModal()">×</span>
-    </div>
-    <div class="modal-body">
-      <p>Please provide details for your return request:</p>
-      <form id="returnRequestForm" onsubmit="submitReturnRequest(event)">
-        <input type="hidden" id="returnOrderId" value="<%= order._id %>">
-        <div class="form-group">
-          <label for="returnReason">Reason for Return:</label>
-          <select id="returnReason" required class="form-control">
-            <option value="">Select a reason</option>
-            <option value="wrong_size">Wrong Size</option>
-            <option value="defective">Defective Product</option>
-            <option value="not_as_described">Not as Described</option>
-            <option value="quality_issues">Quality Issues</option>
-            <option value="other">Other</option>
-          </select>
+
+        <!-- Return Request Modal -->
+        <div id="returnModal" class="modal">
+          <div class="modal-content">
+            <div class="modal-header">
               <h3>Request Return</h3>
               <span class="close" onclick="closeReturnModal()">×</span>
             </div>
@@ -1975,10 +1893,10 @@
             const orderId = document.getElementById('cancelOrderId').value;
             const reason = document.getElementById('cancelReason').value;
             const description = document.getElementById('cancelDescription').value.trim();
-            const itemsToCancel = Array.from(document.querySelectorAll('input[name="cancelItems"]:checked'))
+            const selectedItems = Array.from(document.querySelectorAll('input[name="cancelItems"]:checked'))
               .map(cb => cb.value);
 
-            if (!itemsToCancel.length) {
+            if (!selectedItems.length) {
               showToast('warning', 'Warning', 'Please select at least one item to cancel');
               return;
             }
@@ -1992,14 +1910,14 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                  itemsToCancel, // Changed from 'items' to match backend
+                  items: selectedItems,
                   reason,
                   description
                 })
               });
               const data = await response.json();
-              if (response.ok) {
-                showToast('success', 'Success', data.message || 'Item(s) cancelled successfully');
+              if (data.success) {
+                showToast('success', 'Success', 'Item(s) cancelled successfully');
                 closeCancelModal();
                 setTimeout(() => window.location.reload(), 1500);
               } else {
@@ -2087,12 +2005,144 @@
         <!-- Initialize tooltips -->
         <script>
           document.addEventListener('DOMContentLoaded', function () {
+            // Initialize tooltips
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
               return new bootstrap.Tooltip(tooltipTriggerEl);
             });
           });
+
+          // Function to open cancel modal
+          function openCancelModal(orderId, itemId) {
+            // Store the order ID and item ID in the modal
+            const cancelModal = new bootstrap.Modal(document.getElementById('cancelModal'));
+            document.getElementById('cancelOrderId').value = orderId;
+            document.getElementById('cancelItemId').value = itemId;
+            cancelModal.show();
+          }
+
+          // Function to handle cancel confirmation
+          async function confirmCancel() {
+            const orderId = document.getElementById('cancelOrderId').value;
+            const itemId = document.getElementById('cancelItemId').value;
+            const reason = document.getElementById('cancelReason').value;
+
+            if (!reason) {
+              alert('Please provide a reason for cancellation');
+              return;
+            }
+
+            try {
+              const response = await fetch(`/orders/${orderId}/cancel`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  itemsToCancel: [itemId], // Pass as an array with the item ID
+                  reason: reason
+                })
+              });
+
+              const data = await response.json();
+
+              if (response.ok) {
+                // Show success message
+                showToast('Item cancelled successfully', 'success');
+                // Reload the page after a short delay
+                setTimeout(() => window.location.reload(), 1500);
+              } else {
+                // Show error message
+                showToast(data.message || 'Failed to cancel item', 'error');
+              }
+            } catch (error) {
+              console.error('Error cancelling item:', error);
+              showToast('An error occurred while processing your request', 'error');
+            } finally {
+              // Hide the modal
+              const cancelModal = bootstrap.Modal.getInstance(document.getElementById('cancelModal'));
+              cancelModal.hide();
+            }
+          }
+
+          // Function to show toast messages
+          function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.getElementById('toastContainer').appendChild(toast);
+            
+            // Show the toast
+            setTimeout(() => toast.classList.add('show'), 100);
+            
+            // Remove the toast after 3 seconds
+            setTimeout(() => {
+              toast.classList.remove('show');
+              setTimeout(() => toast.remove(), 300);
+            }, 3000);
+          }
         </script>
+
+        <!-- Cancel Confirmation Modal -->
+        <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="cancelModalLabel">Cancel Item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <input type="hidden" id="cancelOrderId">
+                <input type="hidden" id="cancelItemId">
+                <div class="mb-3">
+                  <label for="cancelReason" class="form-label">Reason for cancellation</label>
+                  <textarea class="form-control" id="cancelReason" rows="3" required></textarea>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" onclick="confirmCancel()">Confirm Cancellation</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <style>
+          /* Toast styles */
+          .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1100;
+          }
+          
+          .toast {
+            background: #fff;
+            border-radius: 4px;
+            padding: 12px 20px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            max-width: 300px;
+          }
+          
+          .toast.show {
+            opacity: 1;
+          }
+          
+          .toast.success {
+            border-left: 4px solid #28a745;
+          }
+          
+          .toast.error {
+            border-left: 4px solid #dc3545;
+          }
+          
+          .toast.info {
+            border-left: 4px solid #17a2b8;
+          }
+        </style>
 </body>
 
 </html>
