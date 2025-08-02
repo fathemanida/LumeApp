@@ -1732,9 +1732,13 @@
     const orderId = document.getElementById('cancelOrderId').value;
     const reason = document.getElementById('cancelReason').value;
     const description = document.getElementById('cancelDescription').value;
-    const selectedItemCheckboxes = document.querySelectorAll('.cancel-item-checkbox:checked');
-    const cancelItems = Array.from(selectedItemCheckboxes).map(cb => cb.value);
-console.log('cancel item',cancelItems);
+    
+    // Get all checkboxes that are checked and not disabled
+    const selectedItemCheckboxes = Array.from(document.querySelectorAll('.cancel-item-checkbox:checked:not([disabled])'));
+    const cancelItems = selectedItemCheckboxes.map(cb => cb.value).filter(Boolean);
+    console.log('selected items',selectedItemCheckboxes);
+    console.log('Selected items for cancellation:', cancelItems);
+    
     if (!reason) {
       showToast('Please select a reason for cancellation.', 'danger');
       return;
