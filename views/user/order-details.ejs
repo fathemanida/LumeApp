@@ -429,9 +429,9 @@
                 <div class="summary-totals mt-4">
                     <div class="total-row">
                         <span>Subtotal:</span>
-                        <span>₹<%= order.subTotal.toFixed(2) %></span>
+                        <span>₹<%= order.subTotal ? order.subTotal.toFixed(2) : '0.00' %></span>
                     </div>
-                    <% if (order.couponDiscount > 0) { %>
+                    <% if (order.couponDiscount && order.couponDiscount > 0) { %>
                         <div class="total-row">
                             <span>Coupon Discount:</span>
                             <span class="text-danger">-₹<%= order.couponDiscount.toFixed(2) %></span>
@@ -439,11 +439,11 @@
                     <% } %>
                     <div class="total-row">
                         <span>Shipping:</span>
-                        <span>₹<%= order.shippingCharge.toFixed(2) %></span>
+                        <span>₹<%= order.shippingCharge ? order.shippingCharge.toFixed(2) : '0.00' %></span>
                     </div>
                     <div class="total-row total-amount">
                         <span>Total:</span>
-                        <span>₹<%= order.totalAmount.toFixed(2) %></span>
+                        <span>₹<%= order.totalAmount ? order.totalAmount.toFixed(2) : '0.00' %></span>
                     </div>
                 </div>
                 <div class="order-actions mt-4">
