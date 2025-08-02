@@ -414,11 +414,15 @@
                     <div class="summary-item">
                         <div class="summary-label">Shipping Address</div>
                         <div class="summary-value">
-                            <%= order.shippingAddress.name %><br>
-                            <%= order.shippingAddress.address %><br>
-                            <%= order.shippingAddress.city %>, <%= order.shippingAddress.state %> <%= order.shippingAddress.pincode %><br>
-                            Phone: <%= order.shippingAddress.phone %><br>
-                            Email: <%= order.shippingAddress.email %>
+                            <% if (order.shippingAddress) { %>
+                                <%= order.shippingAddress.name %><br>
+                                <%= order.shippingAddress.address %><br>
+                                <%= order.shippingAddress.city %>, <%= order.shippingAddress.state %> <%= order.shippingAddress.pincode %><br>
+                                Phone: <%= order.shippingAddress.phone %><br>
+                                Email: <%= order.shippingAddress.email %>
+                            <% } else { %>
+                                No shipping address provided
+                            <% } %>
                         </div>
                     </div>
                 </div>
