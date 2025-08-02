@@ -260,6 +260,7 @@ const cancelOrder = async (req, res) => {
     try {
         const orderId = req.params.orderId;
         const userId = req.session.user.id;
+        const { reason, notes } = req.body;
 
         const order = await Order.findOne({ _id: orderId, userId });
 
@@ -275,13 +276,18 @@ const cancelOrder = async (req, res) => {
             });
         }
 
-        // Update order status
+        // Update order status and cancellation details
         order.status = 'Cancelled';
         order.cancelledAt = new Date();
+        order.cancellationReason = reason;
+        order.cancellationNotes = notes;
         
         // Update all items status
         order.items.forEach(item => {
             item.status = 'Cancelled';
+            item.cancellationReason = reason;
+            item.cancellationNotes = notes;
+            item.cancelledAt = new Date();
         });
 
         await order.save();
@@ -291,7 +297,12 @@ const cancelOrder = async (req, res) => {
             const refundAmount = order.totalAmount;
             await walletController.addRefund({
                 session: { user: { id: userId } },
-                body: { orderId, amount: refundAmount, reason: 'Order cancellation' }
+                body: { 
+                    orderId, 
+                    amount: refundAmount, 
+                    reason: `Order cancellation: ${reason}`,
+                    notes: notes
+                }
             }, {
                 json: () => {}
             });
@@ -306,7 +317,8 @@ const cancelOrder = async (req, res) => {
         console.error('Error in cancelOrder:', error);
         res.status(500).json({ 
             success: false, 
-            message: 'Failed to cancel order' 
+            message: 'Failed to cancel order',
+            error: error.message
         });
     }
 };
@@ -316,6 +328,7 @@ const cancelOrderItem = async (req, res) => {
     try {
         const { orderId, itemId } = req.params;
         const userId = req.session.user.id;
+        const { reason, notes } = req.body;
 
         const order = await Order.findOne({ _id: orderId, userId });
 
@@ -338,6 +351,9 @@ const cancelOrderItem = async (req, res) => {
 
         // Update item status
         item.status = 'Cancelled';
+        item.cancelledAt = new Date();
+        item.cancellationReason = reason;
+        item.cancellationNotes = notes;
         
         // Update order status if all items are cancelled
         const allItemsCancelled = order.items.every(i => 
@@ -347,6 +363,10 @@ const cancelOrderItem = async (req, res) => {
         if (allItemsCancelled) {
             order.status = 'Cancelled';
             order.cancelledAt = new Date();
+            order.cancellationReason = reason;
+            order.cancellationNotes = notes;
+        } else if (!order.status.includes('Partially')) {
+            order.status = 'Partially Cancelled';
         }
 
         await order.save();
@@ -360,10 +380,15 @@ const cancelOrderItem = async (req, res) => {
                     orderId, 
                     itemId,
                     amount: refundAmount, 
-                    reason: 'Item cancellation' 
+                    reason: `Item cancellation: ${reason}`,
+                    notes: notes
                 }
             }, {
-                json: () => {}
+                json: (data) => {
+                    if (!data.success) {
+                        console.error('Failed to process refund:', data.message);
+                    }
+                }
             });
         }
 
@@ -376,7 +401,8 @@ const cancelOrderItem = async (req, res) => {
         console.error('Error in cancelOrderItem:', error);
         res.status(500).json({ 
             success: false, 
-            message: 'Failed to cancel item' 
+            message: 'Failed to cancel item',
+            error: error.message
         });
     }
 };
@@ -385,29 +411,77 @@ const cancelOrderItem = async (req, res) => {
 const returnOrder = async (req, res) => {
     try {
         const orderId = req.params.orderId;
-        const order = await Order.findOne({ _id: orderId, userId: req.session.user_id });
+        const userId = req.session.user.id;
+        const { reason, notes } = req.body;
+
+        const order = await Order.findOne({ _id: orderId, userId });
 
         if (!order) {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
 
-        if (order.status !== 'DELIVERED') {
-            return res.status(400).json({ success: false, message: 'Only delivered orders can be returned' });
+        if (order.status.toLowerCase() !== 'delivered') {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Only delivered orders can be returned' 
+            });
         }
 
-        if (order.status === 'RETURNED') {
-            return res.status(400).json({ success: false, message: 'Order is already returned' });
+        if (order.status.toLowerCase() === 'returned') {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Order is already returned' 
+            });
         }
 
-        await walletController.addRefund(req, res);
+        // Update order status and return details
+        order.status = 'Returned';
+        order.returnedAt = new Date();
+        order.returnReason = reason;
+        order.returnNotes = notes;
+        
+        // Update all items status
+        order.items.forEach(item => {
+            item.isReturned = true;
+            item.returnStatus = 'Returned';
+            item.returnRequestedAt = new Date();
+            item.returnReason = reason;
+            item.returnNotes = notes;
+        });
 
-        order.status = 'RETURNED';
         await order.save();
 
-        res.json({ success: true, message: 'Order returned successfully' });
+        // Process refund if payment was made online
+        if (order.paymentMethod !== 'COD' && order.paymentStatus === 'Paid') {
+            await walletController.addRefund({
+                session: { user: { id: userId } },
+                body: { 
+                    orderId, 
+                    amount: order.totalAmount, 
+                    reason: `Order return: ${reason}`,
+                    notes: notes
+                }
+            }, {
+                json: (data) => {
+                    if (!data.success) {
+                        console.error('Failed to process refund:', data.message);
+                    }
+                }
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            message: 'Return request submitted successfully' 
+        });
+
     } catch (error) {
         console.error('Error in returnOrder:', error);
-        res.status(500).json({ success: false, message: 'Internal server error' });
+        res.status(500).json({ 
+            success: false, 
+            message: 'Failed to process return request',
+            error: error.message
+        });
     }
 };
 
@@ -416,6 +490,7 @@ const returnOrderItem = async (req, res) => {
     try {
         const { orderId, itemId } = req.params;
         const userId = req.session.user.id;
+        const { reason, notes } = req.body;
 
         const order = await Order.findOne({ _id: orderId, userId });
 
@@ -447,6 +522,8 @@ const returnOrderItem = async (req, res) => {
         item.isReturned = true;
         item.returnRequestedAt = new Date();
         item.returnStatus = 'Requested';
+        item.returnReason = reason;
+        item.returnNotes = notes;
         
         // Update order status if all items are returned
         const allItemsReturned = order.items.every(i => 
@@ -456,7 +533,9 @@ const returnOrderItem = async (req, res) => {
         if (allItemsReturned) {
             order.status = 'Returned';
             order.returnedAt = new Date();
-        } else {
+            order.returnReason = reason;
+            order.returnNotes = notes;
+        } else if (!order.status.includes('Partially')) {
             order.status = 'Partially Returned';
         }
 
@@ -471,10 +550,15 @@ const returnOrderItem = async (req, res) => {
                     orderId, 
                     itemId,
                     amount: refundAmount, 
-                    reason: 'Item return' 
+                    reason: `Item return: ${reason}`,
+                    notes: notes
                 }
             }, {
-                json: () => {}
+                json: (data) => {
+                    if (!data.success) {
+                        console.error('Failed to process refund:', data.message);
+                    }
+                }
             });
         }
 
@@ -487,7 +571,8 @@ const returnOrderItem = async (req, res) => {
         console.error('Error in returnOrderItem:', error);
         res.status(500).json({ 
             success: false, 
-            message: 'Failed to process return request' 
+            message: 'Failed to process return request',
+            error: error.message
         });
     }
 };
