@@ -1645,25 +1645,38 @@
                 <div style="color:#444; font-size:0.98rem;">Current Status: <%= order.status %><br>Order Created At: <%=
                       order.createdOn %>
                 </div>
-                <h3 style="font-size:1rem; color:var(--muted-green); margin-top:1.5rem;">Payment Details</h3>
-                <div style="color:#444; font-size:0.98rem;">Payment Method: <%= order.paymentMethod %><br>
-                    <% let paymentStatus='Paid' ; let paymentDate=order.paidAt || order.createdOn; let
-                      showPaymentDate=true; if (order.paymentMethod==='COD' ) { paymentStatus='Pending' ;
-                      showPaymentDate=false; } else if (['Returned', 'Cancelled' ].includes(order.status) &&
-                      ['Razorpay', 'Wallet' ].includes(order.paymentMethod)) { paymentStatus='Refunded' ; if
-                      (order.walletTransaction && order.walletTransaction.type==='CREDIT' ) {
-                      paymentDate=order.walletTransaction.createdAt; } } else if (order.walletTransaction) {
-                      paymentStatus=order.walletTransaction.status==='COMPLETED' ? 'Paid' :
-                      order.walletTransaction.status; paymentDate=order.walletTransaction.createdAt; } else {
-                      paymentStatus=order.paymentStatus || 'Paid' ; } %>
-                      Status: <%= paymentStatus %>
-                        <% if (showPaymentDate) { %><br>
-                          <%= paymentStatus==='Refunded' ? 'Refunded At' : 'Paid At' %>: <%= paymentDate %>
-                              <% } %>
-                                <% if (order.walletTransaction && order.walletTransaction.description) { %><br>Details:
-                                  <%= order.walletTransaction.description %>
-                                    <% } %>
-                </div>
+               <h3 style="font-size:1rem; color:var(--muted-green); margin-top:1.5rem;">Payment Details</h3>
+<div style="color:#444; font-size:0.98rem;">
+    Payment Method: <%= order.paymentMethod %><br>
+    <% 
+        let paymentStatus = 'Paid';
+        let paymentDate = order.paidAt || order.createdOn;
+        let showPaymentDate = true;
+
+        if (order.paymentMethod === 'COD') {
+            paymentStatus = 'Pending';
+            showPaymentDate = false;
+        } else if (['Returned', 'Cancelled'].includes(order.status) && ['Razorpay', 'Wallet'].includes(order.paymentMethod)) {
+            paymentStatus = 'Refunded';
+            if (order.walletTransaction && order.walletTransaction.type === 'CREDIT') {
+                paymentDate = order.walletTransaction.createdAt;
+            }
+        } else if (order.walletTransaction) {
+            paymentStatus = order.walletTransaction.status === 'COMPLETED' ? 'Paid' : order.walletTransaction.status;
+            paymentDate = order.walletTransaction.createdAt;
+        } else {
+            paymentStatus = order.paymentStatus || 'Paid';
+        }
+    %>
+    Status: <%= paymentStatus %>
+    <% if (showPaymentDate) { %><br>
+        <%= paymentStatus === 'Refunded' ? 'Refunded At' : 'Paid At' %>: <%= paymentDate %>
+    <% } %>
+    <% if (order.walletTransaction && order.walletTransaction.description) { %><br>
+        Details: <%= order.walletTransaction.description %>
+    <% } %>
+</div>
+
               </div>
             </div>
             <div class="order-total-amount"
