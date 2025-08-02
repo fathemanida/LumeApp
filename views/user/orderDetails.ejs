@@ -1228,7 +1228,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <% order.items.forEach(item=> { %>
+                  <% if(item) {%>
                     <tr>
                       <td>
                         <div style="display: flex; align-items: center; gap: 1rem;">
@@ -1283,7 +1283,7 @@
 
                       </td>
                     </tr>
-                    <% }) %>
+                    <% } %>
                 </tbody>
               </table>
 
@@ -1727,6 +1727,9 @@
       showToast('Please select a reason for cancellation.', 'danger');
       return;
     }
+   console.log("Sending cancel request", {
+  cancelItems, cancelReason, cancelDescription
+});
 
     try {
       const response = await fetch(`/orders/${orderId}/cancel`, {

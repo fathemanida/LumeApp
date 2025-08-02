@@ -275,7 +275,8 @@ const orderDetails = async (req, res) => {
 
     res.render('orderDetails', {
       order: formattedOrder,
-      user: req.session.user
+      user: req.session.user,
+      item:order.items
     });
 
   } catch (error) {
