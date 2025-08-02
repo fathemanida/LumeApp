@@ -376,7 +376,7 @@ const cancelOrderItem = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Item not found in order' });
         }
 
-        if (['Cancelled', 'Shipped', 'Delivered', 'Returned'].includes(item.status)) {
+        if (['cancelled', 'shipped', 'delivered', 'returned'].includes(item.status.toLowerCase())) {
             return res.status(400).json({ 
                 success: false, 
                 message: `Cannot cancel item that is ${item.status.toLowerCase()}` 
@@ -395,7 +395,7 @@ const cancelOrderItem = async (req, res) => {
                 console.log('====refundAn',refundAmount);
 
         const allItemsCancelled = order.items.every(i => 
-            i.status === 'Cancelled' || i.status === 'Partially Cancelled'
+            i.status.toLowerCase() === 'cancelled'
         );
         
         if (allItemsCancelled) {
@@ -403,7 +403,7 @@ const cancelOrderItem = async (req, res) => {
             order.cancelledAt = new Date();
             order.cancellationReason = reason;
             order.cancellationNotes = notes;
-        } else if (order.status !== 'Partially Cancelled') {
+        } else if (!order.status.includes('Partially')) {
             order.status = 'Partially Cancelled';
         }
 
@@ -585,7 +585,6 @@ const returnOrderItem = async (req, res) => {
 
         console.log('Starting return process for item:', { orderId, itemId, userId });
 
-        // Find the order with the item
         const order = await Order.findOne({ _id: orderId, userId });
         if (!order) {
             console.error('Order not found:', { orderId, userId });
@@ -595,7 +594,6 @@ const returnOrderItem = async (req, res) => {
             });
         }
 
-        // Find the item in the order
         const item = order.items.id(itemId);
         if (!item) {
             console.error('Item not found in order:', { orderId, itemId });
@@ -605,17 +603,15 @@ const returnOrderItem = async (req, res) => {
             });
         }
 
-        // Validate return conditions - only items with status 'Delivered' can be returned
-        if (item.status !== 'Delivered') {
+        if (item.status.toLowerCase() !== 'delivered') {
             console.error('Item not delivered:', { 
                 itemId, 
                 currentStatus: item.status,
-                isReturned: item.isReturned,
-                validStatuses: ['Delivered']
+                isReturned: item.isReturned 
             });
             return res.status(400).json({ 
                 success: false, 
-                message: 'Only items with status "Delivered" can be returned' 
+                message: 'Only delivered items can be returned' 
             });
         }
 
@@ -627,7 +623,6 @@ const returnOrderItem = async (req, res) => {
             });
         }
 
-        // Calculate refund amount if applicable
         let refundAmount = 0;
         const isPaidOrder = order.paymentMethod !== 'COD' && order.paymentStatus === 'Paid';
         
@@ -642,45 +637,32 @@ const returnOrderItem = async (req, res) => {
             });
         }
 
-        // Update item status
         item.isReturned = true;
         item.returnRequestedAt = new Date();
-        item.returnStatus = 'Completed'; // Using 'Completed' as per the returnStatus enum
+        item.returnStatus = 'Completed';
         item.returnReason = reason;
         item.returnNotes = notes;
-        item.status = 'Returned'; // Using 'Returned' as per the item status enum
+        item.status = 'Returned'; 
         
-        // Update order status based on all items
         const allItemsReturned = order.items.every(i => 
-            (i.status === 'Returned' || i.status === 'Cancelled' || i.status === 'Partially Cancelled') && 
-            (i.isReturned || i.status !== 'Returned')
+            i.status === 'Returned' && i.isReturned
         );
         
         if (allItemsReturned) {
-            // All items are either returned or cancelled
             order.status = 'Returned';
             order.returnedAt = new Date();
             order.returnReason = reason;
             order.returnNotes = notes;
         } else {
-            // Check if we need to set to 'Partially Returned' or keep current status
             const hasOtherActiveItems = order.items.some(i => 
-                i.status !== 'Returned' && 
-                i.status !== 'Cancelled' && 
-                i.status !== 'Partially Cancelled' &&
-                i.status !== 'Delivered' // Don't count delivered items as active for this check
+                i.status !== 'Returned' && i.status !== 'Cancelled'
             );
             
             if (hasOtherActiveItems) {
-                order.status = 'Partially Returned'; // Using 'Partially Returned' as per order status enum
-            } else if (order.status === 'Processing' || order.status === 'Shipped') {
-                // If all non-returned items are in a state that can't be returned,
-                // and order status is still in early stages, update to 'Partially Returned'
                 order.status = 'Partially Returned';
             }
         }
 
-        // Save order updates
         await order.save();
         console.log('Order updated with return status:', { 
             orderId, 
@@ -689,12 +671,10 @@ const returnOrderItem = async (req, res) => {
             itemStatus: item.status 
         });
 
-        // Process refund if applicable
         if (refundAmount > 0) {
             try {
                 console.log('Processing refund for item:', { itemId, refundAmount });
                 
-                // Find or create wallet
                 let wallet = await Wallet.findOne({ userId });
                 if (!wallet) {
                     console.log('Creating new wallet for user:', userId);
@@ -705,7 +685,6 @@ const returnOrderItem = async (req, res) => {
                     });
                 }
 
-                // Create refund transaction
                 const transaction = {
                     type: 'CREDIT',
                     amount: refundAmount,
@@ -716,7 +695,6 @@ const returnOrderItem = async (req, res) => {
                     date: new Date()
                 };
 
-                // Update wallet
                 wallet.balance += refundAmount;
                 wallet.transactions.push(transaction);
                 await wallet.save();
@@ -726,7 +704,6 @@ const returnOrderItem = async (req, res) => {
                     refundAmount 
                 });
 
-                // Ensure user has wallet reference
                 await User.findByIdAndUpdate(
                     userId, 
                     { $set: { wallet: wallet._id } }, 
@@ -743,11 +720,9 @@ const returnOrderItem = async (req, res) => {
                     userId,
                     refundAmount
                 });
-                // Continue with the return process even if refund fails
             }
         }
 
-        // Update product inventory
         try {
             console.log('Updating product inventory for item:', { 
                 itemId, 
@@ -761,15 +736,12 @@ const returnOrderItem = async (req, res) => {
                 throw new Error(`Product ${item.productId} not found`);
             }
             
-            // Update product quantity safely
             const currentQuantity = product.quantity || 0;
             const newQuantity = currentQuantity + item.quantity;
             
-            // Update product
             product.quantity = newQuantity;
             product.status = newQuantity > 0 ? 'In Stock' : 'Out of Stock';
             
-            // Save with error handling
             await product.save();
             
             console.log('Product inventory updated successfully:', {
@@ -788,10 +760,8 @@ const returnOrderItem = async (req, res) => {
                 productId: item.productId,
                 quantity: item.quantity
             });
-            // Continue with the return process even if inventory update fails
         }
 
-        // Return success response
         const response = { 
             success: true, 
             message: 'Return request submitted successfully',
