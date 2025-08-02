@@ -1718,7 +1718,11 @@
     document.getElementById('cancelReason').value = '';
     document.getElementById('cancelDescription').value = '';
 
-    const modal = new bootstrap.Modal(document.getElementById('cancelModal'));
+    // Get the modal element
+    const modalElement = document.getElementById('cancelModal');
+    // Initialize modal if not already initialized
+    const modal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+    // Show the modal
     modal.show();
   }
 
@@ -1729,25 +1733,33 @@
     const reason = document.getElementById('cancelReason').value;
     const description = document.getElementById('cancelDescription').value;
     const selectedItemCheckboxes = document.querySelectorAll('.cancel-item-checkbox:checked');
-    console.log('dskajksfks',selectedItemCheckboxes);
     const cancelItems = Array.from(selectedItemCheckboxes).map(cb => cb.value);
 
     if (!reason) {
       showToast('Please select a reason for cancellation.', 'danger');
       return;
     }
-   console.log("Sending cancel request", {
-  cancelItems, cancelReason, cancelDescription
-});
+    
+    if (cancelItems.length === 0) {
+      showToast('Please select at least one item to cancel.', 'danger');
+      return;
+    }
+
+    console.log("Sending cancel request", {
+      cancelItems,
+      reason,
+      description
+    });
 
     try {
       const response = await fetch(`/orders/${orderId}/cancel`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          cancelItems, 
+          cancelItems,
           reason,
-          description
+          description,
+          orderId
         })
       });
 
