@@ -638,7 +638,7 @@ const returnOrderItem = async (req, res) => {
 
         item.isReturned = true;
         item.returnRequestedAt = new Date();
-        item.returnStatus = 'Requested';  
+        item.returnStatus = 'Requested'; 
         item.returnReason = reason;
         item.returnNotes = notes;
         item.status = 'Return Requested';  
@@ -656,11 +656,14 @@ const returnOrderItem = async (req, res) => {
             const hasOtherActiveItems = order.items.some(i => 
                 i.status !== 'Return Requested' && 
                 i.status !== 'Returned' && 
-                i.status !== 'Cancelled'
+                i.status !== 'Cancelled' &&
+                i.status !== 'Partially Returned'
             );
             
             if (hasOtherActiveItems) {
                 order.status = 'Partially Returned';
+            } else {
+                order.status = 'Return Requested';
             }
         }
 
