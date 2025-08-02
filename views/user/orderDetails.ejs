@@ -1554,13 +1554,21 @@
           <input type="hidden" id="cancelOrderId" name="orderId" />
           <div id="cancelItemsList">
             <% order.items.forEach(item => { %>
-              <div class="form-check mb-2">
-                <input class="form-check-input cancel-item-checkbox" type="checkbox" value="<%= item._id %>" id="cancel_item_<%= item._id %>" name="cancelItems">
-                <label class="form-check-label" for="cancel_item_<%= item._id %>">
-                  <%= item.name %> (Qty: <%= item.quantity %>)
-                </label>
-              </div>
-            <% }) %>
+  <div>
+    <p><%= item.productId.productName %></p>
+    <p>Status: <%= item.status %></p>
+    <% if (item.status !== 'Cancelled') { %>
+      <button onclick="cancelItem('<%= order._id %>', '<%= item._id %>')">Cancel Item</button>
+    <% } else { %>
+      <span>Cancelled</span>
+    <% } %>
+  </div>
+<% }) %>
+
+<form action="/orders/<%= order._id %>/cancel" method="POST">
+  <button type="submit">Cancel Full Order</button>
+</form>
+
           </div>
 
           <div class="mb-3">

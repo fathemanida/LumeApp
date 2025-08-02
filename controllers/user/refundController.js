@@ -17,20 +17,17 @@ const cancelOrder = async (req, res) => {
   try {
     const userId = req.session.user.id;
     const { orderId } = req.params;
-    const { itemId } = req.query;
-    const itemsToCancel = itemId ? [itemId] : [];
-
-    console.log('=====orderid', orderId);
-    console.log('=====itemId from query', itemId);
-    console.log('=====itemsToCancel', itemsToCancel);
+    const { cancelItems = [], reason = '', description = '' } = req.body;
+    console.log('====items,reason,description',cancelItems,reason,description);
 
     const order = await Order.findOne({ _id: orderId, userId })
       .populate('items.productId')
       .populate('address');
-      
-    if (!order) return res.status(404).json({ success: false, message: "Order not found" });
 
-    // Check if order is already cancelled
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Order not found" });
+    }
+
     if (order.status === "Cancelled") {
       return res.status(400).json({ success: false, message: "Order is already cancelled" });
     }
@@ -39,19 +36,16 @@ const cancelOrder = async (req, res) => {
       return res.status(400).json({ success: false, message: "Cannot cancel after shipping" });
     }
 
-    const isFullCancel = itemsToCancel.length === 0 || itemsToCancel.length === order.items.length;
-
+    const isFullCancel = cancelItems.length === 0 || cancelItems.length === order.items.length;
     let refundAmount = 0;
     let remainingTotal = 0;
-
     const returnedItems = [];
     const keptItems = [];
 
-    // First, check if any items are already cancelled
     const alreadyCancelledItems = [];
     for (const item of order.items) {
-      const shouldBeCancelled = isFullCancel || itemsToCancel.includes(item._id.toString());
-      if (shouldBeCancelled && item.status === 'Cancelled') {
+      const shouldCancel = isFullCancel || cancelItems.includes(item._id.toString());
+      if (shouldCancel && item.status === 'Cancelled') {
         alreadyCancelledItems.push({
           itemId: item._id,
           productName: item.productId?.productName || 'Unknown Product'
@@ -59,7 +53,6 @@ const cancelOrder = async (req, res) => {
       }
     }
 
-    // If any items are already cancelled, return error with details
     if (alreadyCancelledItems.length > 0) {
       return res.status(400).json({
         success: false,
@@ -68,24 +61,18 @@ const cancelOrder = async (req, res) => {
       });
     }
 
-    // Process cancellation for items that need to be cancelled
     for (let item of order.items) {
-      // Check if this specific item should be cancelled
-      const shouldCancel = isFullCancel || itemsToCancel.some(id => id === item._id.toString() || id === item.productId?._id?.toString());
+      const shouldCancel = isFullCancel || cancelItems.includes(item._id.toString());
 
       if (shouldCancel) {
         let totalPerItem = item.finalPrice * item.quantity;
-
         if (item.couponDiscountPerUnit) {
           totalPerItem -= item.couponDiscountPerUnit * item.quantity;
         }
-
         refundAmount += totalPerItem;
         item.status = 'Cancelled';
         returnedItems.push(item);
-
         await Product.updateOne({ _id: item.productId }, { $inc: { stock: item.quantity } });
-
       } else {
         keptItems.push(item);
         remainingTotal += item.finalPrice * item.quantity;
@@ -99,7 +86,7 @@ const cancelOrder = async (req, res) => {
     ) {
       refundAmount -= order.coupon.discountAmount;
     }
-    
+
     order.status = isFullCancel ? "Cancelled" : "Partialy Cancelled";
 
     if (order.paymentMethod !== "COD" && refundAmount > 0) {
@@ -108,7 +95,7 @@ const cancelOrder = async (req, res) => {
         body: {
           amount: refundAmount,
           orderId: order._id,
-          description: "Order cancellation refund"
+          description: reason || "Order cancellation refund"
         }
       });
     }
@@ -121,6 +108,7 @@ const cancelOrder = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
 
 
 
