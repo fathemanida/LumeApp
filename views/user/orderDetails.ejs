@@ -1734,7 +1734,7 @@
     const description = document.getElementById('cancelDescription').value;
     const selectedItemCheckboxes = document.querySelectorAll('.cancel-item-checkbox:checked');
     const cancelItems = Array.from(selectedItemCheckboxes).map(cb => cb.value);
-
+console.log(object);
     if (!reason) {
       showToast('Please select a reason for cancellation.', 'danger');
       return;
@@ -1760,16 +1760,23 @@
           reason,
           description,
           orderId
-        })
+        }),
+        credentials: 'include' // Ensure cookies are sent with the request
       });
 
-      const result = await response.json();
+      const result = await response.json().catch(() => ({}));
+      
+      console.log('Server response:', {
+        status: response.status,
+        statusText: response.statusText,
+        result: result
+      });
 
       if (response.ok) {
         showToast(result.message || 'Cancelled successfully.', 'success');
         setTimeout(() => location.reload(), 1500);
       } else {
-        showToast(result.message || 'Cancellation failed.', 'danger');
+        showToast(result.message || `Cancellation failed: ${response.statusText}`, 'danger');
       }
     } catch (error) {
       console.error('Cancellation error:', error);

@@ -69,7 +69,7 @@ const orderSchema = new mongoose.Schema({
         },
         status: {
             type: String,
-            enum: ['Active','Processing', 'Cancelled', 'Delivered', 'Shipped', 'Returned', 'Return Requested','Partial Return','Partial Retuen','Partialy Cancelled'],
+            enum: ['Active','Processing', 'Cancelled', 'Delivered', 'Shipped', 'Returned', 'Return Requested','Partial Return','Partially Cancelled'],
             default: 'Active'
         }
     }],
