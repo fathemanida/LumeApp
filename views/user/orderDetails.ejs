@@ -1542,55 +1542,63 @@
 
 
         <!-- Cancel Modal -->
-<div id="cancelModal" class="modal fade" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <form id="cancelForm" onsubmit="submitCancel(event)">
-        <div class="modal-header">
-          <h5 class="modal-title" id="cancelModalLabel">Cancel Item(s)</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <input type="hidden" id="cancelOrderId" name="orderId" />
-          <div id="cancelItemsList">
+<div id="cancelModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Cancel Item(s)</h3>
+      <span class="close" onclick="closeCancelModal()">×</span>
+    </div>
+    <div class="modal-body">
+      <p>Please select items to cancel and provide a reason:</p>
+      <form id="cancelRequestForm" onsubmit="submitCancelRequest(event)">
+        <input type="hidden" id="cancelOrderId" value="<%= order._id %>">
+        
+        <div class="form-group">
+          <label>Items in Order:</label>
+          <div class="cancel-items-list">
             <% order.items.forEach(item => { %>
-  <div>
-    <p><%= item.productId.productName %></p>
-    <p>Status: <%= item.status %></p>
-    <% if (item.status !== 'Cancelled') { %>
-      <button onclick="cancelItem('<%= order._id %>', '<%= item._id %>')">Cancel Item</button>
-    <% } else { %>
-      <span>Cancelled</span>
-    <% } %>
-  </div>
-<% }) %>
-
-<form action="/orders/<%= order._id %>/cancel" method="POST">
-  <button type="submit">Cancel Full Order</button>
-</form>
-
-          </div>
-
-          <div class="mb-3">
-            <label for="cancelReason" class="form-label">Reason for Cancellation:</label>
-            <select id="cancelReason" class="form-select" required>
-              <option value="">-- Select a reason --</option>
-              <option value="ordered_by_mistake">Ordered by Mistake</option>
-              <option value="change_of_mind">Change of Mind</option>
-              <option value="found_cheaper_elsewhere">Found Cheaper Elsewhere</option>
-              <option value="shipping_too_long">Shipping Takes Too Long</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-
-          <div class="mb-3">
-            <label for="cancelDescription" class="form-label">Additional Details:</label>
-            <textarea id="cancelDescription" class="form-control" rows="3" placeholder="Add any details..."></textarea>
+              <div class="cancel-item">
+                <% if (item.status !== 'Cancelled') { %>
+                  <input type="checkbox" id="cancel_item_<%= item._id %>" name="cancelItems"
+                    value="<%= item._id %>" class="cancel-item-checkbox">
+                  <label for="cancel_item_<%= item._id %>">
+                    <span class="item-name"><%= item.productId.productName %></span>
+                    <span class="item-quantity">(Qty: <%= item.quantity %>)</span>
+                    <span class="item-status">Status: <%= item.status %></span>
+                  </label>
+                <% } else { %>
+                  <div class="already-cancelled">
+                    <span class="item-name"><%= item.productId.productName %></span>
+                    <span class="cancelled-badge">Cancelled</span>
+                  </div>
+                <% } %>
+              </div>
+            <% }) %>
           </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-danger">Confirm Cancellation</button>
+
+        <div class="form-group">
+          <label for="cancelReason">Reason for Cancellation:</label>
+          <select id="cancelReason" required class="form-control">
+            <option value="">Select a reason</option>
+            <option value="ordered_by_mistake">Ordered by Mistake</option>
+            <option value="change_of_mind">Change of Mind</option>
+            <option value="found_cheaper_elsewhere">Found Cheaper Elsewhere</option>
+            <option value="shipping_too_long">Shipping Takes Too Long</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="cancelDescription">Additional Details:</label>
+          <textarea id="cancelDescription" name="cancelDescription"
+            placeholder="Please provide more details about your cancellation request..."
+            class="form-control"></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="cancel-modal-btn" onclick="closeCancelModal()">Close</button>
+          <button type="submit" class="confirm-cancel-btn">Submit Cancellation</button>
         </div>
       </form>
     </div>
