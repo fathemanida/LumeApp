@@ -152,6 +152,11 @@ router.post('/orders/:orderId/return', userAuth.isLogin, orderController.returnO
 router.post('/orders/:orderId/items/:itemId/cancel', userAuth.isLogin, orderController.cancelOrderItem);
 router.post('/orders/:orderId/items/:itemId/return', userAuth.isLogin, orderController.returnOrderItem);
 
+// Refund routes
+router.post('/refunds/process', userAuth.isLogin, refundController.processRefund);
+router.get('/refunds/status/:orderId', userAuth.isLogin, refundController.getRefundStatus);
+router.get('/refunds/status/:orderId/items/:itemId', userAuth.isLogin, refundController.getRefundStatus);
+
 // Wishlist routes
 router.post('/wishlist/add', userAuth.isLogin, wishlistController.addToWishlist);
 router.get('/wishlist', userAuth.isLogin, wishlistController.getWishlist);
