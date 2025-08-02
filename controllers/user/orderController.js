@@ -299,21 +299,20 @@ const cancelOrder = async (req, res) => {
                 return total + (item.finalPrice || item.price) * item.quantity;
             }, 0);
             
-            await walletController.addRefund({
+            // Call wallet controller to add refund
+            const refundResult = await walletController.addRefund({
                 session: { user: { id: userId } },
                 body: { 
-                    orderId, 
-                    amount: refundAmount, 
-                    reason: `Order cancellation: ${reason}`,
-                    notes: `Refund for ${order.items.length} items: ${notes}`
-                }
-            }, {
-                json: (data) => {
-                    if (!data.success) {
-                        console.error('Failed to process refund:', data.message);
-                    }
+                    orderId: orderId.toString(),
+                    amount: refundAmount,
+                    description: `Order cancellation: ${reason}`,
+                    notes: notes
                 }
             });
+            
+            if (!refundResult.success) {
+                console.error('Failed to process refund:', refundResult.message);
+            }
         }
 
         res.json({ 
@@ -382,22 +381,20 @@ const cancelOrderItem = async (req, res) => {
         // Add refund to wallet if payment was made online
         if (order.paymentMethod !== 'COD' && order.paymentStatus === 'Paid') {
             const refundAmount = (item.finalPrice || item.price) * item.quantity;
-            await walletController.addRefund({
+            // Call wallet controller to add refund
+            const refundResult = await walletController.addRefund({
                 session: { user: { id: userId } },
                 body: { 
-                    orderId, 
-                    itemId,
-                    amount: refundAmount, 
-                    reason: `Item cancellation: ${reason}`,
-                    notes: `Refund for ${item.quantity} x ${item.productName}: ${notes}`
-                }
-            }, {
-                json: (data) => {
-                    if (!data.success) {
-                        console.error('Failed to process refund:', data.message);
-                    }
+                    orderId: orderId.toString(),
+                    amount: refundAmount,
+                    description: `Item cancellation: ${reason}`,
+                    notes: `Item: ${item.productName} (${item.quantity} x ₹${item.finalPrice || item.price})`
                 }
             });
+            
+            if (!refundResult.success) {
+                console.error('Failed to process refund:', refundResult.message);
+            }
         }
 
         res.json({ 
@@ -466,21 +463,20 @@ const returnOrder = async (req, res) => {
                 return total + (item.finalPrice || item.price) * item.quantity;
             }, 0);
             
-            await walletController.addRefund({
+            // Call wallet controller to add refund
+            const refundResult = await walletController.addRefund({
                 session: { user: { id: userId } },
                 body: { 
-                    orderId, 
-                    amount: refundAmount, 
-                    reason: `Order return: ${reason}`,
+                    orderId: orderId.toString(),
+                    amount: refundAmount,
+                    description: `Order return: ${reason}`,
                     notes: `Refund for ${order.items.length} returned items: ${notes}`
                 }
-            }, {
-                json: (data) => {
-                    if (!data.success) {
-                        console.error('Failed to process refund:', data.message);
-                    }
-                }
             });
+            
+            if (!refundResult.success) {
+                console.error('Failed to process refund:', refundResult.message);
+            }
         }
 
         res.json({ 
