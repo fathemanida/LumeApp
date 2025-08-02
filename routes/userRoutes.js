@@ -144,9 +144,13 @@ router.get('/payment-failure', userAuth.isLogin, paymentController.paymentFailur
 // Order routes
 router.get('/orders', userAuth.isLogin, orderController.orders);
 router.get('/orders/:orderId', userAuth.isLogin, orderController.orderDetails);
-router.post('/orders/:orderId/return', userAuth.isLogin, orderController.returnRequest);
 router.get('/orders/:orderId/invoice', userAuth.isLogin, orderController.downloadInvoice);
-router.post('/orders/:orderId/cancel', userAuth.isLogin, refundController.cancelOrder);
+
+// Order actions
+router.post('/orders/:orderId/cancel', userAuth.isLogin, orderController.cancelOrder);
+router.post('/orders/:orderId/return', userAuth.isLogin, orderController.returnOrder);
+router.post('/orders/:orderId/items/:itemId/cancel', userAuth.isLogin, orderController.cancelOrderItem);
+router.post('/orders/:orderId/items/:itemId/return', userAuth.isLogin, orderController.returnOrderItem);
 
 // Wishlist routes
 router.post('/wishlist/add', userAuth.isLogin, wishlistController.addToWishlist);

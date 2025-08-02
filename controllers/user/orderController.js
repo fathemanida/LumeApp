@@ -50,6 +50,82 @@ const upload = multer({
 
 
 
+// Get order details by ID
+const orderDetails = async (req, res) => {
+    try {
+        if (!req.session.user) {
+            return res.redirect('/login');
+        }
+
+        const orderId = req.params.orderId;
+        const userId = req.session.user.id;
+
+        const order = await Order.findOne({ _id: orderId, userId })
+            .populate({
+                path: 'items.productId',
+                populate: [
+                    { path: 'offer' },
+                    { path: 'category', populate: { path: 'categoryOffer' } }
+                ]
+            })
+            .populate('usedCoupon')
+            .populate('address')
+            .lean();
+
+        if (!order) {
+            return res.status(404).render('error', {
+                message: 'Order not found',
+                error: { status: 404 }
+            });
+        }
+
+        // Format order items with additional details
+        const formattedItems = order.items.map(item => {
+            const product = item.productId;
+            const quantity = item.quantity;
+            const originalPrice = item.originalPrice || (item.price * quantity);
+            const finalPrice = item.finalPrice || item.price * quantity;
+            
+            return {
+                ...item,
+                originalPrice,
+                finalPrice,
+                total: finalPrice,
+                productName: product?.productName || 'Product not available',
+                image: product?.images?.[0] || '/images/no-image.png'
+            };
+        });
+
+        // Calculate order totals
+        const subtotal = formattedItems.reduce((sum, item) => sum + item.originalPrice, 0);
+        const totalDiscount = order.offerDiscount + (order.couponDiscount || 0);
+        const totalAmount = order.totalAmount || (subtotal - totalDiscount + (order.shipping || 0));
+
+        // Format order object for the view
+        const formattedOrder = {
+            ...order,
+            items: formattedItems,
+            subtotal,
+            totalDiscount,
+            totalAmount,
+            orderDate: order.createdOn ? new Date(order.createdOn).toLocaleString() : 'N/A',
+            paymentStatus: order.paymentStatus || (order.paymentMethod === 'COD' ? 'Pending' : 'Paid')
+        };
+
+        res.render('user/order-details', {
+            order: formattedOrder,
+            user: req.session.user
+        });
+
+    } catch (error) {
+        console.error('Error in orderDetails:', error);
+        res.status(500).render('error', {
+            message: 'Error loading order details',
+            error: { status: 500 }
+        });
+    }
+};
+
 const orders = async (req, res) => {
   try {
     if (!req.session.user) {
@@ -173,124 +249,139 @@ const orders = async (req, res) => {
 
 
 
-const orderDetails = async (req, res) => {
-  try {
-    if (!req.session.user) {
-      return res.redirect('/login');
+
+
+
+
+
+
+// Cancel an entire order
+const cancelOrder = async (req, res) => {
+    try {
+        const orderId = req.params.orderId;
+        const userId = req.session.user.id;
+
+        const order = await Order.findOne({ _id: orderId, userId });
+
+        if (!order) {
+            return res.status(404).json({ success: false, message: 'Order not found' });
+        }
+
+        // Check if order can be cancelled
+        if (['cancelled', 'shipped', 'delivered'].includes(order.status.toLowerCase())) {
+            return res.status(400).json({ 
+                success: false, 
+                message: `Cannot cancel order that is ${order.status.toLowerCase()}` 
+            });
+        }
+
+        // Update order status
+        order.status = 'Cancelled';
+        order.cancelledAt = new Date();
+        
+        // Update all items status
+        order.items.forEach(item => {
+            item.status = 'Cancelled';
+        });
+
+        await order.save();
+
+        // Add refund to wallet if payment was made online
+        if (order.paymentMethod !== 'COD' && order.paymentStatus === 'Paid') {
+            const refundAmount = order.totalAmount;
+            await walletController.addRefund({
+                session: { user: { id: userId } },
+                body: { orderId, amount: refundAmount, reason: 'Order cancellation' }
+            }, {
+                json: () => {}
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            message: 'Order cancelled successfully' 
+        });
+
+    } catch (error) {
+        console.error('Error in cancelOrder:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Failed to cancel order' 
+        });
     }
-
-    const orderId = req.params.orderId;
-    const userId = req.session.user.id;
-
-    const order = await Order.findOne({ _id: orderId, userId })
-      .populate({
-        path: 'items.productId',
-        populate: [
-          { path: 'offer' },
-          { path: 'category', populate: { path: 'categoryOffer' } }
-        ],
-        select: 'productName productImage regularPrice salePrice quantity offer category'
-      })
-      .populate('address')
-      .populate('usedCoupon')
-      .lean();
-
-    if (!order) {
-      return res.status(404).render('error', {
-        message: 'Order not found',
-        error: { status: 404 }
-      });
-    }
-
-    let subtotal = 0;
-    let formattedItems = order.items.map(item => {
-      const product = item.productId;
-      const quantity = item.quantity;
-      
-      const originalPrice = item.originalPrice || (item.price * quantity);
-      const offerDiscount = item.appliedOffer ? item.appliedOffer.discountAmount : 0;
-      const couponDiscount = item.totalCouponDiscount || 0;
-      const finalPrice = item.finalPrice || (originalPrice - offerDiscount - couponDiscount);
-      const basePrice = item.price || (product?.salePrice && product.salePrice < product.regularPrice ? product.salePrice : product.regularPrice);
-      
-      subtotal += originalPrice;
-      
-      return {
-        name: product?.productName || 'Product not available',
-        price: basePrice,
-        quantity: quantity,
-        originalPrice: originalPrice,
-        offerDiscount: offerDiscount,
-        couponDiscount: couponDiscount,
-        total: finalPrice,
-        discount: offerDiscount + couponDiscount,
-        image: product?.productImage?.[0] || '/images/no-image.png',
-        productId: product?._id || null,
-        status: item.status || 'Active',
-        appliedOffer: item.appliedOffer || null
-      };
-    });
-    
-    const offerDiscount = typeof order.offerDiscount === 'number' ? order.offerDiscount : 0;
-    const couponDiscount = typeof order.couponDiscount === 'number' ? order.couponDiscount : 0;
-    const shipping = typeof order.shipping === 'number' ? order.shipping : 0;
-    const totalAmount = typeof order.totalAmount === 'number' ? order.totalAmount : (subtotal - offerDiscount - couponDiscount + shipping);
-
-    let walletTransaction = null;
-    if (['Razorpay', 'Wallet'].includes(order.paymentMethod)) {
-      const wallet = await Wallet.findOne({ userId }).lean();
-      if (wallet && wallet.transactions) {
-        walletTransaction = wallet.transactions.find(transaction => 
-          transaction.orderId && transaction.orderId.toString() === order._id.toString()
-        );
-      }
-    }
-
-    const formattedOrder = {
-      _id: order._id,
-      orderNumber: order._id.toString().slice(-6).toUpperCase(),
-      status: order.status || 'Pending',
-      date: order.createdOn,
-      createdOn: order.createdOn,
-      paymentMethod: order.paymentMethod || 'COD',
-      paymentStatus: order.paymentStatus,
-      paidAt: order.paidAt,
-      subtotal: subtotal,
-      shipping: shipping,
-      offerDiscount: offerDiscount,
-      couponDiscount: couponDiscount,
-      totalAmount: totalAmount,
-      items: formattedItems,
-      walletTransaction: walletTransaction, 
-      address: order.address ? {
-        name: order.address.name,
-        houseNo: order.address.houseNo,
-        roadArea: order.address.roadArea,
-        city: order.address.city,
-        state: order.address.state,
-        pincode: order.address.pincode,
-        phone: order.address.phone
-      } : null
-    };
-
-    res.render('orderDetails', {
-      order: formattedOrder,
-      user: req.session.user,
-    });
-
-  } catch (error) {
-    console.error('Error in orderDetails:', error);
-    res.status(500).render('error', {
-      message: 'Error loading order details',
-      error: { status: 500 }
-    });
-  }
 };
 
+// Cancel a single order item
+const cancelOrderItem = async (req, res) => {
+    try {
+        const { orderId, itemId } = req.params;
+        const userId = req.session.user.id;
 
+        const order = await Order.findOne({ _id: orderId, userId });
 
+        if (!order) {
+            return res.status(404).json({ success: false, message: 'Order not found' });
+        }
 
+        const item = order.items.id(itemId);
+        if (!item) {
+            return res.status(404).json({ success: false, message: 'Item not found in order' });
+        }
 
+        // Check if item can be cancelled
+        if (['cancelled', 'shipped', 'delivered'].includes(item.status.toLowerCase())) {
+            return res.status(400).json({ 
+                success: false, 
+                message: `Cannot cancel item that is ${item.status.toLowerCase()}` 
+            });
+        }
+
+        // Update item status
+        item.status = 'Cancelled';
+        
+        // Update order status if all items are cancelled
+        const allItemsCancelled = order.items.every(i => 
+            i.status.toLowerCase() === 'cancelled'
+        );
+        
+        if (allItemsCancelled) {
+            order.status = 'Cancelled';
+            order.cancelledAt = new Date();
+        }
+
+        await order.save();
+
+        // Add refund to wallet if payment was made online
+        if (order.paymentMethod !== 'COD' && order.paymentStatus === 'Paid') {
+            const refundAmount = item.price * item.quantity;
+            await walletController.addRefund({
+                session: { user: { id: userId } },
+                body: { 
+                    orderId, 
+                    itemId,
+                    amount: refundAmount, 
+                    reason: 'Item cancellation' 
+                }
+            }, {
+                json: () => {}
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            message: 'Item cancelled successfully' 
+        });
+
+    } catch (error) {
+        console.error('Error in cancelOrderItem:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Failed to cancel item' 
+        });
+    }
+};
+
+// Return an entire order
 const returnOrder = async (req, res) => {
     try {
         const orderId = req.params.orderId;
@@ -317,6 +408,87 @@ const returnOrder = async (req, res) => {
     } catch (error) {
         console.error('Error in returnOrder:', error);
         res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+};
+
+// Return a single order item
+const returnOrderItem = async (req, res) => {
+    try {
+        const { orderId, itemId } = req.params;
+        const userId = req.session.user.id;
+
+        const order = await Order.findOne({ _id: orderId, userId });
+
+        if (!order) {
+            return res.status(404).json({ success: false, message: 'Order not found' });
+        }
+
+        const item = order.items.id(itemId);
+        if (!item) {
+            return res.status(404).json({ success: false, message: 'Item not found in order' });
+        }
+
+        // Check if item can be returned
+        if (item.status.toLowerCase() !== 'delivered') {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Only delivered items can be returned' 
+            });
+        }
+
+        if (item.isReturned) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Item is already returned' 
+            });
+        }
+
+        // Update item status
+        item.isReturned = true;
+        item.returnRequestedAt = new Date();
+        item.returnStatus = 'Requested';
+        
+        // Update order status if all items are returned
+        const allItemsReturned = order.items.every(i => 
+            i.status.toLowerCase() === 'delivered' && i.isReturned
+        );
+        
+        if (allItemsReturned) {
+            order.status = 'Returned';
+            order.returnedAt = new Date();
+        } else {
+            order.status = 'Partially Returned';
+        }
+
+        await order.save();
+
+        // Add refund to wallet if payment was made online
+        if (order.paymentMethod !== 'COD' && order.paymentStatus === 'Paid') {
+            const refundAmount = item.price * item.quantity;
+            await walletController.addRefund({
+                session: { user: { id: userId } },
+                body: { 
+                    orderId, 
+                    itemId,
+                    amount: refundAmount, 
+                    reason: 'Item return' 
+                }
+            }, {
+                json: () => {}
+            });
+        }
+
+        res.json({ 
+            success: true, 
+            message: 'Return request submitted successfully' 
+        });
+
+    } catch (error) {
+        console.error('Error in returnOrderItem:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Failed to process return request' 
+        });
     }
 };
 
@@ -795,12 +967,13 @@ const downloadInvoice = async (req, res) => {
 //   }
 // };
 
-module.exports = {
-  orders,
-  orderDetails,
-  // cancelOrder,
-  returnOrder,
-  returnRequest,
-  downloadInvoice,
-  // cancelOrderItem
+module.exports = { 
+  orders, 
+  orderDetails, 
+  cancelOrder, 
+  cancelOrderItem, 
+  returnOrder, 
+  returnOrderItem, 
+  returnRequest, 
+  downloadInvoice 
 };
