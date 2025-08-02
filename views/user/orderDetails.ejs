@@ -750,111 +750,48 @@
       flex: 1;
     }
 
-    .cancel-modal-btn,
-    .confirm-return-btn,
-    .confirm-cancel-btn {
-      padding: 0.75rem 1.5rem;
-      border: none;
+    .cancel-items-list {
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.5rem;
+      background-color: var(--light-bg);
+      margin-bottom: 1rem;
+    }
+
+    .cancel-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .cancel-item:last-child {
+      border-bottom: none;
+    }
+
+    .cancel-item input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      border: 1px solid var(--border-color);
       border-radius: 4px;
       cursor: pointer;
-      font-family: 'Jost', sans-serif;
-      font-size: 0.9rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
       transition: all 0.3s ease;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      background-color: white;
     }
 
-    .cancel-modal-btn {
-      background-color: #6c757d;
-      color: white;
-    }
-
-    .cancel-modal-btn:hover {
-      background-color: #5a6268;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .confirm-return-btn,
-    .confirm-cancel-btn {
+    .cancel-item input[type="checkbox"]:checked {
       background-color: var(--muted-green);
-      color: white;
-    }
-
-    .confirm-return-btn:hover,
-    .confirm-cancel-btn:hover {
-      background-color: var(--soft-beige);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    textarea {
-      width: 100%;
-      min-height: 120px;
-      padding: 1rem;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      font-family: 'Jost', sans-serif;
-      font-size: 1rem;
-      resize: vertical;
-      transition: all 0.3s ease;
-      background-color: var(--light-bg);
-      color: var(--dark-text);
-    }
-
-    textarea:focus {
-      outline: none;
       border-color: var(--muted-green);
-      box-shadow: 0 0 0 3px rgba(169, 186, 157, 0.1);
     }
 
-    .return-policy {
-      margin-top: 2rem;
-      padding: 1rem 2rem;
-      background: var(--light-bg);
-      border-radius: 8px;
-      border: 1px solid var(--border-color);
-      color: var(--dark-text);
-      text-align: center;
+    .cancel-item label {
       font-size: 1rem;
-      font-family: 'Aboreto', cursive;
-    }
-
-    .policy-content {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1.5rem;
-    }
-
-    .policy-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 1rem;
-      padding: 1rem;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      border: 1px solid var(--border-color);
-    }
-
-    .policy-item i {
-      font-size: 1.5rem;
-      color: var(--muted-green);
-      margin-top: 0.25rem;
-    }
-
-    .policy-text h4 {
-      font-size: 1rem;
-      margin-bottom: 0.5rem;
       color: var(--dark-text);
-    }
-
-    .policy-text p {
-      font-size: 0.9rem;
-      color: #666;
-      line-height: 1.4;
+      cursor: pointer;
+      flex: 1;
     }
 
     .toast-container {
@@ -1333,6 +1270,51 @@
         width: 100%;
       }
     }
+
+    /* Add styles for cancel-items-list and cancel-item (same as return modal) */
+    .cancel-items-list {
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.5rem;
+      background-color: var(--light-bg);
+      margin-bottom: 1rem;
+    }
+
+    .cancel-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .cancel-item:last-child {
+      border-bottom: none;
+    }
+
+    .cancel-item input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background-color: white;
+    }
+
+    .cancel-item input[type="checkbox"]:checked {
+      background-color: var(--muted-green);
+      border-color: var(--muted-green);
+    }
+
+    .cancel-item label {
+      font-size: 1rem;
+      color: var(--dark-text);
+      cursor: pointer;
+      flex: 1;
+    }
   </style>
 </head>
 
@@ -1351,45 +1333,42 @@
     <!-- Sidebar Overlay -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-    <!-- Cancel Item Modal -->
-    <div class="modal fade" id="cancelItemModal" tabindex="-1" aria-labelledby="cancelItemModalLabel"
-      aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="cancelItemModalLabel">Cancel Item</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <form id="cancelItemForm" onsubmit="submitCancelItem(event)">
-            <input type="hidden" id="cancelItemOrderId" name="orderId">
-            <input type="hidden" id="cancelItemProductId" name="productId">
-            <div class="modal-body">
-              <p>Are you sure you want to cancel this item?</p>
-              <div class="mb-3">
-                <label for="cancelReason" class="form-label">Reason for cancellation</label>
-                <select class="form-select" id="cancelReason" name="reason" required>
-                  <option value="" selected disabled>Select a reason</option>
-                  <option value="Ordered by mistake">Ordered by mistake</option>
-                  <option value="Found better price elsewhere">Found better price elsewhere</option>
-                  <option value="Item not required anymore">Item not required anymore</option>
-                  <option value="Shipping takes too long">Shipping takes too long</option>
-                  <option value="Other">Other (please specify)</option>
-                </select>
-              </div>
-              <div class="mb-3" id="cancelOtherReasonContainer" style="display: none;">
-                <label for="cancelOtherReason" class="form-label">Please specify</label>
-                <textarea class="form-control" id="cancelOtherReason" name="otherReason" rows="2"></textarea>
+    <!-- Item Cancel Modal -->
+    <div id="itemCancelModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Cancel Item</h3>
+          <span class="close" onclick="closeItemCancelModal()">×</span>
+        </div>
+        <div class="modal-body">
+          <p>Please provide a reason for cancelling this item:</p>
+          <form id="itemCancelForm" onsubmit="submitItemCancel(event)">
+            <input type="hidden" id="itemCancelOrderId">
+            <!-- Items selection for cancel (checkboxes) -->
+            <div class="form-group">
+              <label for="itemCancelItems">Select Item(s) to Cancel:</label>
+              <div class="cancel-items-list">
+                <% order.items.forEach(item=> { %>
+                  <div class="cancel-item">
+                    <input type="checkbox" id="cancel_item_<%= item.productId %>" name="itemCancelItems"
+                      value="<%= item.productId %>" class="cancel-item-checkbox">
+                    <label for="cancel_item_<%= item.productId %>">
+                      <%= item.name %> (Quantity: <%= item.quantity %>)
+                    </label>
+                  </div>
+                <% }) %>
               </div>
             </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="submit" class="btn btn-danger">Confirm Cancellation</button>
+            <textarea id="itemCancelReason" required placeholder="Enter your reason for cancellation..."
+              class="form-control"></textarea>
+            <div class="modal-actions">
+              <button type="button" class="cancel-modal-btn" onclick="closeItemCancelModal()">Close</button>
+              <button type="submit" class="confirm-cancel-btn">Confirm Cancellation</button>
             </div>
           </form>
         </div>
       </div>
     </div>
-
 
     <% if (locals.user) { %>
       <div class="main-container">
@@ -1921,29 +1900,6 @@
                 <div class="modal-actions">
                   <button type="button" class="cancel-modal-btn" onclick="closeReturnModal()">Close</button>
                   <button type="submit" class="confirm-return-btn">Submit Return Request</button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-
-        <!-- Item Cancel Modal -->
-        <div id="itemCancelModal" class="modal">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h3>Cancel Item</h3>
-              <span class="close" onclick="closeItemCancelModal()">×</span>
-            </div>
-            <div class="modal-body">
-              <p>Please provide a reason for cancelling this item:</p>
-              <form id="itemCancelForm" onsubmit="submitItemCancel(event)">
-                <input type="hidden" id="itemCancelOrderId">
-                <input type="hidden" id="itemCancelItemId">
-                <textarea id="itemCancelReason" required placeholder="Enter your reason for cancellation..."
-                  class="form-control"></textarea>
-                <div class="modal-actions">
-                  <button type="button" class="cancel-modal-btn" onclick="closeItemCancelModal()">Close</button>
-                  <button type="submit" class="confirm-cancel-btn">Confirm Cancellation</button>
                 </div>
               </form>
             </div>
