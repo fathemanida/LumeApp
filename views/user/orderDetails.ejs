@@ -1709,6 +1709,15 @@
               });
             });
          
+  // Function to close the cancel modal
+  function closeCancelModal() {
+    const modalElement = document.getElementById('cancelModal');
+    const modal = bootstrap.Modal.getInstance(modalElement);
+    if (modal) {
+      modal.hide();
+    }
+  }
+
   // Open modal with order ID
   function openCancelModal(orderId) {
     document.getElementById('cancelOrderId').value = orderId;
@@ -1771,6 +1780,11 @@ console.log(object);
         statusText: response.statusText,
         result: result
       });
+      
+      // Close the modal on success
+      if (response.ok) {
+        closeCancelModal();
+      }
 
       if (response.ok) {
         showToast(result.message || 'Cancelled successfully.', 'success');
