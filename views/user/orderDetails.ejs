@@ -1388,85 +1388,6 @@
     </div>
   </div>
   
-  <!-- Cancel Items Modal -->
-  <div class="modal fade" id="cancelItemsModal" tabindex="-1" aria-labelledby="cancelItemsModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="cancelItemsModalLabel">Cancel Items</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <form id="cancelItemsForm" onsubmit="submitCancelItems(event)">
-          <input type="hidden" id="cancelOrderId" name="orderId">
-          <div class="modal-body">
-            <p>Select items you want to cancel:</p>
-            <div class="mb-3" id="cancelItemsList">
-              <!-- Items will be populated by JavaScript -->
-            </div>
-            <div class="mb-3">
-              <label for="cancelReason" class="form-label">Reason for cancellation</label>
-              <select class="form-select" id="cancelReason" name="reason" required>
-                <option value="" selected disabled>Select a reason</option>
-                <option value="Ordered by mistake">Ordered by mistake</option>
-                <option value="Found better price elsewhere">Found better price elsewhere</option>
-                <option value="Item not required anymore">Item not required anymore</option>
-                <option value="Shipping takes too long">Shipping takes too long</option>
-                <option value="Other">Other (please specify)</option>
-              </select>
-            </div>
-            <div class="mb-3" id="otherReasonContainer" style="display: none;">
-              <label for="otherReason" class="form-label">Please specify</label>
-              <textarea class="form-control" id="otherReason" name="otherReason" rows="2"></textarea>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-danger">Cancel Selected Items</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Cancel Items Modal -->
-  <div class="modal fade" id="cancelItemsModal" tabindex="-1" aria-labelledby="cancelItemsModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="cancelItemsModalLabel">Cancel Items</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <form id="cancelItemsForm" onsubmit="submitCancelItems(event)">
-          <input type="hidden" id="cancelOrderId" name="orderId">
-          <div class="modal-body">
-            <p>Select items you want to cancel:</p>
-            <div class="mb-3" id="cancelItemsList">
-              <!-- Items will be populated by JavaScript -->
-            </div>
-            <div class="mb-3">
-              <label for="cancelReason" class="form-label">Reason for cancellation</label>
-              <select class="form-select" id="cancelReason" name="reason" required>
-                <option value="" selected disabled>Select a reason</option>
-                <option value="Ordered by mistake">Ordered by mistake</option>
-                <option value="Found better price elsewhere">Found better price elsewhere</option>
-                <option value="Item not required anymore">Item not required anymore</option>
-                <option value="Shipping takes too long">Shipping takes too long</option>
-                <option value="Other">Other (please specify)</option>
-              </select>
-            </div>
-            <div class="mb-3" id="otherReasonContainer" style="display: none;">
-              <label for="otherReason" class="form-label">Please specify</label>
-              <textarea class="form-control" id="otherReason" name="otherReason" rows="2"></textarea>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-danger">Cancel Selected Items</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
 
     <% if (locals.user) { %>
       <div class="main-container">
@@ -1935,27 +1856,57 @@
       <!-- Footer -->
       <%-include('../partials/user/fooret.ejs') %>
 
-            <!-- Cancel Order Modal -->
-            <div id="cancelModal" class="modal">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h3>Cancel Order</h3>
-                  <span class="close" onclick="closeCancelModal()">×</span>
+
+  <!-- Cancel Items Modal -->
+  <div id="cancelModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Cancel Items</h3>
+        <span class="close" onclick="closeCancelModal()">×</span>
+      </div>
+      <div class="modal-body">
+        <p>Please provide details for your cancellation request:</p>
+        <form id="cancelRequestForm" onsubmit="submitCancelRequest(event)">
+          <input type="hidden" id="cancelOrderId" value="<%= order._id %>">
+          <div class="form-group">
+            <label for="cancelReason">Reason for Cancellation:</label>
+            <select id="cancelReason" required class="form-control">
+              <option value="">Select a reason</option>
+              <option value="ordered_by_mistake">Ordered by Mistake</option>
+              <option value="change_of_mind">Change of Mind</option>
+              <option value="found_cheaper_elsewhere">Found Cheaper Elsewhere</option>
+              <option value="shipping_too_long">Shipping Takes Too Long</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="cancelDescription">Additional Details:</label>
+            <textarea id="cancelDescription" name="cancelDescription"
+              placeholder="Please provide more details about your cancellation request..."
+              class="form-control"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="cancelItems">Select Items to Cancel:</label>
+            <div class="cancel-items-list">
+              <% order.items.forEach(item=> { %>
+                <div class="cancel-item">
+                  <input type="checkbox" id="item_<%= item.productId %>" name="cancelItems"
+                    value="<%= item.productId %>" class="cancel-item-checkbox">
+                  <label for="item_<%= item.productId %>">
+                    <%= item.name %> (Quantity: <%= item.quantity %>)
+                  </label>
                 </div>
-                <div class="modal-body">
-                  <p>Please provide a reason for cancelling this order:</p>
-                  <form id="cancelOrderForm" onsubmit="submitCancelOrder(event)">
-                    <input type="hidden" id="orderId" value="<%= order._id %>">
-                    <textarea id="cancelReason" required placeholder="Enter your reason for cancellation..."
-                      class="form-control"></textarea>
-                    <div class="modal-actions">
-                      <button type="button" class="cancel-modal-btn" onclick="closeCancelModal()">Close</button>
-                      <button type="submit" class="confirm-cancel-btn">Confirm Cancellation</button>
-                    </div>
-                  </form>
-                </div>
-              </div>
+              <% }) %>
             </div>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="cancel-modal-btn" onclick="closeCancelModal()">Close</button>
+            <button type="submit" class="confirm-cancel-btn">Submit Cancellation Request</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 
             <!-- Return Request Modal -->
             <div id="returnModal" class="modal">
@@ -2031,625 +1982,234 @@
               </div>
             </div>
 
-              <script>
-                document.querySelector('.logout-btn').addEventListener('click', function () {
-                  window.location.href = '/logout';
-                });
+<script>
+  // Toast Container and Functions
+  document.querySelector('.logout-btn').addEventListener('click', function() {
+    window.location.href = '/logout';
+  });
 
-                document.querySelector('.delete-btn').addEventListener('click', function () {
-                  if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
-                    window.location.href = '/profile/delete';
-                  }
-                });
-
-                function showToast(type, title, message) {
-                  const toastContainer = document.getElementById('toastContainer');
-                  const toast = document.createElement('div');
-                  toast.className = `toast ${type}`;
-
-                  const icon = type === 'success' ? 'check-circle' :
-                    type === 'error' ? 'times-circle' : 'exclamation-circle';
-
-                  toast.innerHTML = `
-                <i class="fas fa-${icon} toast-icon"></i>
-                <div class="toast-content">
-                    <div class="toast-title">${title}</div>
-                    <div class="toast-message">${message}</div>
-                </div>
-                <i class="fas fa-times toast-close" onclick="this.parentElement.remove()"></i>
-            `;
-
-                  toastContainer.appendChild(toast);
-
-                  setTimeout(() => {
-                    toast.style.animation = 'slideOut 0.3s ease-in-out forwards';
-                    setTimeout(() => toast.remove(), 300);
-                  }, 5000);
-                }
-
-                function openCancelModal() {
-                  const orderId = '<%= order._id %>';
-                  if (!orderId) {
-                    showToast('error', 'Error', 'Order ID is missing');
-                    return;
-                  }
-                  document.getElementById('orderId').value = orderId;
-                  document.getElementById('cancelReason').value = '';
-                  document.getElementById('cancelModal').classList.add('show');
-                }
-
-                function closeCancelModal() {
-                  document.getElementById('cancelModal').classList.remove('show');
-                  document.getElementById('cancelReason').value = '';
-                }
-
-                async function submitCancelOrder(event) {
-                  event.preventDefault();
-
-                  const orderId = document.getElementById('orderId').value;
-                  const reason = document.getElementById('cancelReason').value;
-
-                  if (!orderId) {
-                    showToast('error', 'Error', 'Order ID is missing');
-                    return;
-                  }
-
-                  if (!reason.trim()) {
-                    showToast('warning', 'Warning', 'Please provide a reason for cancellation');
-                    return;
-                  }
-
-                  try {
-                    const response = await fetch(`/orders/${orderId}/cancel`, {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ reason })
-                    });
-
-                    const data = await response.json();
-                    if (data.success) {
-                      showToast('success', 'Success', 'Order cancelled successfully');
-                      setTimeout(() => window.location.reload(), 1500);
-                    } else {
-                      showToast('error', 'Error', data.message || 'Failed to cancel order');
-                    }
-                  } catch (error) {
-                    showToast('error', 'Error', 'An error occurred while cancelling the order');
-                  }
-                }
-
-                function openReturnModal() {
-                  document.getElementById('returnModal').classList.add('show');
-                }
-
-                function closeReturnModal() {
-                  document.getElementById('returnModal').classList.remove('show');
-                }
-
-                async function submitReturnRequest(event) {
-                  event.preventDefault();
-
-                  const orderId = document.getElementById('returnOrderId').value;
-                  const reason = document.getElementById('returnReason').value;
-                  const description = document.getElementById('returnDescription').value.trim();
-                  const selectedItems = Array.from(document.querySelectorAll('input[name="returnItems"]:checked'))
-                    .map(checkbox => checkbox.value);
-
-                  if (!selectedItems.length) {
-                    showToast('warning', 'Warning', 'Please select at least one item to return');
-                    return;
-                  }
-
-                  if (!description) {
-                    showToast('warning', 'Warning', 'Please provide additional details for your return request');
-                    return;
-                  }
-
-                  try {
-                    const response = await fetch(`/orders/${orderId}/return`, {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ reason, description, items: selectedItems })
-                    });
-
-                    const data = await response.json();
-                    if (data.success) {
-                      showToast('success', 'Success', 'Return request submitted successfully');
-                      setTimeout(() => window.location.reload(), 1500);
-                    } else {
-                      showToast('error', 'Error', data.message || 'Failed to submit return request');
-                    }
-                  } catch (error) {
-                    showToast('error', 'Error', 'An error occurred while submitting the return request');
-                  }
-                }
-
-                document.addEventListener('DOMContentLoaded', function () {
-                  document.querySelectorAll('.return-item-checkbox').forEach(checkbox => {
-                    checkbox.addEventListener('change', function () {
-                      const selectedItems = Array.from(document.querySelectorAll('input[name="returnItems"]:checked'))
-                        .map(checkbox => checkbox.value);
-                      if (!selectedItems.length) {
-                        showToast('warning', 'Warning', 'Please select at least one item to return');
-                      }
-                    });
-                  });
-                });
-
-                window.onclick = function (event) {
-                  const cancelModal = document.getElementById('cancelModal');
-                  const returnModal = document.getElementById('returnModal');
-                  if (event.target === cancelModal) closeCancelModal();
-                  if (event.target === returnModal) closeReturnModal();
-                }
-
-                function openItemCancelModal(orderId, itemId) {
-                  document.getElementById('itemCancelOrderId').value = orderId;
-                  document.getElementById('itemCancelItemId').value = itemId;
-                  document.getElementById('itemCancelReason').value = '';
-                  document.getElementById('itemCancelModal').classList.add('show');
-                }
-
-                function closeItemCancelModal() {
-                  document.getElementById('itemCancelModal').classList.remove('show');
-                  document.getElementById('itemCancelReason').value = '';
-                }
-
-                async function submitItemCancel(event) {
-                  event.preventDefault();
-                  const orderId = document.getElementById('itemCancelOrderId').value;
-                  const itemId = document.getElementById('itemCancelItemId').value;
-                  const reason = document.getElementById('itemCancelReason').value;
-                  if (!orderId || !itemId) {
-                    showToast('error', 'Error', 'Order or Item ID is missing');
-                    return;
-                  }
-                  if (!reason.trim()) {
-                    showToast('warning', 'Warning', 'Please provide a reason for cancellation');
-                    return;
-                  }
-                  try {
-                    const response = await fetch(`/orders/${orderId}/items/${itemId}/cancel`, {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ reason })
-                    });
-                    const data = await response.json();
-                    if (data.success) {
-                      showToast('success', 'Success', 'Item cancelled successfully');
-                      setTimeout(() => window.location.reload(), 1500);
-                    } else {
-                      showToast('error', 'Error', data.message || 'Failed to cancel item');
-                    }
-                  } catch (error) {
-                    showToast('error', 'Error', 'An error occurred while cancelling the item');
-                  }
-                }
-              </script>
-  <script>
-    // Function to open the cancel modal with item selection
-    function openCancelModal(orderId, items) {
-      const modal = new bootstrap.Modal(document.getElementById('cancelItemsModal'));
-      const itemsList = document.getElementById('cancelItemsList');
-      
-      // Set the order ID
-      document.getElementById('cancelOrderId').value = orderId;
-      
-      // Clear previous items
-      itemsList.innerHTML = '';
-      
-      // Add items to the list with checkboxes
-      items.forEach((item, index) => {
-        const itemElement = document.createElement('div');
-        itemElement.className = 'form-check mb-2';
-        itemElement.innerHTML = `
-          <div class="d-flex align-items-center p-2 border rounded">
-            <input class="form-check-input me-3" type="checkbox" 
-                   id="item-${index}" 
-                   name="items" 
-                   value="${item.productId}" 
-                   checked>
-            <img src="/uploads/product/${item.image}" 
-                 alt="${item.name}" 
-                 style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;">
-            <div>
-              <label class="form-check-label" for="item-${index}">
-                ${item.name}
-              </label>
-              <div class="text-muted small">
-                Qty: ${item.quantity} | 
-                Price: ₹${item.price.toFixed(2)}
-              </div>
-            </div>
-          </div>
-        `;
-        itemsList.appendChild(itemElement);
-      });
-      
-      // Show the modal
-      modal.show();
-      
-      // Toggle other reason field based on selection
-      document.getElementById('cancelReason').addEventListener('change', function() {
-        const otherReasonContainer = document.getElementById('otherReasonContainer');
-        otherReasonContainer.style.display = this.value === 'Other' ? 'block' : 'none';
-        if (this.value !== 'Other') {
-          document.getElementById('otherReason').value = '';
-        }
-      });
+  document.querySelector('.delete-btn').addEventListener('click', function() {
+    if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+      window.location.href = '/profile/delete';
     }
+  });
+
+  // Cancel Modal Functions
+  function openCancelModal(orderId, itemId) {
+    document.getElementById('cancelOrderId').value = orderId;
+    document.getElementById('cancelModal').classList.add('show');
     
-    // Function to submit the cancellation form
-    async function submitCancelItems(event) {
-      event.preventDefault();
-      
-      const form = event.target;
-      const orderId = form.orderId.value;
-      const reason = form.reason.value === 'Other' 
-        ? form.otherReason.value 
-        : form.reason.value;
-      
-      // Get selected items
-      const selectedItems = Array.from(document.querySelectorAll('input[name="items"]:checked'))
-        .map(checkbox => checkbox.value);
-      
-      if (selectedItems.length === 0) {
-        showToast('warning', 'No items selected', 'Please select at least one item to cancel');
-        return;
-      }
-      
-      if (!reason.trim()) {
-        showToast('warning', 'Missing reason', 'Please provide a reason for cancellation');
-        return;
-      }
-      
-      try {
-        const response = await fetch(`/orders/${orderId}/items/cancel`, {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest'
-          },
-          body: JSON.stringify({
-            items: selectedItems,
-            reason: reason
-          })
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-          showToast('success', 'Success', 'Selected items have been cancelled successfully');
-          // Close the modal
-          const modal = bootstrap.Modal.getInstance(document.getElementById('cancelItemsModal'));
-          modal.hide();
-          // Reload the page after a short delay
-          setTimeout(() => window.location.reload(), 1500);
-        } else {
-          showToast('error', 'Error', data.message || 'Failed to cancel items');
-        }
-      } catch (error) {
-        console.error('Error cancelling items:', error);
-        showToast('error', 'Error', 'An error occurred while processing your request');
-      }
-    }
-    
-    // Helper function to show toast messages
-    function showToast(type, title, message) {
-      const toastContainer = document.getElementById('toastContainer');
-      const toastId = 'toast-' + Date.now();
-      const toast = document.createElement('div');
-      toast.id = toastId;
-      toast.className = `toast align-items-center text-white bg-${type} border-0`;
-      toast.setAttribute('role', 'alert');
-      toast.setAttribute('aria-live', 'assertive');
-      toast.setAttribute('aria-atomic', 'true');
-      toast.innerHTML = `
-        <div class="d-flex">
-          <div class="toast-body">
-            <strong>${title}</strong><br>${message}
-          </div>
-          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-      `;
-      
-      toastContainer.appendChild(toast);
-      const bsToast = new bootstrap.Toast(toast);
-      bsToast.show();
-      
-      // Remove toast after it's hidden
-      toast.addEventListener('hidden.bs.toast', () => {
-        toast.remove();
-      });
-    }
-  </script>
-  <script>
-    // Function to open the cancel modal with item selection
-    function openCancelModal(orderId, items) {
-      const modal = new bootstrap.Modal(document.getElementById('cancelItemsModal'));
-      const itemsList = document.getElementById('cancelItemsList');
-      
-      // Set the order ID
-      document.getElementById('cancelOrderId').value = orderId;
-      
-      // Clear previous items
-      itemsList.innerHTML = '';
-      
-      // Add items to the list with checkboxes
-      items.forEach((item, index) => {
-        const itemElement = document.createElement('div');
-        itemElement.className = 'form-check mb-2';
-        itemElement.innerHTML = `
-          <div class="d-flex align-items-center p-2 border rounded">
-            <input class="form-check-input me-3" type="checkbox" 
-                   id="item-${index}" 
-                   name="items" 
-                   value="${item.productId}" 
-                   checked>
-            <img src="/uploads/product/${item.image}" 
-                 alt="${item.name}" 
-                 style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;">
-            <div>
-              <label class="form-check-label" for="item-${index}">
-                ${item.name}
-              </label>
-              <div class="text-muted small">
-                Qty: ${item.quantity} | 
-                Price: ₹${item.price.toFixed(2)}
-              </div>
-            </div>
-          </div>
-        `;
-        itemsList.appendChild(itemElement);
-      });
-      
-      // Show the modal
-      modal.show();
-      
-      // Toggle other reason field based on selection
-      document.getElementById('cancelReason').addEventListener('change', function() {
-        const otherReasonContainer = document.getElementById('otherReasonContainer');
-        otherReasonContainer.style.display = this.value === 'Other' ? 'block' : 'none';
-        if (this.value !== 'Other') {
-          document.getElementById('otherReason').value = '';
-        }
-      });
-    }
-    
-    // Function to submit the cancellation form
-    async function submitCancelItems(event) {
-      event.preventDefault();
-      
-      const form = event.target;
-      const orderId = document.getElementById('cancelOrderId').value;
-      const reason = document.getElementById('cancelReason').value === 'Other' 
-        ? document.getElementById('otherReason').value 
-        : document.getElementById('cancelReason').value;
-      
-      // Get selected items
-      const selectedItems = Array.from(document.querySelectorAll('input[name="items"]:checked'))
-        .map(checkbox => checkbox.value);
-      
-      if (selectedItems.length === 0) {
-        showToast('warning', 'No items selected', 'Please select at least one item to cancel');
-        return;
-      }
-      
-      if (!reason.trim()) {
-        showToast('warning', 'Missing reason', 'Please provide a reason for cancellation');
-        return;
-      }
-      
-      try {
-        const response = await fetch(`/orders/${orderId}/items/cancel`, {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest'
-          },
-          body: JSON.stringify({
-            items: selectedItems,
-            reason: reason
-          })
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-          showToast('success', 'Success', 'Selected items have been cancelled successfully');
-          // Close the modal
-          const modal = bootstrap.Modal.getInstance(document.getElementById('cancelItemsModal'));
-          modal.hide();
-          // Reload the page after a short delay
-          setTimeout(() => window.location.reload(), 1500);
-        } else {
-          showToast('error', 'Error', data.message || 'Failed to cancel items');
-        }
-      } catch (error) {
-        console.error('Error cancelling items:', error);
-        showToast('error', 'Error', 'An error occurred while processing your request');
-      }
-    }
-    
-    // Helper function to show toast messages
-    function showToast(type, title, message) {
-      const toastContainer = document.getElementById('toastContainer');
-      const toastId = 'toast-' + Date.now();
-      const toast = document.createElement('div');
-      toast.id = toastId;
-      toast.className = `toast align-items-center text-white bg-${type} border-0`;
-      toast.setAttribute('role', 'alert');
-      toast.setAttribute('aria-live', 'assertive');
-      toast.setAttribute('aria-atomic', 'true');
-      toast.innerHTML = `
-        <div class="d-flex">
-          <div class="toast-body">
-            <strong>${title}</strong><br>${message}
-          </div>
-          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-      `;
-      
-      toastContainer.appendChild(toast);
-      const bsToast = new bootstrap.Toast(toast);
-      bsToast.show();
-      
-      // Remove toast after it's hidden
-      toast.addEventListener('hidden.bs.toast', () => {
-        toast.remove();
-      });
-    }
-  </script>
-  <script>
-    // Function to open the cancel item modal
-    function openCancelItemModal(orderId, productId) {
-      // Set the order and product IDs in the form
-      document.getElementById('cancelItemOrderId').value = orderId;
-      document.getElementById('cancelItemProductId').value = productId;
-      
-      // Reset the form
-      document.getElementById('cancelReason').value = '';
-      document.getElementById('cancelOtherReason').value = '';
-      document.getElementById('cancelOtherReasonContainer').style.display = 'none';
-      
-      // Initialize the modal
-      const modal = new bootstrap.Modal(document.getElementById('cancelItemModal'));
-      
-      // Show the modal
-      modal.show();
-    }
-    
-    // Mobile menu toggle functionality
-    document.addEventListener('DOMContentLoaded', function() {
-      const menuToggle = document.getElementById('menuToggle');
-      const sidebar = document.querySelector('.sidebar');
-      const sidebarOverlay = document.getElementById('sidebarOverlay');
-      
-      if (menuToggle && sidebar && sidebarOverlay) {
-        // Toggle sidebar when menu button is clicked
-        menuToggle.addEventListener('click', function(e) {
-          e.stopPropagation();
-          sidebar.classList.toggle('active');
-          sidebarOverlay.classList.toggle('active');
-        });
-        
-        // Close sidebar when clicking outside
-        sidebarOverlay.addEventListener('click', function() {
-          sidebar.classList.remove('active');
-          this.classList.remove('active');
-        });
-        
-        // Close sidebar when clicking on a link
-        const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
-        sidebarLinks.forEach(link => {
-          link.addEventListener('click', function() {
-            if (window.innerWidth <= 992) {
-              sidebar.classList.remove('active');
-              sidebarOverlay.classList.remove('active');
-            }
-          });
-        });
+    // Initialize checkboxes
+    const checkboxes = document.querySelectorAll('.cancel-item-checkbox');
+    checkboxes.forEach(checkbox => {
+      checkbox.checked = false;
+      if (!itemId || checkbox.value === itemId) {
+        checkbox.checked = true;
       }
     });
     
-    // Function to open the cancel item modal
-    function openCancelItemModal(orderId, productId) {
-      const modal = new bootstrap.Modal(document.getElementById('cancelItemModal'));
-      
-      // Set the order and product IDs
-      document.getElementById('cancelItemOrderId').value = orderId;
-      document.getElementById('cancelItemProductId').value = productId;
-      
-      // Reset form
-      document.getElementById('cancelReason').value = '';
-      document.getElementById('cancelOtherReason').value = '';
-      document.getElementById('cancelOtherReasonContainer').style.display = 'none';
-      
-      // Toggle other reason field based on selection
-      document.getElementById('cancelReason').addEventListener('change', function() {
-        const otherReasonContainer = document.getElementById('cancelOtherReasonContainer');
-        otherReasonContainer.style.display = this.value === 'Other' ? 'block' : 'none';
-        if (this.value !== 'Other') {
-          document.getElementById('cancelOtherReason').value = '';
-        }
+    // Reset form fields
+    document.getElementById('cancelReason').value = '';
+    document.getElementById('cancelDescription').value = '';
+  }
+
+  function closeCancelModal() {
+    document.getElementById('cancelModal').classList.remove('show');
+  }
+
+  async function submitCancelRequest(event) {
+    event.preventDefault();
+    
+    const orderId = document.getElementById('cancelOrderId').value;
+    const reason = document.getElementById('cancelReason').value;
+    const description = document.getElementById('cancelDescription').value.trim();
+    const selectedItems = Array.from(document.querySelectorAll('input[name="cancelItems"]:checked'))
+      .map(checkbox => checkbox.value);
+
+    if (!selectedItems.length) {
+      showToast('warning', 'Warning', 'Please select at least one item to cancel');
+      return;
+    }
+
+    if (!reason) {
+      showToast('warning', 'Warning', 'Please select a cancellation reason');
+      return;
+    }
+
+    try {
+      const response = await fetch(`/orders/${orderId}/cancel-items`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          reason, 
+          description, 
+          items: selectedItems 
+        })
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        showToast('success', 'Success', 'Cancellation request submitted successfully');
+        setTimeout(() => window.location.reload(), 1500);
+      } else {
+        showToast('error', 'Error', data.message || 'Failed to submit cancellation request');
+      }
+    } catch (error) {
+      console.error('Error submitting cancellation:', error);
+      showToast('error', 'Error', 'An error occurred while submitting the cancellation request');
+    }
+  }
+
+  // Return Modal Functions
+  function openReturnModal(orderId, itemId) {
+    document.getElementById('returnOrderId').value = orderId;
+    document.getElementById('returnModal').classList.add('show');
+    
+    // Initialize checkboxes
+    const checkboxes = document.querySelectorAll('.return-item-checkbox');
+    checkboxes.forEach(checkbox => {
+      checkbox.checked = false;
+      if (!itemId || checkbox.value === itemId) {
+        checkbox.checked = true;
+      }
+    });
+    
+    // Reset form fields
+    document.getElementById('returnReason').value = '';
+    document.getElementById('returnDescription').value = '';
+  }
+
+  function closeReturnModal() {
+    document.getElementById('returnModal').classList.remove('show');
+  }
+
+  async function submitReturnRequest(event) {
+    event.preventDefault();
+    
+    const orderId = document.getElementById('returnOrderId').value;
+    const reason = document.getElementById('returnReason').value;
+    const description = document.getElementById('returnDescription').value.trim();
+    const selectedItems = Array.from(document.querySelectorAll('input[name="returnItems"]:checked'))
+      .map(checkbox => checkbox.value);
+
+    if (!selectedItems.length) {
+      showToast('warning', 'Warning', 'Please select at least one item to return');
+      return;
+    }
+
+    if (!reason) {
+      showToast('warning', 'Warning', 'Please select a return reason');
+      return;
+    }
+
+    try {
+      const response = await fetch(`/orders/${orderId}/return`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          reason, 
+          description, 
+          items: selectedItems 
+        })
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        showToast('success', 'Success', 'Return request submitted successfully');
+        setTimeout(() => window.location.reload(), 1500);
+      } else {
+        showToast('error', 'Error', data.message || 'Failed to submit return request');
+      }
+    } catch (error) {
+      console.error('Error submitting return:', error);
+      showToast('error', 'Error', 'An error occurred while submitting the return request');
+    }
+  }
+
+  // Toast Notification System
+  function showToast(type, title, message) {
+    const toastContainer = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+
+    const icon = type === 'success' ? 'check-circle' :
+      type === 'error' ? 'times-circle' : 'exclamation-circle';
+
+    toast.innerHTML = `
+      <i class="fas fa-${icon} toast-icon"></i>
+      <div class="toast-content">
+        <div class="toast-title">${title}</div>
+        <div class="toast-message">${message}</div>
+      </div>
+      <i class="fas fa-times toast-close" onclick="this.parentElement.remove()"></i>
+    `;
+
+    toastContainer.appendChild(toast);
+
+    setTimeout(() => {
+      toast.style.animation = 'slideOut 0.3s ease-in-out forwards';
+      setTimeout(() => toast.remove(), 300);
+    }, 5000);
+  }
+
+  // Mobile Menu Toggle
+  document.addEventListener('DOMContentLoaded', function() {
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.querySelector('.sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    
+    if (menuToggle && sidebar && sidebarOverlay) {
+      menuToggle.addEventListener('click', function(e) {
+        e.stopPropagation();
+        sidebar.classList.toggle('active');
+        sidebarOverlay.classList.toggle('active');
       });
       
-      // Show the modal
-      modal.show();
-    }
-    
-    // Function to submit the cancellation form
-    async function submitCancelItem(event) {
-      event.preventDefault();
+      sidebarOverlay.addEventListener('click', function() {
+        sidebar.classList.remove('active');
+        this.classList.remove('active');
+      });
       
-      const orderId = document.getElementById('cancelItemOrderId').value;
-      const productId = document.getElementById('cancelItemProductId').value;
-      const reason = document.getElementById('cancelReason').value === 'Other' 
-        ? document.getElementById('cancelOtherReason').value 
-        : document.getElementById('cancelReason').value;
-      
-      if (!reason.trim()) {
-        showToast('warning', 'Missing reason', 'Please provide a reason for cancellation');
-        return;
-      }
-      
-      try {
-        const response = await fetch(`/orders/${orderId}/items/${productId}/cancel`, {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest'
-          },
-          body: JSON.stringify({ reason })
+      const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
+      sidebarLinks.forEach(link => {
+        link.addEventListener('click', function() {
+          if (window.innerWidth <= 992) {
+            sidebar.classList.remove('active');
+            sidebarOverlay.classList.remove('active');
+          }
         });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-          showToast('success', 'Success', 'Item has been cancelled successfully');
-          // Close the modal
-          const modal = bootstrap.Modal.getInstance(document.getElementById('cancelItemModal'));
-          modal.hide();
-          // Reload the page after a short delay
-          setTimeout(() => window.location.reload(), 1500);
-        } else {
-          showToast('error', 'Error', data.message || 'Failed to cancel item');
-        }
-      } catch (error) {
-        console.error('Error cancelling item:', error);
-        showToast('error', 'Error', 'An error occurred while processing your request');
-      }
-    }
-    
-    // Helper function to show toast messages
-    function showToast(type, title, message) {
-      const toastContainer = document.getElementById('toastContainer');
-      const toastId = 'toast-' + Date.now();
-      const toast = document.createElement('div');
-      toast.id = toastId;
-      toast.className = `toast align-items-center text-white bg-${type} border-0`;
-      toast.setAttribute('role', 'alert');
-      toast.setAttribute('aria-live', 'assertive');
-      toast.setAttribute('aria-atomic', 'true');
-      toast.innerHTML = `
-        <div class="d-flex">
-          <div class="toast-body">
-            <strong>${title}</strong><br>${message}
-          </div>
-          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-      `;
-      
-      toastContainer.appendChild(toast);
-      const bsToast = new bootstrap.Toast(toast);
-      bsToast.show();
-      
-      // Remove toast after it's hidden
-      toast.addEventListener('hidden.bs.toast', () => {
-        toast.remove();
       });
     }
-  </script>
+
+    // Initialize event listeners for cancel checkboxes
+    document.querySelectorAll('.cancel-item-checkbox').forEach(checkbox => {
+      checkbox.addEventListener('change', function() {
+        const selectedItems = Array.from(document.querySelectorAll('input[name="cancelItems"]:checked'));
+        if (selectedItems.length === 0) {
+          showToast('warning', 'No items selected', 'Please select at least one item to cancel');
+        }
+      });
+    });
+
+    // Initialize event listeners for return checkboxes
+    document.querySelectorAll('.return-item-checkbox').forEach(checkbox => {
+      checkbox.addEventListener('change', function() {
+        const selectedItems = Array.from(document.querySelectorAll('input[name="returnItems"]:checked'));
+        if (selectedItems.length === 0) {
+          showToast('warning', 'No items selected', 'Please select at least one item to return');
+        }
+      });
+    });
+  });
+
+  // Close modals when clicking outside
+  window.onclick = function(event) {
+    const cancelModal = document.getElementById('cancelModal');
+    const returnModal = document.getElementById('returnModal');
+    if (event.target === cancelModal) closeCancelModal();
+    if (event.target === returnModal) closeReturnModal();
+  }
+</script>
   
   <!-- Bootstrap JS and dependencies -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

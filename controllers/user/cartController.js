@@ -788,9 +788,7 @@ const applyCoupon = async (req, res) => {
     const userId = req.session.user.id;
 
     if (!code) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Coupon code is required" });
+      return res.status(400).json({ success: false, message: "Coupon code is required" });
     }
 
     const cart = await Cart.findOne({ userId }).populate({
@@ -802,9 +800,7 @@ const applyCoupon = async (req, res) => {
     });
 
     if (!cart || cart.items.length === 0) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Cart is empty or not found" });
+      return res.status(400).json({ success: false, message: "Cart is empty or not found" });
     }
 
     const now = new Date();
@@ -816,16 +812,21 @@ const applyCoupon = async (req, res) => {
 
     let totalPrice = 0;
     let totalOfferDiscount = 0;
+    let totalQuantity = 0;
 
     cart.items.forEach((item) => {
       const product = item.productId;
       const quantity = item.quantity;
+      totalQuantity += quantity;
+
       const basePrice =
         product.salePrice && product.salePrice < product.regularPrice
           ? product.salePrice
           : product.regularPrice;
+
       const itemTotal = basePrice * quantity;
       totalPrice += itemTotal;
+
       const { maxDiscount } = getBestOffer(product, offers, quantity);
       totalOfferDiscount += maxDiscount;
     });
@@ -837,21 +838,16 @@ const applyCoupon = async (req, res) => {
     });
 
     if (!coupon) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid or expired coupon code" });
+      return res.status(400).json({ success: false, message: "Invalid or expired coupon code" });
     }
 
     const user = await User.findById(userId);
-
     const alreadyUsed = user.usedCoupons.some(
       (used) => used.code === coupon.code.toUpperCase()
     );
 
     if (alreadyUsed) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Coupon already used" });
+      return res.status(400).json({ success: false, message: "Coupon already used" });
     }
 
     if (coupon.minOrderAmount && totalPrice < coupon.minOrderAmount) {
@@ -861,17 +857,19 @@ const applyCoupon = async (req, res) => {
       });
     }
 
-    let totalAfterOff = totalPrice - totalOfferDiscount;
-
+    const totalAfterOffer = totalPrice - totalOfferDiscount;
     let couponDiscount = 0;
+
     if (coupon.discountType === "PERCENTAGE") {
-      couponDiscount = (totalAfterOff * coupon.discountValue) / 100;
+      couponDiscount = (totalAfterOffer * coupon.discountValue) / 100;
       if (coupon.maxDiscount) {
         couponDiscount = Math.min(couponDiscount, coupon.maxDiscount);
       }
     } else {
       couponDiscount = coupon.discountValue;
     }
+
+    const couponPerUnit = totalQuantity > 0 ? couponDiscount / totalQuantity : 0;
 
     cart.couponApplied = coupon._id;
     cart.appliedCouponDetails = coupon;
@@ -892,8 +890,7 @@ const applyCoupon = async (req, res) => {
     });
 
     const shipping = totalPrice >= 1500 ? 0 : 40;
-    const finalPrice =
-      totalPrice - totalOfferDiscount - couponDiscount + shipping;
+    const finalPrice = totalPrice - totalOfferDiscount - couponDiscount + shipping;
 
     return res.json({
       success: true,
@@ -903,7 +900,11 @@ const applyCoupon = async (req, res) => {
         discountType: coupon.discountType,
         discountValue: couponDiscount,
         maxDiscount: coupon.maxDiscount,
-         expiryDate: coupon.expiryDate
+        expiryDate: coupon.expiryDate,
+      },
+      distribution: {
+        totalQuantity,
+        couponPerUnit,
       },
       totals: {
         subtotal: totalPrice,
@@ -945,7 +946,7 @@ const removeCoupon = async (req, res) => {
       if (!item.productId) return total;
 
       const price =
-        item.productId.salePrice <= item.productId.regularPrice
+        item.productId.salePrice && item.productId.salePrice < item.productId.regularPrice
           ? item.productId.salePrice
           : item.productId.regularPrice;
 
@@ -953,7 +954,7 @@ const removeCoupon = async (req, res) => {
     }, 0);
 
     const couponId = cart.couponApplied?._id;
-    const couponCode = cart.couponApplied?.code?.toUpperCase();
+    const couponCode = cart.appliedCouponDetails?.code?.toUpperCase();
 
     cart.couponApplied = null;
     cart.appliedCouponDetails = null;
@@ -973,6 +974,7 @@ const removeCoupon = async (req, res) => {
 
     const shipping = totalPrice >= 1500 ? 0 : 40;
     const finalPrice = totalPrice + shipping;
+
     await cart.save();
 
     return res.json({
@@ -980,8 +982,9 @@ const removeCoupon = async (req, res) => {
       message: "Coupon removed successfully",
       totals: {
         subtotal: totalPrice,
+        offerDiscount: 0, 
+        couponDiscount: 0,
         shipping,
-        discount: 0,
         finalPrice,
       },
     });
@@ -994,6 +997,7 @@ const removeCoupon = async (req, res) => {
     });
   }
 };
+
 
 
 // const placeOrder = async (req, res) => {
