@@ -147,7 +147,6 @@ router.get('/orders/:orderId', userAuth.isLogin, orderController.orderDetails);
 router.post('/orders/:orderId/return', userAuth.isLogin, orderController.returnRequest);
 router.get('/orders/:orderId/invoice', userAuth.isLogin, orderController.downloadInvoice);
 router.post('/orders/:orderId/cancel', userAuth.isLogin, refundController.cancelOrder);
-router.post('/orders/:orderId/items/:itemId/cancel', userAuth.isLogin, refundController.cancelOrder);
 
 // Wishlist routes
 router.post('/wishlist/add', userAuth.isLogin, wishlistController.addToWishlist);

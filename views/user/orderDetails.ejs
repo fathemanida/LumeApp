@@ -1674,19 +1674,60 @@
               <h2>Welcome to LUME</h2>
               <p>Please log in to view your order details.</p>
               <a href="/login" class="login-btn">Login Now</a>
-            </div>
           </div>
           <% } %>
-      </div>
+  </div>
+  <div style="margin-top:0.5rem; font-weight:600; color:var(--dark-text); font-size:1.15rem;">
+    Total Amount: ₹<%= order.totalAmount?.toFixed(2) %>
+  </div>
+</div>
+<!-- Action Buttons -->
+<div class="order-actions-bottom"
+  style="display:flex; justify-content:center; align-items:center; gap:1rem; margin-top:2rem;">
+  <% if (order.status==='Pending' || order.status==='Processing' ) { %>
+    </button>
+    <% } %>
+      <a href="/orders" class="back-btn">Back to Orders</a>
+      <a href="/orders/<%= order._id %>/invoice" class="download-btn"> <i class="fas fa-file-invoice"></i>
+        Download Invoice</a>
+</div>
+</div>
+</div>
+<% } else { %>
+  <div class="content-area">
+    <div class="no-order">
+      <h2>Welcome to LUME</h2>
+      <p>Please log in to view your order details.</p>
+      <a href="/login" class="login-btn">Login Now</a>
+    </div>
+  </div>
+  <% } %>
+</div>
 
-      <!-- Footer -->
+<!-- Footer -->
 <%- include('../partials/user/fooret.ejs') %>
 
-
-        <!-- Return Request Modal -->
-        <div id="returnModal" class="modal">
-          <div class="modal-content">
-            <div class="modal-header">
+<!-- Return Request Modal -->
+<div id="returnModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Request Return</h3>
+      <span class="close" onclick="closeReturnModal()">×</span>
+    </div>
+    <div class="modal-body">
+      <p>Please provide details for your return request:</p>
+      <form id="returnRequestForm" onsubmit="submitReturnRequest(event)">
+        <input type="hidden" id="returnOrderId" value="<%= order._id %>">
+        <div class="form-group">
+          <label for="returnReason">Reason for Return:</label>
+          <select id="returnReason" required class="form-control">
+            <option value="">Select a reason</option>
+            <option value="wrong_size">Wrong Size</option>
+            <option value="defective">Defective Product</option>
+            <option value="not_as_described">Not as Described</option>
+            <option value="quality_issues">Quality Issues</option>
+            <option value="other">Other</option>
+          </select>
               <h3>Request Return</h3>
               <span class="close" onclick="closeReturnModal()">×</span>
             </div>
@@ -1893,10 +1934,10 @@
             const orderId = document.getElementById('cancelOrderId').value;
             const reason = document.getElementById('cancelReason').value;
             const description = document.getElementById('cancelDescription').value.trim();
-            const selectedItems = Array.from(document.querySelectorAll('input[name="cancelItems"]:checked'))
+            const itemsToCancel = Array.from(document.querySelectorAll('input[name="cancelItems"]:checked'))
               .map(cb => cb.value);
 
-            if (!selectedItems.length) {
+            if (!itemsToCancel.length) {
               showToast('warning', 'Warning', 'Please select at least one item to cancel');
               return;
             }
@@ -1910,14 +1951,14 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                  items: selectedItems,
+                  itemsToCancel, // Changed from 'items' to match backend
                   reason,
                   description
                 })
               });
               const data = await response.json();
-              if (data.success) {
-                showToast('success', 'Success', 'Item(s) cancelled successfully');
+              if (response.ok) {
+                showToast('success', 'Success', data.message || 'Item(s) cancelled successfully');
                 closeCancelModal();
                 setTimeout(() => window.location.reload(), 1500);
               } else {

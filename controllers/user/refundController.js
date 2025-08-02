@@ -19,14 +19,20 @@ const cancelOrder = async (req, res) => {
     const { orderId } = req.params;
     const { itemsToCancel = [] } = req.body;
 
- const order = await Order.findOne({ _id: orderId, userId })
+    const order = await Order.findOne({ _id: orderId, userId })
       .populate('items.productId')
       .populate('address');
       
-      if (!order) return res.status(404).json({ success: false, message: "Order not found" });
+    if (!order) return res.status(404).json({ success: false, message: "Order not found" });
 
-    if (["Shipped", "Delivered"].includes(order.status))
+    // Check if order is already cancelled
+    if (order.status === "Cancelled") {
+      return res.status(400).json({ success: false, message: "Order is already cancelled" });
+    }
+
+    if (["Shipped", "Delivered"].includes(order.status)) {
       return res.status(400).json({ success: false, message: "Cannot cancel after shipping" });
+    }
 
     const isFullCancel = itemsToCancel.length === 0 || itemsToCancel.length === order.items.length;
 
@@ -36,6 +42,28 @@ const cancelOrder = async (req, res) => {
     const returnedItems = [];
     const keptItems = [];
 
+    // First, check if any items are already cancelled
+    const alreadyCancelledItems = [];
+    for (const item of order.items) {
+      const shouldBeCancelled = isFullCancel || itemsToCancel.includes(item._id.toString());
+      if (shouldBeCancelled && item.status === 'Cancelled') {
+        alreadyCancelledItems.push({
+          itemId: item._id,
+          productName: item.productId?.productName || 'Unknown Product'
+        });
+      }
+    }
+
+    // If any items are already cancelled, return error with details
+    if (alreadyCancelledItems.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Some items are already cancelled',
+        cancelledItems: alreadyCancelledItems
+      });
+    }
+
+    // Process cancellation for items that need to be cancelled
     for (let item of order.items) {
       const isCancelled = isFullCancel || itemsToCancel.includes(item._id.toString());
 
