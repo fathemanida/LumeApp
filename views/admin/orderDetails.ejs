@@ -360,13 +360,27 @@
                             <% } %>
                         </div>
                     <% } %>
-                    <select id="orderStatus" class="status-select">
+                    <select id="orderStatus" class="status-select" <%= (order.status === 'Return Requested' || order.status === 'Returned' || order.status === 'Partially Returned') ? 'disabled' : '' %>>
                         <option value="Pending" <%= order.status === 'Pending' ? 'selected' : '' %>>Pending</option>
                         <option value="Processing" <%= order.status === 'Processing' ? 'selected' : '' %>>Processing</option>
                         <option value="Shipped" <%= order.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
                         <option value="Delivered" <%= order.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
                         <option value="Cancelled" <%= order.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+                        <option value="Return Requested" <%= order.status === 'Return Requested' ? 'selected' : '' %>>Return Requested</option>
+                        <option value="Returned" <%= order.status === 'Returned' ? 'selected' : '' %>>Returned</option>
+                        <option value="Partially Returned" <%= order.status === 'Partially Returned' ? 'selected' : '' %>>Partially Returned</option>
                     </select>
+                    
+                    <% if (order.status === 'Return Requested' || order.status === 'Partially Returned') { %>
+                        <div class="return-actions" style="margin-top: 1rem;">
+                            <button onclick="handleReturnRequest('accept')" class="btn btn-success me-2">
+                                <i class="fas fa-check"></i> Accept Return
+                            </button>
+                            <button onclick="handleReturnRequest('reject')" class="btn btn-danger">
+                                <i class="fas fa-times"></i> Reject Return
+                            </button>
+                        </div>
+                    <% } %>
                     <button onclick="updateOrderStatus()" class="update-status-btn">Update Status</button>
                 </div>
             </div>

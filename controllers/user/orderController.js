@@ -638,23 +638,25 @@ const returnOrderItem = async (req, res) => {
 
         item.isReturned = true;
         item.returnRequestedAt = new Date();
-        item.returnStatus = 'Completed';
+        item.returnStatus = 'Requested';  
         item.returnReason = reason;
         item.returnNotes = notes;
-        item.status = 'Returned'; 
-        
-        const allItemsReturned = order.items.every(i => 
-            i.status === 'Returned' && i.isReturned
+        item.status = 'Return Requested';  
+
+        const allItemsInReturnState = order.items.every(i => 
+            (i.status === 'Return Requested' || i.status === 'Returned') && i.isReturned
         );
         
-        if (allItemsReturned) {
-            order.status = 'Returned';
-            order.returnedAt = new Date();
+        if (allItemsInReturnState) {
+            order.status = 'Return Requested';
+            order.returnRequestedAt = new Date();
             order.returnReason = reason;
             order.returnNotes = notes;
         } else {
             const hasOtherActiveItems = order.items.some(i => 
-                i.status !== 'Returned' && i.status !== 'Cancelled'
+                i.status !== 'Return Requested' && 
+                i.status !== 'Returned' && 
+                i.status !== 'Cancelled'
             );
             
             if (hasOtherActiveItems) {
