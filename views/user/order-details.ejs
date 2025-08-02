@@ -215,7 +215,11 @@
             </a>
         </div>
 
-        <% if (order) { %>
+        <% if (order) { 
+            // Define these variables once at the top to avoid redeclaration
+            const canCancelOrder = !['cancelled', 'shipped', 'delivered'].includes(order.status.toLowerCase());
+            const canReturnOrder = order.status.toLowerCase() === 'delivered' && !order.isReturned;
+        %>
             <!-- Order Summary -->
             <div class="order-summary-card">
                 <h3 class="mb-4">Order Summary</h3>
@@ -280,9 +284,6 @@
 
                 <!-- Order Level Actions -->
                 <div class="order-actions mt-4">
-                    <% const canCancelOrder = !['cancelled', 'shipped', 'delivered'].includes(order.status.toLowerCase()); %>
-                    <% const canReturnOrder = order.status.toLowerCase() === 'delivered' && !order.isReturned; %>
-                    
                     <% if (canCancelOrder) { %>
                         <button class="btn btn-danger" onclick="cancelOrder()">
                             <i class="fas fa-times me-2"></i>Cancel Order
@@ -448,8 +449,6 @@
                     <a href="/invoice/<%= order._id %>" class="btn btn-outline-primary me-2">
                         <i class="fas fa-download me-2"></i>Download Invoice
                     </a>
-                    <% const canCancelOrder = !['cancelled', 'shipped', 'delivered'].includes(order.status.toLowerCase()); %>
-                    <% const canReturnOrder = order.status.toLowerCase() === 'delivered' && !order.isReturned; %>
                     <% if (canCancelOrder) { %>
                         <button class="btn btn-outline-danger me-2 cancel-order-btn"
                             data-item-id="<%= order._id %>"
