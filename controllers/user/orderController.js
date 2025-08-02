@@ -15,7 +15,6 @@ const multer = require("multer");
 const path = require("path");
 const router = require("../../routes/userRoutes.js");
 const { addRefund } = require('./walletController');
-const Wallet = require("../../models/walletSchema.js");
 
 const PDFDocument = require('pdfkit');
 
