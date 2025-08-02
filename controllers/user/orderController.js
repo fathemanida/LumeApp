@@ -262,6 +262,7 @@ const cancelOrder = async (req, res) => {
         const orderId = req.params.orderId;
         const userId = req.session.user.id;
         const { reason, notes } = req.body;
+        console.log('===reason,notes',reason,notes);
 
         const order = await Order.findOne({ _id: orderId, userId });
 
@@ -283,6 +284,7 @@ const cancelOrder = async (req, res) => {
             }, 0);
         }
 
+        console.log('===refund',refundAmount);
         order.status = 'Cancelled';
         order.cancelledAt = new Date();
         order.cancellationReason = reason;
@@ -361,6 +363,7 @@ const cancelOrderItem = async (req, res) => {
         const { orderId, itemId } = req.params;
         const userId = req.session.user.id;
         const { reason, notes } = req.body;
+        console.log('====,resn,notes',reason,notes);
 
         const order = await Order.findOne({ _id: orderId, userId });
 
@@ -389,7 +392,8 @@ const cancelOrderItem = async (req, res) => {
         item.cancelledAt = new Date();
         item.cancellationReason = reason;
         item.cancellationNotes = notes;
-        
+                console.log('====refundAn',refundAmount);
+
         const allItemsCancelled = order.items.every(i => 
             i.status.toLowerCase() === 'cancelled'
         );
@@ -415,6 +419,7 @@ const cancelOrderItem = async (req, res) => {
                         transactions: []
                     });
                 }
+        console.log('====');
 
                 const transaction = {
                     type: 'CREDIT',
@@ -468,6 +473,8 @@ const returnOrder = async (req, res) => {
         const orderId = req.params.orderId;
         const userId = req.session.user.id;
         const { reason, notes } = req.body;
+                console.log('====retunr');
+
 
         const order = await Order.findOne({ _id: orderId, userId });
 
@@ -576,18 +583,35 @@ const returnOrderItem = async (req, res) => {
         const userId = req.session.user.id;
         const { reason, notes } = req.body;
 
-        const order = await Order.findOne({ _id: orderId, userId });
+        console.log('Starting return process for item:', { orderId, itemId, userId });
 
+        // Find the order with the item
+        const order = await Order.findOne({ _id: orderId, userId });
         if (!order) {
-            return res.status(404).json({ success: false, message: 'Order not found' });
+            console.error('Order not found:', { orderId, userId });
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Order not found' 
+            });
         }
 
+        // Find the item in the order
         const item = order.items.id(itemId);
         if (!item) {
-            return res.status(404).json({ success: false, message: 'Item not found in order' });
+            console.error('Item not found in order:', { orderId, itemId });
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Item not found in order' 
+            });
         }
 
+        // Validate return conditions
         if (item.status.toLowerCase() !== 'delivered') {
+            console.error('Item not delivered:', { 
+                itemId, 
+                currentStatus: item.status,
+                isReturned: item.isReturned 
+            });
             return res.status(400).json({ 
                 success: false, 
                 message: 'Only delivered items can be returned' 
@@ -595,23 +619,37 @@ const returnOrderItem = async (req, res) => {
         }
 
         if (item.isReturned) {
+            console.error('Item already returned:', { itemId, orderId });
             return res.status(400).json({ 
                 success: false, 
                 message: 'Item is already returned' 
             });
         }
 
+        // Calculate refund amount if applicable
         let refundAmount = 0;
-        if (order.paymentMethod !== 'COD' && order.paymentStatus === 'Paid') {
+        const isPaidOrder = order.paymentMethod !== 'COD' && order.paymentStatus === 'Paid';
+        
+        if (isPaidOrder) {
             refundAmount = (item.finalPrice || item.price) * item.quantity;
+            console.log('Refund amount calculated:', { 
+                itemId, 
+                finalPrice: item.finalPrice, 
+                price: item.price, 
+                quantity: item.quantity,
+                refundAmount 
+            });
         }
 
+        // Update item status
         item.isReturned = true;
         item.returnRequestedAt = new Date();
         item.returnStatus = 'Returned';
         item.returnReason = reason;
         item.returnNotes = notes;
+        item.status = 'Returned';
         
+        // Update order status based on all items
         const allItemsReturned = order.items.every(i => 
             i.status.toLowerCase() === 'delivered' && i.isReturned
         );
@@ -625,12 +663,24 @@ const returnOrderItem = async (req, res) => {
             order.status = 'Partially Returned';
         }
 
+        // Save order updates
         await order.save();
+        console.log('Order updated with return status:', { 
+            orderId, 
+            newStatus: order.status,
+            itemId,
+            itemStatus: item.status 
+        });
 
+        // Process refund if applicable
         if (refundAmount > 0) {
             try {
+                console.log('Processing refund for item:', { itemId, refundAmount });
+                
+                // Find or create wallet
                 let wallet = await Wallet.findOne({ userId });
                 if (!wallet) {
+                    console.log('Creating new wallet for user:', userId);
                     wallet = new Wallet({ 
                         userId, 
                         balance: 0,
@@ -638,42 +688,102 @@ const returnOrderItem = async (req, res) => {
                     });
                 }
 
+                // Create refund transaction
                 const transaction = {
                     type: 'CREDIT',
                     amount: refundAmount,
-                    description: `Refund for item return: ${item.productName} (${item.quantity} x ₹${item.finalPrice || item.price})`,
+                    description: `Refund for item return: ${item.productName || 'Product'} (${item.quantity} x ₹${item.finalPrice || item.price})`,
                     orderId: order._id.toString(),
                     itemId: item._id.toString(),
                     status: 'COMPLETED',
                     date: new Date()
                 };
 
+                // Update wallet
                 wallet.balance += refundAmount;
                 wallet.transactions.push(transaction);
                 await wallet.save();
+                console.log('Wallet updated with refund:', { 
+                    userId, 
+                    newBalance: wallet.balance,
+                    refundAmount 
+                });
 
-                await User.findByIdAndUpdate(userId, { $set: { wallet: wallet._id } }, { upsert: true });
+                // Ensure user has wallet reference
+                await User.findByIdAndUpdate(
+                    userId, 
+                    { $set: { wallet: wallet._id } }, 
+                    { upsert: true }
+                );
 
                 console.log(`Refund of ₹${refundAmount} processed successfully for returned item ${itemId} in order ${orderId}`);
             } catch (walletError) {
-                console.error('Error processing wallet refund:', walletError);
-                
+                console.error('Error processing wallet refund:', {
+                    error: walletError.message,
+                    stack: walletError.stack,
+                    orderId,
+                    itemId,
+                    userId,
+                    refundAmount
+                });
+                // Continue with the return process even if refund fails
             }
         }
 
-        const product = await Product.findById(item.productId);
-        if (product) {
-            product.quantity += item.quantity;
-            product.status = product.quantity > 0 ? 'In Stock' : 'Out of Stock';
+        // Update product inventory
+        try {
+            console.log('Updating product inventory for item:', { 
+                itemId, 
+                productId: item.productId,
+                quantity: item.quantity 
+            });
+            
+            const product = await Product.findById(item.productId);
+            if (!product) {
+                console.error('Product not found during return:', item.productId);
+                throw new Error(`Product ${item.productId} not found`);
+            }
+            
+            // Update product quantity safely
+            const currentQuantity = product.quantity || 0;
+            const newQuantity = currentQuantity + item.quantity;
+            
+            // Update product
+            product.quantity = newQuantity;
+            product.status = newQuantity > 0 ? 'In Stock' : 'Out of Stock';
+            
+            // Save with error handling
             await product.save();
+            
+            console.log('Product inventory updated successfully:', {
+                productId: product._id,
+                oldQuantity: currentQuantity,
+                newQuantity: newQuantity,
+                newStatus: product.status
+            });
+            
+        } catch (productError) {
+            console.error('Error updating product inventory during return:', {
+                error: productError.message,
+                stack: productError.stack,
+                orderId,
+                itemId,
+                productId: item.productId,
+                quantity: item.quantity
+            });
+            // Continue with the return process even if inventory update fails
         }
 
-        res.json({ 
+        // Return success response
+        const response = { 
             success: true, 
             message: 'Return request submitted successfully',
             refundProcessed: refundAmount > 0,
             refundAmount
-        });
+        };
+        
+        console.log('Return process completed successfully:', response);
+        res.json(response);
 
     } catch (error) {
         console.error('Error in returnOrderItem:', error);
