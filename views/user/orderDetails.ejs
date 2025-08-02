@@ -1461,7 +1461,7 @@
                       <td>
                         <div class="item-actions">
                           <button class="action-btn cancel-btn"
-                            onclick="openCancelItemModal('<%= order._id %>', '<%= item.productId %>')"
+                            onclick="openCancelModal('<%= order._id %>', '<%= item.productId %>')"
                             title="Cancel this item">
                             <i class="fas fa-times"></i> Cancel
                           </button>
@@ -1734,17 +1734,30 @@
           </div>
         </div>
 
-        <!-- Cancel Items Modal (same structure as Return Modal) -->
+        <!-- Cancellation Modal (single or multiple items) -->
         <div id="cancelModal" class="modal">
           <div class="modal-content">
             <div class="modal-header">
-              <h3>Cancel Items</h3>
+              <h3>Cancel Item(s)</h3>
               <span class="close" onclick="closeCancelModal()">×</span>
             </div>
             <div class="modal-body">
-              <p>Please provide details for your cancellation request:</p>
-              <form id="cancelRequestForm" onsubmit="submitCancelRequest(event)">
-                <input type="hidden" id="cancelOrderId" value="<%= order._id %>">
+              <form id="cancelForm" onsubmit="submitCancel(event)">
+                <input type="hidden" id="cancelOrderId">
+                <div class="form-group">
+                  <label for="cancelItems">Select Item(s) to Cancel:</label>
+                  <div id="cancelItemsList">
+                    <% order.items.forEach(item=> { %>
+                      <div class="form-check" style="margin-bottom:8px;">
+                        <input type="checkbox" id="cancel_item_<%= item.productId %>" name="cancelItems"
+                          value="<%= item.productId %>" class="form-check-input cancel-item-checkbox">
+                        <label class="form-check-label" for="cancel_item_<%= item.productId %>">
+                          <%= item.name %> (Quantity: <%= item.quantity %>)
+                        </label>
+                      </div>
+                    <% }) %>
+                  </div>
+                </div>
                 <div class="form-group">
                   <label for="cancelReason">Reason for Cancellation:</label>
                   <select id="cancelReason" required class="form-control">
@@ -1762,23 +1775,9 @@
                     placeholder="Please provide more details about your cancellation request..."
                     class="form-control"></textarea>
                 </div>
-                <div class="form-group">
-                  <label for="cancelItems">Select Items to Cancel:</label>
-                  <div class="cancel-items-list">
-                    <% order.items.forEach(item=> { %>
-                      <div class="cancel-item">
-                        <input type="checkbox" id="item_<%= item.productId %>" name="cancelItems"
-                          value="<%= item.productId %>" class="cancel-item-checkbox">
-                        <label for="item_<%= item.productId %>">
-                          <%= item.name %> (Quantity: <%= item.quantity %>)
-                        </label>
-                      </div>
-                    <% }) %>
-                  </div>
-                </div>
                 <div class="modal-actions">
                   <button type="button" class="cancel-modal-btn" onclick="closeCancelModal()">Close</button>
-                  <button type="submit" class="confirm-cancel-btn">Submit Cancellation Request</button>
+                  <button type="submit" class="confirm-cancel-btn">Confirm Cancellation</button>
                 </div>
               </form>
             </div>
@@ -1870,43 +1869,37 @@
             }
           }
 
-          // Cancel Modal Functions (same logic as return modal)
-          function openCancelModal(orderId, itemId) {
+          // Cancellation Modal Functions
+          function openCancelModal(orderId, productId) {
             document.getElementById('cancelOrderId').value = orderId;
-            document.getElementById('cancelModal').classList.add('show');
-
-            // Initialize checkboxes
-            const checkboxes = document.querySelectorAll('.cancel-item-checkbox');
-            checkboxes.forEach(checkbox => {
-              checkbox.checked = false;
-              if (!itemId || checkbox.value === itemId) {
-                checkbox.checked = true;
-              }
-            });
-
-            // Reset form fields
             document.getElementById('cancelReason').value = '';
             document.getElementById('cancelDescription').value = '';
+            // Uncheck all
+            document.querySelectorAll('.cancel-item-checkbox').forEach(cb => cb.checked = false);
+            // Pre-select if productId is provided
+            if (productId) {
+              const cb = document.getElementById('cancel_item_' + productId);
+              if (cb) cb.checked = true;
+            }
+            document.getElementById('cancelModal').classList.add('show');
           }
 
           function closeCancelModal() {
             document.getElementById('cancelModal').classList.remove('show');
           }
 
-          async function submitCancelRequest(event) {
+          async function submitCancel(event) {
             event.preventDefault();
-
             const orderId = document.getElementById('cancelOrderId').value;
             const reason = document.getElementById('cancelReason').value;
             const description = document.getElementById('cancelDescription').value.trim();
             const selectedItems = Array.from(document.querySelectorAll('input[name="cancelItems"]:checked'))
-              .map(checkbox => checkbox.value);
+              .map(cb => cb.value);
 
             if (!selectedItems.length) {
               showToast('warning', 'Warning', 'Please select at least one item to cancel');
               return;
             }
-
             if (!reason) {
               showToast('warning', 'Warning', 'Please select a cancellation reason');
               return;
@@ -1917,22 +1910,22 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
+                  items: selectedItems,
                   reason,
-                  description,
-                  items: selectedItems
+                  description
                 })
               });
-
               const data = await response.json();
               if (data.success) {
-                showToast('success', 'Success', 'Cancellation request submitted successfully');
+                showToast('success', 'Success', 'Item(s) cancelled successfully');
+                closeCancelModal();
                 setTimeout(() => window.location.reload(), 1500);
               } else {
-                showToast('error', 'Error', data.message || 'Failed to submit cancellation request');
+                showToast('error', 'Error', data.message || 'Failed to cancel item(s)');
               }
             } catch (error) {
-              console.error('Error submitting cancellation:', error);
-              showToast('error', 'Error', 'An error occurred while submitting the cancellation request');
+              console.error('Error cancelling item(s):', error);
+              showToast('error', 'Error', 'An error occurred while cancelling the item(s)');
             }
           }
 
