@@ -376,7 +376,7 @@ const cancelOrderItem = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Item not found in order' });
         }
 
-        if (['cancelled', 'shipped', 'delivered', 'returned'].includes(item.status.toLowerCase())) {
+        if (['Cancelled', 'Shipped', 'Delivered', 'Returned'].includes(item.status)) {
             return res.status(400).json({ 
                 success: false, 
                 message: `Cannot cancel item that is ${item.status.toLowerCase()}` 
@@ -395,7 +395,7 @@ const cancelOrderItem = async (req, res) => {
                 console.log('====refundAn',refundAmount);
 
         const allItemsCancelled = order.items.every(i => 
-            i.status.toLowerCase() === 'cancelled'
+            i.status === 'Cancelled' || i.status === 'Partially Cancelled'
         );
         
         if (allItemsCancelled) {
@@ -403,7 +403,7 @@ const cancelOrderItem = async (req, res) => {
             order.cancelledAt = new Date();
             order.cancellationReason = reason;
             order.cancellationNotes = notes;
-        } else if (!order.status.includes('Partially')) {
+        } else if (order.status !== 'Partially Cancelled') {
             order.status = 'Partially Cancelled';
         }
 
@@ -605,16 +605,17 @@ const returnOrderItem = async (req, res) => {
             });
         }
 
-        // Validate return conditions
-        if (item.status.toLowerCase() !== 'delivered') {
+        // Validate return conditions - only items with status 'Delivered' can be returned
+        if (item.status !== 'Delivered') {
             console.error('Item not delivered:', { 
                 itemId, 
                 currentStatus: item.status,
-                isReturned: item.isReturned 
+                isReturned: item.isReturned,
+                validStatuses: ['Delivered']
             });
             return res.status(400).json({ 
                 success: false, 
-                message: 'Only delivered items can be returned' 
+                message: 'Only items with status "Delivered" can be returned' 
             });
         }
 
@@ -651,22 +652,31 @@ const returnOrderItem = async (req, res) => {
         
         // Update order status based on all items
         const allItemsReturned = order.items.every(i => 
-            i.status === 'Returned' && i.isReturned
+            (i.status === 'Returned' || i.status === 'Cancelled' || i.status === 'Partially Cancelled') && 
+            (i.isReturned || i.status !== 'Returned')
         );
         
         if (allItemsReturned) {
+            // All items are either returned or cancelled
             order.status = 'Returned';
             order.returnedAt = new Date();
             order.returnReason = reason;
             order.returnNotes = notes;
         } else {
-            // Check if we need to set to 'Partial Return' or keep current status
+            // Check if we need to set to 'Partially Returned' or keep current status
             const hasOtherActiveItems = order.items.some(i => 
-                i.status !== 'Returned' && i.status !== 'Cancelled'
+                i.status !== 'Returned' && 
+                i.status !== 'Cancelled' && 
+                i.status !== 'Partially Cancelled' &&
+                i.status !== 'Delivered' // Don't count delivered items as active for this check
             );
             
             if (hasOtherActiveItems) {
-                order.status = 'Partial Return'; // Using 'Partial Return' as per order status enum
+                order.status = 'Partially Returned'; // Using 'Partially Returned' as per order status enum
+            } else if (order.status === 'Processing' || order.status === 'Shipped') {
+                // If all non-returned items are in a state that can't be returned,
+                // and order status is still in early stages, update to 'Partially Returned'
+                order.status = 'Partially Returned';
             }
         }
 
