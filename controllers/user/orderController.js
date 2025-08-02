@@ -644,14 +644,14 @@ const returnOrderItem = async (req, res) => {
         // Update item status
         item.isReturned = true;
         item.returnRequestedAt = new Date();
-        item.returnStatus = 'Returned';
+        item.returnStatus = 'Completed'; // Using 'Completed' as per the returnStatus enum
         item.returnReason = reason;
         item.returnNotes = notes;
-        item.status = 'Returned';
+        item.status = 'Returned'; // Using 'Returned' as per the item status enum
         
         // Update order status based on all items
         const allItemsReturned = order.items.every(i => 
-            i.status.toLowerCase() === 'delivered' && i.isReturned
+            i.status === 'Returned' && i.isReturned
         );
         
         if (allItemsReturned) {
@@ -659,8 +659,15 @@ const returnOrderItem = async (req, res) => {
             order.returnedAt = new Date();
             order.returnReason = reason;
             order.returnNotes = notes;
-        } else if (!order.status.includes('Partially')) {
-            order.status = 'Partially Returned';
+        } else {
+            // Check if we need to set to 'Partial Return' or keep current status
+            const hasOtherActiveItems = order.items.some(i => 
+                i.status !== 'Returned' && i.status !== 'Cancelled'
+            );
+            
+            if (hasOtherActiveItems) {
+                order.status = 'Partial Return'; // Using 'Partial Return' as per order status enum
+            }
         }
 
         // Save order updates
