@@ -446,7 +446,22 @@ const cancelOrderItem = async (req, res) => {
         const product = await Product.findById(item.productId);
         if (product) {
             product.quantity += item.quantity;
-            product.status = product.quantity > 0 ? 'In Stock' : 'Out of Stock';
+            // Use correct enum values for status
+            if (product.status !== 'Discountinued') {
+                product.status = product.quantity > 0 ? 'Available' : 'Out of Stock';
+            }
+            
+            // Ensure productOffer has valid values if it exists
+            if (product.productOffer) {
+                // Only update discountType if it's not set or invalid
+                if (!['percentage', 'flat'].includes(product.productOffer.discountType)) {
+                    product.productOffer.discountType = 'percentage';
+                }
+                // Ensure other required fields are set to valid values
+                product.productOffer.active = product.productOffer.active === true;
+                product.productOffer.discountValue = Number(product.productOffer.discountValue) || 0;
+            }
+            
             await product.save();
         }
 
