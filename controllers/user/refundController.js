@@ -17,15 +17,10 @@ const cancelOrder = async (req, res) => {
   try {
     const userId = req.session.user.id;
     const { orderId } = req.params;
-    const { itemId, reason } = req.query;
-    
-    console.log('=====orderid', orderId);
-    console.log('=====itemId', itemId);
-    console.log('=====reason', reason);
+    const { itemsToCancel = [] } = req.body;
 
-    if (!itemId || !reason) {
-      return res.status(400).json({ success: false, message: "Item ID and reason are required" });
-    }
+    console.log('=====orderid',orderId);
+    console.log('=====items',itemsToCancel);
 
     const order = await Order.findOne({ _id: orderId, userId })
       .populate('items.productId')
@@ -42,8 +37,7 @@ const cancelOrder = async (req, res) => {
       return res.status(400).json({ success: false, message: "Cannot cancel after shipping" });
     }
 
-    const itemsToCancel = [itemId];
-    const isFullCancel = itemsToCancel.length === order.items.length;
+    const isFullCancel = itemsToCancel.length === 0 || itemsToCancel.length === order.items.length;
 
     let refundAmount = 0;
     let remainingTotal = 0;

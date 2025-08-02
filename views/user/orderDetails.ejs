@@ -2058,11 +2058,15 @@
             }
 
             try {
-              const response = await fetch(`/orders/${orderId}/cancel?itemId=${encodeURIComponent(itemId)}&reason=${encodeURIComponent(reason)}`, {
+              const response = await fetch(`/orders/${orderId}/cancel`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
-                }
+                },
+                body: JSON.stringify({
+                  itemsToCancel: [itemId], // Pass as an array with the item ID
+                  reason: reason
+                })
               });
 
               const data = await response.json();
