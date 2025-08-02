@@ -1550,7 +1550,7 @@
     </div>
     <div class="modal-body">
       <p>Please select items to cancel and provide a reason:</p>
-      <form id="cancelRequestForm" onsubmit="submitCancelRequest(event)">
+      <form id="cancelRequestForm" onsubmit="submitCancel(event)">
         <input type="hidden" id="cancelOrderId" value="<%= order._id %>">
         
         <div class="form-group">
@@ -1729,6 +1729,7 @@
     const reason = document.getElementById('cancelReason').value;
     const description = document.getElementById('cancelDescription').value;
     const selectedItemCheckboxes = document.querySelectorAll('.cancel-item-checkbox:checked');
+    console.log('dskajksfks',selectedItemCheckboxes);
     const cancelItems = Array.from(selectedItemCheckboxes).map(cb => cb.value);
 
     if (!reason) {
