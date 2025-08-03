@@ -14,7 +14,7 @@ const processRefund = async ({
 }) => {
   const session = await Order.startSession();
   session.startTransaction();
-
+console.log('refundd');
   try {
     const order = await Order.findById(orderId).session(session);
     const user = await User.findById(userId).session(session);

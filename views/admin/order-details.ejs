@@ -165,24 +165,35 @@
 
                             <div class="d-flex align-items-center">
                                 <div class="me-3">
-                                    <span
-                                        class="status-badge badge-<%= order.status.toLowerCase().replace(' ', '-') %>">
+                                    <span class="status-badge badge-<%= order.status.toLowerCase().replace(' ', '-') %>">
                                         <%= order.status %>
                                     </span>
                                 </div>
-                                <div class="dropdown">
-                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
-                                        id="statusDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                        Update Status
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="statusDropdown">
-                                        <li><a class="dropdown-item" href="#" data-status="Processing">Processing</a>
-                                        </li>
-                                        <li><a class="dropdown-item" href="#" data-status="Shipped">Shipped</a></li>
-                                        <li><a class="dropdown-item" href="#" data-status="Delivered">Delivered</a></li>
-                                        <li><a class="dropdown-item" href="#" data-status="Cancelled">Cancelled</a></li>
-                                    </ul>
-                                </div>
+                                <% if (order.status === 'Return Requested') { %>
+                                    <div class="btn-group ms-2" role="group">
+                                        <button type="button" class="btn btn-sm btn-success" 
+                                            onclick="handleReturnAction('<%= order._id %>', null, 'approve')">
+                                            <i class="fas fa-check me-1"></i> Accept Return
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-danger"
+                                            onclick="handleReturnAction('<%= order._id %>', null, 'reject')">
+                                            <i class="fas fa-times me-1"></i> Reject
+                                        </button>
+                                    </div>
+                                <% } else { %>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                                            id="statusDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                            Update Status
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="statusDropdown">
+                                            <li><a class="dropdown-item" href="#" data-status="Processing">Processing</a></li>
+                                            <li><a class="dropdown-item" href="#" data-status="Shipped">Shipped</a></li>
+                                            <li><a class="dropdown-item" href="#" data-status="Delivered">Delivered</a></li>
+                                            <li><a class="dropdown-item" href="#" data-status="Cancelled">Cancelled</a></li>
+                                        </ul>
+                                    </div>
+                                <% } %>
                             </div>
                         </div>
 
