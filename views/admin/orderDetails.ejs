@@ -563,25 +563,32 @@
                 showLoaderOnConfirm: true,
                 preConfirm: async () => {
                     try {
-                        const response = await fetch(`/admin/orders/${orderId}/return-request`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                action,
-                                reason: isAccept ? null : document.querySelector('.swal2-textarea').value
-                            })
-                        });
+    const response = await fetch(`/admin/orders/${orderId}/return-request`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            action,
+            reason: isAccept ? null : document.querySelector('.swal2-textarea').value
+        })
+    });
 
-                        const data = await response.json();
-                        if (!data.success) {
-                            throw new Error(data.message || 'Failed to process return request');
-                        }
-                        return data;
-                    } catch (error) {
-                        Swal.showValidationMessage(`Request failed: ${error.message}`);
-                    }
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (!data.success) {
+        throw new Error(data.message || 'Failed to process return request');
+    }
+    return data;
+} catch (error) {
+    console.error('Error in return request:', error);
+    Swal.showValidationMessage(`Request failed: ${error.message}`);
+    throw error; // Re-throw to prevent the success case from executing
+}
                 },
                 allowOutsideClick: () => !Swal.isLoading()
             });
