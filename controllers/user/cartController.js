@@ -325,24 +325,21 @@ const cart = async (req, res) => {
     cart.appliedCouponDetails = appliedCouponDetails;
     await cart.save(); 
 
-    // Get all active coupons that meet the minimum purchase requirement
+    // Get all active coupons - simplified to match checkout logic
     const availableCoupons = await Coupon.find({
       isActive: true,
-      startDate: { $lte: now },
-      endDate: { $gte: now },
-      minOrderAmount: { $lte: totalPrice - totalOfferDiscount },
-      $or: [
-        { usedBy: { $exists: false } },
-        { usedBy: { $size: 0 } },
-        { usedBy: { $not: { $elemMatch: { $eq: userId } } } }
-      ]
-    }).lean();
+      expiryDate: { $gt: now },
+      minOrderAmount: { $lte: totalPrice - totalOfferDiscount }
+    }).select('code discountType discountValue maxDiscount minOrderAmount expiryDate usedBy')
+      .lean();
     
-    // Log for debugging
-    console.log('Available coupons:', availableCoupons.length);
+    // Filter out coupons already used by this user
+    const filteredCoupons = availableCoupons.filter(coupon => {
+      return !coupon.usedBy || !coupon.usedBy.some(id => id.toString() === userId.toString());
+    });
+    
+    console.log('Available coupons:', filteredCoupons.length, 'out of', availableCoupons.length, 'active coupons');
     console.log('Cart total after offers:', totalPrice - totalOfferDiscount);
-    console.log('User ID:', userId);
-    console.log('Available coupon codes:', availableCoupons.map(c => c.code));
 
     res.render("cart", {
       user,

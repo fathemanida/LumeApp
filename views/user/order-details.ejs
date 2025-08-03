@@ -558,7 +558,8 @@
             .then(data => {
                 if (data.success) {
                     showToast(data.message || 'Cancellation request submitted successfully', true);
-                    $('#cancelModal').modal('hide');
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('cancelModal'));
+                    if (modal) modal.hide();
                     setTimeout(() => window.location.reload(), 1500);
                 } else {
                     showToast(data.message || 'Failed to process cancellation', false);
@@ -601,7 +602,8 @@
             .then(data => {
                 if (data.success) {
                     showToast(data.message || 'Return request submitted successfully', true);
-                    $('#returnModal').modal('hide');
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('returnModal'));
+                    if (modal) modal.hide();
                     setTimeout(() => window.location.reload(), 1500);
                 } else {
                     showToast(data.message || 'Failed to process return request', false);
@@ -624,14 +626,27 @@
             otherContainer.style.display = this.value === 'Other' ? 'block' : 'none';
         });
 
-        // Reset modals when hidden
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.addEventListener('hidden.bs.modal', function () {
-                this.querySelector('form')?.reset();
+        // Reset modals when hidden using Bootstrap 5 event
+        const cancelModal = document.getElementById('cancelModal');
+        const returnModal = document.getElementById('returnModal');
+        
+        if (cancelModal) {
+            cancelModal.addEventListener('hidden.bs.modal', function () {
+                const form = this.querySelector('form');
+                if (form) form.reset();
                 this.querySelectorAll('[id$=ReasonContainer]').forEach(el => el.style.display = 'none');
                 currentAction = { type: '', id: '', name: '' };
             });
-        });
+        }
+        
+        if (returnModal) {
+            returnModal.addEventListener('hidden.bs.modal', function () {
+                const form = this.querySelector('form');
+                if (form) form.reset();
+                this.querySelectorAll('[id$=ReasonContainer]').forEach(el => el.style.display = 'none');
+                currentAction = { type: '', id: '', name: '' };
+            });
+        }
 
         // Show toast message
         function showToast(message, isSuccess) {
