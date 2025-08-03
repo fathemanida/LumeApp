@@ -29,7 +29,7 @@ const getOrderDetails = async (req, res) => {
                 model: 'User',
                 select: 'name email phone'
             })
-            .populate('payment.paymentMethod')
+            .populate('usedCoupon')
             .lean();
 
         if (!order) {
