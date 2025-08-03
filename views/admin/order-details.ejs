@@ -110,10 +110,23 @@
                             <h3 class="mb-1">Order #<%= order.orderNumber %></h3>
                             <p class="text-muted mb-0">Placed on <%= order.createdOn %></p>
                         </div>
-                        <div>
-                            <span class="status-badge badge-<%= order.status.toLowerCase().replace(' ', '-') %>">
-                                <%= order.status %>
-                            </span>
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <span class="status-badge badge-<%= order.status.toLowerCase().replace(' ', '-') %>">
+                                    <%= order.status %>
+                                </span>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="statusDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Update Status
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="statusDropdown">
+                                    <li><a class="dropdown-item" href="#" data-status="Processing">Processing</a></li>
+                                    <li><a class="dropdown-item" href="#" data-status="Shipped">Shipped</a></li>
+                                    <li><a class="dropdown-item" href="#" data-status="Delivered">Delivered</a></li>
+                                    <li><a class="dropdown-item" href="#" data-status="Cancelled">Cancelled</a></li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
 
@@ -190,7 +203,7 @@
                                         <tr>
                                             <td>
                                                 <div class="d-flex align-items-center">
-                                                    <img src="<%= item.productId.images && item.productId.images[0] ? item.productId.images[0] : '/images/placeholder-product.jpg' %>" 
+                                                    <img src="/uploads/product/<%= item[index].productImage[0] %>" alt="Product Image" style="height: 54px;" /> 
                                                          alt="<%= item.productId.productName %>" 
                                                          class="img-thumbnail me-3" 
                                                          style="width: 60px; height: 60px; object-fit: cover;">
@@ -321,7 +334,78 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Include SweetAlert2 for notifications -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <script>
+        // Handle order status update
+        document.addEventListener('DOMContentLoaded', function() {
+            // Status update handler
+            document.querySelectorAll('[data-status]').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const newStatus = this.getAttribute('data-status');
+                    const orderId = '<%= order._id %>';
+                    
+                    Swal.fire({
+                        title: 'Update Order Status',
+                        text: `Are you sure you want to update the order status to "${newStatus}"?`,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yes, update it!',
+                        cancelButtonText: 'No, cancel',
+                        confirmButtonColor: '#6c5ce7',
+                        cancelButtonColor: '#dc3545',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            updateOrderStatus(orderId, newStatus);
+                        }
+                    });
+                });
+            });
+        });
+
+        // Function to update order status via API
+        async function updateOrderStatus(orderId, newStatus) {
+            try {
+                const response = await fetch(`/admin/orders/${orderId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ status: newStatus })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Show success message
+                    Swal.fire({
+                        title: 'Success!',
+                        text: `Order status has been updated to "${newStatus}"`,
+                        icon: 'success',
+                        confirmButtonColor: '#6c5ce7',
+                        timer: 2000,
+                        timerProgressBar: true
+                    }).then(() => {
+                        // Reload the page to reflect changes
+                        window.location.reload();
+                    });
+                } else {
+                    throw new Error(data.message || 'Failed to update order status');
+                }
+            } catch (error) {
+                console.error('Error updating order status:', error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: error.message || 'Failed to update order status. Please try again.',
+                    icon: 'error',
+                    confirmButtonColor: '#6c5ce7'
+                });
+            }
+        }
+
         // Mobile menu toggle
         document.getElementById('mobileMenuBtn').addEventListener('click', function() {
             document.body.classList.toggle('sidebar-open');
