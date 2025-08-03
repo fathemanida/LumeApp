@@ -316,51 +316,56 @@ const handleOrderReturn = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
 
+        const isWholeOrderReturn = order.status === 'Return Requested';
+        
         if (action === 'approve') {
             let refundAmount = 0;
+            const itemsToProcess = [];
             
-            if (order.paymentMethod !== 'COD' && order.payment && order.payment.status === 'Paid') {
-                refundAmount = order.items.reduce((total, item) => {
-                    if (item.returnStatus === 'Requested' && item.status !== 'Cancelled') {
-                        return total + (item.finalPrice * item.quantity);
+            order.items.forEach(item => {
+                const isItemRequested = item.status === 'Return Requested' || 
+                                      (item.returnStatus && item.returnStatus === 'Requested');
+                
+                if (isItemRequested && item.status !== 'Cancelled') {
+                    itemsToProcess.push(item);
+                    if (order.paymentMethod !== 'COD' && order.payment && order.payment.status === 'Paid') {
+                        refundAmount += (item.finalPrice || item.price) * item.quantity;
                     }
-                    return total;
-                }, 0);
-
-                if (refundAmount > 0) {
-                    await walletController.processReturnRefund({
-                        body: { 
-                            orderId: order._id,
-                            amount: refundAmount,
-                            userId: order.userId
-                        },
-                        session: req.session
-                    });
                 }
+            });
+
+            if (refundAmount > 0) {
+                await walletController.processReturnRefund({
+                    body: { 
+                        orderId: order._id,
+                        amount: refundAmount,
+                        userId: order.userId
+                    },
+                    session: req.session
+                });
             }
 
-            for (const item of order.items) {
-                if (item.returnStatus === 'Requested' && item.status !== 'Cancelled') {
-                    if (item.productId) {
-                        const product = await Product.findById(item.productId._id);
-                        if (product) {
-                            product.quantity = (parseInt(product.quantity) || 0) + parseInt(item.quantity);
-                            if (product.quantity > 0 && product.status === 'Out of Stock') {
-                                product.status = 'Available';
-                            }
-                            await product.save();
+            for (const item of itemsToProcess) {
+                if (item.productId) {
+                    const product = await Product.findById(item.productId._id);
+                    if (product) {
+                        product.quantity = (parseInt(product.quantity) || 0) + parseInt(item.quantity);
+                        if (product.quantity > 0 && product.status === 'Out of Stock') {
+                            product.status = 'Available';
                         }
+                        await product.save();
                     }
-                    
-                    item.returnStatus = 'Approved';
-                    item.status = 'Returned';
-                    item.isReturned = true;
-                    item.returnProcessedAt = new Date();
                 }
+                
+                item.returnStatus = 'Approved';
+                item.status = 'Returned';
+                item.isReturned = true;
+                item.returnProcessedAt = new Date();
             }
             
             updateOrderStatusBasedOnItems(order);
-        } else {
+            
+        } else { 
             if (!reason || reason.trim() === '') {
                 return res.status(400).json({ 
                     success: false, 
@@ -368,8 +373,14 @@ const handleOrderReturn = async (req, res) => {
                 });
             }
 
+            let anyItemsUpdated = false;
+            
             order.items.forEach(item => {
-                if (item.returnStatus === 'Requested') {
+                const isItemRequested = item.status === 'Return Requested' || 
+                                      (item.returnStatus && item.returnStatus === 'Requested');
+                
+                if (isItemRequested) {
+                    anyItemsUpdated = true;
                     item.returnStatus = 'Rejected';
                     item.returnRejectionReason = reason;
                     item.returnProcessedAt = new Date();
@@ -379,6 +390,13 @@ const handleOrderReturn = async (req, res) => {
                     }
                 }
             });
+            
+            if (!anyItemsUpdated) {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: 'No return requests found to process' 
+                });
+            }
             
             updateOrderStatusBasedOnItems(order);
         }
@@ -406,7 +424,11 @@ const handleOrderReturn = async (req, res) => {
 const handleOrderItemReturn = async (req, res) => {
     try {
         const { orderId, itemId } = req.params;
-        const { action, reason } = req.body; 
+        const { action, reason } = req.body;
+
+        if (!mongoose.Types.ObjectId.isValid(orderId) || !mongoose.Types.ObjectId.isValid(itemId)) {
+            return res.status(400).json({ success: false, message: 'Invalid order or item ID' });
+        }
 
         if (!['approve', 'reject'].includes(action)) {
             return res.status(400).json({ success: false, message: 'Invalid action' });
@@ -417,55 +439,65 @@ const handleOrderItemReturn = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
 
-        const itemIndex = order.items.findIndex(item => item._id.toString() === itemId);
-        if (itemIndex === -1) {
-            return res.status(404).json({ success: false, message: 'Order item not found' });
+        const item = order.items.id(itemId);
+        if (!item) {
+            return res.status(404).json({ success: false, message: 'Item not found in order' });
         }
 
-        const item = order.items[itemIndex];
-        
-        // Skip if item is already cancelled
-        if (item.status === 'Cancelled') {
-            return res.json({ 
-                success: true, 
-                message: 'Skipped cancelled item',
-                order
+        const isItemRequested = item.status === 'Return Requested' || 
+                              (item.returnStatus && item.returnStatus === 'Requested');
+
+        if (!isItemRequested) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Item does not have a pending return request' 
             });
         }
 
         if (action === 'approve') {
-            // Update product quantity
-            if (item.productId) {
-                const product = await Product.findById(item.productId._id);
-                if (product) {
-                    product.quantity = (parseInt(product.quantity) || 0) + parseInt(item.quantity);
-                    if (product.quantity > 0 && product.status === 'Out of Stock') {
-                        product.status = 'Available';
-                    }
-                    await product.save();
-                }
-            }
-            
-            // Process refund for non-COD payments
-            if (order.paymentMethod !== 'COD' && order.payment && order.payment.status === 'Paid') {
-                const refundAmount = item.finalPrice * item.quantity;
-                await walletController.processReturnRefund({
-                    body: { 
-                        orderId: order._id,
-                        amount: refundAmount,
-                        userId: order.userId
-                    },
-                    session: req.session
+            if (item.status === 'Cancelled') {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: 'Cannot process return for a cancelled item' 
                 });
             }
 
-            // Update item status
+            if (order.paymentMethod !== 'COD' && order.payment && order.payment.status === 'Paid' && !item.isReturned) {
+                const refundAmount = (item.finalPrice || item.price) * item.quantity;
+                
+                if (refundAmount > 0) {
+                    await walletController.processReturnRefund({
+                        body: { 
+                            orderId: order._id,
+                            amount: refundAmount,
+                            userId: order.userId,
+                            itemId: item._id,
+                            reason: 'Item return approved'
+                        },
+                        session: req.session
+                    });
+                }
+            }
+
+            if (!item.isReturned && item.status !== 'Cancelled') {
+                if (item.productId) {
+                    const product = await Product.findById(item.productId._id);
+                    if (product) {
+                        product.quantity = (parseInt(product.quantity) || 0) + parseInt(item.quantity);
+                        if (product.quantity > 0 && product.status === 'Out of Stock') {
+                            product.status = 'Available';
+                        }
+                        await product.save();
+                    }
+                }
+            }
+
             item.returnStatus = 'Approved';
             item.status = 'Returned';
             item.isReturned = true;
             item.returnProcessedAt = new Date();
-        } else {
-            // Handle rejection
+
+        } else { 
             if (!reason || reason.trim() === '') {
                 return res.status(400).json({ 
                     success: false, 
@@ -476,14 +508,15 @@ const handleOrderItemReturn = async (req, res) => {
             item.returnStatus = 'Rejected';
             item.returnRejectionReason = reason;
             item.returnProcessedAt = new Date();
-            item.status = 'Delivered'; // Revert to Delivered status
+            
+            if (item.status !== 'Cancelled') {
+                item.status = 'Delivered';
+            }
         }
 
-        // Update order status based on items
         updateOrderStatusBasedOnItems(order);
-        order.updatedAt = new Date();
         
-        order.items[itemIndex] = item;
+        order.updatedAt = new Date();
         await order.save();
 
         res.json({ 

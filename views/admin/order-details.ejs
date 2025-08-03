@@ -475,45 +475,65 @@
             async function handleReturnAction(orderId, itemId, action) {
                 try {
                     let reason = '';
+                    const actionText = action === 'approve' ? 'approve' : 'reject';
+                    const itemText = itemId ? 'this item' : 'the entire order';
                     
                     // For reject action, show a popup to enter reason
                     if (action === 'reject') {
                         const { value: rejectReason } = await Swal.fire({
                             title: 'Enter Rejection Reason',
                             input: 'textarea',
-                            inputLabel: 'Reason for rejection',
-                            inputPlaceholder: 'Enter the reason for rejecting this return...',
+                            inputLabel: `Reason for rejecting return of ${itemText}`,
+                            inputPlaceholder: 'Please provide a detailed reason for rejecting this return...',
                             inputAttributes: {
-                                'aria-label': 'Enter the reason for rejecting this return'
+                                'aria-label': 'Enter the reason for rejecting this return',
+                                'minlength': '10',
+                                'maxlength': '500'
                             },
                             showCancelButton: true,
                             confirmButtonText: 'Submit Rejection',
+                            confirmButtonColor: '#dc3545',
                             cancelButtonText: 'Cancel',
                             inputValidator: (value) => {
-                                if (!value) {
-                                    return 'Please provide a reason for rejection';
+                                if (!value || value.trim().length < 10) {
+                                    return 'Please provide a detailed reason (at least 10 characters)';
                                 }
+                            },
+                            customClass: {
+                                validationMessage: 'my-validation-message'
                             }
                         });
 
                         if (!rejectReason) return; // User cancelled
-                        reason = rejectReason;
+                        reason = rejectReason.trim();
                     } else {
-                        // For approve action, just show confirmation
+                        // For approve action, show confirmation
                         const result = await Swal.fire({
-                            title: `Are you sure you want to ${action} this return?`,
-                            text: `This will ${action} the return request.`,
+                            title: `Confirm Return ${actionText}`,
+                            html: `Are you sure you want to <strong>${actionText}</strong> the return for ${itemText}?`,
                             icon: 'question',
                             showCancelButton: true,
-                            confirmButtonText: `Yes, ${action}`,
+                            confirmButtonText: `Yes, ${actionText}`,
                             cancelButtonText: 'Cancel',
                             confirmButtonColor: '#28a745',
                             cancelButtonColor: '#6c757d',
-                            reverseButtons: true
+                            reverseButtons: true,
+                            focusConfirm: false,
+                            focusCancel: true
                         });
                         
                         if (!result.isConfirmed) return; // User cancelled
                     }
+
+                    // Show loading indicator
+                    Swal.fire({
+                        title: 'Processing...',
+                        text: `Please wait while we ${action} the return request`,
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
 
                     // Determine the API endpoint based on whether it's for an item or whole order
                     const endpoint = itemId 
@@ -524,31 +544,40 @@
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
                         },
-                        body: JSON.stringify({ action, reason })
+                        body: JSON.stringify({ 
+                            action, 
+                            reason
+                        })
                     });
 
                     const data = await response.json();
+                    Swal.close(); // Close loading indicator
 
                     if (response.ok) {
-                        Swal.fire({
+                        await Swal.fire({
                             title: 'Success!',
-                            text: data.message || 'Return request processed successfully',
+                            text: data.message || `Return request ${action}ed successfully`,
                             icon: 'success',
-                            confirmButtonText: 'OK'
-                        }).then(() => {
-                            window.location.reload();
+                            confirmButtonText: 'OK',
+                            timer: 2000,
+                            timerProgressBar: true,
+                            willClose: () => {
+                                window.location.reload();
+                            }
                         });
                     } else {
-                        throw new Error(data.message || 'Failed to process return request');
+                        throw new Error(data.message || `Failed to ${action} return request`);
                     }
                 } catch (error) {
                     console.error('Error processing return:', error);
-                    Swal.fire({
+                    await Swal.fire({
                         title: 'Error!',
                         text: error.message || 'An error occurred while processing the return',
                         icon: 'error',
-                        confirmButtonText: 'OK'
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#dc3545'
                     });
                 }
             }

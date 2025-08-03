@@ -395,7 +395,6 @@ const returnOrder = async (req, res) => {
         const userId = req.session.user.id;
         const { reason, notes } = req.body;
 
-        // Validate required fields
         if (!reason || reason.trim() === '') {
             return res.status(400).json({ 
                 success: false, 
@@ -416,11 +415,9 @@ const returnOrder = async (req, res) => {
             });
         }
 
-        // Calculate refund amount for non-COD payments
         let refundAmount = 0;
         if (order.paymentMethod.toLowerCase() !== 'cod' && order.paymentStatus === 'Paid') {
             refundAmount = order.items.reduce((total, item) => {
-                // Only include non-cancelled items in refund calculation
                 if (item.status.toLowerCase() !== 'cancelled') {
                     return total + (item.price * item.quantity);
                 }
@@ -428,10 +425,8 @@ const returnOrder = async (req, res) => {
             }, 0);
         }
 
-        // Update order status
         order.status = 'Return Requested';
         
-        // Set up order level return request
         order.returnRequest = {
             requestedAt: new Date(),
             reason: reason,
@@ -440,7 +435,6 @@ const returnOrder = async (req, res) => {
             refundAmount: refundAmount
         };
 
-        // Update item statuses (only for non-cancelled items)
         order.items.forEach(item => {
             if (item.status.toLowerCase() !== 'cancelled') {
                 item.status = 'Return Requested';
