@@ -177,15 +177,17 @@
                             <div class="order-section">
                                 <h5 class="section-title">Shipping Address</h5>
                                 <% if (order.address) { %>
-                                    <p class="mb-1"><%= order.address.firstName %> <%= order.address.lastName %></p>
-                                    <p class="mb-1"><%= order.address.addressLine1 %></p>
-                                    <% if (order.address.addressLine2) { %>
-                                        <p class="mb-1"><%= order.address.addressLine2 %></p>
-                                    <% } %>
+                                    <p class="mb-1"><%= order.address.name %></p>                                
                                     <p class="mb-1">
-                                        <%= order.address.city %>, <%= order.address.state %> <%= order.address.postalCode %>
+                                      CITY:  <%= order.address.city %>,STATE: <%= order.address.state %>,PIN: <%= order.address.pincode %>
                                     </p>
-                                    <p class="mb-0"><%= order.address.country %></p>
+                                    <% if(order.address.roadArea) {%>
+                                     Road Area: <p class="mb-0"><%= order.address.roadArea %></p>
+                                    <% } %>
+                                     <% if(order.address.landMark) {%>
+                                      <p class="mb-0">Land Mark:<%= order.address.landmark %></p>
+                                    <% } %>
+                                    <p class="mb-0">Address Type:<% order.address.addressType %></p>
                                     <p class="mb-0">Phone: <%= order.address.phone %></p>
                                 <% } else { %>
                                     <p>No shipping address provided</p>
@@ -198,7 +200,7 @@
                             <div class="order-section">
                                 <h5 class="section-title">Payment Information</h5>
                                 <p class="mb-1"><strong>Payment Method:</strong> 
-                                    <%= order.payment && order.payment.paymentMethod ? order.payment.paymentMethod.name : 'N/A' %>
+                                    <%= order.payment && order.paymentMethod ? order.paymentMethod.name : 'N/A' %>
                                 </p>
                                 <p class="mb-1"><strong>Payment Status:</strong> 
                                     <span class="badge <%= order.payment && order.payment.status === 'Paid' ? 'bg-success' : 'bg-warning' %>">
