@@ -501,90 +501,165 @@
             this.classList.remove('show');
         });
 
-        // Update order status
-        function updateOrderStatus(orderId, status) {
-            if (confirm(`Are you sure you want to mark this order as ${status}?`)) {
-                fetch(`/admin/orders/${orderId}/status`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ status })
-                })
-                .then(response => response.json())
-                .then(data => {
+        // Update order status (duplicate function - keeping both for now but they should be consolidated)
+        async function updateOrderStatus(orderId, status) {
+            const result = await Swal.fire({
+                title: 'Update Order Status',
+                text: `Are you sure you want to mark this order as ${status}?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, update it!',
+                cancelButtonText: 'No, cancel',
+                confirmButtonColor: '#6c5ce7',
+                cancelButtonColor: '#dc3545',
+                reverseButtons: true
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    const response = await fetch(`/admin/orders/${orderId}/status`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ status })
+                    });
+
+                    const data = await response.json();
+
                     if (data.success) {
-                        alert(`Order status updated to ${status}`);
+                        await Swal.fire({
+                            title: 'Success!',
+                            text: `Order status updated to ${status}`,
+                            icon: 'success',
+                            confirmButtonColor: '#6c5ce7',
+                            timer: 2000,
+                            timerProgressBar: true
+                        });
                         location.reload();
                     } else {
-                        alert('Error updating order status: ' + (data.message || 'Unknown error'));
+                        throw new Error(data.message || 'Failed to update order status');
                     }
-                })
-                .catch(error => {
+                } catch (error) {
                     console.error('Error:', error);
-                    alert('Error updating order status');
-                });
+                    await Swal.fire({
+                        title: 'Error!',
+                        text: error.message || 'Error updating order status',
+                        icon: 'error',
+                        confirmButtonColor: '#6c5ce7'
+                    });
+                }
             }
         }
 
         // Update item status
-        function updateItemStatus(orderId, itemId, status) {
-            if (confirm(`Are you sure you want to update this item status to ${status}?`)) {
-                fetch(`/admin/orders/${orderId}/items/${itemId}/status`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ status })
-                })
-                .then(response => response.json())
-                .then(data => {
+        async function updateItemStatus(orderId, itemId, status) {
+            const result = await Swal.fire({
+                title: 'Update Item Status',
+                text: `Are you sure you want to update this item status to ${status}?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, update it!',
+                cancelButtonText: 'No, cancel',
+                confirmButtonColor: '#6c5ce7',
+                cancelButtonColor: '#dc3545',
+                reverseButtons: true
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    const response = await fetch(`/admin/orders/${orderId}/items/${itemId}/status`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ status })
+                    });
+
+                    const data = await response.json();
+
                     if (data.success) {
-                        alert(`Item status updated to ${status}`);
+                        await Swal.fire({
+                            title: 'Success!',
+                            text: `Item status updated to ${status}`,
+                            icon: 'success',
+                            confirmButtonColor: '#6c5ce7',
+                            timer: 2000,
+                            timerProgressBar: true
+                        });
                         location.reload();
                     } else {
-                        alert('Error updating item status: ' + (data.message || 'Unknown error'));
+                        throw new Error(data.message || 'Failed to update item status');
                     }
-                })
-                .catch(error => {
+                } catch (error) {
                     console.error('Error:', error);
-                    alert('Error updating item status');
-                });
+                    await Swal.fire({
+                        title: 'Error!',
+                        text: error.message || 'Error updating item status',
+                        icon: 'error',
+                        confirmButtonColor: '#6c5ce7'
+                    });
+                }
             }
         }
 
-        // Handle return actions (approve/reject)
-        function handleReturnAction(orderId, itemId, action) {
+        // Handle return actions (approve/reject) - duplicate function, consider removing
+        async function handleReturnAction(orderId, itemId, action) {
             const actionText = action === 'approve' ? 'approve' : 'reject';
             const confirmText = itemId 
                 ? `Are you sure you want to ${actionText} return for this item?`
                 : `Are you sure you want to ${actionText} return for the entire order?`;
             
-            if (confirm(confirmText)) {
-                const url = itemId 
-                    ? `/admin/orders/${orderId}/items/${itemId}/return`
-                    : `/admin/orders/${orderId}/return`;
-                
-                fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ action })
-                })
-                .then(response => response.json())
-                .then(data => {
+            const result = await Swal.fire({
+                title: `${actionText.charAt(0).toUpperCase() + actionText.slice(1)} Return`,
+                text: confirmText,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: `Yes, ${actionText} it!`,
+                cancelButtonText: 'No, cancel',
+                confirmButtonColor: action === 'approve' ? '#28a745' : '#dc3545',
+                cancelButtonColor: '#6c757d',
+                reverseButtons: true
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    const url = itemId 
+                        ? `/admin/orders/${orderId}/items/${itemId}/return`
+                        : `/admin/orders/${orderId}/return`;
+                    
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ action })
+                    });
+
+                    const data = await response.json();
+
                     if (data.success) {
-                        alert(`Return request ${actionText}d successfully`);
+                        await Swal.fire({
+                            title: 'Success!',
+                            text: `Return request ${actionText}d successfully`,
+                            icon: 'success',
+                            confirmButtonColor: '#6c5ce7',
+                            timer: 2000,
+                            timerProgressBar: true
+                        });
                         location.reload();
                     } else {
-                        alert(`Error ${actionText}ing return: ${data.message || 'Unknown error'}`);
+                        throw new Error(data.message || `Failed to ${actionText} return`);
                     }
-                })
-                .catch(error => {
+                } catch (error) {
                     console.error('Error:', error);
-                    alert(`Error ${actionText}ing return`);
-                });
+                    await Swal.fire({
+                        title: 'Error!',
+                        text: error.message || `Error ${actionText}ing return`,
+                        icon: 'error',
+                        confirmButtonColor: '#6c5ce7'
+                    });
+                }
             }
         }
     </script>

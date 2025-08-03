@@ -5,6 +5,7 @@ const User = require("../../models/userSchema");
 const processReturnRefund = async (req) => {
   try {
     const { orderId } = req.body;
+    const Product = require('../../models/productSchema');
 
     if (!req.session.user || !req.session.user.isAdmin) {
       return res.status(403).json({
@@ -49,7 +50,39 @@ const processReturnRefund = async (req) => {
 
     await User.findByIdAndUpdate(order.userId, { wallet: wallet._id });
 
+    // Update order status
     order.status = "Returned";
+    
+    // Update product quantities and ensure valid discountType
+    for (const item of order.items) {
+      if (item.status === 'Returned' || item.returnStatus === 'Approved') {
+        const product = await Product.findById(item.productId);
+        if (product) {
+          // Ensure discountType is valid
+          if (product.productOffer && product.productOffer.discountType) {
+            if (product.productOffer.discountType !== 'percentage' && product.productOffer.discountType !== 'flat') {
+              product.productOffer.discountType = 'percentage'; // Set default if invalid
+            }
+          }
+          
+          // Update product quantity
+          product.quantity = (product.quantity || 0) + item.quantity;
+          product.status = 'Available';
+          
+          // Ensure productOffer structure is valid
+          if (!product.productOffer) {
+            product.productOffer = {
+              active: false,
+              discountType: 'percentage',
+              discountValue: 0
+            };
+          }
+          
+          await product.save();
+        }
+      }
+    }
+    
     await order.save();
 
     return {

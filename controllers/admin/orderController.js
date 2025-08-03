@@ -397,11 +397,9 @@ const handleOrderItemReturn = async (req, res) => {
                 const refundAmount = item.finalPrice * item.quantity;
                 console.log(`Processing refund of ${refundAmount} for item ${itemId} in order ${orderId}`);
                 
-                // Update the order with the final amount for refund
                 order.finalAmount = refundAmount;
                 await order.save();
                 
-                // Process the refund
                 await walletController.processReturnRefund({
                     body: { orderId: order._id },
                     session: req.session
