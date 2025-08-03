@@ -355,7 +355,7 @@ if (order.paymentMethod !== 'COD' &&
             await processRefund({
                 userId,
                 orderId: order._id,
-                itemId: item._id,
+                itemId: item._id.toString(),
                 amount: refundAmount,
                 reason: `Item cancellation: ${reason}`,
                 notes: notes,

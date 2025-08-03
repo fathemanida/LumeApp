@@ -24,7 +24,8 @@ const processRefund = async ({
         transactions: []
       });
     }
-
+const item = order.items.find(i => i._id.toString() === itemId);
+console.log('==item in processrefund',item);
     let refundAmount = amount;
 
     if (itemId) {
@@ -32,7 +33,7 @@ const processRefund = async ({
       if (!item) throw new Error('Item not found in order');
 
       if (order.couponDiscount && order.couponDiscount > 0) {
-        const couponPerItem = order.couponDiscount / (order.items.length); // fix: add parentheses
+        const couponPerItem = order.couponDiscount / (order.items.length);
         refundAmount += couponPerItem;
         console.log('===couponper',couponPerItem);
       }
