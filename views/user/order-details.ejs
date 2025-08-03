@@ -477,9 +477,27 @@
 
     <!-- Bootstrap JS Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Include SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Include Toastify -->
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <!-- SweetAlert2 Theme -->
+    <style>
+        .swal2-popup {
+            background: #1e1e1e;
+            color: #e0e0e0;
+            border: 1px solid #333;
+        }
+        .swal2-title, .swal2-content {
+            color: #e0e0e0 !important;
+        }
+        .swal2-confirm {
+            background-color: #6c5ce7 !important;
+        }
+        .swal2-cancel {
+            background-color: #dc3545 !important;
+        }
+    </style>
     
     <script>
         // Variables to store the current action context
@@ -658,102 +676,160 @@
 
         // Cancel Order
         function cancelOrder() {
-            if (confirm('Are you sure you want to cancel this order?')) {
-                fetch(`/orders/cancel/<%= order._id %>`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showToast('Order cancelled successfully', true);
-                        setTimeout(() => window.location.reload(), 1500);
-                    } else {
-                        showToast(data.message || 'Failed to cancel order', false);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showToast('An error occurred while cancelling the order', false);
-                });
-            }
+            Swal.fire({
+                title: 'Cancel Order',
+                text: 'Are you sure you want to cancel this order?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#6c5ce7',
+                cancelButtonColor: '#dc3545',
+                confirmButtonText: 'Yes, cancel it!',
+                cancelButtonText: 'No, keep it',
+                background: '#1e1e1e',
+                color: '#e0e0e0',
+                customClass: {
+                    title: 'swal2-title',
+                    content: 'swal2-content',
+                    confirmButton: 'swal2-confirm',
+                    cancelButton: 'swal2-cancel'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/orders/cancel/<%= order._id %>`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showToast('Order cancelled successfully', true);
+                            setTimeout(() => window.location.reload(), 1500);
+                        } else {
+                            showToast(data.message || 'Failed to cancel order', false);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showToast('An error occurred while cancelling the order', false);
+                    });
+                }
+            });
         }
 
         // Return Order
         function returnOrder() {
-            if (confirm('Are you sure you want to return this order?')) {
-                fetch(`/orders/return/<%= order._id %>`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showToast('Return request submitted successfully', true);
-                        setTimeout(() => window.location.reload(), 1500);
-                    } else {
-                        showToast(data.message || 'Failed to process return request', false);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showToast('An error occurred while processing your request', false);
-                });
-            }
+            Swal.fire({
+                title: 'Return Order',
+                text: 'Are you sure you want to return this order?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#6c5ce7',
+                cancelButtonColor: '#dc3545',
+                confirmButtonText: 'Yes, return it',
+                cancelButtonText: 'No, keep it',
+                background: '#1e1e1e',
+                color: '#e0e0e0'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/orders/return/<%= order._id %>`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showToast('Return request submitted successfully', true);
+                            setTimeout(() => window.location.reload(), 1500);
+                        } else {
+                            showToast(data.message || 'Failed to process return request', false);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showToast('An error occurred while processing your request', false);
+                    });
+                }
+            });
         }
 
         // Cancel Item
         function cancelItem(itemId) {
-            if (confirm('Are you sure you want to cancel this item?')) {
-                fetch(`/orders/cancel-item/${itemId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showToast('Item cancelled successfully', true);
-                        setTimeout(() => window.location.reload(), 1500);
-                    } else {
-                        showToast(data.message || 'Failed to cancel item', false);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showToast('An error occurred while cancelling the item', false);
-                });
-            }
+            Swal.fire({
+                title: 'Cancel Item',
+                text: 'Are you sure you want to cancel this item?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#6c5ce7',
+                cancelButtonColor: '#dc3545',
+                confirmButtonText: 'Yes, cancel it',
+                cancelButtonText: 'No, keep it',
+                background: '#1e1e1e',
+                color: '#e0e0e0'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/orders/cancel-item/${itemId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showToast('Item cancelled successfully', true);
+                            setTimeout(() => window.location.reload(), 1500);
+                        } else {
+                            showToast(data.message || 'Failed to cancel item', false);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showToast('An error occurred while cancelling the item', false);
+                    });
+                }
+            });
         }
 
         // Return Item
         function returnItem(itemId) {
-            if (confirm('Are you sure you want to return this item?')) {
-                fetch(`/orders/return-item/${itemId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showToast('Return request submitted successfully', true);
-                        setTimeout(() => window.location.reload(), 1500);
-                    } else {
-                        showToast(data.message || 'Failed to process return request', false);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showToast('An error occurred while processing your request', false);
-                });
-            }
+            Swal.fire({
+                title: 'Return Item',
+                text: 'Are you sure you want to return this item?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#6c5ce7',
+                cancelButtonColor: '#dc3545',
+                confirmButtonText: 'Yes, return it',
+                cancelButtonText: 'No, keep it',
+                background: '#1e1e1e',
+                color: '#e0e0e0'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/orders/return-item/${itemId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showToast('Return request submitted successfully', true);
+                            setTimeout(() => window.location.reload(), 1500);
+                        } else {
+                            showToast(data.message || 'Failed to process return request', false);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showToast('An error occurred while processing your request', false);
+                    });
+                }
+            });
         }
     </script>
 </body>
