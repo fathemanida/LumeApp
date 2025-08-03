@@ -7,7 +7,7 @@ const productController = require("../controllers/admin/productController");
 const orderController = require("../controllers/admin/orderController");
 const {userAuth, adminAuth} = require("../middleware/auth");
 const walletController = require('../controllers/user/walletController');
-const couponController=require('../controllers/admin/couponController')
+const couponController = require('../controllers/admin/couponController');
 const offerController = require('../controllers/admin/offerController');
 const multer = require('multer');
 const path = require('path');
@@ -65,7 +65,6 @@ router.put("/orders/:orderId/items/:itemId/status", adminAuth, orderController.u
 router.post("/orders/:orderId/return", adminAuth, orderController.handleOrderReturn);
 router.post("/orders/:orderId/items/:itemId/return", adminAuth, orderController.handleOrderItemReturn);
 router.get("/order-address", adminAuth, orderController.getOrderAddress);
-router.post('/orders/:orderId/status', adminAuth, orderController.updateOrderStatus);
 
 // Return processing route
 router.post('/orders/:orderId/process-return', adminAuth, walletController.processReturnRefund);
