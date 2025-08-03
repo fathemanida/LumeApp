@@ -370,13 +370,13 @@ const handleOrderReturn = async (req, res) => {
 const handleOrderItemReturn = async (req, res) => {
     try {
         const { orderId, itemId } = req.params;
-        const { action } = req.body; 
+        const { action, reason } = req.body; 
 
         if (!['approve', 'reject'].includes(action)) {
             return res.status(400).json({ success: false, message: 'Invalid action' });
         }
 
-        const order = await Order.findById(orderId);
+        const order = await Order.findById(orderId).populate('items.productId');
         if (!order) {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
@@ -389,33 +389,55 @@ const handleOrderItemReturn = async (req, res) => {
         const item = order.items[itemIndex];
         
         if (action === 'approve') {
+            const product = await Product.findById(item.productId._id);
+            if (product) {
+                product.quantity = (parseInt(product.quantity) || 0) + parseInt(item.quantity);
+                
+                if (product.quantity > 0 && product.status === 'Out of Stock') {
+                    product.status = 'Available';
+                }
+                
+                await product.save();
+            }
+            
             item.returnStatus = 'Approved';
             item.status = 'Returned';
             item.isReturned = true;
+            item.returnProcessedAt = new Date();
             
             if (order.paymentMethod !== 'COD') {
                 const refundAmount = item.finalPrice * item.quantity;
                 console.log(`Processing refund of ${refundAmount} for item ${itemId} in order ${orderId}`);
                 
-                order.finalAmount = refundAmount;
-                await order.save();
+                order.refundAmount = (order.refundAmount || 0) + refundAmount;
+                order.refundStatus = 'Processed';
+                order.refundDate = new Date();
                 
                 await walletController.processReturnRefund({
-                    body: { orderId: order._id },
+                    body: { 
+                        orderId: order._id,
+                        amount: refundAmount,
+                        userId: order.userId
+                    },
                     session: req.session
                 });
             }
         } else {
             item.returnStatus = 'Rejected';
+            item.status = item.status === 'Return Requested' ? 'Delivered' : item.status; // Revert to previous status
+            item.returnRejectionReason = reason || 'No reason provided';
+            item.returnProcessedAt = new Date();
         }
 
         updateOrderStatusBasedOnItems(order);
         order.updatedAt = new Date();
+        
+        order.items[itemIndex] = item;
         await order.save();
 
         res.json({ 
             success: true, 
-            message: `Return request for item ${action}ed successfully`,
+            message: `Return request ${action}ed successfully`,
             order
         });
 
@@ -424,7 +446,8 @@ const handleOrderItemReturn = async (req, res) => {
         res.status(500).json({ 
             success: false, 
             message: 'Error handling item return',
-            error: error.message 
+            error: error.message,
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
         });
     }
 };
@@ -432,18 +455,31 @@ const handleOrderItemReturn = async (req, res) => {
 const updateOrderStatusBasedOnItems = (order) => {
     const itemStatuses = [...new Set(order.items.map(item => item.status))];
     const returnStatuses = [...new Set(order.items.map(item => item.returnStatus).filter(Boolean))];
+    const hasPendingReturns = order.items.some(item => 
+        item.returnStatus === 'Requested' || 
+        (item.returnStatus === 'Approved' && item.status !== 'Returned')
+    );
 
-    if (itemStatuses.length === 1) {
-        order.status = itemStatuses[0];
-    } else if (itemStatuses.includes('Cancelled') && itemStatuses.length === 2) {
-        order.status = 'Partially Cancelled';
-    } else if (returnStatuses.includes('Requested')) {
+    if (order.items.every(item => item.status === 'Returned' || item.status === 'Cancelled')) {
+        order.status = 'Returned';
+    } 
+    else if (order.items.some(item => item.status === 'Returned')) {
+        order.status = 'Partially Returned';
+    }
+    else if (hasPendingReturns) {
         order.status = 'Return Requested';
-    } else if (returnStatuses.includes('Approved')) {
-        order.status = itemStatuses.every(s => s === 'Returned') ? 'Returned' : 'Partially Returned';
-    } else {
+    }
+    else if (itemStatuses.includes('Cancelled') && itemStatuses.length > 1) {
+        order.status = 'Partially Cancelled';
+    }
+    else if (itemStatuses.length === 1) {
+        order.status = itemStatuses[0];
+    } 
+    else {
         order.status = 'Processing';
     }
+
+    order.updatedAt = new Date();
 };
 
 module.exports = {

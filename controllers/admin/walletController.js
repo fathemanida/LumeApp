@@ -1,11 +1,11 @@
 const Order = require("../../models/orderSchema");
 const Wallet = require("../../models/walletSchema");
 const User = require("../../models/userSchema");
+const Product = require('../../models/productSchema');
 
 const processReturnRefund = async (req) => {
   try {
-    const { orderId } = req.body;
-    const Product = require('../../models/productSchema');
+    const { orderId,amount,userId } = req.body;
 
     if (!req.session.user || !req.session.user.isAdmin) {
       return {
@@ -13,7 +13,7 @@ const processReturnRefund = async (req) => {
         message: "Unauthorized access",
       };
     }
-
+console.log('==processing refund,amount,orderid',orderId,userid,amount);
     const order = await Order.findById(orderId).populate("items.productId");
 
     if (!order) {
@@ -23,7 +23,7 @@ const processReturnRefund = async (req) => {
       };
     }
 
-    let wallet = await Wallet.findOne({ userId: order.userId });
+    let wallet = await Wallet.findOne({ userId: userId });
 
     if (!wallet) {
       wallet = new Wallet({
@@ -33,18 +33,18 @@ const processReturnRefund = async (req) => {
       });
     }
 
-    const refundAmount = order.finalAmount;
+    const refundAmount = amount;
 
     const transaction = {
       type: "CREDIT",
-      amount: refundAmount,
+      amount: amount,
       description: `Refund for returned order #${order.orderId}`,
-      orderId: order._id,
+      orderId: orderId,
       status: "COMPLETED",
       createdAt: new Date(),
     };
 
-    wallet.balance += refundAmount;
+    wallet.balance += amount;
     wallet.transactions.push(transaction);
     await wallet.save();
 
@@ -58,7 +58,6 @@ const processReturnRefund = async (req) => {
           const product = await Product.findById(item.productId);
           if (!product) continue;
 
-          // Ensure productOffer exists and has correct structure
           if (!product.productOffer) {
             product.productOffer = {
               active: false,
@@ -68,14 +67,15 @@ const processReturnRefund = async (req) => {
               endDate: null
             };
           } else {
-            // Ensure discountType is valid
-            if (typeof product.productOffer.discountType === 'number' || 
-                (product.productOffer.discountType !== 'percentage' && 
-                 product.productOffer.discountType !== 'flat')) {
+            if (typeof product.productOffer.discountType === 'number') {
+              console.warn(`Invalid discountType (${product.productOffer.discountType}) found for product ${product._id}, defaulting to 'percentage'`);
+              product.productOffer.discountType = 'percentage';
+            } else if (product.productOffer.discountType !== 'percentage' && 
+                      product.productOffer.discountType !== 'flat') {
+              console.warn(`Invalid discountType (${product.productOffer.discountType}) found for product ${product._id}, defaulting to 'percentage'`);
               product.productOffer.discountType = 'percentage';
             }
             
-            // Ensure all required fields exist
             product.productOffer = {
               active: product.productOffer.active || false,
               discountType: product.productOffer.discountType || 'percentage',
@@ -86,11 +86,9 @@ const processReturnRefund = async (req) => {
             };
           }
 
-          // Update product quantity and status
           product.quantity = (parseInt(product.quantity) || 0) + (parseInt(item.quantity) || 0);
           product.status = 'Available';
 
-          // Save with validation
           await product.save({ validateBeforeSave: true });
         } catch (error) {
           console.error('Error updating product inventory during return:', {
@@ -101,7 +99,6 @@ const processReturnRefund = async (req) => {
             productId: item.productId,
             quantity: item.quantity
           });
-          // Continue with other items even if one fails
           continue;
         }
       }
