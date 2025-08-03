@@ -306,43 +306,65 @@ const updateOrderItemStatus = async (req, res) => {
 const handleOrderReturn = async (req, res) => {
     try {
         const { orderId } = req.params;
-        const { action } = req.body; 
+        const { action, reason } = req.body; 
 
         if (!['approve', 'reject'].includes(action)) {
             return res.status(400).json({ success: false, message: 'Invalid action' });
         }
 
-        const order = await Order.findById(orderId);
+        const order = await Order.findById(orderId).populate('items.productId');
         if (!order) {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
 
         if (action === 'approve') {
-            order.items.forEach(item => {
+            if (order.paymentMethod !== 'COD' && order.payment && order.payment.status === 'Paid') {
+                const refundAmount = order.items.reduce((total, item) => {
+                    if (item.returnStatus === 'Requested') {
+                        return total + (item.finalPrice * item.quantity);
+                    }
+                    return total;
+                }, 0);
+
+                if (refundAmount > 0) {
+                    await walletController.processReturnRefund({
+                        body: { 
+                            orderId: order._id,
+                            amount: refundAmount,
+                            userId: order.userId
+                        },
+                        session: req.session
+                    });
+                }
+            }
+
+            for (const item of order.items) {
                 if (item.returnStatus === 'Requested') {
+                    if (item.productId) {
+                        const product = await Product.findById(item.productId._id);
+                        if (product) {
+                            product.quantity = (parseInt(product.quantity) || 0) + parseInt(item.quantity);
+                            if (product.quantity > 0 && product.status === 'Out of Stock') {
+                                product.status = 'Available';
+                            }
+                            await product.save();
+                        }
+                    }
+                    
                     item.returnStatus = 'Approved';
                     item.status = 'Returned';
                     item.isReturned = true;
+                    item.returnProcessedAt = new Date();
                 }
-            });
-            order.status = 'Returned';
-            
-            if (order.payment.status === 'Paid') {
-                const refundAmount = order.totalAmount;
-                console.log(`Processing refund of ${refundAmount} for order ${orderId}`);
-                
-                await walletController.addToWallet({
-                    userId: order.userId,
-                    amount: refundAmount,
-                    type: 'refund',
-                    description: `Refund for order #${order.orderNumber}`,
-                    orderId: order._id
-                });
             }
+            
+            updateOrderStatusBasedOnItems(order);
         } else {
             order.items.forEach(item => {
                 if (item.returnStatus === 'Requested') {
                     item.returnStatus = 'Rejected';
+                    item.returnRejectionReason = reason || 'No reason provided';
+                    item.returnProcessedAt = new Date();
                 }
             });
             updateOrderStatusBasedOnItems(order);
@@ -362,7 +384,8 @@ const handleOrderReturn = async (req, res) => {
         res.status(500).json({ 
             success: false, 
             message: 'Error handling order return',
-            error: error.message 
+            error: error.message,
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
         });
     }
 };
@@ -424,7 +447,7 @@ const handleOrderItemReturn = async (req, res) => {
             }
         } else {
             item.returnStatus = 'Rejected';
-            item.status = item.status === 'Return Requested' ? 'Delivered' : item.status; // Revert to previous status
+            item.status = item.status === 'Return Requested' ? 'Delivered' : item.status; 
             item.returnRejectionReason = reason || 'No reason provided';
             item.returnProcessedAt = new Date();
         }
