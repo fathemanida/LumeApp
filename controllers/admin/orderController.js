@@ -348,7 +348,9 @@ const handleReturnRequest = async (req, res) => {
         const orderId = req.params.orderId;
         const { action, reason, itemId } = req.body; 
 
-        if (!mongoose.Types.ObjectId.isValid(orderId)) {
+        console.log('===items,action,reason',itemId,action,reason);
+
+        if (!orderId) {
             return res.status(400).json({
                 success: false,
                 message: 'Invalid order ID'
@@ -376,6 +378,7 @@ const handleReturnRequest = async (req, res) => {
             if (action === 'accept') {
                 item.status = 'Returned';
                 item.returnStatus = 'Completed';
+                console.log('===status changed');
                 
                 const allItemsReturned = order.items.every(i => 
                     i.status === 'Returned' || i.status === 'Cancelled'
@@ -427,6 +430,7 @@ const handleReturnRequest = async (req, res) => {
                     }
                     await product.save();
                 }
+                console.log('===success');
 
                 await order.save();
                 return res.json({
