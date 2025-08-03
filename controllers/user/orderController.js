@@ -407,36 +407,44 @@ const returnOrder = async (req, res) => {
                 message: 'Only delivered orders can be returned' 
             });
         }
-                 const item = order.items.id(itemId);
-    
+
+        // Calculate refund amount for non-COD payments
         let refundAmount = 0;
         if (order.paymentMethod.toLowerCase() !== 'cod' && order.paymentStatus === 'Paid') {
-            refundAmount = calculateRefundAmount(order);
+            refundAmount = order.items.reduce((total, item) => {
+                // Only include non-cancelled items in refund calculation
+                if (item.status.toLowerCase() !== 'cancelled') {
+                    return total + (item.price * item.quantity);
+                }
+                return total;
+            }, 0);
         }
 
+        // Update order status
         order.status = 'Return Requested';
-        if(item.status!=="Cancelled"){
-
-        }
-        if (!order.returnRequest) {
-            order.returnRequest = {
-                requestedAt: new Date(),
-                reason: reason,
-                notes: notes,
-                status: 'Pending',
-                refundAmount: refundAmount
-            };
-        }
-         if(item.status!=="cancelled"){
-         item.status = 'Return Requested';
-        item.returnRequest = {
+        
+        // Set up order level return request
+        order.returnRequest = {
             requestedAt: new Date(),
             reason: reason,
             notes: notes,
             status: 'Pending',
             refundAmount: refundAmount
         };
-     }
+
+        // Update item statuses (only for non-cancelled items)
+        order.items.forEach(item => {
+            if (item.status.toLowerCase() !== 'cancelled') {
+                item.status = 'Return Requested';
+                item.returnRequest = {
+                    requestedAt: new Date(),
+                    reason: reason,
+                    notes: notes,
+                    status: 'Pending',
+                    refundAmount: item.price * item.quantity
+                };
+            }
+        });
 
         await order.save();
 

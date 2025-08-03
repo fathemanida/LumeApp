@@ -218,43 +218,42 @@ const updateOrderStatus = async (req, res) => {
 
         order.status = status;
         order.updatedAt = new Date();
-        
-        // Update status for all items in the order
+
         order.items.forEach(item => {
+            if (item.status === 'Cancelled') return;
+
             item.status = status;
-            
-            // If order is cancelled, also update return status if applicable
+
             if (status === 'Cancelled' && item.returnStatus === 'Requested') {
                 item.returnStatus = 'Rejected';
             }
-            
-            // If order is delivered, mark items as delivered if they weren't cancelled
-            if (status === 'Delivered' && item.status !== 'Cancelled') {
+
+            if (status === 'Delivered') {
                 item.status = 'Delivered';
             }
         });
 
         await order.save();
-        
-        // Update the order status based on item statuses
+
         updateOrderStatusBasedOnItems(order);
         await order.save();
 
-        res.json({ 
-            success: true, 
+        res.json({
+            success: true,
             message: `Order status updated to ${status}`,
             order
         });
 
     } catch (error) {
         console.error('Error updating order status:', error);
-        res.status(500).json({ 
-            success: false, 
+        res.status(500).json({
+            success: false,
             message: 'Error updating order status',
-            error: error.message 
+            error: error.message
         });
     }
 };
+
 
 const updateOrderItemStatus = async (req, res) => {
     try {
