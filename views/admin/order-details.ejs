@@ -249,7 +249,7 @@
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td>₹<%= item.originalPrice.toFixed(2) %></td>
+                                            <td>₹<%= item.price.toFixed(2) %></td>
                                             <td><%= item.quantity %></td>
                                             <td>
                                                 <% if (item.appliedOffer) { %>
@@ -262,7 +262,7 @@
                                                     -
                                                 <% } %>
                                             </td>
-                                            <td>₹<%= (item.price * item.quantity).toFixed(2) %></td>
+                                            <td>₹<%= (item.finalPrice * item.quantity).toFixed(2) %></td>
                                             <td>
                                                 <span class="status-badge badge-<%= item.status.toLowerCase().replace(' ', '-') %>">
                                                     <%= item.status %>
@@ -294,15 +294,21 @@
                                 <tfoot>
                                     <tr class="table-active" style="--bs-table-bg: #141619;">
                                         <td colspan="4" class="text-end"><strong>Subtotal:</strong></td>
-                                        <td colspan="3">₹<%= order.subTotal ? order.subTotal.toFixed(2) : order.totalAmount.toFixed(2) %></td>
+                                        <td colspan="3">₹<%= order.subtotal ? order.subtotal.toFixed(2) : order.totalAmount.toFixed(2) %></td>
                                     </tr>
-                                    <% if (order.discountAmount > 0) { %>
+                                    <% if (order.offerDiscount> 0) { %>
                                         <tr style="--bs-table-bg: #1a1d20;">
-                                            <td colspan="4" class="text-end"><strong>Discount:</strong></td>
-                                            <td colspan="3">-₹<%= order.discountAmount.toFixed(2) %></td>
+                                            <td colspan="4" class="text-end"><strong>Offer Discount:</strong></td>
+                                            <td colspan="3">-₹<%= order.offerDiscount.toFixed(2) %></td>
                                         </tr>
                                     <% } %>
                                     <tr>
+                                          <% if (order.couponDiscount> 0) { %>
+                                        <tr style="--bs-table-bg: #1a1d20;">
+                                            <td colspan="4" class="text-end"><strong>Coupon Discount:</strong></td>
+                                            <td colspan="3">-₹<%= order.couponDiscount.toFixed(2) %></td>
+                                        </tr>
+                                    <% } %>
                                         <td colspan="4" class="text-end"><strong>Shipping:</strong></td>
                                         <td colspan="3">
                                             <% if (order.shippingCharge === 0) { %>
