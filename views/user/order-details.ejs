@@ -306,24 +306,23 @@
                                             </span>
                                         </td>
                                         <td class="text-center">
-                                            <% if (canCancelItem) { %>
-                                                <button class="btn btn-sm btn-outline-danger me-2 cancel-item-btn"
-                                                    data-item-id="<%= item._id %>"
-                                                    data-item-name="<%= item.productId.productName.replace(/"
-                                                    /g, '&quot;' ) %>"
-                                                    data-type="item">
-                                                    <i class="fas fa-times"></i> Cancel
-                                                </button>
-                                                <% } %>
-                                                    <% if (canReturnItem) { %>
-                                                        <button class="btn btn-sm btn-outline-warning return-item-btn"
-                                                            data-item-id="<%= item._id %>"
-                                                            data-item-name="<%= item.productId.productName.replace(/"
-                                                            /g, '&quot;' ) %>"
-                                                            data-type="item">
-                                                            <i class="fas fa-undo"></i> Return
-                                                        </button>
-                                                        <% } %>
+                                           <% if (canCancelItem) { %>
+    <button class="btn btn-sm btn-outline-danger me-2 cancel-item-btn"
+        data-item-id="<%= item._id %>"
+        data-item-name="<%= item.productId.productName.replace(/"/g, '&quot;') %>"
+        data-type="item">
+        <i class="fas fa-times"></i> Cancel
+    </button>
+<% } %>
+<% if (canReturnItem) { %>
+    <button class="btn btn-sm btn-outline-warning return-item-btn"
+        data-item-id="<%= item._id %>"
+        data-item-name="<%= item.productId.productName.replace(/"/g, '&quot;') %>"
+        data-type="item">
+        <i class="fas fa-undo"></i> Return
+    </button>
+<% } %>
+
                                         </td>
                                     </tr>
                                     <% }) %>
