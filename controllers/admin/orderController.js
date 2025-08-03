@@ -393,7 +393,7 @@ const handleOrderItemReturn = async (req, res) => {
             item.status = 'Returned';
             item.isReturned = true;
             
-            if (order.payment.status === 'Paid') {
+            if (order.paymentMethod !== 'COD') {
                 const refundAmount = item.finalPrice * item.quantity;
                 console.log(`Processing refund of ${refundAmount} for item ${itemId} in order ${orderId}`);
                 
