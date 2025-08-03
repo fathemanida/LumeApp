@@ -8,18 +8,18 @@ const processReturnRefund = async (req) => {
     const Product = require('../../models/productSchema');
 
     if (!req.session.user || !req.session.user.isAdmin) {
-      return res.status(403).json({
+      return {
         success: false,
         message: "Unauthorized access",
-      });
+      };
     }
 
     const order = await Order.findById(orderId).populate("items.productId");
 
-    if (!req.session.user || !req.session.user.isAdmin) {
+    if (!order) {
       return {
         success: false,
-        message: "Unauthorized access",
+        message: "Order not found",
       };
     }
 
@@ -50,39 +50,34 @@ const processReturnRefund = async (req) => {
 
     await User.findByIdAndUpdate(order.userId, { wallet: wallet._id });
 
-    // Update order status
     order.status = "Returned";
-    
-    // Update product quantities and ensure valid discountType
+
     for (const item of order.items) {
       if (item.status === 'Returned' || item.returnStatus === 'Approved') {
         const product = await Product.findById(item.productId);
         if (product) {
-          // Ensure discountType is valid
-          if (product.productOffer && product.productOffer.discountType) {
-            if (product.productOffer.discountType !== 'percentage' && product.productOffer.discountType !== 'flat') {
-              product.productOffer.discountType = 'percentage'; // Set default if invalid
-            }
-          }
-          
-          // Update product quantity
-          product.quantity = (product.quantity || 0) + item.quantity;
-          product.status = 'Available';
-          
-          // Ensure productOffer structure is valid
+          // Validate offer data
           if (!product.productOffer) {
             product.productOffer = {
               active: false,
               discountType: 'percentage',
               discountValue: 0
             };
+          } else if (
+            product.productOffer.discountType !== 'percentage' &&
+            product.productOffer.discountType !== 'flat'
+          ) {
+            product.productOffer.discountType = 'percentage'; // default fallback
           }
-          
+
+          product.quantity = (product.quantity || 0) + item.quantity;
+          product.status = 'Available';
+
           await product.save();
         }
       }
     }
-    
+
     await order.save();
 
     return {
@@ -95,6 +90,7 @@ const processReturnRefund = async (req) => {
     throw new Error("Something went wrong while processing the return");
   }
 };
+
 
 module.exports = {
   processReturnRefund,
