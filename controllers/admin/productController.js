@@ -507,15 +507,38 @@ const getListProduct = async (req, res) => {
 
     product.isListed = true;
     
+    // Define valid discount types
+    const validDiscountTypes = ['percentage', 'flat'];
+    
     if (product.productOffer && product.productOffer.active) {
+      // Validate and normalize discountType
+      let discountType = 'percentage'; // Default value
+      
+      // If discountType is a valid string, use it; otherwise, use default
+      if (typeof product.productOffer.discountType === 'string' && 
+          validDiscountTypes.includes(product.productOffer.discountType)) {
+        discountType = product.productOffer.discountType;
+      } else if (product.productOffer.discountType !== undefined) {
+        console.warn(`Invalid discountType (${product.productOffer.discountType}) found for product ${product._id}, defaulting to 'percentage'`);
+      }
+      
+      // Ensure discountValue is a valid number
+      const discountValue = typeof product.productOffer.discountValue === 'number' && 
+                          !isNaN(product.productOffer.discountValue) ?
+                          Math.max(0, product.productOffer.discountValue) : 0;
+      
+      // Set product offer with validated values
       product.productOffer = {
         active: true,
-        discountType: product.productOffer.discountType || 'percentage',
-        discountValue: product.productOffer.discountValue || 0,
-        startDate: product.productOffer.startDate,
-        endDate: product.productOffer.endDate
+        discountType: discountType,
+        discountValue: discountValue,
+        startDate: product.productOffer.startDate instanceof Date ? 
+                  product.productOffer.startDate : null,
+        endDate: product.productOffer.endDate instanceof Date ? 
+                product.productOffer.endDate : null
       };
     } else {
+      // If no active offer or no productOffer, set defaults
       product.productOffer = {
         active: false,
         discountType: 'percentage',

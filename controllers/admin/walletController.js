@@ -58,6 +58,10 @@ console.log('==processing refund,amount,orderid',orderId,userid,amount);
           const product = await Product.findById(item.productId);
           if (!product) continue;
 
+          // Ensure productOffer exists and has valid values
+          const validDiscountTypes = ['percentage', 'flat'];
+          
+          // Initialize productOffer if it doesn't exist
           if (!product.productOffer) {
             product.productOffer = {
               active: false,
@@ -67,22 +71,31 @@ console.log('==processing refund,amount,orderid',orderId,userid,amount);
               endDate: null
             };
           } else {
-            if (typeof product.productOffer.discountType === 'number') {
+            // Validate and normalize discountType
+            let discountType = 'percentage'; // Default value
+            
+            // If discountType is a valid string, use it; otherwise, log a warning and use default
+            if (typeof product.productOffer.discountType === 'string' && 
+                validDiscountTypes.includes(product.productOffer.discountType)) {
+              discountType = product.productOffer.discountType;
+            } else if (product.productOffer.discountType !== undefined) {
               console.warn(`Invalid discountType (${product.productOffer.discountType}) found for product ${product._id}, defaulting to 'percentage'`);
-              product.productOffer.discountType = 'percentage';
-            } else if (product.productOffer.discountType !== 'percentage' && 
-                      product.productOffer.discountType !== 'flat') {
-              console.warn(`Invalid discountType (${product.productOffer.discountType}) found for product ${product._id}, defaulting to 'percentage'`);
-              product.productOffer.discountType = 'percentage';
             }
             
+            // Ensure discountValue is a valid number
+            const discountValue = typeof product.productOffer.discountValue === 'number' && 
+                                !isNaN(product.productOffer.discountValue) ?
+                                Math.max(0, product.productOffer.discountValue) : 0;
+            
+            // Rebuild productOffer with validated values
             product.productOffer = {
-              active: product.productOffer.active || false,
-              discountType: product.productOffer.discountType || 'percentage',
-              discountValue: typeof product.productOffer.discountValue === 'number' ? 
-                product.productOffer.discountValue : 0,
-              startDate: product.productOffer.startDate || null,
-              endDate: product.productOffer.endDate || null
+              active: !!product.productOffer.active,
+              discountType: discountType,
+              discountValue: discountValue,
+              startDate: product.productOffer.startDate instanceof Date ? 
+                        product.productOffer.startDate : null,
+              endDate: product.productOffer.endDate instanceof Date ? 
+                      product.productOffer.endDate : null
             };
           }
 

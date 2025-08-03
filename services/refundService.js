@@ -12,19 +12,12 @@ const processRefund = async ({
   reason,
   type = 'CANCEL'
 }) => {
-  const session = await Order.startSession();
-  session.startTransaction();
-console.log('refundd');
   try {
-    const order = await Order.findById(orderId).session(session);
-    const user = await User.findById(userId).session(session);
-    
-    if (!order || !user) {
-      throw new Error('Order or user not found');
-    }
+    const order = await Order.findById(orderId);
+    const user = await User.findById(userId);
+    if (!order || !user) throw new Error('Order or user not found');
 
-    let wallet = await Wallet.findOne({ userId }).session(session);
-    
+    let wallet = await Wallet.findOne({ userId });
     if (!wallet) {
       wallet = new Wallet({
         userId,
@@ -36,8 +29,8 @@ console.log('refundd');
     const transaction = {
       type: 'CREDIT',
       amount,
-      description: `${type} Refund for Order #${order.orderNumber}` + 
-                  (itemId ? ` (Item: ${itemId})` : ''),
+      description: `${type} Refund for Order #${order.orderNumber}` +
+                   (itemId ? ` (Item: ${itemId})` : ''),
       orderId: order._id,
       status: 'COMPLETED',
       date: new Date(),
@@ -49,9 +42,10 @@ console.log('refundd');
       }
     };
 
-    wallet.balance += amount;
+console.log('===refuned for cancel orde=amountr',amount);   
+ wallet.balance += amount;
     wallet.transactions.push(transaction);
-    await wallet.save({ session });
+    await wallet.save();
 
     if (itemId) {
       const item = order.items.find(i => i._id.toString() === itemId);
@@ -61,15 +55,13 @@ console.log('refundd');
         item.refundAmount = amount;
       }
 
-      const allItemsProcessed = order.items.every(item => 
+      const allItemsProcessed = order.items.every(item =>
         ['Cancelled', 'Returned'].includes(item.status)
       );
-      
-      if (allItemsProcessed) {
-        order.status = type === 'CANCEL' ? 'Cancelled' : 'Returned';
-      } else {
-        order.status = type === 'CANCEL' ? 'Partially Cancelled' : 'Partially Returned';
-      }
+
+      order.status = allItemsProcessed
+        ? (type === 'CANCEL' ? 'Cancelled' : 'Returned')
+        : (type === 'CANCEL' ? 'Partially Cancelled' : 'Partially Returned');
     } else {
       order.status = type === 'CANCEL' ? 'Cancelled' : 'Returned';
       order.items.forEach(item => {
@@ -80,27 +72,25 @@ console.log('refundd');
     }
 
     order.updatedAt = new Date();
-    await order.save({ session });
+    await order.save();
 
     if (type === 'RETURN' && itemId) {
       const item = order.items.find(i => i._id.toString() === itemId);
       if (item) {
-        const product = await Product.findById(item.productId).session(session);
+        const product = await Product.findById(item.productId);
         if (product) {
           product.quantity += item.quantity;
           product.status = product.quantity > 0 ? 'Available' : 'Out of Stock';
-          await product.save({ session });
+          await product.save();
         }
       }
     }
 
+    // Attach wallet to user if not already
     if (!user.wallet || user.wallet.toString() !== wallet._id.toString()) {
       user.wallet = wallet._id;
-      await user.save({ session });
+      await user.save();
     }
-
-    await session.commitTransaction();
-    session.endSession();
 
     return {
       success: true,
@@ -110,25 +100,42 @@ console.log('refundd');
       orderStatus: order.status
     };
   } catch (error) {
-    await session.abortTransaction();
-    session.endSession();
-    
     console.error(`Error in processRefund (${type}):`, error);
     throw new Error(`Failed to process ${type.toLowerCase()} refund: ${error.message}`);
   }
 };
 
 
-const calculateRefundAmount = (order, itemId = null) => {
-  if (itemId) {
-    const item = order.items.find(i => i._id.toString() === itemId);
-    return item ? (item.finalPrice || item.price) * item.quantity : 0;
+
+const calculateRefundAmount = (item) => {
+  console.log('==calculated refund');
+  if (
+    item.status !== "Delivered" ||
+    item.isReturned === true ||
+    item.returnStatus === "Rejected"
+  ) {
+    return {
+      eligible: false,
+      reason: "Item is not eligible for refund",
+      refundAmount: 0
+    };
   }
-  
-  return order.items.reduce((total, item) => {
-    return total + ((item.finalPrice || item.price) * item.quantity);
-  }, 0);
+
+  const refundAmount = item.finalPrice * item.quantity;
+
+  return {
+    eligible: true,
+    refundAmount,
+    details: {
+      originalPrice: item.originalPrice,
+      appliedOffer: item.appliedOffer,
+      couponPerUnit: item.couponPerUnit,
+      quantity: item.quantity,
+      finalPricePerUnit: item.finalPrice
+    }
+  };
 };
+
 
 module.exports = {
   processRefund,

@@ -320,6 +320,7 @@ const cancelOrder = async (req, res) => {
 
 const cancelOrderItem = async (req, res) => {
     try {
+        console.log('==items cancelling');
         const { orderId, itemId } = req.params;
         const userId = req.session.user.id;
         const { reason, notes } = req.body;
