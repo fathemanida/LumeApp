@@ -173,29 +173,30 @@
                         </div>
 
                         <!-- Shipping Address -->
-                        <div class="col-md-4">
-                            <div class="order-section">
-                                <h5 class="section-title">Shipping Address</h5>
-                                <% if (order.address) { %>
-                                    <p class="mb-1"><%= order.address.name %></p>                                
-                                    <p class="mb-1">
-                                      CITY:  <%= order.address.city %>,STATE: <%= order.address.state %>,PIN: <%= order.address.pincode %>
-                                    </p>
-                                    <% if(order.address.roadArea) {%>
-                                     Road Area: <p class="mb-0"><%= order.address.roadArea %></p>
-                                    <% } %>
-                                     <% if(order.address.landMark) {%>
-                                      <p class="mb-0">Land Mark:<%= order.address.landMark %></p>
-                                    <% } %>
-                                     <% } %>
-                                     <% if(order.address.addressType) {%>
-                                    <p class="mb-0">Address Type:<% order.address.addressType %></p>
-                                    <% } %>
-                                    <p class="mb-0">Phone: <%= order.address.phone %></p>
-                                <% } else { %>
-                                    <p>No shipping address provided</p>
-                                <% } %>
-                            </div>
+                       <div class="col-md-4">
+    <div class="order-section">
+        <h5 class="section-title">Shipping Address</h5>
+        <% if (order.address) { %>
+            <p class="mb-1"><%= order.address.name %></p>                                
+            <p class="mb-1">
+              CITY: <%= order.address.city %>, STATE: <%= order.address.state %>, PIN: <%= order.address.pincode %>
+            </p>
+            <% if (order.address.roadArea) { %>
+              <p class="mb-0">Road Area: <%= order.address.roadArea %></p>
+            <% } %>
+            <% if (order.address.landMark) { %>
+              <p class="mb-0">Land Mark: <%= order.address.landMark %></p>
+            <% } %>
+            <% if (order.address.addressType) { %>
+              <p class="mb-0">Address Type: <%= order.address.addressType %></p>
+            <% } %>
+            <p class="mb-0">Phone: <%= order.address.phone %></p>
+        <% } else { %>
+            <p>No shipping address provided</p>
+        <% } %>
+    </div>
+</div>
+
                         </div>
 
                         <!-- Payment Info -->
