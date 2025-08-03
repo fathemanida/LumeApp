@@ -599,6 +599,7 @@ const handleReturnRequest = async (req, res) => {
                 });
             }
         }
+        }
 
         // Handle order-level return request
         if (!order.returnRequest || order.returnRequest.status !== 'Pending') {
@@ -708,19 +709,20 @@ const handleReturnRequest = async (req, res) => {
                 orderStatus: order.status
             });
         }
-
-    } catch (error) {
+     } catch (error) {
         console.error('Error handling return request:', error);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
-            message: 'Error processing return request'
+            message: 'Error processing return request',
+            error: error.message
         });
     }
-};
+
 
 module.exports = {
     getOrders,
     getOrderDetails,
     updateOrderStatus,
-    handleReturnRequest
+    handleReturnRequest,
+    handleItemReturnRequest
 };
