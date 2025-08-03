@@ -395,6 +395,14 @@ const returnOrder = async (req, res) => {
         const userId = req.session.user.id;
         const { reason, notes } = req.body;
 
+        // Validate required fields
+        if (!reason || reason.trim() === '') {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Return reason is required' 
+            });
+        }
+
         const order = await Order.findOne({ _id: orderId, userId });
 
         if (!order) {
@@ -427,7 +435,7 @@ const returnOrder = async (req, res) => {
         order.returnRequest = {
             requestedAt: new Date(),
             reason: reason,
-            notes: notes,
+            notes: notes || '',
             status: 'Pending',
             refundAmount: refundAmount
         };
@@ -439,13 +447,14 @@ const returnOrder = async (req, res) => {
                 item.returnRequest = {
                     requestedAt: new Date(),
                     reason: reason,
-                    notes: notes,
+                    notes: notes || '',
                     status: 'Pending',
                     refundAmount: item.price * item.quantity
                 };
             }
         });
 
+        order.updatedAt = new Date();
         await order.save();
 
         res.json({ 
