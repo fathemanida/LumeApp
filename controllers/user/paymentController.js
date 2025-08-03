@@ -448,7 +448,7 @@ const processPayment = async (req, res) => {
     const order = await Order.findById(orderId)
       .populate('items.productId')
       .populate('address');
- const orderNumber: order._id.toString().slice(-6).toUpperCase()
+ const orderNumber= orderId.toString().slice(-6).toUpperCase()
     if (!order) {
       return res.status(404).json({ success: false, message: 'Order not found' });
     }
