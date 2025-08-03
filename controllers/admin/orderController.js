@@ -343,14 +343,131 @@ const updateOrderStatus = async (req, res) => {
     }
 };
 
+const handleItemReturnRequest = async (req, res, order, itemId, action, reason) => {
+    try {
+        const item = order.items.id(itemId);
+        if (!item) {
+            return res.status(404).json({
+                success: false,
+                message: 'Item not found in order'
+            });
+        }
+
+        if (action === 'accept') {
+            item.status = 'Returned';
+            item.returnStatus = 'Completed';
+            
+            const allItemsReturned = order.items.every(i => 
+                i.status === 'Returned' || i.status === 'Cancelled'
+            );
+            
+            const someItemsReturned = order.items.some(i => 
+                i.status === 'Returned' || i.status === 'Return Requested'
+            );
+
+            if (allItemsReturned) {
+                order.status = 'Returned';
+            } else if (someItemsReturned) {
+                order.status = 'Partially Returned';
+            }
+
+            if (order.paymentMethod !== 'COD' && order.paymentStatus === 'Paid') {
+                const refundAmount = (item.finalPrice || item.price) * item.quantity;
+                if (refundAmount > 0) {
+                    let wallet = await Wallet.findOne({ userId: order.userId });
+                    if (!wallet) {
+                        wallet = new Wallet({ 
+                            userId: order.userId, 
+                            balance: 0,
+                            transactions: []
+                        });
+                    }
+
+                    const transaction = {
+                        type: 'CREDIT',
+                        amount: refundAmount,
+                        description: `Refund for returned item: ${item.productName || 'Item'} (${item.quantity} x ₹${item.finalPrice || item.price})`,
+                        orderId: order._id.toString(),
+                        itemId: item._id.toString(),
+                        status: 'COMPLETED',
+                        date: new Date()
+                    };
+
+                    wallet.balance += refundAmount;
+                    wallet.transactions.push(transaction);
+                    await wallet.save();
+                }
+            }
+
+            const product = await Product.findById(item.productId);
+            if (product) {
+                product.quantity += item.quantity;
+                if (product.status !== 'Discountinued') {
+                    product.status = product.quantity > 0 ? 'Available' : 'Out of Stock';
+                }
+                await product.save();
+            }
+
+            await order.save();
+            return res.json({
+                success: true,
+                message: 'Item return processed successfully',
+                orderStatus: order.status
+            });
+
+        } else if (action === 'reject') {
+            if (!reason) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Rejection reason is required'
+                });
+            }
+
+            item.status = 'Active'; 
+            item.returnStatus = 'Rejected';
+            item.returnReason = reason;
+            
+            const hasOtherReturnRequests = order.items.some(i => 
+                i._id.toString() !== itemId && i.returnStatus === 'Requested'
+            );
+            
+            if (!hasOtherReturnRequests) {
+                order.status = order.items.some(i => i.status === 'Returned') 
+                    ? 'Partially Returned' 
+                    : 'Active';
+            }
+            
+            await order.save();
+            return res.json({
+                success: true,
+                message: 'Item return request rejected',
+                orderStatus: order.status
+            });
+        }
+
+        return res.status(400).json({
+            success: false,
+            message: 'Invalid action'
+        });
+
+    } catch (error) {
+        console.error('Error in handleItemReturnRequest:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Failed to process item return request',
+            error: error.message
+        });
+    }
+};
+
 const handleReturnRequest = async (req, res) => {
     try {
         const orderId = req.params.orderId;
         const { action, reason, itemId } = req.body; 
 
-        console.log('===items,action,reason',itemId,action,reason);
+        console.log('===items,action,reason', itemId, action, reason);
 
-        if (!orderId) {
+        if (!orderId || !mongoose.Types.ObjectId.isValid(orderId)) {
             return res.status(400).json({
                 success: false,
                 message: 'Invalid order ID'
@@ -365,34 +482,42 @@ const handleReturnRequest = async (req, res) => {
                 message: 'Order not found'
             });
         }
-
+        
+        // Check if this is an item-level return
         if (itemId) {
-            const item = order.items.id(itemId);
-            if (!item) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Item not found in order'
-                });
-            }
+            return handleItemReturnRequest(req, res, order, itemId, action, reason);
+        }
 
-            if (action === 'accept') {
-                item.status = 'Returned';
-                item.returnStatus = 'Completed';
-                console.log('===status changed');
-                
-                const allItemsReturned = order.items.every(i => 
-                    i.status === 'Returned' || i.status === 'Cancelled'
-                );
-                
-                const someItemsReturned = order.items.some(i => 
-                    i.status === 'Returned' || i.status === 'Return Requested'
-                );
+        // Handle order-level return request
+        if (!order.returnRequest || order.returnRequest.status !== 'Pending') {
+            return res.status(400).json({
+                success: false,
+                message: 'No pending return request found for this order'
+            });
+        }
 
-                if (allItemsReturned) {
-                    order.status = 'Returned';
-                } else if (someItemsReturned) {
-                    order.status = 'Partially Returned';
+        if (action === 'accept') {
+            // Update all items with status 'Return Requested' to 'Returned'
+            order.items.forEach(item => {
+                if (item.status === 'Return Requested') {
+                    item.status = 'Returned';
+                    item.returnStatus = 'Completed';
                 }
+            });
+            
+            const allItemsReturned = order.items.every(i => 
+                i.status === 'Returned' || i.status === 'Cancelled'
+            );
+            
+            const someItemsReturned = order.items.some(i => 
+                i.status === 'Returned' || i.status === 'Return Requested'
+            );
+
+            if (allItemsReturned) {
+                order.status = 'Returned';
+            } else if (someItemsReturned) {
+                order.status = 'Partially Returned';
+            }
 
                 if (order.paymentMethod !== 'COD' && order.paymentStatus === 'Paid') {
                     const refundAmount = (item.finalPrice || item.price) * item.quantity;
@@ -467,9 +592,15 @@ const handleReturnRequest = async (req, res) => {
                     message: 'Item return request rejected',
                     orderStatus: order.status
                 });
+            } else {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Invalid action'
+                });
             }
         }
 
+        // Handle order-level return request
         if (!order.returnRequest || order.returnRequest.status !== 'Pending') {
             return res.status(400).json({
                 success: false,
