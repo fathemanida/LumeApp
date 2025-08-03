@@ -136,7 +136,6 @@ console.log('====cart data',cartData);
       });
     }
 
-    // Coupon logic
     let couponDiscount = 0;
     if (cart.couponApplied) {
       const coupon = await Coupon.findById(cart.couponApplied._id);
@@ -292,6 +291,8 @@ const createOrder = async (req, res) => {
             ? (originalPrice * product.offer.discountValue) / 100
             : product.offer.discountValue * quantity;
         }
+
+        console.log('===create order offer',productOfferDiscount);
 
         let categoryOfferDiscount = 0;
         if (

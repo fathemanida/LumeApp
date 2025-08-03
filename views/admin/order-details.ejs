@@ -220,9 +220,9 @@
                     <div class="order-section">
                         <h5 class="section-title">Order Items</h5>
                         <div class="table-responsive">
-                            <table class="table align-middle">
-                                <thead>
-                                    <tr>
+                            <table class="table table-dark table-hover align-middle" style="--bs-table-bg: #1a1d20; --bs-table-striped-bg: #1e2124; --bs-table-hover-bg: #2c3034;">
+                                <thead class="table-dark">
+                                    <tr style="--bs-table-bg: #141619;">
                                         <th>Product</th>
                                         <th>Price</th>
                                         <th>Quantity</th>
@@ -234,10 +234,10 @@
                                 </thead>
                                 <tbody>
                                     <% order.items.forEach((item, index) => { %>
-                                        <tr>
+                                        <tr style="--bs-table-bg: #1a1d20;">
                                             <td>
                                                 <div class="d-flex align-items-center">
-                                                    <img src="<%= item.productId.images && item.productId.images[0] ? '/uploads/product/' + item.productId.images[0] : '/images/placeholder-product.jpg' %>" 
+                                                    <img src="/uploads/product/<%= item.productId.productImage[0]  %>" 
                                                          alt="<%= item.productId.productName %>" 
                                                          class="img-thumbnail me-3" 
                                                          style="width: 60px; height: 60px; object-fit: cover;">
@@ -249,7 +249,7 @@
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td>₹<%= item.price.toFixed(2) %></td>
+                                            <td>₹<%= item.originalPrice.toFixed(2) %></td>
                                             <td><%= item.quantity %></td>
                                             <td>
                                                 <% if (item.appliedOffer) { %>
@@ -269,7 +269,7 @@
                                                 </span>
                                             </td>
                                             <td class="action-buttons">
-                                                <% if (item.returnStatus === 'Requested') { %>
+                                                <% if (item.status === 'Return Requested') { %>
                                                     <button class="btn btn-sm btn-success" 
                                                             onclick="handleReturnAction('<%= order._id %>', '<%= item._id %>', 'approve')">
                                                         Approve Return
@@ -292,12 +292,12 @@
                                     <% }) %>
                                 </tbody>
                                 <tfoot>
-                                    <tr>
+                                    <tr class="table-active" style="--bs-table-bg: #141619;">
                                         <td colspan="4" class="text-end"><strong>Subtotal:</strong></td>
                                         <td colspan="3">₹<%= order.subTotal ? order.subTotal.toFixed(2) : order.totalAmount.toFixed(2) %></td>
                                     </tr>
                                     <% if (order.discountAmount > 0) { %>
-                                        <tr>
+                                        <tr style="--bs-table-bg: #1a1d20;">
                                             <td colspan="4" class="text-end"><strong>Discount:</strong></td>
                                             <td colspan="3">-₹<%= order.discountAmount.toFixed(2) %></td>
                                         </tr>

@@ -246,7 +246,7 @@
                                     <td>
                                          <% if (order.items && order.items.length > 0) { %>
                                                 <div style="display: flex; flex-direction: column; align-items: center;">
-                                                    <img src="/uploads/product/<%= order.items[0].image %>" alt="<%= order.items[0].name %>" width="80" height="80" style="object-fit: cover;">
+                                                    <img src="/uploads/product/<%= order.items[0].productImage[0] %>" alt="<%= order.items[0].name %>" width="80" height="80" style="object-fit: cover;">
                                                     <span style="margin-top: 8px; font-size: 0.85rem; color: var(--theme-gray); text-align: center; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                                         <%= order.items[0].name %>
                                                     </span>
