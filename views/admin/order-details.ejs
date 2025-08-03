@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title || 'Order Details' %> | Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500&family=Aboreto&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/admin/orders.css">
+    <style>
+        .order-details-container {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin: 1.5rem 0;
+        }
+        .order-header {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+        .order-section {
+            margin-bottom: 2.5rem;
+        }
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .order-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .order-item:last-child {
+            border-bottom: none;
+        }
+        .item-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-right: 1.5rem;
+        }
+        .item-details {
+            flex: 1;
+        }
+        .item-name {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+        .item-meta {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 0.35em 0.65em;
+            font-size: 0.75em;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: 0.25rem;
+        }
+        .badge-placed { background-color: #cfe2ff; color: #084298; }
+        .badge-shipped { background-color: #fff3cd; color: #664d03; }
+        .badge-delivered { background-color: #d1e7dd; color: #0a3622; }
+        .badge-cancelled { background-color: #f8d7da; color: #58151c; }
+        .badge-return-requested { background-color: #e2e3e5; color: #2b2f32; }
+        .action-buttons .btn {
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body class="dashboard">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <%-include('../partials/admin/sidebar.ejs',{currentPage:'orders'}) %>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <header class="main-header">
+            <div class="header-left">
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h2 class="page-title">ORDER DETAILS</h2>
+            </div>
+            <div class="header-right">
+                <a href="/admin/orders" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-arrow-left me-1"></i> Back to Orders
+                </a>
+            </div>
+        </header>
+
+        <div class="container-fluid">
+            <% if (order) { %>
+                <div class="order-details-container">
+                    <!-- Order Header -->
+                    <div class="order-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-1">Order #<%= order.orderNumber %></h3>
+                            <p class="text-muted mb-0">Placed on <%= order.createdOn %></p>
+                        </div>
+                        <div>
+                            <span class="status-badge badge-<%= order.status.toLowerCase().replace(' ', '-') %>">
+                                <%= order.status %>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Order Info -->
+                    <div class="row">
+                        <!-- Customer Info -->
+                        <div class="col-md-4">
+                            <div class="order-section">
+                                <h5 class="section-title">Customer Information</h5>
+                                <p class="mb-1"><strong><%= order.userId.name %></strong></p>
+                                <p class="mb-1"><%= order.userId.email %></p>
+                                <% if (order.userId.phone) { %>
+                                    <p class="mb-0"><%= order.userId.phone %></p>
+                                <% } %>
+                            </div>
+                        </div>
+
+                        <!-- Shipping Address -->
+                        <div class="col-md-4">
+                            <div class="order-section">
+                                <h5 class="section-title">Shipping Address</h5>
+                                <% if (order.address) { %>
+                                    <p class="mb-1"><%= order.address.firstName %> <%= order.address.lastName %></p>
+                                    <p class="mb-1"><%= order.address.addressLine1 %></p>
+                                    <% if (order.address.addressLine2) { %>
+                                        <p class="mb-1"><%= order.address.addressLine2 %></p>
+                                    <% } %>
+                                    <p class="mb-1">
+                                        <%= order.address.city %>, <%= order.address.state %> <%= order.address.postalCode %>
+                                    </p>
+                                    <p class="mb-0"><%= order.address.country %></p>
+                                    <p class="mb-0">Phone: <%= order.address.phone %></p>
+                                <% } else { %>
+                                    <p>No shipping address provided</p>
+                                <% } %>
+                            </div>
+                        </div>
+
+                        <!-- Payment Info -->
+                        <div class="col-md-4">
+                            <div class="order-section">
+                                <h5 class="section-title">Payment Information</h5>
+                                <p class="mb-1"><strong>Payment Method:</strong> 
+                                    <%= order.payment && order.payment.paymentMethod ? order.payment.paymentMethod.name : 'N/A' %>
+                                </p>
+                                <p class="mb-1"><strong>Payment Status:</strong> 
+                                    <span class="badge <%= order.payment && order.payment.status === 'Paid' ? 'bg-success' : 'bg-warning' %>">
+                                        <%= order.payment && order.payment.status || 'Pending' %>
+                                    </span>
+                                </p>
+                                <p class="mb-0"><strong>Total Amount:</strong> ₹<%= order.totalAmount.toFixed(2) %></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Items -->
+                    <div class="order-section">
+                        <h5 class="section-title">Order Items</h5>
+                        <div class="table-responsive">
+                            <table class="table align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Price</th>
+                                        <th>Quantity</th>
+                                        <th>Discount</th>
+                                        <th>Total</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% order.items.forEach((item, index) => { %>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <img src="<%= item.productId.images && item.productId.images[0] ? item.productId.images[0] : '/images/placeholder-product.jpg' %>" 
+                                                         alt="<%= item.productId.productName %>" 
+                                                         class="img-thumbnail me-3" 
+                                                         style="width: 60px; height: 60px; object-fit: cover;">
+                                                    <div>
+                                                        <h6 class="mb-0"><%= item.productId.productName %></h6>
+                                                        <% if (item.appliedOffer) { %>
+                                                            <small class="text-muted">Offer: <%= item.appliedOffer.offerName %></small>
+                                                        <% } %>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>₹<%= item.price.toFixed(2) %></td>
+                                            <td><%= item.quantity %></td>
+                                            <td>
+                                                <% if (item.appliedOffer) { %>
+                                                    <% if (item.appliedOffer.discountType === 'percentage') { %>
+                                                        <%= item.appliedOffer.discountValue %>%
+                                                    <% } else { %>
+                                                        ₹<%= item.appliedOffer.discountValue.toFixed(2) %>
+                                                    <% } %>
+                                                <% } else { %>
+                                                    -
+                                                <% } %>
+                                            </td>
+                                            <td>₹<%= (item.price * item.quantity).toFixed(2) %></td>
+                                            <td>
+                                                <span class="status-badge badge-<%= item.status.toLowerCase().replace(' ', '-') %>">
+                                                    <%= item.status %>
+                                                </span>
+                                            </td>
+                                            <td class="action-buttons">
+                                                <% if (item.returnStatus === 'Requested') { %>
+                                                    <button class="btn btn-sm btn-success" 
+                                                            onclick="handleReturnAction('<%= order._id %>', '<%= item._id %>', 'approve')">
+                                                        Approve Return
+                                                    </button>
+                                                    <button class="btn btn-sm btn-danger" 
+                                                            onclick="handleReturnAction('<%= order._id %>', '<%= item._id %>', 'reject')">
+                                                        Reject
+                                                    </button>
+                                                <% } else if (item.status === 'Active' || item.status === 'Processing') { %>
+                                                    <select class="form-select form-select-sm" 
+                                                            onchange="updateItemStatus('<%= order._id %>', '<%= item._id %>', this.value)">
+                                                        <option value="Processing" <%= item.status === 'Processing' ? 'selected' : '' %>>Processing</option>
+                                                        <option value="Shipped" <%= item.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                                                        <option value="Delivered" <%= item.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                                                        <option value="Cancelled" <%= item.status === 'Cancelled' ? 'selected' : '' %>>Cancel</option>
+                                                    </select>
+                                                <% } %>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="4" class="text-end"><strong>Subtotal:</strong></td>
+                                        <td colspan="3">₹<%= order.subTotal ? order.subTotal.toFixed(2) : order.totalAmount.toFixed(2) %></td>
+                                    </tr>
+                                    <% if (order.discountAmount > 0) { %>
+                                        <tr>
+                                            <td colspan="4" class="text-end"><strong>Discount:</strong></td>
+                                            <td colspan="3">-₹<%= order.discountAmount.toFixed(2) %></td>
+                                        </tr>
+                                    <% } %>
+                                    <tr>
+                                        <td colspan="4" class="text-end"><strong>Shipping:</strong></td>
+                                        <td colspan="3">
+                                            <% if (order.shippingCharge === 0) { %>
+                                                Free
+                                            <% } else { %>
+                                                ₹<%= (order.shippingCharge || 0).toFixed(2) %>
+                                            <% } %>
+                                        </td>
+                                    </tr>
+                                    <tr class="table-active">
+                                        <td colspan="4" class="text-end"><strong>Total:</strong></td>
+                                        <td colspan="3"><strong>₹<%= order.totalAmount.toFixed(2) %></strong></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Order Notes -->
+                    <% if (order.notes) { %>
+                        <div class="order-section">
+                            <h5 class="section-title">Order Notes</h5>
+                            <p class="mb-0"><%= order.notes %></p>
+                        </div>
+                    <% } %>
+
+                    <!-- Admin Actions -->
+                    <div class="order-section">
+                        <h5 class="section-title">Order Actions</h5>
+                        <div class="d-flex flex-wrap gap-2">
+                            <% if (order.status === 'Processing') { %>
+                                <button class="btn btn-primary" onclick="updateOrderStatus('<%= order._id %>', 'Shipped')">
+                                    <i class="fas fa-truck me-1"></i> Mark as Shipped
+                                </button>
+                                <button class="btn btn-danger" onclick="updateOrderStatus('<%= order._id %>', 'Cancelled')">
+                                    <i class="fas fa-times me-1"></i> Cancel Order
+                                </button>
+                            <% } else if (order.status === 'Shipped') { %>
+                                <button class="btn btn-success" onclick="updateOrderStatus('<%= order._id %>', 'Delivered')">
+                                    <i class="fas fa-check-circle me-1"></i> Mark as Delivered
+                                </button>
+                            <% } %>
+                            
+                            <% if (order.returnStatus === 'Requested') { %>
+                                <button class="btn btn-success" onclick="handleReturnAction('<%= order._id %>', null, 'approve')">
+                                    <i class="fas fa-check me-1"></i> Approve Return
+                                </button>
+                                <button class="btn btn-danger" onclick="handleReturnAction('<%= order._id %>', null, 'reject')">
+                                    <i class="fas fa-times me-1"></i> Reject Return
+                                </button>
+                            <% } %>
+                            
+                            <a href="/admin/orders/print/<%= order._id %>" class="btn btn-outline-secondary" target="_blank">
+                                <i class="fas fa-print me-1"></i> Print Invoice
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            <% } else { %>
+                <div class="alert alert-warning">Order not found.</div>
+            <% } %>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+            document.body.classList.toggle('sidebar-open');
+            document.getElementById('sidebarOverlay').classList.toggle('show');
+        });
+
+        document.getElementById('sidebarOverlay').addEventListener('click', function() {
+            document.body.classList.remove('sidebar-open');
+            this.classList.remove('show');
+        });
+
+        // Update order status
+        function updateOrderStatus(orderId, status) {
+            if (confirm(`Are you sure you want to mark this order as ${status}?`)) {
+                fetch(`/admin/orders/${orderId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ status })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(`Order status updated to ${status}`);
+                        location.reload();
+                    } else {
+                        alert('Error updating order status: ' + (data.message || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error updating order status');
+                });
+            }
+        }
+
+        // Update item status
+        function updateItemStatus(orderId, itemId, status) {
+            if (confirm(`Are you sure you want to update this item status to ${status}?`)) {
+                fetch(`/admin/orders/${orderId}/items/${itemId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ status })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(`Item status updated to ${status}`);
+                        location.reload();
+                    } else {
+                        alert('Error updating item status: ' + (data.message || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error updating item status');
+                });
+            }
+        }
+
+        // Handle return actions (approve/reject)
+        function handleReturnAction(orderId, itemId, action) {
+            const actionText = action === 'approve' ? 'approve' : 'reject';
+            const confirmText = itemId 
+                ? `Are you sure you want to ${actionText} return for this item?`
+                : `Are you sure you want to ${actionText} return for the entire order?`;
+            
+            if (confirm(confirmText)) {
+                const url = itemId 
+                    ? `/admin/orders/${orderId}/items/${itemId}/return`
+                    : `/admin/orders/${orderId}/return`;
+                
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ action })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(`Return request ${actionText}d successfully`);
+                        location.reload();
+                    } else {
+                        alert(`Error ${actionText}ing return: ${data.message || 'Unknown error'}`);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert(`Error ${actionText}ing return`);
+                });
+            }
+        }
+    </script>
+</body>
+</html>

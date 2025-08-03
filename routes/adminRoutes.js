@@ -58,8 +58,13 @@ router.get('/unlist-product/:id', adminAuth, productController.getUnlistProduct)
 router.get('/delete-product/:id', adminAuth, productController.deleteProduct);
 
 // Order management routes
-router.get('/orders', adminAuth, orderController.getOrders);
-router.get('/orders/:orderId', adminAuth, orderController.getOrderDetails);
+router.get("/orders", adminAuth, orderController.getOrders);
+router.get("/orders/:orderId", adminAuth, orderController.getOrderDetails);
+router.put("/orders/:orderId/status", adminAuth, orderController.updateOrderStatus);
+router.put("/orders/:orderId/items/:itemId/status", adminAuth, orderController.updateOrderItemStatus);
+router.post("/orders/:orderId/return", adminAuth, orderController.handleOrderReturn);
+router.post("/orders/:orderId/items/:itemId/return", adminAuth, orderController.handleOrderItemReturn);
+router.get("/order-address", adminAuth, orderController.getOrderAddress);
 router.post('/orders/:orderId/status', adminAuth, orderController.updateOrderStatus);
 router.post('/orders/:orderId/return-request', adminAuth, orderController.handleReturnRequest);
 
