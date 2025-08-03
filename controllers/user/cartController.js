@@ -326,44 +326,17 @@ const cart = async (req, res) => {
     await cart.save(); 
 
     // Get all active coupons that meet the minimum purchase requirement
-        const userIdObj = new mongoose.Types.ObjectId(userId);
-    
-    const availableCoupons = await Coupon.aggregate([
-      {
-        $match: {
-          isActive: true,
-          startDate: { $lte: now },
-          endDate: { $gte: now },
-          minOrderAmount: { $lte: totalPrice - totalOfferDiscount },
-          $or: [
-            { usedBy: { $ne: userIdObj } },
-            { usedBy: { $exists: false } },
-            { usedBy: { $size: 0 } }
-          ]
-        }
-      },
-      {
-        $addFields: {
-          isUsed: {
-            $cond: {
-              if: { $isArray: "$usedBy" },
-              then: { $in: [userIdObj, "$usedBy"] },
-              else: false
-            }
-          }
-        }
-      },
-      {
-        $match: {
-          isUsed: false
-        }
-      },
-      {
-        $project: {
-          isUsed: 0  // Remove the temporary field
-        }
-      }
-    ]);
+    const availableCoupons = await Coupon.find({
+      isActive: true,
+      startDate: { $lte: now },
+      endDate: { $gte: now },
+      minOrderAmount: { $lte: totalPrice - totalOfferDiscount },
+      $or: [
+        { usedBy: { $exists: false } },
+        { usedBy: { $size: 0 } },
+        { usedBy: { $not: { $elemMatch: { $eq: userId } } } }
+      ]
+    }).lean();
     
     // Log for debugging
     console.log('Available coupons:', availableCoupons.length);
