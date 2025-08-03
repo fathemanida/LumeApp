@@ -336,7 +336,7 @@ const cancelOrderItem = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Item not found in order' });
         }
 
-        if (['cancelled', 'shipped', 'delivered', 'returned'].includes(item.status.toLowerCase())) {
+        if (['Cancelled', 'Shipped', 'Delivered', 'Returned','Return Requested'].includes(item.status.toLowerCase())) {
             return res.status(400).json({ 
                 success: false, 
                 message: `Cannot cancel item with status: ${item.status}` 
@@ -344,7 +344,8 @@ const cancelOrderItem = async (req, res) => {
         }
 
         let refundAmount = 0;
-        if (order.paymentMethod.toLowerCase() !== 'cod' && order.paymentStatus === 'Paid') {
+if (order.paymentMethod !== 'COD' && 
+    (order.paymentMethod === 'Wallet' || order.paymentMethod === 'Razorpay')) {
             refundAmount = (item.finalPrice || item.price) * item.quantity;
         }
 
