@@ -407,14 +407,17 @@ const returnOrder = async (req, res) => {
                 message: 'Only delivered orders can be returned' 
             });
         }
-
+                 const item = order.items.id(itemId);
+    
         let refundAmount = 0;
         if (order.paymentMethod.toLowerCase() !== 'cod' && order.paymentStatus === 'Paid') {
             refundAmount = calculateRefundAmount(order);
         }
 
         order.status = 'Return Requested';
-        // Initialize returnRequest if it doesn't exist
+        if(item.status!=="Cancelled"){
+
+        }
         if (!order.returnRequest) {
             order.returnRequest = {
                 requestedAt: new Date(),
@@ -424,6 +427,16 @@ const returnOrder = async (req, res) => {
                 refundAmount: refundAmount
             };
         }
+         if(item.status!=="cancelled"){
+         item.status = 'Return Requested';
+        item.returnRequest = {
+            requestedAt: new Date(),
+            reason: reason,
+            notes: notes,
+            status: 'Pending',
+            refundAmount: refundAmount
+        };
+     }
 
         await order.save();
 

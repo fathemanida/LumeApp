@@ -320,7 +320,6 @@ const handleOrderReturn = async (req, res) => {
         if (action === 'approve') {
             let refundAmount = 0;
             
-            // Calculate refund amount for non-COD payments
             if (order.paymentMethod !== 'COD' && order.payment && order.payment.status === 'Paid') {
                 refundAmount = order.items.reduce((total, item) => {
                     if (item.returnStatus === 'Requested' && item.status !== 'Cancelled') {
@@ -341,10 +340,8 @@ const handleOrderReturn = async (req, res) => {
                 }
             }
 
-            // Update items and product quantities
             for (const item of order.items) {
                 if (item.returnStatus === 'Requested' && item.status !== 'Cancelled') {
-                    // Update product quantity if not cancelled
                     if (item.productId) {
                         const product = await Product.findById(item.productId._id);
                         if (product) {
@@ -356,7 +353,6 @@ const handleOrderReturn = async (req, res) => {
                         }
                     }
                     
-                    // Update item status
                     item.returnStatus = 'Approved';
                     item.status = 'Returned';
                     item.isReturned = true;
@@ -364,10 +360,8 @@ const handleOrderReturn = async (req, res) => {
                 }
             }
             
-            // Update order status based on items
             updateOrderStatusBasedOnItems(order);
         } else {
-            // Handle rejection
             if (!reason || reason.trim() === '') {
                 return res.status(400).json({ 
                     success: false, 
@@ -375,14 +369,12 @@ const handleOrderReturn = async (req, res) => {
                 });
             }
 
-            // Update items with rejection reason
             order.items.forEach(item => {
                 if (item.returnStatus === 'Requested') {
                     item.returnStatus = 'Rejected';
                     item.returnRejectionReason = reason;
                     item.returnProcessedAt = new Date();
                     
-                    // If item was not cancelled, set status back to Delivered
                     if (item.status !== 'Cancelled') {
                         item.status = 'Delivered';
                     }
