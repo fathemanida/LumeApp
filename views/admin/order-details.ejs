@@ -269,17 +269,15 @@
                                             </td>
                                             <td class="action-buttons">
                                                 <% if (item.returnStatus === 'Requested') { %>
-                                                    <div class="d-flex flex-column gap-1">
-                                                        <button class="btn btn-sm btn-success" 
-                                                                onclick="handleReturnAction('<%= order._id %>', '<%= item._id %>', 'approve')">
-                                                            <i class="fas fa-check me-1"></i> Approve Return
-                                                        </button>
-                                                        <button class="btn btn-sm btn-danger" 
-                                                                onclick="handleReturnAction('<%= order._id %>', '<%= item._id %>', 'reject')">
-                                                            <i class="fas fa-times me-1"></i> Reject
-                                                        </button>
-                                                    </div>
-                                                <% } else if (item.status === 'Active' || item.status === 'Processing' || item.status === 'Delivered') { %>
+                                                    <button class="btn btn-sm btn-success" 
+                                                            onclick="handleReturnAction('<%= order._id %>', '<%= item._id %>', 'approve')">
+                                                        Approve Return
+                                                    </button>
+                                                    <button class="btn btn-sm btn-danger" 
+                                                            onclick="handleReturnAction('<%= order._id %>', '<%= item._id %>', 'reject')">
+                                                        Reject
+                                                    </button>
+                                                <% } else if (item.status === 'Active' || item.status === 'Processing') { %>
                                                     <select class="form-select form-select-sm" 
                                                             onchange="updateItemStatus('<%= order._id %>', '<%= item._id %>', this.value)">
                                                         <option value="Processing" <%= item.status === 'Processing' ? 'selected' : '' %>>Processing</option>
@@ -373,6 +371,56 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <script>
+        // Handle return action (approve/reject)
+        async function handleReturnAction(orderId, itemId, action) {
+            try {
+                const result = await Swal.fire({
+                    title: `Are you sure you want to ${action} this return?`,
+                    text: `This action will ${action} the return request for this item.`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: `Yes, ${action}`,
+                    cancelButtonText: 'Cancel',
+                    confirmButtonColor: action === 'approve' ? '#28a745' : '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    reverseButtons: true
+                });
+
+                if (result.isConfirmed) {
+                    const response = await fetch(`/admin/orders/${orderId}/items/${itemId}/return`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ action })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        Swal.fire({
+                            title: 'Success!',
+                            text: data.message || 'Return request processed successfully',
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        throw new Error(data.message || 'Failed to process return request');
+                    }
+                }
+            } catch (error) {
+                console.error('Error processing return:', error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: error.message || 'An error occurred while processing the return',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
+        }
+
         // Handle order status update
         document.addEventListener('DOMContentLoaded', function() {
             // Status update handler
