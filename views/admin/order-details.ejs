@@ -204,7 +204,7 @@
                             <div class="order-section">
                                 <h5 class="section-title">Payment Information</h5>
                                 <p class="mb-1"><strong>Payment Method:</strong> 
-                                    <%= order.payment && order.paymentMethod ? order.paymentMethod.name : 'N/A' %>
+                                    <%= order.payment && order.paymentMethod ? order.paymentMethod : 'N/A' %>
                                 </p>
                                 <p class="mb-1"><strong>Payment Status:</strong> 
                                     <span class="badge <%= order.payment && order.payment.status === 'Paid' ? 'bg-success' : 'bg-warning' %>">
