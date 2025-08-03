@@ -318,9 +318,12 @@ const handleOrderReturn = async (req, res) => {
         }
 
         if (action === 'approve') {
+            let refundAmount = 0;
+            
+            // Calculate refund amount for non-COD payments
             if (order.paymentMethod !== 'COD' && order.payment && order.payment.status === 'Paid') {
-                const refundAmount = order.items.reduce((total, item) => {
-                    if (item.returnStatus === 'Requested') {
+                refundAmount = order.items.reduce((total, item) => {
+                    if (item.returnStatus === 'Requested' && item.status !== 'Cancelled') {
                         return total + (item.finalPrice * item.quantity);
                     }
                     return total;
@@ -338,8 +341,10 @@ const handleOrderReturn = async (req, res) => {
                 }
             }
 
+            // Update items and product quantities
             for (const item of order.items) {
-                if (item.returnStatus === 'Requested') {
+                if (item.returnStatus === 'Requested' && item.status !== 'Cancelled') {
+                    // Update product quantity if not cancelled
                     if (item.productId) {
                         const product = await Product.findById(item.productId._id);
                         if (product) {
@@ -351,6 +356,7 @@ const handleOrderReturn = async (req, res) => {
                         }
                     }
                     
+                    // Update item status
                     item.returnStatus = 'Approved';
                     item.status = 'Returned';
                     item.isReturned = true;
@@ -358,15 +364,31 @@ const handleOrderReturn = async (req, res) => {
                 }
             }
             
+            // Update order status based on items
             updateOrderStatusBasedOnItems(order);
         } else {
+            // Handle rejection
+            if (!reason || reason.trim() === '') {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: 'Rejection reason is required' 
+                });
+            }
+
+            // Update items with rejection reason
             order.items.forEach(item => {
                 if (item.returnStatus === 'Requested') {
                     item.returnStatus = 'Rejected';
-                    item.returnRejectionReason = reason || 'No reason provided';
+                    item.returnRejectionReason = reason;
                     item.returnProcessedAt = new Date();
+                    
+                    // If item was not cancelled, set status back to Delivered
+                    if (item.status !== 'Cancelled') {
+                        item.status = 'Delivered';
+                    }
                 }
             });
+            
             updateOrderStatusBasedOnItems(order);
         }
 
@@ -411,31 +433,31 @@ const handleOrderItemReturn = async (req, res) => {
 
         const item = order.items[itemIndex];
         
+        // Skip if item is already cancelled
+        if (item.status === 'Cancelled') {
+            return res.json({ 
+                success: true, 
+                message: 'Skipped cancelled item',
+                order
+            });
+        }
+
         if (action === 'approve') {
-            const product = await Product.findById(item.productId._id);
-            if (product) {
-                product.quantity = (parseInt(product.quantity) || 0) + parseInt(item.quantity);
-                
-                if (product.quantity > 0 && product.status === 'Out of Stock') {
-                    product.status = 'Available';
+            // Update product quantity
+            if (item.productId) {
+                const product = await Product.findById(item.productId._id);
+                if (product) {
+                    product.quantity = (parseInt(product.quantity) || 0) + parseInt(item.quantity);
+                    if (product.quantity > 0 && product.status === 'Out of Stock') {
+                        product.status = 'Available';
+                    }
+                    await product.save();
                 }
-                
-                await product.save();
             }
             
-            item.returnStatus = 'Approved';
-            item.status = 'Returned';
-            item.isReturned = true;
-            item.returnProcessedAt = new Date();
-            
-            if (order.paymentMethod !== 'COD') {
+            // Process refund for non-COD payments
+            if (order.paymentMethod !== 'COD' && order.payment && order.payment.status === 'Paid') {
                 const refundAmount = item.finalPrice * item.quantity;
-                console.log(`Processing refund of ${refundAmount} for item ${itemId} in order ${orderId}`);
-                
-                order.refundAmount = (order.refundAmount || 0) + refundAmount;
-                order.refundStatus = 'Processed';
-                order.refundDate = new Date();
-                
                 await walletController.processReturnRefund({
                     body: { 
                         orderId: order._id,
@@ -445,13 +467,28 @@ const handleOrderItemReturn = async (req, res) => {
                     session: req.session
                 });
             }
-        } else {
-            item.returnStatus = 'Rejected';
-            item.status = item.status === 'Return Requested' ? 'Delivered' : item.status; 
-            item.returnRejectionReason = reason || 'No reason provided';
+
+            // Update item status
+            item.returnStatus = 'Approved';
+            item.status = 'Returned';
+            item.isReturned = true;
             item.returnProcessedAt = new Date();
+        } else {
+            // Handle rejection
+            if (!reason || reason.trim() === '') {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: 'Rejection reason is required' 
+                });
+            }
+
+            item.returnStatus = 'Rejected';
+            item.returnRejectionReason = reason;
+            item.returnProcessedAt = new Date();
+            item.status = 'Delivered'; // Revert to Delivered status
         }
 
+        // Update order status based on items
         updateOrderStatusBasedOnItems(order);
         order.updatedAt = new Date();
         

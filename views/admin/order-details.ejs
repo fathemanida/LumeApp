@@ -463,41 +463,73 @@
             // Handle return action (approve/reject)
             async function handleReturnAction(orderId, itemId, action) {
                 try {
-                    const result = await Swal.fire({
-                        title: `Are you sure you want to ${action} this return?`,
-                        text: `This action will ${action} the return request for this item.`,
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonText: `Yes, ${action}`,
-                        cancelButtonText: 'Cancel',
-                        confirmButtonColor: action === 'approve' ? '#28a745' : '#dc3545',
-                        cancelButtonColor: '#6c757d',
-                        reverseButtons: true
-                    });
-
-                    if (result.isConfirmed) {
-                        const response = await fetch(`/admin/orders/${orderId}/items/${itemId}/return`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
+                    let reason = '';
+                    
+                    // For reject action, show a popup to enter reason
+                    if (action === 'reject') {
+                        const { value: rejectReason } = await Swal.fire({
+                            title: 'Enter Rejection Reason',
+                            input: 'textarea',
+                            inputLabel: 'Reason for rejection',
+                            inputPlaceholder: 'Enter the reason for rejecting this return...',
+                            inputAttributes: {
+                                'aria-label': 'Enter the reason for rejecting this return'
                             },
-                            body: JSON.stringify({ action })
+                            showCancelButton: true,
+                            confirmButtonText: 'Submit Rejection',
+                            cancelButtonText: 'Cancel',
+                            inputValidator: (value) => {
+                                if (!value) {
+                                    return 'Please provide a reason for rejection';
+                                }
+                            }
                         });
 
-                        const data = await response.json();
+                        if (!rejectReason) return; // User cancelled
+                        reason = rejectReason;
+                    } else {
+                        // For approve action, just show confirmation
+                        const result = await Swal.fire({
+                            title: `Are you sure you want to ${action} this return?`,
+                            text: `This will ${action} the return request.`,
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonText: `Yes, ${action}`,
+                            cancelButtonText: 'Cancel',
+                            confirmButtonColor: '#28a745',
+                            cancelButtonColor: '#6c757d',
+                            reverseButtons: true
+                        });
+                        
+                        if (!result.isConfirmed) return; // User cancelled
+                    }
 
-                        if (response.ok) {
-                            Swal.fire({
-                                title: 'Success!',
-                                text: data.message || 'Return request processed successfully',
-                                icon: 'success',
-                                confirmButtonText: 'OK'
-                            }).then(() => {
-                                window.location.reload();
-                            });
-                        } else {
-                            throw new Error(data.message || 'Failed to process return request');
-                        }
+                    // Determine the API endpoint based on whether it's for an item or whole order
+                    const endpoint = itemId 
+                        ? `/admin/orders/${orderId}/items/${itemId}/return`
+                        : `/admin/orders/${orderId}/return`;
+
+                    const response = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ action, reason })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        Swal.fire({
+                            title: 'Success!',
+                            text: data.message || 'Return request processed successfully',
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        throw new Error(data.message || 'Failed to process return request');
                     }
                 } catch (error) {
                     console.error('Error processing return:', error);
