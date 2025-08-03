@@ -577,7 +577,7 @@ const returnOrderItem = async (req, res) => {
             const newQuantity = currentQuantity + item.quantity;
             
             product.quantity = newQuantity;
-            product.status = newQuantity > 0 ? 'In Stock' : 'Out of Stock';
+            product.status = newQuantity > 0 ? 'Available' : 'Out of Stock';
             
             await product.save();
             

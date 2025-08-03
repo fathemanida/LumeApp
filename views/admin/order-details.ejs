@@ -185,9 +185,12 @@
                                      Road Area: <p class="mb-0"><%= order.address.roadArea %></p>
                                     <% } %>
                                      <% if(order.address.landMark) {%>
-                                      <p class="mb-0">Land Mark:<%= order.address.landmark %></p>
+                                      <p class="mb-0">Land Mark:<%= order.address.landMark %></p>
                                     <% } %>
+                                     <% } %>
+                                     <% if(order.address.addressType) {%>
                                     <p class="mb-0">Address Type:<% order.address.addressType %></p>
+                                    <% } %>
                                     <p class="mb-0">Phone: <%= order.address.phone %></p>
                                 <% } else { %>
                                     <p>No shipping address provided</p>
@@ -265,16 +268,18 @@
                                                 </span>
                                             </td>
                                             <td class="action-buttons">
-                                                <% if (item.returnStatus === 'Requested') { %>
-                                                    <button class="btn btn-sm btn-success" 
-                                                            onclick="handleReturnAction('<%= order._id %>', '<%= item._id %>', 'approve')">
-                                                        Approve Return
-                                                    </button>
-                                                    <button class="btn btn-sm btn-danger" 
-                                                            onclick="handleReturnAction('<%= order._id %>', '<%= item._id %>', 'reject')">
-                                                        Reject
-                                                    </button>
-                                                <% } else if (item.status === 'Active' || item.status === 'Processing') { %>
+                                                <% if (item.returnStatus === 'Requested' || (item.isReturned && item.returnStatus === 'Requested')) { %>
+                                                    <div class="d-flex flex-column gap-1">
+                                                        <button class="btn btn-sm btn-success" 
+                                                                onclick="handleReturnAction('<%= order._id %>', '<%= item._id %>', 'approve')">
+                                                            <i class="fas fa-check me-1"></i> Approve Return
+                                                        </button>
+                                                        <button class="btn btn-sm btn-danger" 
+                                                                onclick="handleReturnAction('<%= order._id %>', '<%= item._id %>', 'reject')">
+                                                            <i class="fas fa-times me-1"></i> Reject
+                                                        </button>
+                                                    </div>
+                                                <% } else if (item.status === 'Active' || item.status === 'Processing' || item.status === 'Delivered') { %>
                                                     <select class="form-select form-select-sm" 
                                                             onchange="updateItemStatus('<%= order._id %>', '<%= item._id %>', this.value)">
                                                         <option value="Processing" <%= item.status === 'Processing' ? 'selected' : '' %>>Processing</option>
