@@ -23,17 +23,14 @@ const orderSchema = new mongoose.Schema({
             ref: 'Product',
             required: true
         },
-        // Item Status Tracking
         status: {
             type: String,
             enum: ['Active', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Returned', 'Return Requested'],
             default: 'Active'
         },
-        // Cancellation Details
         cancelledAt: Date,
         cancellationReason: String,
         cancellationNotes: String,
-        // Return Details
         isReturned: {
             type: Boolean,
             default: false
