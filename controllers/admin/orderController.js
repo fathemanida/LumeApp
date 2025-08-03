@@ -437,6 +437,7 @@ const updateOrderStatusBasedOnItems = (order) => {
 module.exports = {
     getOrders,
     getOrderDetails,
+    getOrderAddress,
     updateOrderStatus,
     updateOrderItemStatus,
     handleOrderReturn,
