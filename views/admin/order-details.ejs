@@ -268,7 +268,7 @@
                                                 </span>
                                             </td>
                                             <td class="action-buttons">
-                                                <% if (item.returnStatus === 'Requested' || (item.isReturned && item.returnStatus === 'Requested')) { %>
+                                                <% if (item.returnStatus === 'Requested') { %>
                                                     <div class="d-flex flex-column gap-1">
                                                         <button class="btn btn-sm btn-success" 
                                                                 onclick="handleReturnAction('<%= order._id %>', '<%= item._id %>', 'approve')">
