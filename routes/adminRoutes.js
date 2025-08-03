@@ -66,7 +66,6 @@ router.post("/orders/:orderId/return", adminAuth, orderController.handleOrderRet
 router.post("/orders/:orderId/items/:itemId/return", adminAuth, orderController.handleOrderItemReturn);
 router.get("/order-address", adminAuth, orderController.getOrderAddress);
 router.post('/orders/:orderId/status', adminAuth, orderController.updateOrderStatus);
-router.post('/orders/:orderId/return-request', adminAuth, orderController.handleReturnRequest);
 
 // Return processing route
 router.post('/orders/:orderId/process-return', adminAuth, walletController.processReturnRefund);
