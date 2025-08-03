@@ -268,17 +268,18 @@ const cancelOrder = async (req, res) => {
         if (!order) {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
+if (!['Processing', 'Active', 'Pending'].includes(order.status)) {
+    return res.status(400).json({ 
+        success: false, 
+        message: `Cannot cancel item with status: ${order.status}` 
+    });
+}
 
-        if (['cancelled', 'shipped', 'delivered', 'returned'].includes(order.status.toLowerCase())) {
-            return res.status(400).json({ 
-                success: false, 
-                message: `Cannot cancel order with status: ${order.status}` 
-            });
-        }
 
         let refundAmount = 0;
-        if (order.paymentMethod.toLowerCase() !== 'cod' && order.paymentStatus === 'Paid') {
-            refundAmount = calculateRefundAmount(order);
+       if (order.paymentMethod !== 'COD' && 
+    (order.paymentMethod === 'Wallet' || order.paymentMethod === 'Razorpay')) {
+            refundAmount = (item.finalPrice || item.price) * item.quantity;
         }
 
         if (refundAmount > 0) {
@@ -336,12 +337,13 @@ const cancelOrderItem = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Item not found in order' });
         }
 
-        if (['Cancelled', 'Shipped', 'Delivered', 'Returned','Return Requested'].includes(item.status.toLowerCase())) {
-            return res.status(400).json({ 
-                success: false, 
-                message: `Cannot cancel item with status: ${item.status}` 
-            });
-        }
+       if (!['Processing', 'Active', 'Pending'].includes(item.status)) {
+    return res.status(400).json({ 
+        success: false, 
+        message: `Cannot cancel item with status: ${item.status}` 
+    });
+}
+
 
         let refundAmount = 0;
 if (order.paymentMethod !== 'COD' && 
