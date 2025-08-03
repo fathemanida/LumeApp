@@ -676,30 +676,25 @@
                                         <h5 class="product-name"><%= item.productId.productName %></h5>
                                         <div class="product-price">
                                             <% 
-                                                // Get product details from productId
                                                 const product = item.productId;
                                                 const basePrice = product.salePrice && product.salePrice < product.regularPrice ? 
                                                     product.salePrice : product.regularPrice;
                                                 
-                                                // Debug: Log category and offer information
                                                 console.log('Product:', product.productName);
                                                 console.log('Category:', product.category);
                                                 if (product.category) {
                                                     console.log('Category Offer:', product.category.categoryOffer);
                                                 }
                                                 
-                                                // Calculate offer discount
                                                 let offerDiscount = 0;
                                                 let bestOffer = null;
                                                 
-                                                // Check product offer
                                                 if (product.productOffer && product.productOffer.active) {
                                                     if (product.productOffer.discountType === 'percentage') {
                                                         offerDiscount = (basePrice * product.productOffer.discountValue) / 100;
                                                     } else {
                                                         offerDiscount = product.productOffer.discountValue;
                                                     }
-                                                    // Create a best offer object with the product offer details
                                                     bestOffer = {
                                                         name: 'Product Offer',
                                                         discountType: product.productOffer.discountType,
@@ -707,7 +702,6 @@
                                                     };
                                                 }
                                                 
-                                                // Check category offer (only if better than product offer)
                                                 if (product.category && product.category.categoryOffer && 
                                                     product.category.categoryOffer.active) {
                                                     let categoryDiscount = 0;
@@ -719,7 +713,6 @@
                                                     
                                                     if (categoryDiscount > offerDiscount) {
                                                         offerDiscount = categoryDiscount;
-                                                        // Create a best offer object with the category offer details
                                                         bestOffer = {
                                                             name: 'Category Offer',
                                                             discountType: product.category.categoryOffer.discountType,

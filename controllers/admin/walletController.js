@@ -54,26 +54,55 @@ const processReturnRefund = async (req) => {
 
     for (const item of order.items) {
       if (item.status === 'Returned' || item.returnStatus === 'Approved') {
-        const product = await Product.findById(item.productId);
-        if (product) {
-          // Validate offer data
+        try {
+          const product = await Product.findById(item.productId);
+          if (!product) continue;
+
+          // Ensure productOffer exists and has correct structure
           if (!product.productOffer) {
             product.productOffer = {
               active: false,
               discountType: 'percentage',
-              discountValue: 0
+              discountValue: 0,
+              startDate: null,
+              endDate: null
             };
-          } else if (
-            product.productOffer.discountType !== 'percentage' &&
-            product.productOffer.discountType !== 'flat'
-          ) {
-            product.productOffer.discountType = 'percentage'; // default fallback
+          } else {
+            // Ensure discountType is valid
+            if (typeof product.productOffer.discountType === 'number' || 
+                (product.productOffer.discountType !== 'percentage' && 
+                 product.productOffer.discountType !== 'flat')) {
+              product.productOffer.discountType = 'percentage';
+            }
+            
+            // Ensure all required fields exist
+            product.productOffer = {
+              active: product.productOffer.active || false,
+              discountType: product.productOffer.discountType || 'percentage',
+              discountValue: typeof product.productOffer.discountValue === 'number' ? 
+                product.productOffer.discountValue : 0,
+              startDate: product.productOffer.startDate || null,
+              endDate: product.productOffer.endDate || null
+            };
           }
 
-          product.quantity = (product.quantity || 0) + item.quantity;
+          // Update product quantity and status
+          product.quantity = (parseInt(product.quantity) || 0) + (parseInt(item.quantity) || 0);
           product.status = 'Available';
 
-          await product.save();
+          // Save with validation
+          await product.save({ validateBeforeSave: true });
+        } catch (error) {
+          console.error('Error updating product inventory during return:', {
+            error: error.message,
+            stack: error.stack,
+            orderId: order._id,
+            itemId: item._id,
+            productId: item.productId,
+            quantity: item.quantity
+          });
+          // Continue with other items even if one fails
+          continue;
         }
       }
     }
