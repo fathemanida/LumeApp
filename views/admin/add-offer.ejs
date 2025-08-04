@@ -278,17 +278,6 @@
         productGrid.parentElement.insertBefore(productSearch, productGrid);
 
         // Validate discount value
-       // Show toast message
-       function showToast(message, isSuccess = true) {
-           Toastify({
-               text: message,
-               duration: 3000,
-               gravity: "top",
-               position: 'right',
-               backgroundColor: isSuccess ? "#28a745" : "#dc3545",
-               stopOnFocus: true
-           }).showToast();
-       }
 
        function validateTextField(input, fieldName) {
            if (!input.value.trim()) {
