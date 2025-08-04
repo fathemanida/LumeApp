@@ -10,7 +10,11 @@
     rel="stylesheet">
   <!-- Comment out external stylesheet to isolate conflicts -->
   <link rel="stylesheet" href="/styles/userStyles.css">
-
+<style>
+  .auth-heading{
+    padding-top: 42px;
+  }
+</style>
 </head>
 
 <body>
@@ -41,7 +45,7 @@
           <div id="error4" class="error-message"></div>
 
 
-
+           
           <% if (locals.message && message.length> 0) { %>
             <div class="alert alert-danger text-message">
               <%= message %>
@@ -103,6 +107,21 @@
 
 
   </script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <% if (successMessage) { %>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    Swal.fire({
+      icon: "success",
+      title: "Success!",
+      text: "<%= successMessage %>",
+      confirmButtonText: "OK",
+    });
+  });
+</script>
+<% } %>
+
 </body>
 
 </html>

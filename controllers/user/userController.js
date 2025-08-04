@@ -273,11 +273,10 @@ const verifyOtp = async (req, res) => {
       req.session.user = saveUserData._id;
       req.session.otp = null;
 
-      return res.json({
-        success: true,
-        message: "Account created successfully! Redirecting to login...",
-        redirectUrl: "/login",
-      });
+     return res.render("login", {
+  message: "Account created successfully! Please log in.",
+});
+
     } else {
       return res.status(400).json({
         success: false,
@@ -624,13 +623,7 @@ const loadShopAll = async (req, res) => {
   }
 };
 
-const hello=async (req,res) => {
-  try {
-    res.render('hello')
-  } catch (error) {
-    
-  }
-}
+
 const filterProduct = async (req, res) => {
   console.log("req received here");
   try {
@@ -899,15 +892,15 @@ console.log(maxQuantity,'max quantity');
 
 const newArrivals = async (req, res) => {
   try {
-     let userData = null;
-    const user=req.session.user
+    let userData = null;
+    const user = req.session.user;
     if (user) {
-          const userId=user.id
-
+      const userId = user.id;
       userData = await User.findById(userId);
     }
+
     const categories = await Category.find({ isListed: true });
-    const listedCategoryIds = categories.map((c) => c._id); 
+    const listedCategoryIds = categories.map((c) => c._id);
 
     const query = {
       status: "Available",
@@ -929,36 +922,46 @@ const newArrivals = async (req, res) => {
       .limit(limit)
       .populate("category")
       .exec();
+
     const now = new Date();
     const offers = await Offer.find({
       isActive: true,
       startDate: { $lte: now },
       endDate: { $gte: now },
-      applicableOn: { $in: ["all", "categories", "products"] },
-    }).lean();
+    });
 
-    const filteredProductsWithOffers = filteredProducts.map((product) => {
-      const matchedOffers = offers.filter((offer) => {
-        if (offer.applicableOn === "all") return true;
-        if (
-          offer.applicableOn === "categories" &&
-          offer.categories.some(cat => cat.toString() === product.category._id.toString())
-        ) return true;
-        if (
-          offer.applicableOn === "products" &&
-          offer.products.some(prod => prod.toString() === product._id.toString())
-        ) return true;
-        return false;
-      });
+    const featuredWithPrices = await Promise.all(
+      featuredData.map(async (product) => {
+        const salesPrice = product.salePrice || product.regularPrice;
 
-      if (matchedOffers.length > 0) {
+        const matchedOffers = offers.filter((offer) => {
+          if (offer.applicableOn === "all") return true;
+          if (
+            offer.applicableOn === "categories" &&
+            offer.categories.some(
+              (cat) => cat.toString() === product.category._id.toString()
+            )
+          ) {
+            return true;
+          }
+          if (
+            offer.applicableOn === "products" &&
+            offer.products.some(
+              (prod) => prod.toString() === product._id.toString()
+            )
+          ) {
+            return true;
+          }
+          return false;
+        });
+
         let maxDiscount = 0;
         let bestOffer = null;
 
         matchedOffers.forEach((offer) => {
           let discount = 0;
-          if (offer.discountType === 'percentage') {
-            discount = (product.salePrice * offer.discountValue) / 100;
+          if (offer.discountType === "percentage") {
+            discount = (salesPrice * offer.discountValue) / 100;
           } else {
             discount = offer.discountValue;
           }
@@ -969,20 +972,15 @@ const newArrivals = async (req, res) => {
           }
         });
 
-        if (bestOffer) {
-          product.offer = bestOffer;
-        }
-      }
-
-      return product;
-    });
-    const featuredWithPrices = await Promise.all(
-      featuredData.map(async (product) => {
-        const salesPrice = product.regularPrice;
-        return {
+        const finalProduct = {
           ...product._doc,
           salesPrice,
         };
+        if (bestOffer) {
+          finalProduct.offer = bestOffer;
+        }
+
+        return finalProduct;
       })
     );
 
@@ -1002,6 +1000,7 @@ const newArrivals = async (req, res) => {
     res.render("page404");
   }
 };
+
 
 
 const featured = async (req, res) => {
