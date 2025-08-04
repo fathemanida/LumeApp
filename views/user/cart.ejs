@@ -1021,6 +1021,10 @@
                 document.getElementById('finalPrice').textContent = `₹${data.finalPrice.toLocaleString()}`;
                 updateSummaryDiscounts(data.totals.offerDiscount, data.totals.couponDiscount);
                 showNotification('Quantity updated successfully', 'success');
+
+setTimeout(() => {
+    location.reload();
+}, 200);
             } catch (error) {
                 console.log('An error occurred while updating quantity', error);
             } finally {
