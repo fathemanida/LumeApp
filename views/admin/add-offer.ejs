@@ -369,8 +369,48 @@ function validateApplicableOn() {
         // Form submission
         document.getElementById('offer-form').addEventListener('submit', async function(e) {
             e.preventDefault();
+            console.log('Form submitted');
 
+            // Reset error messages
+            document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+            
+            // Validate required fields
+            let isValid = true;
+            
+            // Validate offer name
+            const offerName = document.getElementById('offer-name').value.trim();
+            if (!offerName) {
+                document.getElementById('offerName-value-error').textContent = 'Offer name is required';
+                isValid = false;
+            }
+            
+            // Validate offer code
+            const offerCode = document.getElementById('offer-code').value.trim();
+            if (!offerCode) {
+                document.getElementById('offerCode-value-error').textContent = 'Offer code is required';
+                isValid = false;
+            }
+            
+            // Validate discount value
             if (!validateDiscountValue()) {
+                console.log('Discount validation failed');
+                isValid = false;
+            }
+            
+            // Validate dates
+            if (!validateDates()) {
+                console.log('Date validation failed');
+                isValid = false;
+            }
+            
+            // Validate applicable on
+            if (!validateApplicableOn()) {
+                console.log('Applicable on validation failed');
+                isValid = false;
+            }
+            
+            if (!isValid) {
+                console.log('Form validation failed');
                 return;
             }
 
@@ -404,6 +444,8 @@ function validateApplicableOn() {
             }
 
             try {
+                console.log('Sending request to /admin/add-offer');
+                console.log('Request data:', formData);
                 const response = await fetch('/admin/add-offer', {
                     method: 'POST',
                     headers: {
@@ -412,15 +454,26 @@ function validateApplicableOn() {
                     body: JSON.stringify(formData)
                 });
 
-                const result = await response.json();
+                console.log('Response status:', response.status);
+                
+                let result;
+                try {
+                    result = await response.json();
+                    console.log('Response body:', result);
+                } catch (error) {
+                    console.error('Error parsing JSON response:', error);
+                    throw new Error('Invalid response from server');
+                }
 
-                if (result.success) {
+                if (response.ok && result.success) {
                     showToast('Offer created successfully!');
                     setTimeout(() => {
                         window.location.href = '/admin/offers';
                     }, 1500);
                 } else {
-                    throw new Error(result.message || 'Failed to create offer');
+                    const errorMessage = result.message || `Request failed with status ${response.status}`;
+                    console.error('Server error:', errorMessage);
+                    throw new Error(errorMessage);
                 }
             } catch (error) {
                 console.error('Error creating offer:', error);

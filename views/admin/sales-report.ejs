@@ -170,7 +170,6 @@
                             <th>Orders</th>
                             <th>Gross Sales</th>
                             <th>Discounts</th>
-                            <th>Coupons</th>
                             <th>Net Sales</th>
                             <th>Status</th>
                         </tr>
@@ -182,7 +181,6 @@
       <td><%= row.orders %></td>
       <td>₹<%= row.grossSales.toLocaleString() %></td>
       <td>₹<%= row.discounts.toLocaleString() %></td>
-      <td><%= row.coupons %></td>
       <td>₹<%= row.netSales.toLocaleString() %></td>
       <td>
         <% if (row.status === 'Holiday') { %>
