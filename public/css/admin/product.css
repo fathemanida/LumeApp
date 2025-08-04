@@ -452,33 +452,7 @@
 
     /* Responsive Design */
     @media (max-width: 1024px) {
-      .sidebar {
-        transform: translateX(-100%);
-        position: fixed;
-        z-index: 2000;
-        left: 0;
-        top: 0;
-        width: 240px;
-        height: 100vh;
-        transition: transform 0.3s;
-        display: block;
-      }
-      .sidebar.active {
-        transform: translateX(0);
-      }
-      .sidebar-overlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background: rgba(0,0,0,0.2);
-        z-index: 1999;
-      }
-      .sidebar.active + .sidebar-overlay {
-        display: block;
-      }
+      
       .main-content {
         margin-left: 0 !important;
         padding: 1rem 0.5rem !important;
@@ -589,9 +563,7 @@
         padding-left: 0.25rem !important;
         padding-right: 0.25rem !important;
       }
-      .sidebar {
-        width: 200px !important;
-      }
+      
       table {
         min-width: 600px;
         font-size: 0.9rem;
