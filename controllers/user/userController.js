@@ -1129,5 +1129,4 @@ module.exports = {
   logout,
   newArrivals,
   featured,
-  hello
 };
