@@ -66,7 +66,7 @@ const createOffer = async (req, res) => {
       categories,
       products
     } = req.body;
-
+console.log('=admin @ offer add');
     if (!name || !code || !discountType || !discountValue || !startDate || !endDate || !applicableOn) {
       return res.status(400).json({
         success: false,
