@@ -273,10 +273,11 @@ const verifyOtp = async (req, res) => {
       req.session.user = saveUserData._id;
       req.session.otp = null;
 
-     return res.render("login", {
-  message: "Account created successfully! Please log in.",
-});
-
+      return res.json({
+        success: true,
+        message: "Account created successfully! Redirecting to login...",
+        redirectUrl: "/login",
+      });
     } else {
       return res.status(400).json({
         success: false,
@@ -1129,4 +1130,5 @@ module.exports = {
   logout,
   newArrivals,
   featured,
+  hello
 };
