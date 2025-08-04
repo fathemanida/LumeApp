@@ -26,7 +26,7 @@
 
         <!-- Offer Form -->
         <div class="form-container">
-            <form id="offer-form" action="/admin/add-offer" method="POST">
+            <form id="offer-form" action="javascript:void(0);">
                 <div class="form-row">
                     <div class="form-group">
                         <label for="offer-name" class="form-label">Offer Name</label>
@@ -366,87 +366,9 @@ function validateApplicableOn() {
 }
 
 
-        // Function to clear all error messages
-        function clearAllErrors() {
-            // Clear all error messages
-            document.querySelectorAll('.error-message').forEach(el => {
-                el.textContent = '';
-            });
-        }
-
-        // Function to show error for a specific field
-        function showFieldError(fieldId, message) {
-            const errorElement = document.getElementById(`${fieldId}-error`);
-            if (errorElement) {
-                errorElement.textContent = message;
-            }
-        }
-
-        // Form validation
-        function validateForm() {
-            let isValid = true;
-            clearAllErrors();
-
-            // Validate offer name
-            const offerName = document.getElementById('offer-name').value.trim();
-            if (!offerName) {
-                showFieldError('offer-name', 'Offer name is required');
-                isValid = false;
-            }
-
-            // Validate offer code
-            const offerCode = document.getElementById('offer-code').value.trim();
-            if (!offerCode) {
-                showFieldError('offer-code', 'Offer code is required');
-                isValid = false;
-            }
-
-            // Validate discount value
-            if (!validateDiscountValue()) {
-                isValid = false;
-            }
-
-            // Validate dates
-            if (!validateDates()) {
-                isValid = false;
-            }
-
-            // Validate applicable on selection
-            if (!applicableOnSelect.value) {
-                showToast('Please select where the offer is applicable', false);
-                isValid = false;
-            } else if (applicableOnSelect.value === 'categories') {
-                const selectedCategories = document.querySelectorAll('input[name="categories"]:checked').length;
-                if (selectedCategories === 0) {
-                    showToast('Please select at least one category', false);
-                    isValid = false;
-                }
-            } else if (applicableOnSelect.value === 'products') {
-                const selectedProducts = document.querySelectorAll('input[name="products"]:checked').length;
-                if (selectedProducts === 0) {
-                    showToast('Please select at least one product', false);
-                    isValid = false;
-                }
-            }
-
-            return isValid;
-        }
-
         // Form submission
         document.getElementById('offer-form').addEventListener('submit', async function(e) {
             e.preventDefault();
-
-            const offerName = document.getElementById('offer-name').value.trim();
-            const offerCode = document.getElementById('offer-code').value.trim();
-            const startDate = document.getElementById('start-date').value;
-            const endDate = document.getElementById('end-date').value;
-            const applicableOn = applicableOnSelect.value;
-
-            // Basic validation
-            if (!offerName || !offerCode || !startDate || !endDate || !applicableOn) {
-                showToast('Please fill in all required fields', false);
-                return;
-            }
 
             if (!validateDiscountValue()) {
                 return;
@@ -454,43 +376,35 @@ function validateApplicableOn() {
 
             // Collect form data
             const formData = {
-                name: offerName,
-                code: offerCode,
+                name: document.getElementById('offer-name').value,
+                code: document.getElementById('offer-code').value,
                 discountType: discountTypeSelect.value,
                 discountValue: parseFloat(discountValueInput.value),
-                startDate: startDate,
-                endDate: endDate,
-                applicableOn: applicableOn,
+                startDate: document.getElementById('start-date').value,
+                endDate: document.getElementById('end-date').value,
+                applicableOn: applicableOnSelect.value,
                 categories: [],
                 products: []
             };
 
             // Get selected categories if applicable
-            if (applicableOn === 'categories') {
+            if (formData.applicableOn === 'categories') {
                 const selectedCategories = document.querySelectorAll('input[name="categories"]:checked');
-                if (selectedCategories.length === 0) {
-                    showToast('Please select at least one category', false);
-                    return;
-                }
                 selectedCategories.forEach(cat => {
                     formData.categories.push(cat.value);
                 });
             }
 
             // Get selected products if applicable
-            if (applicableOn === 'products') {
+            if (formData.applicableOn === 'products') {
                 const selectedProducts = document.querySelectorAll('input[name="products"]:checked');
-                if (selectedProducts.length === 0) {
-                    showToast('Please select at least one product', false);
-                    return;
-                }
                 selectedProducts.forEach(prod => {
                     formData.products.push(prod.value);
                 });
             }
 
             try {
-                const response = await fetch('/add-offer', {
+                const response = await fetch('/admin/add-offer', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -506,13 +420,11 @@ function validateApplicableOn() {
                         window.location.href = '/admin/offers';
                     }, 1500);
                 } else {
-                    // Show error message from server
-                    const errorMessage = result.message || 'Failed to create offer';
-                    showToast(errorMessage, false);
+                    throw new Error(result.message || 'Failed to create offer');
                 }
             } catch (error) {
                 console.error('Error creating offer:', error);
-                showToast('Error creating offer. Please try again.', false);
+                showToast(error.message || 'Error creating offer. Please try again.', 'error');
             }
         });
 

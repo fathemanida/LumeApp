@@ -126,16 +126,20 @@ const addCategory = async (req, res) => {
       });
     }
 
-    const existingCategory = await Category.findOne({ name });
-    if (existingCategory) {
-      if (req.file) {
-        fs.unlinkSync(req.file.path);
-      }
-      return res.status(400).json({
-        success: false,
-        message: "A category with this name already exists"
-      });
-    }
+    const existingCategory = await Category.findOne({
+  name: { $regex: new RegExp(`^${name}$`, 'i') }
+});
+
+if (existingCategory) {
+  if (req.file) {
+    fs.unlinkSync(req.file.path);
+  }
+  return res.status(400).json({
+    success: false,
+    message: "A category with this name already exists"
+  });
+}
+
 
     
     const category = new Category({
@@ -294,16 +298,20 @@ const editCategory = async (req, res) => {
       });
     }
 
-    const existingCategory = await Category.findOne({
-      name,
-      _id: { $ne: categoryId }
-    });
-    if (existingCategory) {
-      return res.status(400).json({
-        success: false,
-        message: "A category with this name already exists"
-      });
-    }
+  const existingCategory = await Category.findOne({
+  name: { $regex: new RegExp(`^${name}$`, 'i') }
+});
+
+if (existingCategory) {
+  if (req.file) {
+    fs.unlinkSync(req.file.path);
+  }
+  return res.status(400).json({
+    success: false,
+    message: "A category with this name already exists"
+  });
+}
+
 
 
     const updateData = {
