@@ -330,26 +330,31 @@ function validateDiscountValue() {
 }
 
 function validateDates() {
-    const start = new Date(startDateInput.value);
-    const end = new Date(endDateInput.value);
+    const start = startDateInput.value ? new Date(startDateInput.value) : null;
+    const end = endDateInput.value ? new Date(endDateInput.value) : null;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time part to compare dates only
 
     let valid = true;
+    startDateError.textContent = '';
+    endDateError.textContent = '';
 
+    // Validate start date
     if (!startDateInput.value) {
         startDateError.textContent = 'Start date is required';
         valid = false;
-    } else {
-        startDateError.textContent = '';
+    } else if (start < today) {
+        startDateError.textContent = 'Start date cannot be in the past';
+        valid = false;
     }
 
+    // Validate end date
     if (!endDateInput.value) {
         endDateError.textContent = 'End date is required';
         valid = false;
-    } else if (start >= end) {
+    } else if (start && end <= start) {
         endDateError.textContent = 'End date must be after start date';
         valid = false;
-    } else {
-        endDateError.textContent = '';
     }
 
     return valid;
@@ -357,20 +362,101 @@ function validateDates() {
 
 function validateApplicableOn() {
     const value = applicableOnSelect.value;
+    const applicableOnError = document.createElement('div');
+    applicableOnError.id = 'applicable-on-error';
+    applicableOnError.className = 'error-message text-sm mt-1';
+    
+    // Remove any existing error message
+    const existingError = document.getElementById('applicable-on-error');
+    if (existingError) {
+        existingError.remove();
+    }
+    
     if (!value) {
-        showToast('Please select where the offer is applicable', false);
+        applicableOnError.textContent = 'Please select where the offer is applicable';
+        applicableOnSelect.after(applicableOnError);
         applicableOnSelect.focus();
         return false;
     }
+    
+    // If we have a value, make sure the appropriate items are selected
+    if (value === 'categories' || value === 'products') {
+        const items = value === 'categories' ? 
+            document.querySelectorAll('input[name="categories"]:checked') : 
+            document.querySelectorAll('input[name="products"]:checked');
+            
+        if (items.length === 0) {
+            applicableOnError.textContent = `Please select at least one ${value === 'categories' ? 'category' : 'product'}`;
+            applicableOnSelect.after(applicableOnError);
+            return false;
+        }
+    }
+    
     return true;
 }
 
 
+        // Form validation functions
+        function validateForm() {
+            let isValid = true;
+            
+            // Reset all error messages
+            document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+            
+            // Validate offer name
+            const offerName = document.getElementById('offer-name').value.trim();
+            if (!offerName) {
+                document.getElementById('offerName-value-error').textContent = 'Offer name is required';
+                isValid = false;
+            }
+            
+            // Validate offer code
+            const offerCode = document.getElementById('offer-code').value.trim();
+            if (!offerCode) {
+                document.getElementById('offerCode-value-error').textContent = 'Offer code is required';
+                isValid = false;
+            }
+            
+            // Validate discount value
+            if (!validateDiscountValue()) {
+                isValid = false;
+            }
+            
+            // Validate dates
+            if (!validateDates()) {
+                isValid = false;
+            }
+            
+            // Validate applicable on selection
+            if (!validateApplicableOn()) {
+                isValid = false;
+            }
+            
+            // Validate selected categories/products based on applicable on
+            const applicableOn = applicableOnSelect.value;
+            if (applicableOn === 'categories') {
+                const selectedCategories = document.querySelectorAll('input[name="categories"]:checked');
+                if (selectedCategories.length === 0) {
+                    showToast('Please select at least one category', false);
+                    isValid = false;
+                }
+            } else if (applicableOn === 'products') {
+                const selectedProducts = document.querySelectorAll('input[name="products"]:checked');
+                if (selectedProducts.length === 0) {
+                    showToast('Please select at least one product', false);
+                    isValid = false;
+                }
+            }
+            
+            return isValid;
+        }
+
         // Form submission
         document.getElementById('offer-form').addEventListener('submit', async function(e) {
             e.preventDefault();
-
-            if (!validateDiscountValue()) {
+            
+            // Validate form before submission
+            if (!validateForm()) {
                 return;
             }
 

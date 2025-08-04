@@ -149,8 +149,9 @@ const addProduct = async (req, res) => {
       featured,
       new: isNew,
       sizes,
-      productOffer
     } = req.body;
+        const productId = req.params.id;
+
 console.log(isNew);
     if (!productName || !description || !category || !regularPrice || !quantity) {
       return res.status(400).json({ message: 'Please fill all required fields' });
@@ -176,41 +177,18 @@ console.log(isNew);
         return res.status(400).json({ message: 'Invalid sizes format' });
       }
     }
+     const existingProduct = await Product.findOne({
+  productName: { $regex: new RegExp(`^${productName}$`, 'i') },
+  _id: { $ne: productId }
+});
 
-    let parsedProductOffer = { active: false };
-    if (productOffer) {
-      try {
-        parsedProductOffer = JSON.parse(productOffer);
-        if (typeof parsedProductOffer !== 'object') {
-          return res.status(400).json({ message: 'Invalid product offer format' });
-        }
-
-        if (parsedProductOffer.active) {
-          const { discountType, discountValue, startDate, endDate } = parsedProductOffer;
-
-          if (!discountType || !['percentage', 'flat'].includes(discountType)) {
-            return res.status(400).json({ message: 'Invalid or missing discount type' });
-          }
-          if (typeof discountValue !== 'number' || discountValue < 0) {
-            return res.status(400).json({ message: 'Discount value must be a non-negative number' });
-          }
-          if (discountType === 'percentage' && discountValue > 100) {
-            return res.status(400).json({ message: 'Percentage discount must be between 0 and 100' });
-          }
-          if (!startDate || isNaN(new Date(startDate).getTime())) {
-            return res.status(400).json({ message: 'Invalid or missing start date' });
-          }
-          if (!endDate || isNaN(new Date(endDate).getTime())) {
-            return res.status(400).json({ message: 'Invalid or missing end date' });
-          }
-          if (new Date(startDate) >= new Date(endDate)) {
-            return res.status(400).json({ message: 'End date must be after start date' });
-          }
-        }
-      } catch (error) {
-        return res.status(400).json({ message: 'Invalid product offer format' });
-      }
+    if (existingProduct) {
+      return res.status(400).json({
+        success: false,
+        message: "A product with this name already exists",
+      });
     }
+   
 
     const categoryExists = await Category.findById(category);
     if (!categoryExists) {
@@ -255,7 +233,6 @@ console.log(parsedFeatured,parsedNew,'parsed');
       sizes: parsedSizes,
       featured: parsedFeatured,
       new: parsedNew,
-      productOffer: parsedProductOffer,
       productCode
     });
 
@@ -315,7 +292,7 @@ const editProduct = async (req, res) => {
       sizes,
       featured,
       new: isNew,
-      productOffer
+      
     } = req.body;
 
     const productId = req.params.id;
@@ -387,10 +364,11 @@ if (salePrice && (isNaN(sale) || sale > regular)) {
       });
     }
 
-    const existingProduct = await Product.findOne({
-      productName,
-      _id: { $ne: productId }
-    });
+   const existingProduct = await Product.findOne({
+  productName: { $regex: new RegExp(`^${productName}$`, 'i') },
+  _id: { $ne: productId }
+});
+
     if (existingProduct) {
       return res.status(400).json({
         success: false,
@@ -398,41 +376,7 @@ if (salePrice && (isNaN(sale) || sale > regular)) {
       });
     }
 
-    let parsedOffer = { active: false };
-    if (productOffer) {
-      try {
-        parsedOffer = JSON.parse(productOffer);
-        
-        if (parsedOffer.active) {
-          if (!parsedOffer.discountType || !parsedOffer.discountValue || !parsedOffer.startDate || !parsedOffer.endDate) {
-            return res.status(400).json({
-              success: false,
-              message: "All offer fields are required when offer is active"
-            });
-          }
-
-          if (parsedOffer.discountType === 'percentage' && (parsedOffer.discountValue < 0 || parsedOffer.discountValue > 100)) {
-            return res.status(400).json({
-              success: false,
-              message: "Percentage discount must be between 0 and 100"
-            });
-          }
-
-          if (new Date(parsedOffer.startDate) >= new Date(parsedOffer.endDate)) {
-            return res.status(400).json({
-              success: false,
-              message: "End date must be after start date"
-            });
-          }
-        }
-      } catch (error) {
-        return res.status(400).json({
-          success: false,
-          message: "Invalid offer data format"
-        });
-      }
-    }
-
+    
     let finalPrice = regularPrice;
     if (parsedOffer.active) {
       if (parsedOffer.discountType === 'percentage') {
@@ -453,7 +397,6 @@ const parsedFeatured = featured === 'yes'?true:false
       sizes: parsedSizes,
       featured: parsedFeatured,
       new: parsedNew,
-      productOffer: parsedOffer
     };
 
     if (req.files && req.files.length > 0) {
@@ -511,14 +454,11 @@ const getListProduct = async (req, res) => {
 
     product.isListed = true;
     
-    // Define valid discount types
     const validDiscountTypes = ['percentage', 'flat'];
     
     if (product.productOffer && product.productOffer.active) {
-      // Validate and normalize discountType
-      let discountType = 'percentage'; // Default value
+      let discountType = 'percentage'; 
       
-      // If discountType is a valid string, use it; otherwise, use default
       if (typeof product.productOffer.discountType === 'string' && 
           validDiscountTypes.includes(product.productOffer.discountType)) {
         discountType = product.productOffer.discountType;
@@ -526,12 +466,10 @@ const getListProduct = async (req, res) => {
         console.warn(`Invalid discountType (${product.productOffer.discountType}) found for product ${product._id}, defaulting to 'percentage'`);
       }
       
-      // Ensure discountValue is a valid number
       const discountValue = typeof product.productOffer.discountValue === 'number' && 
                           !isNaN(product.productOffer.discountValue) ?
                           Math.max(0, product.productOffer.discountValue) : 0;
       
-      // Set product offer with validated values
       product.productOffer = {
         active: true,
         discountType: discountType,
@@ -542,7 +480,6 @@ const getListProduct = async (req, res) => {
                 product.productOffer.endDate : null
       };
     } else {
-      // If no active offer or no productOffer, set defaults
       product.productOffer = {
         active: false,
         discountType: 'percentage',
