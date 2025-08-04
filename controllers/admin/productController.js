@@ -378,13 +378,7 @@ if (salePrice && (isNaN(sale) || sale > regular)) {
 
     
     let finalPrice = regularPrice;
-    if (parsedOffer.active) {
-      if (parsedOffer.discountType === 'percentage') {
-        finalPrice = regularPrice - (regularPrice * parsedOffer.discountValue / 100);
-      } else {
-        finalPrice = Math.max(regularPrice - parsedOffer.discountValue, 0);
-      }
-    }
+    
 const parsedFeatured = featured === 'yes'?true:false
     const parsedNew = isNew === 'yes'?true:false   
      const updateData = {

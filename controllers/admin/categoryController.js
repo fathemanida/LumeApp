@@ -137,53 +137,11 @@ const addCategory = async (req, res) => {
       });
     }
 
-    let parsedOffer = { active: false };
-    if (categoryOffer) {
-      try {
-        parsedOffer = JSON.parse(categoryOffer);
-        
-        if (parsedOffer.discountType) {
-          parsedOffer.discountType = parsedOffer.discountType.toLowerCase();
-        }
-        
-        parsedOffer.active = parsedOffer.isActive;
-        
-        if (parsedOffer.active) {
-          if (!parsedOffer.discountType || !parsedOffer.discountValue || !parsedOffer.startDate || !parsedOffer.endDate) {
-            return res.status(400).json({
-              success: false,
-              message: "All offer fields are required when offer is active"
-            });
-          }
-
-          if (parsedOffer.discountType === 'percentage' && (parsedOffer.discountValue < 0 || parsedOffer.discountValue > 100)) {
-            return res.status(400).json({
-              success: false,
-              message: "Percentage discount must be between 0 and 100"
-            });
-          }
-
-          if (new Date(parsedOffer.startDate) >= new Date(parsedOffer.endDate)) {
-            return res.status(400).json({
-              success: false,
-              message: "End date must be after start date"
-            });
-          }
-        }
-      } catch (error) {
-        console.error("Error parsing offer data:", error);
-        return res.status(400).json({
-          success: false,
-          message: "Invalid offer data format"
-        });
-      }
-    }
-
+    
     const category = new Category({
       name,
       description,
 image: req.file.filename,
-      categoryOffer: parsedOffer
     });
 
     await category.save();
@@ -347,52 +305,10 @@ const editCategory = async (req, res) => {
       });
     }
 
-    let parsedOffer = { active: false };
-    if (categoryOffer) {
-      try {
-        parsedOffer = JSON.parse(categoryOffer);
-        
-        if (parsedOffer.discountType) {
-          parsedOffer.discountType = parsedOffer.discountType.toLowerCase();
-        }
-        
-        parsedOffer.active = parsedOffer.isActive;
-        
-        if (parsedOffer.active) {
-          if (!parsedOffer.discountType || !parsedOffer.discountValue || !parsedOffer.startDate || !parsedOffer.endDate) {
-            return res.status(400).json({
-              success: false,
-              message: "All offer fields are required when offer is active"
-            });
-          }
-
-          if (parsedOffer.discountType === 'percentage' && (parsedOffer.discountValue < 0 || parsedOffer.discountValue > 100)) {
-            return res.status(400).json({
-              success: false,
-              message: "Percentage discount must be between 0 and 100"
-            });
-          }
-
-          if (new Date(parsedOffer.startDate) >= new Date(parsedOffer.endDate)) {
-            return res.status(400).json({
-              success: false,
-              message: "End date must be after start date"
-            });
-          }
-        }
-      } catch (error) {
-        console.error("Error parsing offer data:", error);
-        return res.status(400).json({
-          success: false,
-          message: "Invalid offer data format"
-        });
-      }
-    }
 
     const updateData = {
       name,
       description,
-      categoryOffer: parsedOffer
     };
 
     if (req.file) {

@@ -436,34 +436,54 @@ function validateApplicableOn() {
         document.getElementById('offer-form').addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            if (!validateForm()) {
+            const offerName = document.getElementById('offer-name').value.trim();
+            const offerCode = document.getElementById('offer-code').value.trim();
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+            const applicableOn = applicableOnSelect.value;
+
+            // Basic validation
+            if (!offerName || !offerCode || !startDate || !endDate || !applicableOn) {
+                showToast('Please fill in all required fields', false);
+                return;
+            }
+
+            if (!validateDiscountValue()) {
                 return;
             }
 
             // Collect form data
             const formData = {
-                name: document.getElementById('offer-name').value.trim(),
-                code: document.getElementById('offer-code').value.trim(),
+                name: offerName,
+                code: offerCode,
                 discountType: discountTypeSelect.value,
                 discountValue: parseFloat(discountValueInput.value),
-                startDate: document.getElementById('start-date').value,
-                endDate: document.getElementById('end-date').value,
-                applicableOn: applicableOnSelect.value,
+                startDate: startDate,
+                endDate: endDate,
+                applicableOn: applicableOn,
                 categories: [],
                 products: []
             };
 
             // Get selected categories if applicable
-            if (formData.applicableOn === 'categories') {
+            if (applicableOn === 'categories') {
                 const selectedCategories = document.querySelectorAll('input[name="categories"]:checked');
+                if (selectedCategories.length === 0) {
+                    showToast('Please select at least one category', false);
+                    return;
+                }
                 selectedCategories.forEach(cat => {
                     formData.categories.push(cat.value);
                 });
             }
 
             // Get selected products if applicable
-            if (formData.applicableOn === 'products') {
+            if (applicableOn === 'products') {
                 const selectedProducts = document.querySelectorAll('input[name="products"]:checked');
+                if (selectedProducts.length === 0) {
+                    showToast('Please select at least one product', false);
+                    return;
+                }
                 selectedProducts.forEach(prod => {
                     formData.products.push(prod.value);
                 });
@@ -486,27 +506,13 @@ function validateApplicableOn() {
                         window.location.href = '/admin/offers';
                     }, 1500);
                 } else {
-                    // Handle server-side validation errors
-                    if (result.errors) {
-                        // Clear all previous errors
-                        clearAllErrors();
-                        
-                        // Show field-specific errors
-                        Object.entries(result.errors).forEach(([field, message]) => {
-                            showFieldError(field, message);
-                        });
-                        
-                        // Show general error message if any
-                        if (result.message) {
-                            showToast(result.message, false);
-                        }
-                    } else {
-                        throw new Error(result.message || 'Failed to create offer');
-                    }
+                    // Show error message from server
+                    const errorMessage = result.message || 'Failed to create offer';
+                    showToast(errorMessage, false);
                 }
             } catch (error) {
                 console.error('Error creating offer:', error);
-                showToast(error.message || 'Error creating offer. Please try again.', false);
+                showToast('Error creating offer. Please try again.', false);
             }
         });
 
