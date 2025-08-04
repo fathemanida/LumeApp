@@ -305,7 +305,7 @@ const cart = async (req, res) => {
       }).lean();
 
       if (coupon) {
-        if (coupon.discountType === "percentage") {
+        if (coupon.discountType === "PERCENTAGE") {
           totalCouponDiscount =
             ((totalPrice - totalOfferDiscount) * coupon.discountValue) / 100;
         } else {
@@ -318,14 +318,13 @@ const cart = async (req, res) => {
       }
     }
 
-    const shipping = totalPrice - totalOfferDiscount - totalCouponDiscount >= 1000 ? 0 : 50;
+    const shipping = totalPrice - totalOfferDiscount - totalCouponDiscount >= 1000 ? 0 : 40;
     const finalPrice = totalPrice - totalOfferDiscount - totalCouponDiscount + shipping;
 
     cart.discount = totalCouponDiscount;
     cart.appliedCouponDetails = appliedCouponDetails;
     await cart.save(); 
 
-    // Get all active coupons - simplified to match checkout logic
     const availableCoupons = await Coupon.find({
       isActive: true,
       expiryDate: { $gt: now },
@@ -333,7 +332,6 @@ const cart = async (req, res) => {
     }).select('code discountType discountValue maxDiscount minOrderAmount expiryDate usedBy')
       .lean();
     
-    // Filter out coupons already used by this user
     const filteredCoupons = availableCoupons.filter(coupon => {
       return !coupon.usedBy || !coupon.usedBy.some(id => id.toString() === userId.toString());
     });

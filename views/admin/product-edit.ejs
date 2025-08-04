@@ -623,7 +623,7 @@
         console.log("Validation failed: Invalid regular price");
       }
 
-      if (quantity === "" || !Number.isInteger(Number(quantity)) || parseInt(quantity) < 0) {
+      if (quantity === "" || !Number.isInteger(Number(quantity)) || quantity < 0) {
         displayErrorMessage("quantity-error", "Enter a valid stock quantity (0 or more)");
         isValid = false;
         console.log("Validation failed: Invalid quantity");

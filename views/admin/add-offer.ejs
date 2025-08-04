@@ -26,7 +26,7 @@
 
         <!-- Offer Form -->
         <div class="form-container">
-            <form id="offer-form" onsubmit="return false;">
+            <form id="offer-form" action="/admin/add-offer" method="POST">
                 <div class="form-row">
                     <div class="form-group">
                         <label for="offer-name" class="form-label">Offer Name</label>
@@ -98,9 +98,8 @@
                 </div>
 
                 <div class="form-footer">
-                     <button type="button" class="btn btn-secondary">Cancel</button>
-
-    <button type="submit" class="btn btn-primary">Create Offer</button>
+                    <button type="button" class="btn btn-secondary">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Offer</button>
                 </div>
             </form>
         </div>
@@ -370,96 +369,62 @@ function validateApplicableOn() {
         // Form submission
         document.getElementById('offer-form').addEventListener('submit', async function(e) {
             e.preventDefault();
-            console.log('Form submission started');
 
-            // Validate all required fields
-            if (!validateTextField(offerNameInput, 'Offer name') ||
-                !validateTextField(offerCodeInput, 'Offer code') ||
-                !validateDiscountValue() ||
-                !validateDates() ||
-                !validateApplicableOn()) {
+            if (!validateDiscountValue()) {
                 return;
             }
 
-            // Show loading state
-            const submitBtn = this.querySelector('button[type="submit"]');
-            const originalBtnText = submitBtn.innerHTML;
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+            // Collect form data
+            const formData = {
+                name: document.getElementById('offer-name').value,
+                code: document.getElementById('offer-code').value,
+                discountType: discountTypeSelect.value,
+                discountValue: parseFloat(discountValueInput.value),
+                startDate: document.getElementById('start-date').value,
+                endDate: document.getElementById('end-date').value,
+                applicableOn: applicableOnSelect.value,
+                categories: [],
+                products: []
+            };
+
+            // Get selected categories if applicable
+            if (formData.applicableOn === 'categories') {
+                const selectedCategories = document.querySelectorAll('input[name="categories"]:checked');
+                selectedCategories.forEach(cat => {
+                    formData.categories.push(cat.value);
+                });
+            }
+
+            // Get selected products if applicable
+            if (formData.applicableOn === 'products') {
+                const selectedProducts = document.querySelectorAll('input[name="products"]:checked');
+                selectedProducts.forEach(prod => {
+                    formData.products.push(prod.value);
+                });
+            }
 
             try {
-                // Collect form data
-                const formData = {
-                    name: offerNameInput.value.trim(),
-                    code: offerCodeInput.value.trim(),
-                    discountType: discountTypeSelect.value,
-                    discountValue: parseFloat(discountValueInput.value),
-                    startDate: startDateInput.value,
-                    endDate: endDateInput.value,
-                    applicableOn: applicableOnSelect.value,
-                    categories: [],
-                    products: []
-                };
-
-                console.log('Form data:', formData);
-
-                // Get selected categories if applicable
-                if (formData.applicableOn === 'categories') {
-                    const selectedCategories = document.querySelectorAll('input[name="categories"]:checked');
-                    selectedCategories.forEach(cat => {
-                        formData.categories.push(cat.value);
-                    });
-                    
-                    if (formData.categories.length === 0) {
-                        showToast('Please select at least one category', false);
-                        return;
-                    }
-                }
-
-                // Get selected products if applicable
-                if (formData.applicableOn === 'products') {
-                    const selectedProducts = document.querySelectorAll('input[name="products"]:checked');
-                    selectedProducts.forEach(prod => {
-                        formData.products.push(prod.value);
-                    });
-                    
-                    if (formData.products.length === 0) {
-                        showToast('Please select at least one product', false);
-                        return;
-                    }
-                }
-
-                console.log('Sending request to server...');
-                const response = await fetch('/admin/add-offer', {
+                const response = await fetch('/add-offer', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
+                        'Content-Type': 'application/json'
                     },
-                    credentials: 'same-origin',
                     body: JSON.stringify(formData)
                 });
 
-                console.log('Response status:', response.status);
                 const result = await response.json();
-                console.log('Server response:', result);
 
-                if (response.ok && result.success) {
+                if (result.success) {
                     showToast('Offer created successfully!');
                     setTimeout(() => {
                         window.location.href = '/admin/offers';
                     }, 1500);
                 } else {
-                    const errorMessage = result.message || 'Failed to create offer';
-                    console.error('Server error:', errorMessage);
-                    throw new Error(errorMessage);
+                    throw new Error(result.message || 'Failed to create offer');
                 }
             } catch (error) {
                 console.error('Error creating offer:', error);
-                showToast(error.message || 'Error creating offer. Please try again.', false);
-                // Re-enable the submit button on error
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalBtnText;
+                showToast(error.message || 'Error creating offer. Please try again.', 'error');
             }
         });
 
