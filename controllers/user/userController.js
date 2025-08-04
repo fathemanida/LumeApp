@@ -269,16 +269,17 @@ const verifyOtp = async (req, res) => {
           await coupon.save();
         }
       }
-
-      req.session.user = saveUserData._id;
-      req.session.otp = null;
-
-      return res.json({
+       return res.json({
         success: true,
         message: "Account created successfully! Redirecting to login...",
         redirectUrl: "/login",
       });
+      req.session.user = saveUserData._id;
+      req.session.otp = null;
+
+     
     } else {
+      console.log('invalid otp');
       return res.status(400).json({
         success: false,
         message: "Invalid OTP, please try again!",
