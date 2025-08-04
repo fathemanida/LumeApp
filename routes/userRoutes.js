@@ -56,7 +56,6 @@ router.get('/check-auth', (req, res) => {
     });
   }
 });
-router.get('/hello',userController.hello)
 router.get('/login',userController.loadLogin);
 router.post("/login",userController.login);
 router.get('/logout',userController.logout)
@@ -173,7 +172,7 @@ router.post('/payment/process', userAuth.isLogin, paymentController.processPayme
 router.get('/payment-confirmation', userAuth.isLogin, paymentController.paymentConfirmation);
 router.post('/verify-payment', userAuth.isLogin, paymentController.verifyPayment);
 router.get('/payment-failure', userAuth.isLogin, paymentController.paymentFailure);
-router.get('/payment-failed', userAuth.isLogin, paymentController.paymentFailure); // Alias for payment-failure
+router.get('/payment-failed', userAuth.isLogin, paymentController.paymentFailure); 
 
 // Footer routes
 router.get('/faqs', footerController.faq);
