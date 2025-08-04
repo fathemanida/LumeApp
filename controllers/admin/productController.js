@@ -361,12 +361,16 @@ const editProduct = async (req, res) => {
       });
     }
 
-    if (salePrice && (isNaN(salePrice) || salePrice > regularPrice)) {
-      return res.status(400).json({
-        success: false,
-        message: "Sale price must be less than or equal to regular price",
-      });
-    }
+   const sale = Number(salePrice);
+const regular = Number(regularPrice);
+
+if (salePrice && (isNaN(sale) || sale > regular)) {
+  return res.status(400).json({
+    success: false,
+    message: "Sale price must be less than or equal to regular price",
+  });
+}
+
 
     if (!Number.isInteger(Number(quantity)) || quantity < 0) {
       return res.status(400).json({
