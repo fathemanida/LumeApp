@@ -423,8 +423,10 @@ const handleOrderReturn = async (req, res) => {
 
 const handleOrderItemReturn = async (req, res) => {
     try {
+        console.log('=items returning');
         const { orderId, itemId } = req.params;
         const { action, reason } = req.body;
+        console.log('====item,action,reason',itemId,action,reason);
 
         if (!mongoose.Types.ObjectId.isValid(orderId) || !mongoose.Types.ObjectId.isValid(itemId)) {
             return res.status(400).json({ success: false, message: 'Invalid order or item ID' });
@@ -462,13 +464,8 @@ const handleOrderItemReturn = async (req, res) => {
                 });
             }
 
-            if (
-                order.paymentMethod !== 'COD' &&
-                order.payment &&
-                order.payment.status === 'Paid' &&
-                !item.isReturned
-            ) {
-                let refundAmount = (item.finalPrice || item.price) * item.quantity;
+            if (order.paymentMethod !== 'COD') {
+                let refundAmount = item.finalPrice  * item.quantity;
 
                 if (order.couponDiscount && order.couponDiscount > 0) {
                     const totalItemsCount = order.items.length; 
@@ -479,7 +476,7 @@ const handleOrderItemReturn = async (req, res) => {
 
                     console.log('=== Adjusted for coupon discount:', itemCouponDiscount, 'Final refund:', refundAmount);
                 }
-
+                console.log('===amount to refund',refundAmount);
                 await walletController.processReturnRefund({
                     body: {
                         orderId: order._id,
