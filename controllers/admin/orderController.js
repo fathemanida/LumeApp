@@ -322,19 +322,7 @@ const handleOrderReturn = async (req, res) => {
         
         if (action === 'approve') {
             let refundAmount = 0;
-            const itemsToProcess = [];
-            
-            order.items.forEach(item => {
-                const isItemRequested = item.status === 'Return Requested' || 
-                                      (item.returnStatus && item.returnStatus === 'Requested');
-                
-                if (isItemRequested && item.status !== 'Cancelled') {
-                    itemsToProcess.push(item);
-                    if (order.paymentMethod !== 'COD' && order.payment && order.payment.status === 'Paid') {
-                        refundAmount += (item.finalPrice ) * item.quantity;
-                    }
-                }
-            });
+            refundAmount=order.totalAmount
 
             console.log('==rfundanmount',refundAmount);
             if (refundAmount > 0) {
