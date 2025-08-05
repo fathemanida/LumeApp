@@ -345,6 +345,13 @@ const cancelOrderItem = async (req, res) => {
 if (order.paymentMethod !== 'COD' && 
     (order.paymentMethod === 'Wallet' || order.paymentMethod === 'Razorpay')) {
             refundAmount = (item.finalPrice || item.price) * item.quantity;
+                if (order.couponDiscount && order.couponDiscount > 0) {
+        const totalItems = order.items.reduce((sum, it) => sum + it.quantity, 0);
+        const couponPerItem = order.couponDiscount / totalItems;
+        const itemCouponDiscount = couponPerItem * item.quantity;
+        refundAmount += itemCouponDiscount;
+
+        console.log('=== Adjusted for coupon discount:', itemCouponDiscount, 'Final refund:', refundAmount);
         }
 
         if (refundAmount > 0) {

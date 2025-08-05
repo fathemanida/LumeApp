@@ -5,6 +5,7 @@ const Product = require("../../models/productSchema");
 
 const processReturnRefund = async (req) => {
   try {
+    console.log('==process return refund');
     const { orderId, amount, userId, itemId } = req.body;
 
     if (!req.session.user || !req.session.user.isAdmin) {
@@ -39,11 +40,11 @@ const processReturnRefund = async (req) => {
       status: "COMPLETED",
       createdAt: new Date(),
     };
-
+console.log('==wallet balance',wallet.balance);
     wallet.balance += amount;
     wallet.transactions.push(transaction);
     await wallet.save();
-
+console.log('=amount',amount);
     await User.findByIdAndUpdate(userId, { wallet: wallet._id });
 
     const returnedItem = order.items.find((item) => item._id.toString() === itemId);
