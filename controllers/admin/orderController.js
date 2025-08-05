@@ -471,7 +471,7 @@ const handleOrderItemReturn = async (req, res) => {
                 let refundAmount = (item.finalPrice || item.price) * item.quantity;
 
                 if (order.couponDiscount && order.couponDiscount > 0) {
-                    const totalItemsCount = order.items.length; // not by quantity, 1 per item
+                    const totalItemsCount = order.items.length; 
                     const couponPerItem = order.couponDiscount / totalItemsCount;
                     const itemCouponDiscount = couponPerItem;
 

@@ -55,11 +55,7 @@ console.log('=amount',amount);
 
       const product = await Product.findById(returnedItem.productId);
 
-      if (product) {
-        product.quantity = (parseInt(product.quantity) || 0) + (parseInt(returnedItem.quantity) || 0);
-        product.status = 'Available';
-        await product.save();
-      }
+    
     }
 
     const allReturned = order.items.every((item) => item.status === 'Returned');
