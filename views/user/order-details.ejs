@@ -344,7 +344,7 @@
                         <div class="summary-item">
                             <div class="summary-label">Order Date</div>
                             <div class="summary-value">
-                                <%= new Date(order.createdAt).toLocaleDateString('en-US', { year: 'numeric' ,
+                                <%= new Date(order.createdOn).toLocaleDateString('en-US', { year: 'numeric' ,
                                     month: 'long' , day: 'numeric' , hour: '2-digit' , minute: '2-digit' }) %>
                             </div>
                         </div>
@@ -373,13 +373,13 @@
                         <div class="summary-item">
                             <div class="summary-label">Shipping Address</div>
                             <div class="summary-value">
-                                <% if (order.shippingAddress) { %>
-                                    <%= order.shippingAddress.name %><br>
+                                <% if (order.address) { %>
+                                    <%= order.address.name %><br>
                                         <%= order.shippingAddress.address %><br>
-                                            <%= order.shippingAddress.city %>, <%= order.shippingAddress.state %>
-                                                    <%= order.shippingAddress.pincode %><br>
-                                                        Phone: <%= order.shippingAddress.phone %><br>
-                                                            Email: <%= order.shippingAddress.email %>
+                                            <%= order.address.city %>, <%= order.address.state %>
+                                                    <%= order.address.pincode %><br>
+                                                        Phone: <%= order.address.phone %><br>
+                                                            Email: <%= order.address.pincode %>
                                                                 <% } else { %>
                                                                     No shipping address provided
                                                                     <% } %>
@@ -389,7 +389,7 @@
                     <div class="summary-totals mt-4">
                         <div class="total-row">
                             <span>Subtotal:</span>
-                            <span>₹<%= order.subTotal ? order.subTotal.toFixed(2) : '0.00' %></span>
+                            <span>₹<%= order.subtotal ? order.subtotal.toFixed(2) : '0.00' %></span>
                         </div>
                         <% if (order.couponDiscount && order.couponDiscount> 0) { %>
                             <div class="total-row">

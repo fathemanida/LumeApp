@@ -478,7 +478,6 @@
                     const actionText = action === 'approve' ? 'approve' : 'reject';
                     const itemText = itemId ? 'this item' : 'the entire order';
                     
-                    // For reject action, show a popup to enter reason
                     if (action === 'reject') {
                         const { value: rejectReason } = await Swal.fire({
                             title: 'Enter Rejection Reason',
@@ -504,10 +503,9 @@
                             }
                         });
 
-                        if (!rejectReason) return; // User cancelled
+                        if (!rejectReason) return; 
                         reason = rejectReason.trim();
                     } else {
-                        // For approve action, show confirmation
                         const result = await Swal.fire({
                             title: `Confirm Return ${actionText}`,
                             html: `Are you sure you want to <strong>${actionText}</strong> the return for ${itemText}?`,
@@ -763,65 +761,6 @@
                 }
             }
 
-            // Handle return actions (approve/reject) - duplicate function, consider removing
-            async function handleReturnAction(orderId, itemId, action) {
-                const actionText = action === 'approve' ? 'approve' : 'reject';
-                const confirmText = itemId
-                    ? `Are you sure you want to ${actionText} return for this item?`
-                    : `Are you sure you want to ${actionText} return for the entire order?`;
-
-                const result = await Swal.fire({
-                    title: `${actionText.charAt(0).toUpperCase() + actionText.slice(1)} Return`,
-                    text: confirmText,
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonText: `Yes, ${actionText} it!`,
-                    cancelButtonText: 'No, cancel',
-                    confirmButtonColor: action === 'approve' ? '#28a745' : '#dc3545',
-                    cancelButtonColor: '#6c757d',
-                    reverseButtons: true
-                });
-
-                if (result.isConfirmed) {
-                    try {
-                        const url = itemId
-                            ? `/admin/orders/${orderId}/items/${itemId}/return`
-                            : `/admin/orders/${orderId}/return`;
-
-                        const response = await fetch(url, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({ action })
-                        });
-
-                        const data = await response.json();
-
-                        if (data.success) {
-                            await Swal.fire({
-                                title: 'Success!',
-                                text: `Return request ${actionText}d successfully`,
-                                icon: 'success',
-                                confirmButtonColor: '#6c5ce7',
-                                timer: 2000,
-                                timerProgressBar: true
-                            });
-                            location.reload();
-                        } else {
-                            throw new Error(data.message || `Failed to ${actionText} return`);
-                        }
-                    } catch (error) {
-                        console.error('Error:', error);
-                        await Swal.fire({
-                            title: 'Error!',
-                            text: error.message || `Error ${actionText}ing return`,
-                            icon: 'error',
-                            confirmButtonColor: '#6c5ce7'
-                        });
-                    }
-                }
-            }
         </script>
 </body>
 
