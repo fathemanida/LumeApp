@@ -307,6 +307,8 @@ const handleOrderReturn = async (req, res) => {
         const { orderId } = req.params;
         const { action, reason } = req.body; 
 
+        console.log('===retrun order');
+
         if (!['approve', 'reject'].includes(action)) {
             return res.status(400).json({ success: false, message: 'Invalid action' });
         }
@@ -329,11 +331,12 @@ const handleOrderReturn = async (req, res) => {
                 if (isItemRequested && item.status !== 'Cancelled') {
                     itemsToProcess.push(item);
                     if (order.paymentMethod !== 'COD' && order.payment && order.payment.status === 'Paid') {
-                        refundAmount += (item.finalPrice || item.price) * item.quantity;
+                        refundAmount += (item.finalPrice ) * item.quantity;
                     }
                 }
             });
 
+            console.log('==rfundanmount',refundAmount);
             if (refundAmount > 0) {
                 await walletController.processReturnRefund({
                     body: { 
