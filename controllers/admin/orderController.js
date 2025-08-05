@@ -336,23 +336,7 @@ const handleOrderReturn = async (req, res) => {
                 });
             }
 
-            for (const item of itemsToProcess) {
-                if (item.productId) {
-                    const product = await Product.findById(item.productId._id);
-                    if (product) {
-                        product.quantity = (parseInt(product.quantity) || 0) + parseInt(item.quantity);
-                        if (product.quantity > 0 && product.status === 'Out of Stock') {
-                            product.status = 'Available';
-                        }
-                        await product.save();
-                    }
-                }
-                
-                item.returnStatus = 'Approved';
-                item.status = 'Returned';
-                item.isReturned = true;
-                item.returnProcessedAt = new Date();
-            }
+         
             
             updateOrderStatusBasedOnItems(order);
             
