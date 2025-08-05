@@ -466,6 +466,15 @@ const handleOrderItemReturn = async (req, res) => {
                 const refundAmount = (item.finalPrice || item.price) * item.quantity;
                 
                 if (refundAmount > 0) {
+                    if (item.productId && item.productId.productOffer) {
+                        if (!item.productId.productOffer.discountType) {
+                            item.productId.productOffer.discountType = 'percentage'; // Default to percentage if missing
+                        } else if (typeof item.productId.productOffer.discountType === 'number') {
+                            item.productId.productOffer.discountType = 
+                                item.productId.productOffer.discountType === 0 ? 'percentage' : 'flat';
+                        }
+                    }
+                    
                     await walletController.processReturnRefund({
                         body: { 
                             orderId: order._id,

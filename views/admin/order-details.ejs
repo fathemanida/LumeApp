@@ -560,10 +560,9 @@
                             focusCancel: true
                         });
                         
-                        if (!result.isConfirmed) return; // User cancelled
+                        if (!result.isConfirmed) return; 
                     }
 
-                    // Show loading indicator
                     Swal.fire({
                         title: 'Processing...',
                         text: `Please wait while we ${action} the return request`,
@@ -573,7 +572,6 @@
                         }
                     });
 
-                    // Determine the API endpoint based on whether it's for an item or whole order
                     const endpoint = itemId 
                         ? `/admin/orders/${orderId}/items/${itemId}/return`
                         : `/admin/orders/${orderId}/return`;
@@ -591,7 +589,7 @@
                     });
 
                     const data = await response.json();
-                    Swal.close(); // Close loading indicator
+                    Swal.close(); 
 
                     if (response.ok) {
                         await Swal.fire({
@@ -671,7 +669,6 @@
                             timer: 2000,
                             timerProgressBar: true
                         }).then(() => {
-                            // Reload the page to reflect changes
                             window.location.reload();
                         });
                     } else {
