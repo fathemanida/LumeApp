@@ -14,7 +14,7 @@ const processReturnRefund = async (req) => {
         message: "Unauthorized access",
       };
     }
-
+console.log('====orderId,amount,userId,itemId',orderId,amount,userId,itemId);
     const order = await Order.findById(orderId).populate("items.productId");
 
     if (!order) {
@@ -30,6 +30,8 @@ const processReturnRefund = async (req) => {
         transactions: [],
       });
     }
+        console.log('===wallet',wallet);
+
 
     const transaction = {
       type: "CREDIT",
