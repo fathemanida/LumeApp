@@ -52,7 +52,6 @@ const upload = multer({
 
 
 
-// Get order details by ID
 const orderDetails = async (req, res) => {
     try {
         if (!req.session.user) {
@@ -81,7 +80,6 @@ const orderDetails = async (req, res) => {
             });
         }
 
-        // Format order items with additional details
         const formattedItems = order.items.map(item => {
             const product = item.productId;
             const quantity = item.quantity;
@@ -98,12 +96,10 @@ const orderDetails = async (req, res) => {
             };
         });
 
-        // Calculate order totals
         const subtotal = formattedItems.reduce((sum, item) => sum + item.originalPrice, 0);
         const totalDiscount = order.offerDiscount + (order.couponDiscount || 0);
         const totalAmount = order.totalAmount || (subtotal - totalDiscount + (order.shipping || 0));
 
-        // Format order object for the view
         const formattedOrder = {
             ...order,
             items: formattedItems,

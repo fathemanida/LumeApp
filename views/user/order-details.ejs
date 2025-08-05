@@ -375,14 +375,16 @@
                             <div class="summary-value">
                                 <% if (order.address) { %>
                                     <%= order.address.name %><br>
-                                        <%= order.shippingAddress.address %><br>
-                                            <%= order.address.city %>, <%= order.address.state %>
-                                                    <%= order.address.pincode %><br>
-                                                        Phone: <%= order.address.phone %><br>
-                                                            Email: <%= order.address.pincode %>
-                                                                <% } else { %>
-                                                                    No shipping address provided
-                                                                    <% } %>
+                                    <%= order.address.roadArea || '' %><%= order.address.roadArea ? '<br>' : '' %>
+                                    <%= order.address.landMark || '' %><%= order.address.landMark ? '<br>' : '' %>
+                                    <%= order.address.city %>, <%= order.address.state %>, <%= order.address.pincode %><br>
+                                    Phone: <%= order.address.phone %><br>
+                                    <% if (order.address.email) { %>
+                                        Email: <%= order.address.email %>
+                                    <% } %>
+                                <% } else { %>
+                                    No shipping address provided
+                                <% } %>
                             </div>
                         </div>
                     </div>
