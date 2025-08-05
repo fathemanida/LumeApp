@@ -37,20 +37,19 @@ console.log('====orderId,amount,userId,itemId',orderId,amount,userId,itemId);
       status: "COMPLETED",
       createdAt: new Date(),
     };
-console.log('==wallet balance',wallet.balance);
+    console.log('==wallet balance',wallet.balance);
     wallet.balance += amount;
     wallet.transactions.push(transaction);
     await wallet.save();
-console.log('=amount',amount);
+    console.log('=amount',amount);
     await User.findByIdAndUpdate(userId, { wallet: wallet._id });
 
     const returnedItem = order.items.find((item) => item._id.toString() === itemId);
+    console.log('==item',returnedItem);
 
     if (returnedItem) {
       returnedItem.status = "Returned";
       returnedItem.returnStatus = "Approved";
-
-
     }
 
     const allReturned = order.items.every((item) => item.status === 'Returned');
