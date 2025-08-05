@@ -445,7 +445,7 @@ const handleOrderItemReturn = async (req, res) => {
         }
 
         const isItemRequested = item.status === 'Return Requested' || 
-                              (item.returnStatus && item.returnStatus === 'Requested');
+            (item.returnStatus && item.returnStatus === 'Requested');
 
         if (!isItemRequested) {
             return res.status(400).json({ 
@@ -462,30 +462,34 @@ const handleOrderItemReturn = async (req, res) => {
                 });
             }
 
-            if (order.paymentMethod !== 'COD' && order.payment && order.payment.status === 'Paid' && !item.isReturned) {
-                const refundAmount = (item.finalPrice || item.price) * item.quantity;
-                
-                if (refundAmount > 0) {
-                    if (item.productId && item.productId.productOffer) {
-                        if (!item.productId.productOffer.discountType) {
-                            item.productId.productOffer.discountType = 'percentage'; // Default to percentage if missing
-                        } else if (typeof item.productId.productOffer.discountType === 'number') {
-                            item.productId.productOffer.discountType = 
-                                item.productId.productOffer.discountType === 0 ? 'percentage' : 'flat';
-                        }
-                    }
-                    
-                    await walletController.processReturnRefund({
-                        body: { 
-                            orderId: order._id,
-                            amount: refundAmount,
-                            userId: order.userId,
-                            itemId: item._id,
-                            reason: 'Item return approved'
-                        },
-                        session: req.session
-                    });
+            if (
+                order.paymentMethod !== 'COD' &&
+                order.payment &&
+                order.payment.status === 'Paid' &&
+                !item.isReturned
+            ) {
+                let refundAmount = (item.finalPrice || item.price) * item.quantity;
+
+                if (order.couponDiscount && order.couponDiscount > 0) {
+                    const totalItemsCount = order.items.length; // not by quantity, 1 per item
+                    const couponPerItem = order.couponDiscount / totalItemsCount;
+                    const itemCouponDiscount = couponPerItem;
+
+                    refundAmount += itemCouponDiscount;
+
+                    console.log('=== Adjusted for coupon discount:', itemCouponDiscount, 'Final refund:', refundAmount);
                 }
+
+                await walletController.processReturnRefund({
+                    body: {
+                        orderId: order._id,
+                        amount: refundAmount,
+                        userId: order.userId,
+                        itemId: item._id,
+                        reason: 'Item return approved'
+                    },
+                    session: req.session
+                });
             }
 
             if (!item.isReturned && item.status !== 'Cancelled') {
@@ -506,7 +510,7 @@ const handleOrderItemReturn = async (req, res) => {
             item.isReturned = true;
             item.returnProcessedAt = new Date();
 
-        } else { 
+        } else {
             if (!reason || reason.trim() === '') {
                 return res.status(400).json({ 
                     success: false, 
@@ -517,14 +521,14 @@ const handleOrderItemReturn = async (req, res) => {
             item.returnStatus = 'Rejected';
             item.returnRejectionReason = reason;
             item.returnProcessedAt = new Date();
-            
+
             if (item.status !== 'Cancelled') {
                 item.status = 'Delivered';
             }
         }
 
         updateOrderStatusBasedOnItems(order);
-        
+
         order.updatedAt = new Date();
         await order.save();
 
@@ -544,6 +548,7 @@ const handleOrderItemReturn = async (req, res) => {
         });
     }
 };
+
 
 const updateOrderStatusBasedOnItems = (order) => {
     const itemStatuses = [...new Set(order.items.map(item => item.status))];

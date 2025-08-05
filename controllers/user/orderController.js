@@ -349,10 +349,10 @@ const cancelOrderItem = async (req, res) => {
             refundAmount = (item.finalPrice || item.price) * item.quantity;
 
             if (order.couponDiscount && order.couponDiscount > 0) {
-                const totalItems = order.items.reduce((sum, it) => sum + it.quantity, 0);
-                const couponPerItem = order.couponDiscount / totalItems;
-                const itemCouponDiscount = couponPerItem * item.quantity;
-                refundAmount += itemCouponDiscount;  
+               const totalItemsCount = order.items.length;
+const couponPerItem = order.couponDiscount / totalItemsCount;
+const itemCouponDiscount = couponPerItem;
+
                 console.log('=== Adjusted for coupon discount:', itemCouponDiscount, 'Final refund:', refundAmount);
             }
 
