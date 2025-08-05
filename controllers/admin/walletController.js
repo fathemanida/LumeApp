@@ -8,12 +8,7 @@ const processReturnRefund = async (req) => {
     console.log('==process return refund');
     const { orderId, amount, userId, itemId } = req.body;
 
-    if (!req.session.user || !req.session.user.isAdmin) {
-      return {
-        success: false,
-        message: "Unauthorized access",
-      };
-    }
+ 
 console.log('====orderId,amount,userId,itemId',orderId,amount,userId,itemId);
     const order = await Order.findById(orderId).populate("items.productId");
 
