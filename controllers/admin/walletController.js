@@ -51,6 +51,7 @@ const returnedItem = order.items.find((item) => item._id.equals(itemId));
       returnedItem.status = "Returned";
       returnedItem.returnStatus = "Approved";
     }
+    console.log('==status changed',returnedItem.status);
 
     const allReturned = order.items.every((item) => item.status === 'Returned');
     if (allReturned) {
