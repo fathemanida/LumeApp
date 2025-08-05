@@ -34,7 +34,7 @@ console.log('==item in processrefund',item);
 
       if (order.couponDiscount && order.couponDiscount > 0) {
         const couponPerItem = order.couponDiscount / (order.items.length);
-        refundAmount += couponPerItem;
+        refundAmount -= couponPerItem;
         console.log('===couponper',couponPerItem);
       }
 

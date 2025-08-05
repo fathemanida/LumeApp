@@ -472,7 +472,7 @@ const handleOrderItemReturn = async (req, res) => {
                     const couponPerItem = order.couponDiscount / totalItemsCount;
                     const itemCouponDiscount = couponPerItem;
 
-                    refundAmount += itemCouponDiscount;
+                    refundAmount -= itemCouponDiscount;
 
                     console.log('=== Adjusted for coupon discount:', itemCouponDiscount, 'Final refund:', refundAmount);
                 }
