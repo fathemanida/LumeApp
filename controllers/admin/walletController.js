@@ -44,7 +44,7 @@ console.log('====orderId,amount,userId,itemId',orderId,amount,userId,itemId);
     console.log('=amount',amount);
     await User.findByIdAndUpdate(userId, { wallet: wallet._id });
 
-    const returnedItem = order.items.find((item) => item._id.toString() === itemId);
+const returnedItem = order.items.find((item) => item._id.equals(itemId));
     console.log('==item',returnedItem);
 
     if (returnedItem) {
