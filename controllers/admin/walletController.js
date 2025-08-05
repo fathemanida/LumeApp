@@ -8,8 +8,8 @@ const processReturnRefund = async (req) => {
     console.log('==process return refund');
     const { orderId, amount, userId, itemId } = req.body;
 
- 
-console.log('====orderId,amount,userId,itemId',orderId,amount,userId,itemId);
+    console.log('====orderId,amount,userId,itemId', orderId, amount, userId, itemId);
+
     const order = await Order.findById(orderId).populate("items.productId");
 
     if (!order) {
@@ -25,44 +25,57 @@ console.log('====orderId,amount,userId,itemId',orderId,amount,userId,itemId);
         transactions: [],
       });
     }
-        console.log('===wallet',wallet);
 
+    console.log('===wallet', wallet);
 
     const transaction = {
       type: "CREDIT",
-      amount: amount,
-      description: `Refund for returned item in order #${order.orderId}`,
+      amount,
+      description: `Refund for ${itemId ? "returned item" : "returned order"} in order #${order.orderId}`,
       orderId,
-      itemId,
+      itemId: itemId || null,
       status: "COMPLETED",
       createdAt: new Date(),
     };
-    console.log('==wallet balance',wallet.balance);
+
+    console.log('==wallet balance', wallet.balance);
     wallet.balance += amount;
     wallet.transactions.push(transaction);
     await wallet.save();
-    console.log('=amount',amount);
+    console.log('=amount', amount);
+
     await User.findByIdAndUpdate(userId, { wallet: wallet._id });
 
-const returnedItem = order.items.find((item) => item._id.equals(itemId));
-    console.log('==item',returnedItem);
+    if (itemId) {
+      const returnedItem = order.items.find((item) => item._id.equals(itemId));
+      console.log('==item', returnedItem);
 
-    if (returnedItem) {
-      returnedItem.status = "Returned";
-      returnedItem.returnStatus = "Approved";
-    }
-    console.log('==status changed',returnedItem.status);
+      if (returnedItem) {
+        returnedItem.status = "Returned";
+        returnedItem.returnStatus = "Approved";
+        console.log('==status changed', returnedItem.status);
+      }
 
-    const allReturned = order.items.every((item) => item.status === 'Returned');
-    if (allReturned) {
-      order.status = 'Returned';
+      const allReturned = order.items.every((item) => item.status === "Returned");
+      if (allReturned) {
+        order.status = "Returned";
+      }
+
+    } else {
+      order.items.forEach((item) => {
+        item.status = "Returned";
+        item.returnStatus = "Approved";
+      });
+      order.status = "Returned";
     }
 
     await order.save();
 
     return {
       success: true,
-      message: "Item refund processed successfully",
+      message: itemId
+        ? "Item refund processed successfully"
+        : "Full order refund processed successfully",
       refundAmount: amount,
     };
 
@@ -71,6 +84,7 @@ const returnedItem = order.items.find((item) => item._id.equals(itemId));
     throw new Error("Something went wrong while processing the return");
   }
 };
+
 
 
 module.exports = {
