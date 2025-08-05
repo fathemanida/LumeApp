@@ -333,51 +333,54 @@ const cancelOrderItem = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Item not found in order' });
         }
 
-       if (!['Processing', 'Active', 'Pending'].includes(item.status)) {
-    return res.status(400).json({ 
-        success: false, 
-        message: `Cannot cancel item with status: ${item.status}` 
-    });
-}
-
+        if (!['Processing', 'Active', 'Pending'].includes(item.status)) {
+            return res.status(400).json({ 
+                success: false, 
+                message: `Cannot cancel item with status: ${item.status}` 
+            });
+        }
 
         let refundAmount = 0;
-if (order.paymentMethod !== 'COD' && 
-    (order.paymentMethod === 'Wallet' || order.paymentMethod === 'Razorpay')) {
+
+        if (
+            order.paymentMethod !== 'COD' && 
+            (order.paymentMethod === 'Wallet' || order.paymentMethod === 'Razorpay')
+        ) {
             refundAmount = (item.finalPrice || item.price) * item.quantity;
-                if (order.couponDiscount && order.couponDiscount > 0) {
-        const totalItems = order.items.reduce((sum, it) => sum + it.quantity, 0);
-        const couponPerItem = order.couponDiscount / totalItems;
-        const itemCouponDiscount = couponPerItem * item.quantity;
-        refundAmount += itemCouponDiscount;
 
-        console.log('=== Adjusted for coupon discount:', itemCouponDiscount, 'Final refund:', refundAmount);
-        }
-
-        if (refundAmount > 0) {
-            await processRefund({
-                userId,
-                orderId: order._id,
-                itemId: item._id.toString(),
-                amount: refundAmount,
-                reason: `Item cancellation: ${reason}`,
-                notes: notes,
-                type: 'CANCEL'
-            });
-        } else {
-            item.status = 'Cancelled';
-            item.cancelledAt = new Date();
-            item.cancellationReason = reason;
-            
-            const remainingItems = order.items.filter(i => i.status.toLowerCase() === 'active');
-            if (remainingItems.length === 0) {
-                order.status = 'Cancelled';
-            } else if (remainingItems.length < order.items.length) {
-                order.status = 'Partially Cancelled';
+            if (order.couponDiscount && order.couponDiscount > 0) {
+                const totalItems = order.items.reduce((sum, it) => sum + it.quantity, 0);
+                const couponPerItem = order.couponDiscount / totalItems;
+                const itemCouponDiscount = couponPerItem * item.quantity;
+                refundAmount += itemCouponDiscount;  
+                console.log('=== Adjusted for coupon discount:', itemCouponDiscount, 'Final refund:', refundAmount);
             }
-            
-            await order.save();
+
+            if (refundAmount > 0) {
+                await processRefund({
+                    userId,
+                    orderId: order._id,
+                    itemId: item._id.toString(),
+                    amount: refundAmount,
+                    reason: `Item cancellation: ${reason}`,
+                    notes: notes,
+                    type: 'CANCEL'
+                });
+            }
         }
+
+        item.status = 'Cancelled';
+        item.cancelledAt = new Date();
+        item.cancellationReason = reason;
+
+        const remainingItems = order.items.filter(i => i.status.toLowerCase() === 'active');
+        if (remainingItems.length === 0) {
+            order.status = 'Cancelled';
+        } else if (remainingItems.length < order.items.length) {
+            order.status = 'Partially Cancelled';
+        }
+
+        await order.save();
 
         res.json({ 
             success: true, 
@@ -395,6 +398,7 @@ if (order.paymentMethod !== 'COD' &&
         });
     }
 };
+
 
 const returnOrder = async (req, res) => {
     try {
