@@ -10,7 +10,7 @@ const passport = require("passport");
 const Offer = require("../../models/offerSchema");
 const Wallet = require("../../models/walletSchema");
 const Order = require('../../models/orderSchema');
-const Cart = require('../models/Cart');
+const Cart = require('../../models/cartSchema');
 const Wishlist = require('../../models/wishlistSchema');
 const Address = require('../../models/addressSchema');
 
