@@ -1375,7 +1375,7 @@ const buyNow = async (req, res) => {
     );
 
     const cart = await Cart.findOneAndUpdate(
-      { user: userId },
+      { userId: userId },
       {
         $push: {
           items: {
