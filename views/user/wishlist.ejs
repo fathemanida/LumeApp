@@ -348,12 +348,15 @@
                                                     <span class="fw-bold">₹<%= item.product.regularPrice.toLocaleString() %></span>
                                                 <% } %>
                                             </p>
-                                            <div class="wishlist-actions">
-                                                <button class="btn btn-primary btn-sm add-to-cart" data-product-id="<%= item.product._id %>">
-                                                    <i class="fas fa-shopping-cart me-1"></i>Add to Cart
+                                            <div class="wishlist-actions mt-3">
+                                                <button class="btn btn-sm btn-success add-to-cart" 
+                                                        data-product-id="<%= item.product._id %>"
+                                                        style="background-color: #8a9b7d; border-color: #8a9b7d;">
+                                                    <i class="fas fa-shopping-cart me-1"></i> Add to Cart
                                                 </button>
-                                                <button class="btn btn-outline-danger btn-sm remove-from-wishlist" data-product-id="<%= item.product._id %>">
-                                                    <i class="fas fa-trash me-1"></i>Remove
+                                                <button class="btn btn-sm btn-outline-danger ms-2 remove-from-wishlist" 
+                                                        data-product-id="<%= item.product._id %>">
+                                                    <i class="fas fa-trash me-1"></i> Remove
                                                 </button>
                                             </div>
                                         </div>
@@ -423,24 +426,22 @@
 
         async function addToCart(productId) {
             try {
+                // Show loading state
+                const addToCartBtn = document.querySelector(`.add-to-cart[data-product-id="${productId}"]`);
+                if (addToCartBtn) {
+                    addToCartBtn.disabled = true;
+                    addToCartBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Adding...';
+                }
+
                 // First check if user is authenticated
                 const authCheck = await fetch('/check-auth');
                 const authData = await authCheck.json();
                 
                 if (!authData.isAuthenticated) {
-                    Toastify({
-                        text: "Please login to add items to your cart",
-                        duration: 3000,
-                        gravity: "top",
-                        position: "right",
-                        backgroundColor: "#8a9b7d",
-                        stopOnFocus: true
-                    }).showToast();
+                    showToast('Please login to add items to your cart', 'warning');
+                    resetButton(addToCartBtn, 'Add to Cart', 'fa-shopping-cart');
                     return;
                 }
-
-                const wishlistItem = document.querySelector(`.wishlist-item-card [data-product-id="${productId}"]`).closest('.wishlist-item-card');
-                const selectedSize = wishlistItem ? wishlistItem.dataset.selectedSize : null;
 
                 const response = await fetch('/cart/add', {
                     method: 'POST',
@@ -449,7 +450,6 @@
                     },
                     body: JSON.stringify({
                         productId,
-                        size: selectedSize,
                         quantity: 1
                     })
                 });
@@ -459,32 +459,29 @@
                 if (response.ok) {
                     // Remove from wishlist after successful add to cart
                     await removeFromWishlist(productId, false);
-                    
-                    // Show success message
-                    Toastify({
-                        text: "Added to cart and removed from wishlist",
-                        duration: 3000,
-                        gravity: "top",
-                        position: "right",
-                        className: "custom-toast success"
-                    }).showToast();
+                    showToast('Added to cart and removed from wishlist', 'success');
                 } else {
                     throw new Error(data.message || 'Failed to add to cart');
                 }
             } catch (error) {
                 console.error('Error adding to cart:', error);
-                Toastify({
-                    text: error.message || "Failed to add to cart. Please try again.",
-                    duration: 3000,
-                    gravity: "top",
-                    position: "right",
-                    className: "custom-toast error"
-                }).showToast();
+                showToast(error.message || 'Failed to add to cart. Please try again.', 'error');
+                resetButton(
+                    document.querySelector(`.add-to-cart[data-product-id="${productId}"]`), 
+                    'Add to Cart', 
+                    'fa-shopping-cart'
+                );
             }
         }
 
         async function removeFromWishlist(productId, showToast = true) {
             try {
+                const removeBtn = document.querySelector(`.remove-from-wishlist[data-product-id="${productId}"]`);
+                if (removeBtn) {
+                    removeBtn.disabled = true;
+                    removeBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>';
+                }
+
                 const response = await fetch('/wishlist/remove', {
                     method: 'POST',
                     headers: {
@@ -496,26 +493,27 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    // Find the wishlist item card and remove it
+                    // Find the wishlist item card and remove it with animation
                     const wishlistItem = document.querySelector(`.wishlist-item-card [data-product-id="${productId}"]`).closest('.wishlist-item-card').parentElement;
                     if (wishlistItem) {
-                        wishlistItem.remove();
+                        // Add fade out animation
+                        wishlistItem.style.transition = 'opacity 0.3s ease';
+                        wishlistItem.style.opacity = '0';
                         
-                        // Check if there are no more items left
-                        const remainingItems = document.querySelectorAll('.wishlist-item-card');
-                        if (remainingItems.length === 0) {
-                            location.reload();
-                        }
+                        // Remove after animation completes
+                        setTimeout(() => {
+                            wishlistItem.remove();
+                            
+                            // Check if there are no more items left
+                            const remainingItems = document.querySelectorAll('.wishlist-item-card');
+                            if (remainingItems.length === 0) {
+                                location.reload();
+                            }
+                        }, 300);
                     }
                     
                     if (showToast) {
-                        Toastify({
-                            text: "Removed from wishlist",
-                            duration: 3000,
-                            gravity: "top",
-                            position: "right",
-                            className: "custom-toast success"
-                        }).showToast();
+                        showToast('Removed from wishlist', 'success');
                     }
                 } else {
                     throw new Error(data.message || 'Failed to remove from wishlist');
@@ -523,22 +521,51 @@
             } catch (error) {
                 console.error('Error removing from wishlist:', error);
                 if (showToast) {
-                    Toastify({
-                        text: error.message || "Failed to remove from wishlist",
-                        duration: 3000,
-                        gravity: "top",
-                        position: "right",
-                        className: "custom-toast error"
-                    }).showToast();
+                    showToast(error.message || 'Failed to remove from wishlist', 'error');
                 }
+                resetButton(
+                    document.querySelector(`.remove-from-wishlist[data-product-id="${productId}"]`), 
+                    'Remove', 
+                    'fa-trash'
+                );
+            }
+        }
+
+        // Helper function to show toast messages
+        function showToast(message, type = 'info') {
+            const colors = {
+                success: '#4CAF50',
+                error: '#f44336',
+                warning: '#ff9800',
+                info: '#2196F3'
+            };
+            
+            Toastify({
+                text: message,
+                duration: 3000,
+                gravity: 'top',
+                position: 'right',
+                backgroundColor: colors[type] || colors.info,
+                stopOnFocus: true,
+                className: 'custom-toast'
+            }).showToast();
+        }
+
+        // Helper function to reset button state
+        function resetButton(button, text, iconClass) {
+            if (button) {
+                button.disabled = false;
+                button.innerHTML = `<i class="fas ${iconClass} me-1"></i> ${text}`;
             }
         }
 
         // Event delegation for dynamically loaded buttons
         document.addEventListener('click', function(event) {
+            event.stopPropagation();
+            
             // Handle Add to Cart button clicks
             const addToCartBtn = event.target.closest('.add-to-cart');
-            if (addToCartBtn) {
+            if (addToCartBtn && !addToCartBtn.disabled) {
                 event.preventDefault();
                 const productId = addToCartBtn.getAttribute('data-product-id');
                 if (productId) {
@@ -549,11 +576,13 @@
 
             // Handle Remove from Wishlist button clicks
             const removeFromWishlistBtn = event.target.closest('.remove-from-wishlist');
-            if (removeFromWishlistBtn) {
+            if (removeFromWishlistBtn && !removeFromWishlistBtn.disabled) {
                 event.preventDefault();
                 const productId = removeFromWishlistBtn.getAttribute('data-product-id');
                 if (productId) {
-                    removeFromWishlist(productId);
+                    if (confirm('Are you sure you want to remove this item from your wishlist?')) {
+                        removeFromWishlist(productId);
+                    }
                 }
             }
         });
