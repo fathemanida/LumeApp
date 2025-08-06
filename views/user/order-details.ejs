@@ -262,6 +262,66 @@
                 gap: 1rem;
             }
         }
+        .custom-btn {
+  border-radius: 0;
+  outline: none;
+  background-color: transparent;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.custom-btn:hover {
+  background-color: olive;
+  color: white; /* optional: for better contrast */
+}
+
+.custom-btn:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.custom-btn:not(:hover) {
+  background-color: brown;
+}
+.custom-btn {
+  border-radius: 0;
+  outline: none;
+  border: none;
+  background-color: brown;
+  color: white; /* Optional: ensure text is visible */
+  transition: background-color 0.3s ease;
+}
+
+.custom-btn:hover {
+  background-color: olive;
+  color: white;
+}
+
+.custom-btn:focus {
+  outline: none;
+  box-shadow: none;
+}
+.custom-btn {
+  border-radius: 0;
+  border: none;
+  outline: none;
+  background-color: brown;
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+.custom-btn:hover {
+  background-color: olive;
+  color: white;
+}
+
+.custom-btn:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+
+
     </style>
 </head>
 
@@ -329,15 +389,14 @@
                                                     <% } %>
                                         </td>
                                         <td>
-                                            <% if (item.originalPrice> item.finalPrice) { %>
+                                            <% if (item.originalPrice) { %>
                                                 <span class="price-original">₹<%= item.originalPrice %></span>
                                                 <% } %>
-                                                    <span class="price-discounted">₹<%= item.finalPrice %></span>
                                         </td>
                                         <td>
                                             <%= item.quantity %>
                                         </td>
-                                        <td>₹<%= (item.finalPrice * item.quantity).toFixed(2) %>
+                                        <td>₹<%= (item.finalPrice).toFixed(2) %>
                                         </td>
                                         <td>
                                             <span class="status-badge status-<%= item.status.toLowerCase() %>">
@@ -420,21 +479,37 @@
                         <div class="summary-item">
                             <div class="summary-label">Shipping Address</div>
                             <div class="summary-value">
-                                <% if (order.address) { %>
-                                    <%= order.address.name %><br>
-                                    <%= order.address.roadArea || '' %><% if (order.address.roadArea) { %><br><% } %>
-                                    <%= order.address.landMark || '' %><% if (order.address.landMark) { %><br><% } %>
-                                    <%= order.address.city %>, <%= order.address.state %>, <%= order.address.pincode %><br>
-                                                                    Phone: <%= order.address.phone %><br>
-                                                                        <% if (order.address.email) { %>
-                                                                            Email: <%= order.address.email %>
-                                                                                <% } %>
-                                                                                    <% } else { %>
-                                                                                        No shipping address provided
-                                                                                        <% } %>
+                               <div class="shipping-details">
+                                        <% if (order.address) { %>
+                                            <p class="mb-1"><i class="fas fa-map-marker-alt me-2"></i><%= order.address.name %></p>
+                                            <% if (order.address.roadArea) { %>
+                                                <p class="mb-1"><i class="fas fa-road me-2"></i><%= order.address.roadArea %></p>
+                                            <% } %>
+                                            <% if (order.address.landMark) { %>
+                                                <p class="mb-1"><i class="fas fa-map-pin me-2"></i><%= order.address.landMark %></p>
+                                            <% } %>
+                                            <p class="mb-1">
+                                                <i class="fas fa-city me-2"></i>
+                                                <%= order.address.city %>, <%= order.address.state %>, <%= order.address.pincode %>
+                                            </p>
+                                            <p class="mb-0"><i class="fas fa-phone me-2"></i><%= order.address.phone %></p>
+                                            <% if (order.address.addressType) { %>
+                                                <p class="mb-0 mt-1">
+                                                    <span class="badge bg-secondary"><%= order.address.addressType %></span>
+                                                </p>
+                                            <% } %>
+                                        <% } else { %>
+                                            <p class="mb-0">No shipping address provided</p>
+                                        <% } %>
                             </div>
                         </div>
                     </div>
+                    
+                           
+
+                           
+
+                          
                     <div class="summary-totals mt-4">
                         <div class="total-row">
                             <span>Subtotal:</span>
@@ -456,14 +531,14 @@
                                 </div>
                     </div>
                     <div class="order-actions mt-4">
-                        <button class="btn btn-outline-dark me-2" onclick="window.print()">
+                        <button class="ustom-btn me-2" onclick="window.print()">
                             <i class="fas fa-print me-2"></i>Print Invoice
                         </button>
-                        <a href="/orders/<%= order._id %>/invoice" class="btn btn-outline-primary me-2">
+                        <a href="/orders/<%= order._id %>/invoice" class="custom-btn me-2">">
                             <i class="fas fa-download me-2"></i>Download Invoice
                         </a>
                         <% if (canCancelOrder) { %>
-                            <button class="btn btn-outline-danger me-2 cancel-order-btn" data-item-id="<%= order._id %>"
+                            <button class="custom-btn me-2 cancel-order-btn" data-item-id="<%= order._id %>"
                                 data-item-name="Order #<%= order.orderId %>" data-type="order">
                                 <i class="fas fa-times-circle me-2"></i>Cancel Order
                             </button>

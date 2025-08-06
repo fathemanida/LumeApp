@@ -60,7 +60,7 @@ const addToCart = async (req, res) => {
       return res.status(404).json({ success: false, message: "Product not found" });
     }
 
-    const productStock = product.quantity || product.productStock || 0;
+    const productStock = product.quantity || 0;
     const maxAllowed = Math.min(productStock, 6);
     console.log('======priduct stock',productStock);
         console.log('======maxAllowed',maxAllowed);
@@ -121,6 +121,7 @@ const addToCart = async (req, res) => {
     const existingItem = cart.items.find(
       item => item.productId.equals(productId) && item.size === selectedSize
     );
+    console.log(existingItem,'====existing item')
 
     if (existingItem) {
       const newTotalQuantity = existingItem.quantity + Number(quantity);

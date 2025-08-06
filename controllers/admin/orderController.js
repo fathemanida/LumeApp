@@ -440,7 +440,7 @@ const handleOrderItemReturn = async (req, res) => {
             }
 
             if (order.paymentMethod !== 'COD') {
-                let refundAmount = item.finalPrice  * item.quantity;
+                let refundAmount = item.finalPrice;
 
                 if (order.couponDiscount && order.couponDiscount > 0) {
                     const totalItemsCount = order.items.length; 

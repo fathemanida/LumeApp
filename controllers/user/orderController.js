@@ -346,7 +346,7 @@ const cancelOrderItem = async (req, res) => {
             order.paymentMethod !== 'COD' && 
             (order.paymentMethod === 'Wallet' || order.paymentMethod === 'Razorpay')
         ) {
-            refundAmount = (item.finalPrice || item.price) * item.quantity;
+            refundAmount = item.finalPrice
 
             if (order.couponDiscount && order.couponDiscount > 0) {
                const totalItemsCount = order.items.length;

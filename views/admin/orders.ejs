@@ -103,15 +103,15 @@
                                     </span>
                                     <% if (order.returnRequest) { %>
                                         <div class="return-status">
-                                            <% if (order.returnRequest.status === 'Pending') { %>
+                                            <% if (order.status === 'Requested') { %>
                                                 <div class="return-pending">
                                                     <i class="fas fa-exclamation-circle"></i> Return Requested
                                                 </div>
-                                            <% } else if (order.returnRequest.status === 'Accepted') { %>
+                                            <% } else if (order.returnRequest === 'Approved') { %>
                                                 <div class="return-accepted">
-                                                    <i class="fas fa-check-circle"></i> Return Accepted
+                                                    <i class="fas fa-check-circle"></i> Return Approved
                                                 </div>
-                                            <% } else if (order.returnRequest.status === 'Rejected') { %>
+                                            <% } else if (order.returnRequest === 'Rejected') { %>
                                                 <div class="return-rejected">
                                                     <i class="fas fa-times-circle"></i> Return Rejected
                                                 </div>

@@ -1470,7 +1470,25 @@
         }).showToast();
         return;
       }
+      
+      // First check if user is authenticated
       try {
+        const authCheck = await fetch('/check-auth');
+        const authData = await authCheck.json();
+        
+        if (!authData.isAuthenticated) {
+          Toastify({
+            text: "Please login to add items to your wishlist",
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#ff9800",
+            stopOnFocus: true
+          }).showToast();
+          return;
+        }
+        
+        // If user is authenticated, proceed with wishlist operation
         const response = await fetch('/wishlist/add', {
           method: 'POST',
           headers: {
@@ -1479,12 +1497,13 @@
           body: JSON.stringify({ productId })
         });
         const data = await response.json();
-        if (data.success) {
+        
+        if (response.ok) {
           iconElement.classList.toggle('far');
           iconElement.classList.toggle('fas');
-          iconElement.classList.toggle('text-danger');
+          
           Toastify({
-            text: iconElement.classList.contains('fas') ? "Added to Wishlist 💖" : "Removed from Wishlist ❌",
+            text: iconElement.classList.contains('fas') ? "Added to Wishlist " : "Removed from Wishlist ",
             duration: 3000,
             gravity: "top",
             position: "right",

@@ -87,6 +87,9 @@ router.get("/filter", userController.filterProduct);
 router.get('/new-arrivals',userController.newArrivals)
 router.get('/featured',userController.featured)
 
+router.get('/delete-account',userAuth.isLogin,userController.deleteUserAccount)
+
+
 
 
 router.get('/product-details', userController.productDetails)

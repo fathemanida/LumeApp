@@ -74,13 +74,15 @@ console.log('=admin @ offer add');
       });
     }
 
-    const existingOffer = await Offer.findOne({ code: code.toUpperCase() });
-    if (existingOffer) {
-      return res.status(400).json({
-        success: false,
-        message: 'Offer code already exists'
-      });
-    }
+    const existingOffer = await Offer.findOne({ code: { $regex: `^${code}$`, $options: 'i' } });
+
+if (existingOffer) {
+  return res.status(400).json({
+    success: false,
+    message: 'Offer code already exists',
+  });
+}
+
 
     const newOffer = new Offer({
       name,

@@ -48,101 +48,13 @@
             gap: 30px;
         }
         
-        /* Sidebar */
-        .sidebar {
-            width: 250px;
-            flex-shrink: 0;
-            background-color: white;
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            height: fit-content;
-        }
         
-        /* Content Area */
         .content-area {
             flex: 1;
             padding: 0;
             background: transparent;
         }
 
-        /* Elegant Sidebar */
-        .sidebar {
-            width: 100%;
-            background-color: white;
-            padding: 1rem;
-            border-bottom: 1px solid var(--theme-border);
-        }
-
-        .sidebar-title {
-            font-family: 'Aboreto', cursive;
-            font-size: 1.5rem;
-            color: var(--olive-green);
-            margin-bottom: 1rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--theme-border);
-            letter-spacing: 1px;
-        }
-
-        .sidebar-nav {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .sidebar-nav a {
-            color: var(--dark-brown);
-            text-decoration: none;
-            padding: 0.75rem 1rem;
-            border-radius: 0;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            font-size: 0.95rem;
-        }
-
-        .sidebar-nav a i {
-            width: 20px;
-            text-align: center;
-            color: var(--olive-green);
-        }
-
-        .sidebar-nav a:hover {
-            background-color: rgba(51, 68, 17, 0.1);
-            color: var(--olive-green);
-            transform: translateX(4px);
-        }
-
-        .sidebar-nav a.active {
-            background-color: rgba(51, 68, 17, 0.2);
-            color: var(--olive-green);
-            font-weight: 500;
-            border-left: 3px solid var(--olive-green);
-        }
-
-        .sidebar-actions {
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--theme-border);
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .sidebar-actions button {
-            padding: 0.75rem;
-            border-radius: 0;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Aboreto', sans-serif;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
 
         .logout-btn {
             background-color: rgba(51, 68, 17, 0.1);
@@ -216,37 +128,7 @@
                 padding: 20px 0;
             }
             
-            .sidebar {
-                width: 100%;
-                position: static;
-                margin-bottom: 20px;
-                box-shadow: none;
-                padding: 0;
-            }
-            
-            .sidebar-nav {
-                flex-direction: row;
-                flex-wrap: wrap;
-                gap: 5px;
-                margin-bottom: 10px;
-            }
-            
-            .sidebar-nav a {
-                padding: 0.6rem 1rem;
-                font-size: 0.9rem;
-                white-space: nowrap;
-                border-radius: 4px;
-            }
-            
-            .sidebar-actions {
-                flex-direction: row;
-                flex-wrap: wrap;
-                gap: 10px;
-                margin-top: 15px;
-                padding-top: 15px;
-                border-top: 1px solid var(--theme-border);
-            }
-            
+           
             .orders-table-container {
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
@@ -278,42 +160,6 @@
                 padding: 15px 0;
             }
             
-            .sidebar {
-                position: fixed;
-                top: 60px;
-                left: 0;
-                right: 0;
-                z-index: 1000;
-                background: white;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                padding: 10px 15px;
-            }
-            
-            .sidebar-nav {
-                flex-direction: row;
-                flex-wrap: nowrap;
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-                padding-bottom: 5px;
-                margin: 0 -15px;
-                padding: 0 15px 5px;
-            }
-            
-            .sidebar-nav a {
-                padding: 0.5rem 0.8rem;
-                font-size: 0.85rem;
-                white-space: nowrap;
-                border-radius: 4px;
-                flex-shrink: 0;
-            }
-            
-            .sidebar-actions {
-                flex-direction: row;
-                flex-wrap: wrap;
-                gap: 8px;
-                margin-top: 10px;
-                padding-top: 10px;
-            }
             
             .page-header {
                 flex-direction: column;
@@ -561,13 +407,7 @@
                 flex-direction: row;
             }
 
-            .sidebar {
-                width: 280px;
-                min-height: calc(100vh - 70px);
-                border-right: 1px solid var(--theme-border);
-                border-bottom: none;
-                padding: 2rem 1.5rem;
-            }
+          
 
             .content-area {
                 flex: 1;
@@ -626,9 +466,7 @@
   .content-area {
     padding: 0 !important;
   }
-  .sidebar {
-    padding: 0 !important;
-  }
+ 
   .page-header {
     flex-direction: column !important;
     gap: 0.5rem !important;
@@ -668,9 +506,7 @@
   .content-area {
     padding: 0 !important;
   }
-  .sidebar {
-    padding: 0 !important;
-  }
+ 
   .page-header {
     flex-direction: column !important;
     gap: 0.25rem !important;
@@ -840,16 +676,11 @@
  <%-include('../partials/user/fooret.ejs')  %>
 
     <script>
-        // Sidebar button functionality
         document.querySelector('.logout-btn').addEventListener('click', function() {
             window.location.href = '/logout';
         });
 
-        document.querySelector('.delete-btn').addEventListener('click', function() {
-            if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
-                window.location.href = '/profile/delete';
-            }
-        });
+       
 
         function requestReturn(orderId) {
             window.location.href = `/orders/${orderId}`;

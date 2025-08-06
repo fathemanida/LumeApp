@@ -9,6 +9,10 @@ const session = require("express-session");
 const passport = require("passport");
 const Offer = require("../../models/offerSchema");
 const Wallet = require("../../models/walletSchema");
+const Order = require('../../models/orderSchema');
+const Cart = require('../models/Cart');
+const Wishlist = require('../../models/wishlistSchema');
+const Address = require('../../models/addressSchema');
 
 const loadLogin = async (req, res) => {
   try {
@@ -1117,6 +1121,33 @@ const featured = async (req, res) => {
 };
 
 
+const deleteUserAccount = async (req, res) => {
+  try {
+    const userId = req.session.user.id; 
+
+    if (!userId) {
+      return res.status(400).json({ success: false, message: 'User ID missing' });
+    }
+
+    await Promise.all([
+      Cart.deleteOne({ user: userId }),
+      Wishlist.deleteOne({ user: userId }),
+      Address.deleteMany({ user: userId }),
+      Wallet.deleteOne({ user: userId }),
+      Order.deleteMany({ user: userId }),
+    ]);
+
+    await User.findByIdAndDelete(userId);
+
+    res.status(200).json({ success: true, message: 'User account and related data deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting user account:', err);
+    res.status(500).json({ success: false, message: 'Server error while deleting user' });
+  }
+};
+
+
+
 module.exports = {
   loadLogin,
   login,
@@ -1131,5 +1162,5 @@ module.exports = {
   logout,
   newArrivals,
   featured,
-  
+  deleteUserAccount
 };
