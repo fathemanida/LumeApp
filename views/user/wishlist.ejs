@@ -1,107 +1,384 @@
 <%- include('../partials/user/header') %>
 
-<div class="container py-4">
-  <div class="row">
-    <!-- Sidebar -->
-    <div class="col-lg-3 d-none d-lg-block">
-      <%- include('../partials/user/sidebar', { currentPage: 'wishlist' }) %>
-    </div>
+<style>
+  /* Wishlist Specific Styles */
+  .wishlist-container {
+    padding: clamp(2rem, 5vw, 3rem);
+    background-color: #f0e9e0;
+    font-family: 'Jost', sans-serif;
+  }
+  
+  .wishlist-title {
+    font-family: 'Aboreto', cursive;
+    color: var(--darker-text);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    display: flex;
+    align-items: center;
+  }
+  
+  .wishlist-badge {
+    background-color: var(--offer-red);
+    color: white;
+    font-size: 0.8rem;
+    margin-left: 0.75rem;
+    font-family: 'Jost', sans-serif;
+    font-weight: 600;
+  }
+  
+  .wishlist-item {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .wishlist-item:hover {
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    transform: translateY(-3px);
+  }
+  
+  .product-image-container {
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--light-bg);
+    height: 180px;
+  }
+  
+  .product-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    mix-blend-mode: multiply;
+    transition: transform 0.3s ease;
+  }
+  
+  .wishlist-item:hover .product-image {
+    transform: scale(1.05);
+  }
+  
+  .product-details {
+    padding: 1.5rem;
+  }
+  
+  .product-name {
+    font-family: 'Jost', sans-serif;
+    color: var(--darker-text);
+    font-size: clamp(1rem, 2.5vw, 1.1rem);
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+  
+  .product-price {
+    color: var(--dark-text);
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+    font-family: 'Jost', sans-serif;
+  }
+  
+  .sale-price {
+    color: var(--offer-red);
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+  
+  .regular-price {
+    text-decoration: line-through;
+    opacity: 0.7;
+    margin-left: 0.5rem;
+    font-size: 0.9em;
+    color: #666;
+  }
+  
+  .discount-badge {
+    display: inline-block;
+    background-color: #f8e8e8;
+    color: var(--offer-red);
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    margin-left: 0.5rem;
+    font-weight: 600;
+  }
+  
+  .stock-status {
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .in-stock {
+    color: var(--muted-green);
+    font-weight: 500;
+  }
+  
+  .out-of-stock {
+    color: var(--offer-red);
+    font-weight: 500;
+  }
+  
+  .wishlist-actions {
+    display: flex;
+    gap: 0.75rem;
+  }
+  
+  .btn-add-to-cart {
+    background: var(--muted-green);
+    border: none;
+    color: white;
+    padding: 0.6rem 1rem;
+    border-radius: 4px;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .btn-add-to-cart:hover {
+    background: #546a47;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(101, 120, 88, 0.2);
+  }
+  
+  .btn-add-to-cart:disabled {
+    background: #cccccc;
+    color: #666666;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+  
+  .btn-remove {
+    background: var(--soft-beige);
+    border: none;
+    color: var(--darker-text);
+    padding: 0.6rem 1rem;
+    border-radius: 4px;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .btn-remove:hover {
+    background: #c9aa82;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(212, 185, 150, 0.2);
+  }
+  
+  .empty-wishlist {
+    text-align: center;
+    padding: clamp(3rem, 8vw, 4rem);
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+  }
+  
+  .empty-wishlist-icon {
+    font-size: clamp(3rem, 8vw, 4rem);
+    color: var(--soft-beige);
+    margin-bottom: 1.5rem;
+  }
+  
+  .empty-wishlist-text {
+    font-family: 'Aboreto', cursive;
+    color: var(--darker-text);
+    font-size: clamp(1.2rem, 3vw, 1.5rem);
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+  
+  .empty-wishlist-subtext {
+    color: var(--dark-text);
+    margin-bottom: 1.5rem;
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    font-family: 'Jost', sans-serif;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.5;
+  }
+  
+  .btn-continue-shopping {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.75rem;
+    background: var(--darker-text);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-family: 'Jost', sans-serif;
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .btn-continue-shopping:hover {
+    background: var(--muted-green);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  
+  @media (max-width: 768px) {
+    .product-image-container {
+      height: 150px;
+    }
     
-    <!-- Main Content -->
-    <div class="col-lg-9">
-      <div class="card border-0 shadow-sm mb-4">
-        <div class="card-body">
-          <h2 class="h4 mb-4">
-            <i class="fas fa-heart text-danger me-2"></i> My Wishlist
-            <span class="badge bg-secondary ms-2"><%= wishlist && wishlist.items ? wishlist.items.length : 0 %></span>
-          </h2>
-          
+    .product-details {
+      padding: 1.2rem;
+    }
+    
+    .btn-add-to-cart,
+    .btn-remove {
+      padding: 0.5rem;
+      font-size: 0.8rem;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .wishlist-title {
+      font-size: clamp(1.2rem, 4vw, 1.5rem);
+    }
+    
+    .product-name {
+      font-size: clamp(0.9rem, 3vw, 1rem);
+    }
+    
+    .product-image-container {
+      height: 120px;
+    }
+    
+    .sale-price {
+      font-size: 1rem;
+    }
+    
+    .empty-wishlist {
+      padding: 2rem 1.5rem;
+    }
+  }
+</style>
+
+<div class="wishlist-container">
+  <div class="container">
+    <div class="row">
+      <!-- Sidebar -->
+      <div class="col-lg-3 d-none d-lg-block">
+        <%- include('../partials/user/sidebar', { currentPage: 'wishlist' }) %>
+      </div>
+      
+      <!-- Main Content -->
+      <div class="col-lg-9">
+        <h2 class="wishlist-title">
+          <i class="fas fa-heart me-2" style="color: var(--offer-red);"></i> My Wishlist
           <% if (wishlist && wishlist.items && wishlist.items.length > 0) { %>
-            <div class="row g-4">
-              <% wishlist.items.forEach(item => { %>
-                <div class="col-12">
-                  <div class="card border-0 shadow-sm h-100">
-                    <div class="row g-0">
-                      <!-- Product Image -->
-                      <div class="col-md-2">
-                        <img 
-                          src="/uploads/product/<%= item.productId.productImage[0] %>" 
-                          class="img-fluid rounded-start" 
-                          alt="<%= item.productId.productName %>"
-                          style="height: 150px; width: 100%; object-fit: cover;"
-                        >
-                      </div>
-                      
-                      <!-- Product Details -->
-                      <div class="col-md-7">
-                        <div class="card-body">
-                          <h5 class="card-title mb-2">
-                            <a href="/product/<%= item.productId._id %>" class="text-dark text-decoration-none">
-                              <%= item.productId.productName %>
-                            </a>
-                          </h5>
-                          
-                          <!-- Price -->
-                          <div class="mb-2">
-                            <% if (item.productId.salePrice && item.productId.salePrice < item.productId.regularPrice) { %>
-                              <span class="h5 text-danger fw-bold">₹<%= item.productId.salePrice.toLocaleString() %></span>
-                              <small class="text-muted text-decoration-line-through ms-2">₹<%= item.productId.regularPrice.toLocaleString() %></small>
-                              <% const discount = Math.round(((item.productId.regularPrice - item.productId.salePrice) / item.productId.regularPrice) * 100); %>
-                              <span class="badge bg-success ms-2"><%= discount %>% OFF</span>
-                            <% } else { %>
-                              <span class="h5 fw-bold">₹<%= item.productId.regularPrice.toLocaleString() %></span>
-                            <% } %>
-                          </div>
-                          
-                          <!-- Stock Status -->
-                          <% if (item.productId.quantity > 0) { %>
-                            <p class="text-success mb-0"><i class="fas fa-check-circle"></i> In Stock</p>
-                          <% } else { %>
-                            <p class="text-danger mb-0"><i class="fas fa-times-circle"></i> Out of Stock</p>
-                          <% } %>
-                        </div>
-                      </div>
-                      
-                      <!-- Actions -->
-                      <div class="col-md-3">
-                        <div class="card-body h-100 d-flex flex-column justify-content-between">
-                          <div class="d-grid gap-2">
-                            <% if (item.productId.quantity > 0) { %>
-                              <button 
-                                class="btn btn-dark btn-sm w-100 mb-2" 
-                                onclick="addToCartFromWishlist('<%= item.productId._id %>', this)"
-                              >
-                                <i class="fas fa-shopping-cart me-2"></i>Add to Cart
-                              </button>
-                            <% } %>
-                            
-                            <button 
-                              class="btn btn-outline-danger btn-sm w-100" 
-                              onclick="removeFromWishlist('<%= item.productId._id %>')"
-                            >
-                              <i class="far fa-trash-alt me-2"></i>Remove
-                            </button>
-                          </div>
-                        </div>
-                      </div>
+            <span class="badge wishlist-badge"><%= wishlist.items.length %></span>
+          <% } %>
+        </h2>
+        
+        <% if (wishlist && wishlist.items && wishlist.items.length > 0) { %>
+          <div class="row">
+            <% wishlist.items.forEach(item => { %>
+              <div class="col-md-6 col-lg-4 mb-4">
+                <div class="wishlist-item h-100">
+                  <div class="product-image-container">
+                    <img 
+                      src="/uploads/product/<%= item.productId.productImage[0] %>" 
+                      class="product-image" 
+                      alt="<%= item.productId.productName %>"
+                    >
+                  </div>
+                  
+                  <div class="product-details">
+                    <h5 class="product-name">
+                      <a href="/product/<%= item.productId._id %>" class="text-decoration-none text-dark">
+                        <%= item.productId.productName %>
+                      </a>
+                    </h5>
+                    
+                    <div class="product-price">
+                      <% if (item.productId.salePrice && item.productId.salePrice < item.productId.regularPrice) { %>
+                        <span class="sale-price">₹<%= item.productId.salePrice.toLocaleString() %></span>
+                        <span class="regular-price">₹<%= item.productId.regularPrice.toLocaleString() %></span>
+                        <% const discount = Math.round(((item.productId.regularPrice - item.productId.salePrice) / item.productId.regularPrice) * 100); %>
+                        <span class="discount-badge"><%= discount %>% OFF</span>
+                      <% } else { %>
+                        <span>₹<%= item.productId.regularPrice.toLocaleString() %></span>
+                      <% } %>
+                    </div>
+                    
+                    <div class="stock-status">
+                      <% if (item.productId.quantity > 0) { %>
+                        <i class="fas fa-check-circle"></i>
+                        <span class="in-stock">In Stock</span>
+                      <% } else { %>
+                        <i class="fas fa-times-circle"></i>
+                        <span class="out-of-stock">Out of Stock</span>
+                      <% } %>
+                    </div>
+                    
+                    <div class="wishlist-actions">
+                      <button 
+                        class="btn-add-to-cart" 
+                        onclick="addToCartFromWishlist('<%= item.productId._id %>', this)"
+                        <%= item.productId.quantity <= 0 ? 'disabled' : '' %>
+                      >
+                        <i class="fas fa-shopping-cart"></i> Add to Cart
+                      </button>
+                      <button 
+                        class="btn-remove" 
+                        onclick="removeFromWishlist('<%= item.productId._id %>', this)"
+                      >
+                        <i class="far fa-trash-alt"></i> Remove
+                      </button>
                     </div>
                   </div>
                 </div>
-              <% }); %>
-            </div>
-          <% } else { %>
-            <!-- Empty Wishlist -->
-            <div class="text-center py-5">
-              <div class="mb-4">
-                <i class="far fa-heart fa-4x text-muted"></i>
               </div>
-              <h4 class="h5 mb-3">Your wishlist is empty</h4>
-              <p class="text-muted mb-4">You haven't added any items to your wishlist yet.</p>
-              <a href="/shop" class="btn btn-primary">Continue Shopping</a>
-            </div>
-          <% } %>
+            <% }); %>
           </div>
-        </div>
+        <% } else { %>
+          <!-- Empty Wishlist -->
+          <div class="empty-wishlist">
+            <div class="mb-4">
+              <i class="far fa-heart empty-wishlist-icon"></i>
+            </div>
+            <h4 class="empty-wishlist-text">Your wishlist is empty</h4>
+            <p class="empty-wishlist-subtext">You haven't added any items to your wishlist yet. Start exploring our collection and save your favorite items here.</p>
+            <a href="/shop" class="btn-continue-shopping">
+              <i class="fas fa-arrow-left me-1"></i> Continue Shopping
+            </a>
+          </div>
+        <% } %>
       </div>
     </div>
   </div>
@@ -134,12 +411,20 @@ async function addToCartFromWishlist(productId, button) {
     if (data.success) {
       // Show success message
       Toastify({
-        text: data.message || 'Added to cart successfully',
+        text: "✓ " + (data.message || "Added to cart successfully!"),
         duration: 3000,
-        gravity: 'top',
-        position: 'right',
-        backgroundColor: '#28a745',
-        stopOnFocus: true
+        close: true,
+        gravity: "top",
+        position: "right",
+        backgroundColor: "#28a745",
+        stopOnFocus: true,
+        className: "toastify-success",
+        style: {
+          fontFamily: "'Jost', sans-serif",
+          fontWeight: "500",
+          borderRadius: "4px",
+          boxShadow: "0 4px 12px rgba(40, 167, 69, 0.3)"
+        }
       }).showToast();
 
       // Update cart count in header
@@ -151,36 +436,66 @@ async function addToCartFromWishlist(productId, button) {
     } else {
       // Show error message
       Toastify({
-        text: data.message || 'Failed to add to cart',
+        text: "✗ " + (data.message || "Failed to add to cart"),
         duration: 3000,
-        gravity: 'top',
-        position: 'right',
-        backgroundColor: '#dc3545',
-        stopOnFocus: true
+        close: true,
+        gravity: "top",
+        position: "right",
+        backgroundColor: "#dc3545",
+        stopOnFocus: true,
+        className: "toastify-error",
+        style: {
+          fontFamily: "'Jost', sans-serif",
+          fontWeight: "500",
+          borderRadius: "4px",
+          boxShadow: "0 4px 12px rgba(220, 53, 69, 0.3)"
+        }
       }).showToast();
+      
+      // If not logged in, redirect to login
+      if (data.message === 'Please login to continue') {
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 1500);
+      }
     }
   } catch (error) {
     console.error('Add to cart error:', error);
     Toastify({
-      text: 'An error occurred. Please try again.',
+      text: "✗ An error occurred. Please try again.",
       duration: 3000,
-      gravity: 'top',
-      position: 'right',
-      backgroundColor: '#dc3545',
-      stopOnFocus: true
+      close: true,
+      gravity: "top",
+      position: "right",
+      backgroundColor: "#dc3545",
+      stopOnFocus: true,
+      className: "toastify-error",
+      style: {
+        fontFamily: "'Jost', sans-serif",
+        fontWeight: "500",
+        borderRadius: "4px",
+        boxShadow: "0 4px 12px rgba(220, 53, 69, 0.3)"
+      }
     }).showToast();
   } finally {
     // Reset button state
     if (button) {
       button.disabled = false;
-      button.innerHTML = '<i class="fas fa-shopping-cart me-2"></i>Add to Cart';
+      button.innerHTML = '<i class="fas fa-shopping-cart"></i> Add to Cart';
     }
   }
 }
 
 // Remove from Wishlist
-async function removeFromWishlist(productId) {
+async function removeFromWishlist(productId, button) {
   try {
+    // Show loading state if button is provided
+    if (button) {
+      const originalText = button.innerHTML;
+      button.disabled = true;
+      button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+    }
+
     const response = await fetch('/wishlist/remove', {
       method: 'POST',
       headers: {
@@ -192,11 +507,23 @@ async function removeFromWishlist(productId) {
     const data = await response.json();
     
     if (data.success) {
-      // Remove the item from the UI
-      const itemElement = document.querySelector(`[data-product-id="${productId}"]`);
-      if (itemElement) {
-        itemElement.remove();
-      }
+      // Show success message
+      Toastify({
+        text: "✓ Removed from wishlist",
+        duration: 3000,
+        close: true,
+        gravity: "top",
+        position: "right",
+        backgroundColor: "#28a745",
+        stopOnFocus: true,
+        className: "toastify-success",
+        style: {
+          fontFamily: "'Jost', sans-serif",
+          fontWeight: "500",
+          borderRadius: "4px",
+          boxShadow: "0 4px 12px rgba(40, 167, 69, 0.3)"
+        }
+      }).showToast();
 
       // Update wishlist count in header
       const wishlistCountElement = document.querySelector('.wishlist-count');
@@ -205,224 +532,51 @@ async function removeFromWishlist(productId) {
         wishlistCountElement.style.display = data.wishlistCount > 0 ? 'flex' : 'none';
       }
 
-      // Show success message
-      Toastify({
-        text: 'Removed from wishlist',
-        duration: 3000,
-        gravity: 'top',
-        position: 'right',
-        backgroundColor: '#28a745',
-        stopOnFocus: true
-      }).showToast();
+      // Remove the item from the UI
+      const itemElement = button ? button.closest('.col-md-6') : null;
+      if (itemElement) {
+        itemElement.style.opacity = '0';
+        setTimeout(() => {
+          itemElement.remove();
+        }, 300);
+      }
 
-      // If no items left, show empty state
-      const wishlistItems = document.querySelectorAll('[data-product-id]');
+      // If no items left, reload to show empty state
+      const wishlistItems = document.querySelectorAll('.wishlist-item');
       if (wishlistItems.length === 0) {
-        window.location.reload(); // Reload to show empty state
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
       }
     } else {
-      // Show error message
-      Toastify({
-        text: data.message || 'Failed to remove from wishlist',
-        duration: 3000,
-        gravity: 'top',
-        position: 'right',
-        backgroundColor: '#dc3545',
-        stopOnFocus: true
-      }).showToast();
+      throw new Error(data.message || 'Failed to remove from wishlist');
     }
   } catch (error) {
     console.error('Remove from wishlist error:', error);
     Toastify({
-      text: 'An error occurred. Please try again.',
+      text: "✗ " + (error.message || "Failed to remove item"),
       duration: 3000,
-      gravity: 'top',
-      position: 'right',
-      backgroundColor: '#dc3545',
-      stopOnFocus: true
+      close: true,
+      gravity: "top",
+      position: "right",
+      backgroundColor: "#dc3545",
+      stopOnFocus: true,
+      className: "toastify-error",
+      style: {
+        fontFamily: "'Jost', sans-serif",
+        fontWeight: "500",
+        borderRadius: "4px",
+        boxShadow: "0 4px 12px rgba(220, 53, 69, 0.3)"
+      }
     }).showToast();
+  } finally {
+    // Reset button state if button is provided
+    if (button) {
+      button.disabled = false;
+      button.innerHTML = '<i class="far fa-trash-alt"></i> Remove';
+    }
   }
 }
 </script>
 
-    </style>
-</head>
-<body>
-<%- include('../partials/user/header.ejs') %>
-    <div class="container py-4 main-content-container">
-      <%- include('../partials/user/sidebar.ejs', { currentPage: 'wishlist' }) %>
-
-        <h2 class="wishlist-title">My Wishlist</h2>
-        <% if (wishlist && wishlist.items && wishlist.items.length > 0) { %>
-            <div class="row">
-                <% wishlist.items.forEach(item => { %>
-                    <div class="col-12 col-md-6 col-lg-4 mb-4">
-                        <div class="wishlist-item">
-                            <button class="btn-remove" onclick="removeFromWishlist('<%= item.productId._id %>')">
-                                <i class="fas fa-times"></i>
-                            </button>
-                            <div class="row">
-                                <div class="col-12 col-md-5 mb-3 mb-md-0">
-                                    <img src="/uploads/product/<%= item.productId.productImage[0] %>" 
-                                         alt="<%= item.productId.productName %>" 
-                                         class="product-image w-100">
-                                </div>
-                                <div class="col-12 col-md-7">
-                                    <h5 class="product-name"><%= item.productId.productName %></h5>
-                                    <div class="product-price">
-                                        <% 
-                                            const product = item.productId;
-                                            const basePrice = product.salePrice && product.salePrice < product.regularPrice ? 
-                                                product.salePrice : product.regularPrice;
-                                            const hasOffer = product.salePrice && product.salePrice < product.regularPrice;
-                                        %>
-                                        <% if (hasOffer) { %>
-                                            <span class="sale-price">₹<%= product.salePrice.toLocaleString() %></span>
-                                            <span class="regular-price">₹<%= product.regularPrice.toLocaleString() %></span>
-                                        <% } else { %>
-                                            <span>₹<%= product.regularPrice.toLocaleString() %></span>
-                                        <% } %>
-                                    </div>
-                                    <div class="mt-3">
-                                        <button class="btn-action" 
-                                                onclick="addToCart('<%= item.productId._id %>')">
-                                            <i class="fas fa-shopping-cart me-2"></i>Add to Cart
-                                        </button>
-                                        <button class="btn-action" 
-                                                style="background-color: var(--muted-green)"
-                                                onclick="window.location.href='/product-details/<%= item.productId._id %>'">
-                                            <i class="fas fa-eye me-2"></i>View Details
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                <% }) %>
-            </div>
-        <% } else { %>
-            <div class="empty-wishlist">
-                <i class="far fa-heart empty-wishlist-icon"></i>
-                <h3 class="empty-wishlist-text">Your wishlist is empty</h3>
-                <p class="empty-wishlist-subtext">You haven't added any items to your wishlist yet.</p>
-                <a href="/shopAll" class="btn-shop-now">Continue Shopping</a>
-            </div>
-        <% } %>
-    </div>
-
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-    
-    <script>
-    // Function to remove item from wishlist
-    async function removeFromWishlist(productId) {
-        try {
-            const response = await fetch('/wishlist/remove', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ productId })
-            });
-
-            const result = await response.json();
-            
-            if (result.success) {
-                // Show success message
-                Toastify({
-                    text: "Removed from wishlist",
-                    duration: 3000,
-                    close: true,
-                    gravity: "top",
-                    position: 'right',
-                    backgroundColor: "#4caf50",
-                    stopOnFocus: true
-                }).showToast();
-
-                // Reload the page to update the wishlist
-                setTimeout(() => {
-                    window.location.reload();
-                }, 500);
-            } else {
-                throw new Error(result.message || 'Failed to remove item');
-            }
-        } catch (error) {
-            console.error('Error removing from wishlist:', error);
-            Toastify({
-                text: error.message || "Failed to remove item",
-                duration: 3000,
-                close: true,
-                gravity: "top",
-                position: 'right',
-                backgroundColor: "#f44336",
-                stopOnFocus: true
-            }).showToast();
-        }
-    }
-
-    // Function to add item to cart
-    async function addToCart(productId) {
-        try {
-            const response = await fetch('/add-to-cart', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    productId: productId,
-                    quantity: 1
-                })
-            });
-
-            const result = await response.json();
-            
-            if (result.success) {
-                // Update cart count in header if element exists
-                const cartCountElement = document.querySelector('.cart-count');
-                if (cartCountElement) {
-                    cartCountElement.textContent = result.cartCount;
-                }
-
-                // Show success message
-                Toastify({
-                    text: "Added to cart successfully!",
-                    duration: 3000,
-                    close: true,
-                    gravity: "top",
-                    position: 'right',
-                    backgroundColor: "#4caf50",
-                    stopOnFocus: true
-                }).showToast();
-
-                // Optionally remove from wishlist after adding to cart
-                // Uncomment the line below if you want to remove from wishlist after adding to cart
-                // await removeFromWishlist(productId);
-                
-            } else {
-                throw new Error(result.message || 'Failed to add to cart');
-            }
-        } catch (error) {
-            console.error('Error adding to cart:', error);
-            Toastify({
-                text: error.message || "Failed to add to cart",
-                duration: 3000,
-                close: true,
-                gravity: "top",
-                position: 'right',
-                backgroundColor: "#f44336",
-                stopOnFocus: true
-            }).showToast();
-
-            // If not logged in, redirect to login
-            if (error.message === 'Please login to continue') {
-                setTimeout(() => {
-                    window.location.href = '/login';
-                }, 1500);
-            }
-        }
-    }
-    </script>
-</body>
-</html>
+<%- include('../partials/user/footer') %>

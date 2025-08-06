@@ -821,38 +821,64 @@
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'Accept': 'application/json'
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest' // Add this header to identify AJAX requests
                         },
-                        body: JSON.stringify({ addressId })
+                        body: JSON.stringify({ addressId }),
+                        redirect: 'follow' // Follow redirects
                     })
-                    .then(response => {
-                        if (!response.ok) {
-                            return response.text().then(text => {
-                                throw new Error(`Failed to remove address (Status: ${response.status}, Response: ${text})`);
-                            });
+                    .then(async response => {
+                        const contentType = response.headers.get('content-type');
+                        
+                        // If the response is a redirect (last address removed)
+                        if (response.redirected) {
+                            window.location.href = response.url;
+                            return;
                         }
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log('Server response:', data);
-                        if (data.success) {
-                            Swal.fire({
-                                toast: true,
-                                position: 'top-end',
-                                icon: 'success',
-                                title: 'Address has been removed successfully',
-                                showConfirmButton: false,
-                                timer: 3000,
-                                timerProgressBar: true
-                            }).then(() => {
-                                location.reload();
-                            });
-                        } else {
+                        
+                        // If response is JSON, parse it
+                        if (contentType && contentType.includes('application/json')) {
+                            const data = await response.json();
+                            
+                            if (!response.ok) {
+                                throw new Error(data.message || `Failed to remove address (Status: ${response.status})`);
+                            }
+                            
+                            console.log('Server response:', data);
+                            
+                            if (data.success) {
+                                Swal.fire({
+                                    toast: true,
+                                    position: 'top-end',
+                                    icon: 'success',
+                                    title: 'Address has been removed successfully',
+                                    showConfirmButton: false,
+                                    timer: 3000,
+                                    timerProgressBar: true
+                                }).then(() => {
+                                    location.reload();
+                                });
+                                return;
+                            }
+                            
                             throw new Error(data.message || 'Failed to remove address');
                         }
+                        
+                        // If we get here, it's not JSON and not a redirect, so handle as error
+                        const text = await response.text();
+                        throw new Error(`Unexpected response format: ${text}`);
                     })
                     .catch(error => {
                         console.error('Error in removeAddress:', error);
+                        
+                        // If it's a redirect error, let the browser handle it
+                        if (error.message.includes('Failed to fetch') || 
+                            error.message.includes('redirect')) {
+                            window.location.reload();
+                            return;
+                        }
+                        
+                        // Show error message for other errors
                         Swal.fire({
                             toast: true,
                             position: 'top-end',

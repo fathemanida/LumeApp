@@ -1356,13 +1356,11 @@ const buyNow = async (req, res) => {
     const { productId, quantity = 1 } = req.body;
     const userId = req.session.user.id;
 
-    // Find the product
     const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({ success: false, message: 'Product not found' });
     }
 
-    // Check if product is in stock
     if (product.quantity < quantity) {
       return res.status(400).json({ 
         success: false, 
@@ -1370,14 +1368,12 @@ const buyNow = async (req, res) => {
       });
     }
 
-    // Clear existing cart
     await Cart.findOneAndUpdate(
       { user: userId },
       { $set: { items: [] } },
       { new: true, upsert: true }
     );
 
-    // Add the new product to cart
     const cart = await Cart.findOneAndUpdate(
       { user: userId },
       {
@@ -1392,7 +1388,6 @@ const buyNow = async (req, res) => {
       { new: true, upsert: true }
     ).populate('items.product');
 
-    // Redirect to checkout
     res.json({ success: true, redirect: '/checkout' });
 
   } catch (error) {
