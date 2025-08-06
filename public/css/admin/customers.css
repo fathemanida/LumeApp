@@ -99,6 +99,32 @@
         outline: none;
         box-shadow: 0 0 0 2px rgba(218, 198, 164, 0.2);
     }
+    
+    /* User Avatar Styles */
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--accent-color);
+    }
+    
+    .default-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: var(--bg-secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-secondary);
+        font-size: 24px;
+    }
+    
+    .default-avatar i {
+        color: var(--accent-color);
+    }
+    }
 
     .search-bar::placeholder {
         color: var(--text-secondary);

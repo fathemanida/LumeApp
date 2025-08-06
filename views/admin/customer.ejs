@@ -75,32 +75,32 @@
             </tr>
           </thead>
           <tbody>
-            <% for(let i = 0; i < data.length; i++) { %>
+            <% users.forEach(user => { %>
               <tr>
                 <td>
-                  <% if (data[i].profileImage) { %>
-                    <img src="/uploads/user/<%= data[i].profileImage %>" alt="<%= data[i].name %>" class="user-avatar">
+                  <% if (user.profileImage) { %>
+                    <img src="/uploads/user/<%= user.profileImage %>" alt="<%= user.username || 'User' %>" class="user-avatar">
                   <% } else { %>
                     <div class="default-avatar">
                       <i class="fas fa-user-circle"></i>
                     </div>
                   <% } %>
                 </td>
-                <td><%= data[i].name %></td>
-                <td><%= data[i].email %></td>
-                <td><%= data[i].createdAt ? new Date(data[i].createdAt).toLocaleDateString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' }) : 'N/A' %></td>
+                <td><%= user.username || 'N/A' %></td>
+                <td><%= user.email %></td>
+                <td><%= user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' }) : 'N/A' %></td>
                 <td>  
-                  <span class="status-badge <%= data[i].isBlocked ? 'status-blocked' : 'status-active' %>">
-                    <%= data[i].isBlocked ? 'Blocked' : 'Active' %>
+                  <span class="status-badge <%= user.isBlocked ? 'status-blocked' : 'status-active' %>">
+                    <%= user.isBlocked ? 'Blocked' : 'Active' %>
                   </span>
                 </td>
                 <td>
-                  <% if(data[i].isBlocked === false) { %>
-                    <button class="action-btn block-btn" title="Block User" data-url="/admin/customerBlocked?id=<%= data[i]._id %>" data-action="block">
+                  <% if(!user.isBlocked) { %>
+                    <a href="/admin/customerBlocked?id=<%= user._id %>" class="action-btn block-btn" title="Block User">
                       Block
-                    </button>
+                    </a>
                   <% } else { %>
-                    <button class="action-btn unblock-btn" title="Unblock User" data-url="/admin/customerUnblocked?id=<%= data[i]._id %>" data-action="unblock">
+                    <button class="action-btn unblock-btn" title="Unblock User" data-url="/admin/customerUnblocked?id=<%= user._id %>" data-action="unblock">
                       Unblock
                     </button>
                   <% } %>

@@ -24,15 +24,97 @@
         </a>
     </div>
     <div class="sidebar-actions">
-        <button class="logout-btn">
+        <button class="logout-btn" onclick="window.location.href='/logout'">
             <i class="fas fa-sign-out-alt"></i>
             Logout
         </button>
-        <button class="delete-btn">
+        <button class="delete-btn" id="deleteAccountBtn">
             <i class="fas fa-trash-alt"></i>
             Delete Account
         </button>
     </div>
+    
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteAccountModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Delete Your Account</h3>
+            <p>Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently removed.</p>
+            <div class="modal-actions">
+                <button id="confirmDelete" class="btn btn-danger">Yes, Delete My Account</button>
+                <button id="cancelDelete" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('deleteAccountModal');
+        const btn = document.getElementById('deleteAccountBtn');
+        const span = document.getElementsByClassName('close')[0];
+        const cancelBtn = document.getElementById('cancelDelete');
+        
+        // Open modal when delete button is clicked
+        btn.onclick = function() {
+            modal.style.display = 'block';
+        }
+        
+        // Close modal when X is clicked
+        span.onclick = function() {
+            modal.style.display = 'none';
+        }
+        
+        // Close modal when cancel button is clicked
+        cancelBtn.onclick = function() {
+            modal.style.display = 'none';
+        }
+        
+        // Close modal when clicking outside the modal
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+        
+        // Handle account deletion
+        document.getElementById('confirmDelete').addEventListener('click', async function() {
+            try {
+                const response = await fetch('/delete-account', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Show success message and redirect to home page
+                    Swal.fire({
+                        title: 'Account Deleted',
+                        text: 'Your account has been successfully deleted.',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.href = '/';
+                    });
+                } else {
+                    throw new Error(data.message || 'Failed to delete account');
+                }
+            } catch (error) {
+                console.error('Error deleting account:', error);
+                Swal.fire({
+                    title: 'Error',
+                    text: error.message || 'An error occurred while deleting your account',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            } finally {
+                modal.style.display = 'none';
+            }
+        });
+    });
+    </script>
 </div>
 
 <style>
@@ -138,6 +220,92 @@
 
     .delete-btn:hover {
         background-color: rgba(255, 107, 107, 0.1);
+    }
+    
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .modal-content {
+        background-color: white;
+        padding: 2rem;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        position: relative;
+    }
+    
+    .modal h3 {
+        margin-top: 0;
+        color: var(--dark-brown);
+        font-family: 'Aboreto', cursive;
+        margin-bottom: 1rem;
+    }
+    
+    .modal p {
+        margin-bottom: 1.5rem;
+        color: #555;
+        line-height: 1.5;
+    }
+    
+    .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+    
+    .btn {
+        padding: 0.6rem 1.5rem;
+        border: none;
+        border-radius: 4px;
+        font-family: 'Jost', sans-serif;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-danger {
+        background-color: #ff4d4f;
+        color: white;
+    }
+    
+    .btn-danger:hover {
+        background-color: #ff7875;
+    }
+    
+    .btn-secondary {
+        background-color: #f0f0f0;
+        color: #333;
+    }
+    
+    .btn-secondary:hover {
+        background-color: #e0e0e0;
+    }
+    
+    .close {
+        position: absolute;
+        top: 1rem;
+        right: 1.5rem;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #999;
+    }
+    
+    .close:hover {
+        color: #333;
     }
         @media (max-width: 768px) {
       .main-container {

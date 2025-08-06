@@ -30,10 +30,11 @@ const customerInfo=async (req,res) => {
         ],
      }).countDocuments()
      console.log('userData', userData);
-     return res.render("customer",{
-        data: userData,
+     return res.render("admin/customer",{
+        users: userData,
         currentPage: page,
         totalPages: Math.ceil(count / limit),
+        search: req.query.search || ''
       });
       
 
