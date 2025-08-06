@@ -77,7 +77,7 @@
           <tbody>
             <% for(let i = 0; i < data.length; i++) { %>
               <tr>
-                <td><img src="<%data[i].profileImage%>" alt="User" class="user-avatar"></td>
+                <td><img src="uploads/user/<%data[i].profileImage%>" alt="<%data[i].name %>"></td>
                 <td><%= data[i].name %></td>
                 <td><%= data[i].email %></td>
                 <td><%= data[i].createdAt ? new Date(data[i].createdAt).toLocaleDateString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' }) : 'N/A' %></td>

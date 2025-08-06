@@ -500,6 +500,7 @@ const processPayment = async (req, res) => {
             });
           }
           
+          
           wallet.balance -= order.totalAmount;
           wallet.transactions.push({
             amount: order.totalAmount,
@@ -509,7 +510,8 @@ const processPayment = async (req, res) => {
             status: 'COMPLETED'
           });
           await wallet.save();
-          
+                  console.log('====order created');
+
           order.paymentStatus = 'Paid';
           order.paymentDetails = { 
             walletId,

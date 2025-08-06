@@ -111,51 +111,7 @@
           </div>
         </div>
 
-        <!-- Offer Section -->
-        <div class="form-group">
-          <label>Category Offer</label>
-          <div class="offer-fields">
-            <div class="form-check">
-              <input type="checkbox" id="offerActive" name="offerActive" class="form-check-input">
-              <label for="offerActive" class="form-check-label">Enable Offer</label>
-            </div>
-            
-            <div id="offerDetails" style="display: none;">
-              <div class="form-group">
-                <label for="discountType">Discount Type</label>
-                <select id="discountType" name="discountType" class="form-input">
-                  <option value="PERCENTAGE">PERCENTAGE</option>
-                  <option value="FLAT">Flat Amount</option>
-                </select>
-                <span class="error-message" id="discount-type-error"></span>
-              </div>
-              
-              <div class="form-group">
-                <label for="discountValue">Discount Value</label>
-                <input type="number" id="discountValue" name="discountValue" class="form-input" min="0" step="0.01">
-                <span class="error-message" id="discount-value-error"></span>
-              </div>
-              
-              <div class="form-group">
-                <label for="startDate">Start Date</label>
-                <div class="date-input-container">
-                  <input type="datetime-local" id="startDate" name="startDate" class="form-input date-input">
-                  <i class="fas fa-calendar-alt date-icon"></i>
-                </div>
-                <span class="error-message" id="start-date-error"></span>
-              </div>
-              
-              <div class="form-group">
-                <label for="endDate">End Date</label>
-                <div class="date-input-container">
-                  <input type="datetime-local" id="endDate" name="endDate" class="form-input date-input">
-                  <i class="fas fa-calendar-alt date-icon"></i>
-                </div>
-                <span class="error-message" id="end-date-error"></span>
-              </div>
-            </div>
-          </div>
-        </div>
+
 
         <button type="submit" class="submit-btn">ADD CATEGORY</button>
       </form>
@@ -227,53 +183,7 @@
       return true;
     }
 
-    function validateOfferFields() {
-      let isValid = true;
-      const discountType = document.getElementById("discountType").value;
-      const discountValue = document.getElementById("discountValue").value;
-      const startDate = document.getElementById("startDate").value;
-      const endDate = document.getElementById("endDate").value;
-
-      if (!discountType) {
-        displayErrorMsg("discount-type-error", "Please select a discount type");
-        isValid = false;
-      } else {
-        clearErrorMsg("discount-type-error");
-      }
-
-      if (!discountValue || discountValue <= 0) {
-        displayErrorMsg("discount-value-error", "Please enter a valid discount value");
-        isValid = false;
-      } else if (discountType === 'PERCENTAGE' && discountValue > 100) {
-        displayErrorMsg("discount-value-error", "Percentage discount cannot exceed 100%");
-        isValid = false;
-      } else {
-        clearErrorMsg("discount-value-error");
-      }
-
-      if (!startDate) {
-        displayErrorMsg("start-date-error", "Please select a start date");
-        isValid = false;
-      } else if (new Date(startDate) <= new Date()) {
-        displayErrorMsg("start-date-error", "Start date must be in the future");
-        isValid = false;
-      } else {
-        clearErrorMsg("start-date-error");
-      }
-
-      if (!endDate) {
-        displayErrorMsg("end-date-error", "Please select an end date");
-        isValid = false;
-      } else if (startDate && new Date(startDate) >= new Date(endDate)) {
-        displayErrorMsg("end-date-error", "End date must be after start date");
-        isValid = false;
-      } else {
-        clearErrorMsg("end-date-error");
-      }
-
-      return isValid;
-    }
-
+    
     function validateForm() {
       clearErrorMsg();
       
@@ -299,11 +209,7 @@
         clearErrorMsg("image-error");
       }
 
-      // Validate offer fields if offer is active
-      if (offerActive && !validateOfferFields()) {
-        isValid = false;
-      }
-
+      
       return isValid;
     }
 
@@ -402,19 +308,6 @@
       }
     });
 
-    // Add offer toggle functionality
-    document.getElementById('offerActive').addEventListener('change', function() {
-      const offerDetails = document.getElementById('offerDetails');
-      offerDetails.style.display = this.checked ? 'block' : 'none';
-      
-      // Clear all offer-related error messages when toggling
-      if (!this.checked) {
-        clearErrorMsg("discount-type-error");
-        clearErrorMsg("discount-value-error");
-        clearErrorMsg("start-date-error");
-        clearErrorMsg("end-date-error");
-      }
-    });
 
     // Form submission handler
     document.getElementById('categoryForm').addEventListener('submit', async function(event) {
@@ -433,26 +326,7 @@
         formData.append('name', document.getElementById("name").value.trim());
         formData.append('description', document.getElementById("description").value.trim());
         
-        // Add offer data
-        const offerActive = document.getElementById("offerActive").checked;
-        if (offerActive) {
-          const offerData = {
-            isActive: true,
-            discountType: document.getElementById("discountType").value,
-            discountValue: parseFloat(document.getElementById("discountValue").value),
-            startDate: document.getElementById("startDate").value,
-            endDate: document.getElementById("endDate").value
-          };
-          formData.append('categoryOffer', JSON.stringify(offerData));
-        } else {
-          formData.append('categoryOffer', JSON.stringify({
-            isActive: false,
-            discountType: null,
-            discountValue: null,
-            startDate: null,
-            endDate: null
-          }));
-        }
+       
 
         if (croppedImageBlob) {
           formData.append('image', croppedImageBlob, 'category.jpg');
@@ -518,63 +392,11 @@
       validateField('description');
     });
 
-    // Add input validation for offer fields
-    document.getElementById('discountValue')?.addEventListener('input', function() {
-      if (document.getElementById("offerActive").checked) {
-        const discountType = document.getElementById("discountType").value;
-        const value = this.value;
-        
-        if (!value || value <= 0) {
-          displayErrorMsg("discount-value-error", "Please enter a valid discount value");
-        } else if (discountType === 'PERCENTAGE' && value > 100) {
-          displayErrorMsg("discount-value-error", "Percentage discount cannot exceed 100%");
-        } else {
-          clearErrorMsg("discount-value-error");
-        }
-      }
-    });
+    
 
-    document.getElementById('discountType')?.addEventListener('change', function() {
-      if (document.getElementById("offerActive").checked) {
-        const discountValue = document.getElementById("discountValue").value;
-        
-        if (this.value === 'PERCENTAGE' && discountValue > 100) {
-          displayErrorMsg("discount-value-error", "Percentage discount cannot exceed 100%");
-        } else {
-          clearErrorMsg("discount-value-error");
-        }
-      }
-    });
+   
 
-    document.getElementById('startDate')?.addEventListener('change', function() {
-      if (document.getElementById("offerActive").checked) {
-        const endDate = document.getElementById("endDate").value;
-        
-        if (!this.value) {
-          displayErrorMsg("start-date-error", "Please select a start date");
-        } else if (new Date(this.value) <= new Date()) {
-          displayErrorMsg("start-date-error", "Start date must be in the future");
-        } else if (endDate && new Date(this.value) >= new Date(endDate)) {
-          displayErrorMsg("start-date-error", "Start date must be before end date");
-        } else {
-          clearErrorMsg("start-date-error");
-        }
-      }
-    });
-
-    document.getElementById('endDate')?.addEventListener('change', function() {
-      if (document.getElementById("offerActive").checked) {
-        const startDate = document.getElementById("startDate").value;
-        
-        if (!this.value) {
-          displayErrorMsg("end-date-error", "Please select an end date");
-        } else if (startDate && new Date(startDate) >= new Date(this.value)) {
-          displayErrorMsg("end-date-error", "End date must be after start date");
-        } else {
-          clearErrorMsg("end-date-error");
-        }
-      }
-    });
+   
 </script>
 
 </body>

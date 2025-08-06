@@ -588,7 +588,7 @@
 
     async function toggleWishlist(button, productId) {
       try {
-             const authCheck = await fetch('/check-auth');
+        const authCheck = await fetch('/check-auth');
         const authData = await authCheck.json();
         
         if (!authData.isAuthenticated) {
@@ -602,6 +602,7 @@
           }).showToast();
           return;
         }
+        
         const response = await fetch('/wishlist/add', {
           method: 'POST',
           headers: {
@@ -614,17 +615,33 @@
 
         if (data.success) {
           const icon = button.querySelector('i');
-          icon.classList.toggle('far');
-          icon.classList.toggle('fas');
+          const isAdded = !icon.classList.contains('fas');
+          
+          // Toggle the heart icon
+          if (isAdded) {
+            icon.classList.remove('far');
+            icon.classList.add('fas', 'text-danger');
+          } else {
+            icon.classList.remove('fas', 'text-danger');
+            icon.classList.add('far');
+          }
 
+          // Show appropriate toast message
           Toastify({
-            text: icon.classList.contains('fas') ? "Added to Wishlist " : "Removed from Wishlist ",
+            text: isAdded ? "Added to Wishlist" : "Removed from Wishlist",
             duration: 3000,
             gravity: "top",
             position: "right",
-            backgroundColor: icon.classList.contains('fas') ? "#a9ba9d" : "#f44336",
+            backgroundColor: isAdded ? "#a9ba9d" : "#f44336",
             stopOnFocus: true
           }).showToast();
+          
+          // Update wishlist count in header if element exists
+          const wishlistCountElement = document.querySelector('.wishlist-count');
+          if (wishlistCountElement && data.wishlistCount !== undefined) {
+            wishlistCountElement.textContent = data.wishlistCount;
+            wishlistCountElement.style.display = data.wishlistCount > 0 ? 'flex' : 'none';
+          }
         } else {
           Toastify({
             text: data.message || "Something went wrong",

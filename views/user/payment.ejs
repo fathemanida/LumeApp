@@ -741,7 +741,6 @@ html, body {
             const method = document.querySelector('input[name="paymentMethod"]:checked').value;
             const loadingOverlay = document.getElementById('loadingOverlay');
             
-            // Get orderId from URL if it exists
             const urlParams = new URLSearchParams(window.location.search);
             const orderId = urlParams.get('orderId');
 

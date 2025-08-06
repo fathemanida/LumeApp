@@ -161,6 +161,7 @@ router.get('/refunds/status/:orderId/items/:itemId', userAuth.isLogin, refundCon
 
 // Wishlist routes
 router.post('/wishlist/add', userAuth.isLogin, wishlistController.addToWishlist);
+router.post('/wishlist/remove', userAuth.isLogin, wishlistController.removeFromWishlist);
 router.get('/wishlist', userAuth.isLogin, wishlistController.getWishlist);
 
 // Wallet routes

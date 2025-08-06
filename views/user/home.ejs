@@ -986,6 +986,81 @@
         </div>
       </div>
   <script>
+    // Function to toggle wishlist status
+    async function toggleWishlist(iconElement, productId) {
+      try {
+        const response = await fetch('/wishlist/add', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ productId })
+        });
+
+        const result = await response.json();
+        
+        if (result.success) {
+          // Toggle the heart icon between outline and solid
+          if (iconElement.classList.contains('far')) {
+            iconElement.classList.remove('far');
+            iconElement.classList.add('fas', 'text-danger');
+            
+            // Show success toast
+            Toastify({
+              text: "Added to wishlist",
+              duration: 3000,
+              close: true,
+              gravity: "top",
+              position: 'right',
+              backgroundColor: "#4caf50",
+              stopOnFocus: true
+            }).showToast();
+          } else {
+            iconElement.classList.remove('fas', 'text-danger');
+            iconElement.classList.add('far');
+            
+            // Show removed toast
+            Toastify({
+              text: "Removed from wishlist",
+              duration: 3000,
+              close: true,
+              gravity: "top",
+              position: 'right',
+              backgroundColor: "#f44336",
+              stopOnFocus: true
+            }).showToast();
+          }
+          
+          // Update wishlist count in header if element exists
+          const wishlistCountElement = document.querySelector('.wishlist-count');
+          if (wishlistCountElement && result.wishlistCount !== undefined) {
+            wishlistCountElement.textContent = result.wishlistCount;
+            wishlistCountElement.style.display = result.wishlistCount > 0 ? 'flex' : 'none';
+          }
+        } else {
+          throw new Error(result.message || 'Failed to update wishlist');
+        }
+      } catch (error) {
+        console.error('Wishlist error:', error);
+        
+        // If not logged in, redirect to login
+        if (error.message === 'Please login to continue') {
+          window.location.href = '/login';
+        } else {
+          // Show error toast
+          Toastify({
+            text: error.message || "Failed to update wishlist",
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: 'right',
+            backgroundColor: "#f44336",
+            stopOnFocus: true
+          }).showToast();
+        }
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
       const slides = document.getElementById('ornamentSlides');
       const prevBtn = document.getElementById('ornamentPrevBtn');
