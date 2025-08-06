@@ -1356,6 +1356,10 @@ const buyNow = async (req, res) => {
     const { productId, quantity = 1 } = req.body;
     const userId = req.session.user.id;
 
+    if (!productId) {
+      return res.status(400).json({ success: false, message: 'Product ID is required' });
+    }
+
     const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({ success: false, message: 'Product not found' });
@@ -1368,31 +1372,42 @@ const buyNow = async (req, res) => {
       });
     }
 
-    await Cart.findOneAndUpdate(
-      { user: userId },
-      { $set: { items: [] } },
-      { new: true, upsert: true }
-    );
+    let cart = await Cart.findOne({ user: userId });
+    
+    if (cart) {
+      cart.items = [{
+        product: productId,
+        quantity: parseInt(quantity),
+        price: product.salePrice || product.regularPrice
+      }];
+      await cart.save();
+    } else {
+      cart = new Cart({
+        user: userId,
+        items: [{
+          product: productId,
+          quantity: parseInt(quantity),
+          price: product.salePrice || product.regularPrice
+        }]
+      });
+      await cart.save();
+    }
 
-    const cart = await Cart.findOneAndUpdate(
-      { userId: userId },
-      {
-        $push: {
-          items: {
-            product: productId,
-            quantity: parseInt(quantity),
-            price: product.salePrice || product.regularPrice
-          }
-        }
-      },
-      { new: true, upsert: true }
-    ).populate('items.product');
+    const populatedCart = await Cart.findById(cart._id).populate('items.product');
 
-    res.json({ success: true, redirect: '/checkout' });
+    res.json({ 
+      success: true, 
+      redirect: '/checkout',
+      cart: populatedCart
+    });
 
   } catch (error) {
     console.error('Buy Now error:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ 
+      success: false, 
+      message: 'Server error',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 };
 
