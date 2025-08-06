@@ -59,49 +59,47 @@ const addToWishlist = async (req, res) => {
 const getWishlist = async (req, res) => {
   try {
     const userId = req.session.user.id;
-    const wishlist = await Wishlist.findOne({ userId });
+    
+    // Find the wishlist and populate the product data
+    const wishlist = await Wishlist.findOne({ userId })
+      .populate({
+        path: 'items.productId',
+        model: 'Product',
+        select: 'productName productImage regularPrice salePrice isListed quantity',
+        match: { isListed: true } // Only include listed products
+      });
 
     if (!wishlist) {
-      return res.render('wishlist', {
+      return res.render('user/wishlist', {
         wishlist: { items: [] },
         user: req.session.user
       });
     }
 
-    const productIds = wishlist.items
-      .filter(item => item.productId && item.productId.toString)
-      .map(item => item.productId);
+    // Filter out any items where the product is missing or unlisted
+    const validItems = wishlist.items.filter(item => {
+      return item.productId && 
+             item.productId.isListed !== false &&
+             item.productId.productImage && 
+             item.productId.productImage.length > 0;
+    });
 
-    if (productIds.length === 0) {
-      return res.render('wishlist', {
-        wishlist: { items: [] },
-        user: req.session.user
-      });
-    }
-
-    const products = await Product.find({ _id: { $in: productIds } });
-
-    const productMap = products.reduce((map, product) => {
-      map[product._id.toString()] = product;
-      return map;
-    }, {});
-
+    // Create a new wishlist object with only valid items
     const populatedWishlist = {
       ...wishlist.toObject(),
-      items: wishlist.items
-        .filter(item => item.productId && item.productId.toString)
-        .map(item => {
-          const product = productMap[item.productId.toString()];
-          if (!product) return null;
-          return {
-            ...item.toObject(),
-            product
-          };
-        })
-        .filter(item => item !== null)
+      items: validItems.map(item => ({
+        ...item.toObject(),
+        productId: item.productId // Already populated by Mongoose
+      }))
     };
 
-    res.render('wishlist', {
+    // Update the wishlist in the database to remove any invalid items
+    if (validItems.length !== wishlist.items.length) {
+      wishlist.items = validItems;
+      await wishlist.save();
+    }
+
+    res.render('user/wishlist', {
       wishlist: populatedWishlist,
       user: req.session.user
     });
