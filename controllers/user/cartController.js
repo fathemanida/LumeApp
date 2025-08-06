@@ -1351,6 +1351,56 @@ function getBestOffer(product, offers = [], quantity = 1) {
   };
 }
 
+const buyNow = async (req, res) => {
+  try {
+    const { productId, quantity = 1 } = req.body;
+    const userId = req.session.user.id;
+
+    // Find the product
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({ success: false, message: 'Product not found' });
+    }
+
+    // Check if product is in stock
+    if (product.quantity < quantity) {
+      return res.status(400).json({ 
+        success: false, 
+        message: `Only ${product.quantity} items available in stock` 
+      });
+    }
+
+    // Clear existing cart
+    await Cart.findOneAndUpdate(
+      { user: userId },
+      { $set: { items: [] } },
+      { new: true, upsert: true }
+    );
+
+    // Add the new product to cart
+    const cart = await Cart.findOneAndUpdate(
+      { user: userId },
+      {
+        $push: {
+          items: {
+            product: productId,
+            quantity: parseInt(quantity),
+            price: product.salePrice || product.regularPrice
+          }
+        }
+      },
+      { new: true, upsert: true }
+    ).populate('items.product');
+
+    // Redirect to checkout
+    res.json({ success: true, redirect: '/checkout' });
+
+  } catch (error) {
+    console.error('Buy Now error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
 module.exports = {
   addToCart,
   cart,
@@ -1359,5 +1409,6 @@ module.exports = {
   getCheckout,
   applyCoupon,
   removeCoupon,
-  // placeOrder,
+  getBestOffer,
+  buyNow
 };
