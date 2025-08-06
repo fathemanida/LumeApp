@@ -3,28 +3,106 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-</head>
-<body>
-  <%- include('../partials/user/header') %>
-
-<style>
-  .wishlist-container {
-    padding: clamp(2rem, 5vw, 3rem);
-    background-color: #f0e9e0;
+  <title>My Wishlist | LUME</title>
+  <link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+  :root {
+    --primary-color: #d4b78f;
+    --primary-dark: #b39973;
+    --text-dark: #2c2c2c;
+    --text-light: #666666;
+    --light-bg: #f9f5f0;
+    --border-color: #e0d6c9;
+    --success: #4caf50;
+    --danger: #f44336;
+    --white: #ffffff;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --transition: all 0.3s ease;
+  }
+  
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
     font-family: 'Jost', sans-serif;
+    color: var(--text-dark);
+    background-color: var(--light-bg);
+    line-height: 1.6;
+  }
+  /* Main Container */
+  .wishlist-container {
+    padding: 2rem 1rem 4rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    min-height: 60vh;
+  }
+  
+  /* Wishlist Header */
+  .wishlist-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
   }
   
   .wishlist-title {
     font-family: 'Aboreto', cursive;
-    color: var(--darker-text);
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    font-weight: 700;
-    margin-bottom: 2rem;
-    font-size: clamp(1.5rem, 4vw, 2rem);
-    display: flex;
-    align-items: center;
+    color: var(--text-dark);
+    font-size: 2.5rem;
+    font-weight: 400;
+    margin-bottom: 0.5rem;
+    position: relative;
+    display: inline-block;
+  }
+  
+  .wishlist-title:after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 2px;
+    background-color: var(--primary-color);
+  }
+  
+  .wishlist-subtitle {
+    color: var(--text-light);
+    font-size: 1.1rem;
+    margin-top: 1rem;
+  }
+  
+  /* Empty State */
+  .wishlist-empty {
+    text-align: center;
+    padding: 4rem 1rem;
+    background: var(--white);
+    border-radius: 8px;
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .wishlist-empty i {
+    font-size: 4rem;
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+    opacity: 0.8;
+  }
+  
+  .wishlist-empty h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--text-dark);
+  }
+  
+  .wishlist-empty p {
+    color: var(--text-light);
+    max-width: 500px;
+    margin: 0 auto 2rem;
   }
   
   .wishlist-badge {
@@ -36,36 +114,49 @@
     font-weight: 600;
   }
   
+  /* Product Grid */
+  .wishlist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+  }
+  
+  /* Product Card */
   .wishlist-item {
-    background: white;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    margin-bottom: 1.5rem;
-    transition: all 0.3s ease;
-    position: relative;
+    background: var(--white);
+    border-radius: 10px;
     overflow: hidden;
+    transition: var(--transition);
+    box-shadow: var(--shadow-sm);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
   }
   
   .wishlist-item:hover {
-    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-    transform: translateY(-3px);
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
   }
   
   .product-image-container {
-    padding: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: var(--light-bg);
-    height: 180px;
+    position: relative;
+    padding-top: 100%;
+    background: var(--white);
+    overflow: hidden;
   }
   
   .product-image {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     object-fit: contain;
+    padding: 1.5rem;
+    transition: transform 0.5s ease;
     mix-blend-mode: multiply;
-    transition: transform 0.3s ease;
   }
   
   .wishlist-item:hover .product-image {
@@ -74,128 +165,226 @@
   
   .product-details {
     padding: 1.5rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
   }
   
   .product-name {
-    font-family: 'Jost', sans-serif;
-    color: var(--darker-text);
-    font-size: clamp(1rem, 2.5vw, 1.1rem);
-    margin-bottom: 0.75rem;
+    font-size: 1.1rem;
     font-weight: 600;
-    line-height: 1.3;
+    color: var(--text-dark);
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
   
-  .product-price {
-    color: var(--dark-text);
-    font-weight: 500;
-    margin-bottom: 0.75rem;
-    font-family: 'Jost', sans-serif;
+  .product-price-container {
+    margin: 0.5rem 0;
   }
   
   .sale-price {
-    color: var(--offer-red);
+    font-size: 1.25rem;
     font-weight: 700;
-    font-size: 1.1rem;
+    color: var(--text-dark);
   }
   
   .regular-price {
+    font-size: 0.9rem;
+    color: var(--text-light);
     text-decoration: line-through;
-    opacity: 0.7;
     margin-left: 0.5rem;
-    font-size: 0.9em;
-    color: #666;
   }
   
   .discount-badge {
     display: inline-block;
-    background-color: #f8e8e8;
-    color: var(--offer-red);
+    background: #f8e8e8;
+    color: #e74c3c;
     font-size: 0.75rem;
+    font-weight: 600;
     padding: 0.2rem 0.5rem;
     border-radius: 4px;
     margin-left: 0.5rem;
-    font-weight: 600;
+    vertical-align: middle;
   }
   
   .stock-status {
     font-size: 0.85rem;
-    margin-bottom: 1rem;
+    margin: 0.5rem 0 1rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
   }
   
   .in-stock {
-    color: var(--muted-green);
+    color: var(--success);
     font-weight: 500;
+  }
+  
+  .in-stock i {
+    margin-right: 0.25rem;
   }
   
   .out-of-stock {
-    color: var(--offer-red);
+    color: var(--danger);
     font-weight: 500;
   }
   
+  .product-actions {
+    margin-top: auto;
+    display: flex;
+    gap: 0.75rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+  }
+  
+  /* Action Buttons */
   .wishlist-actions {
     display: flex;
     gap: 0.75rem;
+    width: 100%;
   }
   
-  .btn-add-to-cart {
-    background: var(--muted-green);
-    border: none;
-    color: white;
-    padding: 0.6rem 1rem;
-    border-radius: 4px;
-    font-family: 'Jost', sans-serif;
-    font-size: 0.85rem;
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.7rem 1.25rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
     font-weight: 600;
-    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: var(--transition);
+    cursor: pointer;
+    border: none;
+    outline: none;
+    text-decoration: none;
+    gap: 0.5rem;
+  }
+  
+  .btn i {
+    font-size: 1rem;
+  }
+  
+  .btn-primary {
+    background-color: var(--primary-color);
+    color: var(--white);
     flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
   }
   
-  .btn-add-to-cart:hover {
-    background: #546a47;
+  .btn-primary:hover {
+    background-color: var(--primary-dark);
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(101, 120, 88, 0.2);
+    box-shadow: 0 4px 12px rgba(212, 185, 150, 0.3);
   }
   
-  .btn-add-to-cart:disabled {
-    background: #cccccc;
-    color: #666666;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
+  .btn-primary:active {
+    transform: translateY(0);
   }
   
-  .btn-remove {
-    background: var(--soft-beige);
-    border: none;
-    color: var(--darker-text);
-    padding: 0.6rem 1rem;
-    border-radius: 4px;
-    font-family: 'Jost', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+  .btn-danger {
+    background-color: #fff0f0;
+    color: #e74c3c;
+    border: 1px solid #ffd1d1;
   }
   
-  .btn-remove:hover {
-    background: #c9aa82;
+  .btn-danger:hover {
+    background-color: #e74c3c;
     color: white;
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(212, 185, 150, 0.2);
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.2);
+  }
+  
+  .btn-danger:active {
+    transform: translateY(0);
+  }
+  
+  .btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+  
+  /* Loading State */
+  .btn-loading {
+    position: relative;
+    color: transparent !important;
+    pointer-events: none;
+  }
+  
+  .btn-loading:after {
+    content: '';
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    top: 50%;
+    left: 50%;
+    margin: -9px 0 0 -9px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 0.8s ease-in-out infinite;
+  }
+  
+  .btn-danger.btn-loading:after {
+    border-top-color: #e74c3c;
+  }
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .wishlist-grid {
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    .product-details {
+      padding: 1.25rem;
+    }
+    
+    .product-name {
+      font-size: 1rem;
+    }
+    
+    .sale-price {
+      font-size: 1.1rem;
+    }
+    
+    .btn {
+      padding: 0.6rem 1rem;
+      font-size: 0.85rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .wishlist-header {
+      margin-bottom: 2rem;
+    }
+    
+    .wishlist-title {
+      font-size: 2rem;
+    }
+    
+    .wishlist-grid {
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+    
+    .product-actions {
+      flex-direction: column;
+    }
+    
+    .btn {
+      width: 100%;
+    }
   }
   
   .empty-wishlist {
@@ -315,53 +504,6 @@
         <% if (wishlist && wishlist.items && wishlist.items.length > 0) { %>
           <div class="row">
             <% wishlist.items.forEach(item => { %>
-              <div class="col-md-6 col-lg-4 mb-4">
-                <div class="wishlist-item h-100">
-                  <div class="product-image-container">
-                    <img 
-                      src="/uploads/product/<%= item.productId.productImage[0] %>" 
-                      class="product-image" 
-                      alt="<%= item.productId.productName %>"
-                    >
-                  </div>
-                  
-                  <div class="product-details">
-                    <h5 class="product-name">
-                      <a href="/product/<%= item.productId._id %>" class="text-decoration-none text-dark">
-                        <%= item.productId.productName %>
-                      </a>
-                    </h5>
-                    
-                    <div class="product-price">
-                      <% if (item.productId.salePrice && item.productId.salePrice < item.productId.regularPrice) { %>
-                        <span class="sale-price">₹<%= item.productId.salePrice.toLocaleString() %></span>
-                        <span class="regular-price">₹<%= item.productId.regularPrice.toLocaleString() %></span>
-                        <% const discount = Math.round(((item.productId.regularPrice - item.productId.salePrice) / item.productId.regularPrice) * 100); %>
-                        <span class="discount-badge"><%= discount %>% OFF</span>
-                      <% } else { %>
-                        <span>₹<%= item.productId.regularPrice.toLocaleString() %></span>
-                      <% } %>
-                    </div>
-                    
-                    <div class="stock-status">
-                      <% if (item.productId.quantity > 0) { %>
-                        <i class="fas fa-check-circle"></i>
-                        <span class="in-stock">In Stock</span>
-                      <% } else { %>
-                        <i class="fas fa-times-circle"></i>
-                        <span class="out-of-stock">Out of Stock</span>
-                      <% } %>
-                    </div>
-                    
-                    <div class="wishlist-actions">
-                      <button 
-                        class="btn-add-to-cart" 
-                        onclick="addToCartFromWishlist('<%= item.productId._id %>', this)"
-                        <%= item.productId.quantity <= 0 ? 'disabled' : '' %>
-                      >
-                        <i class="fas fa-shopping-cart"></i> Add to Cart
-                      </button>
-                      <button 
                         class="btn-remove" 
                         onclick="removeFromWishlist('<%= item.productId._id %>', this)"
                       >
@@ -494,11 +636,81 @@ async function addToCartFromWishlist(productId, button) {
 }
 
 // Remove from Wishlist
+// Add to Cart from Wishlist
+async function addToCartFromWishlist(productId, button) {
+  try {
+    // Show loading state
+    const addToCartBtn = button.closest('.add-to-cart-btn') || button;
+    const originalContent = addToCartBtn.innerHTML;
+    addToCartBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+    addToCartBtn.disabled = true;
+    
+    const response = await fetch('/add-to-cart', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        productId: productId,
+        quantity: 1,
+        fromWishlist: true
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      // Show success message
+      Toastify({
+        text: data.message || 'Product added to cart successfully',
+        duration: 3000,
+        close: true,
+        gravity: 'top',
+        position: 'right',
+        backgroundColor: '#4caf50',
+        stopOnFocus: true,
+      }).showToast();
+      
+      // Update cart count in header
+      const cartCount = document.querySelector('.cart-count');
+      if (cartCount) {
+        const currentCount = parseInt(cartCount.textContent) || 0;
+        cartCount.textContent = currentCount + 1;
+        cartCount.style.display = 'flex';
+      }
+    } else {
+      throw new Error(data.message || 'Failed to add product to cart');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    Toastify({
+      text: error.message || 'Failed to add product to cart',
+      duration: 3000,
+      close: true,
+      gravity: 'top',
+      position: 'right',
+      backgroundColor: '#f44336',
+      stopOnFocus: true,
+    }).showToast();
+  } finally {
+    // Reset button state if it exists
+    if (addToCartBtn) {
+      addToCartBtn.innerHTML = originalContent;
+      addToCartBtn.disabled = false;
+    }
+  }
+}
+
+// Remove from Wishlist
 async function removeFromWishlist(productId, button) {
   try {
-    // Show loading state if button is provided
-    if (button) {
-      const originalText = button.innerHTML;
+    const wishlistItem = button.closest('.wishlist-item');
+    const removeBtn = button.classList.contains('remove-from-wishlist') ? button : button.closest('.remove-from-wishlist');
+    
+    // Show loading state
+    const originalContent = removeBtn.innerHTML;
+    removeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    removeBtn.disabled = true;
       button.disabled = true;
       button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
     }
