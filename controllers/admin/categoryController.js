@@ -280,7 +280,7 @@ const getEditCategory = async (req, res) => {
 
 const editCategory = async (req, res) => {
   try {
-    const { name, description, categoryOffer } = req.body;
+    const { name, description} = req.body;
     const categoryId = req.params.id;
 
     if (!name || !description) {
@@ -298,8 +298,9 @@ const editCategory = async (req, res) => {
       });
     }
 
-  const existingCategory = await Category.findOne({
-  name: { $regex: new RegExp(`^${name}$`, 'i') }
+const existingCategory = await Category.findOne({
+  name: { $regex: new RegExp(`^${name}$`, 'i') },
+  _id: { $ne: categoryId}
 });
 
 if (existingCategory) {

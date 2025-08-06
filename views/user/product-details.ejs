@@ -588,6 +588,20 @@
 
     async function toggleWishlist(button, productId) {
       try {
+             const authCheck = await fetch('/check-auth');
+        const authData = await authCheck.json();
+        
+        if (!authData.isAuthenticated) {
+          Toastify({
+            text: "Please login to add items to your wishlist",
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#8a9b7d",
+            stopOnFocus: true
+          }).showToast();
+          return;
+        }
         const response = await fetch('/wishlist/add', {
           method: 'POST',
           headers: {
