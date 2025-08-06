@@ -1372,28 +1372,50 @@ const buyNow = async (req, res) => {
       });
     }
 
-    let cart = await Cart.findOne({ user: userId });
+    // Calculate prices
+    const price = product.salePrice || product.regularPrice;
+    const totalPrice = price * quantity;
+    const finalPrice = totalPrice; // No discount applied initially
+
+    // Prepare cart item with all required fields
+    const cartItem = {
+      productId: product._id,
+      size: 'default',
+      quantity: parseInt(quantity),
+      price: price,
+      offerDiscount: 0,
+      finalPrice: finalPrice,
+      totalPrice: totalPrice,
+      status: 'In Cart'
+    };
+
+    // Update or create cart
+    let cart = await Cart.findOne({ userId: userId });
     
     if (cart) {
-      cart.items = [{
-        product: productId,
-        quantity: parseInt(quantity),
-        price: product.salePrice || product.regularPrice
-      }];
-      await cart.save();
+      // Clear existing items and add the new one
+      cart.items = [cartItem];
+      // Reset cart totals
+      cart.cartTotal = totalPrice;
+      cart.finalCartTotal = finalPrice;
+      cart.totalOfferDiscount = 0;
+      cart.couponDiscount = 0;
+      cart.couponApplied = undefined;
+      cart.appliedCoupnonDetails = undefined;
     } else {
+      // Create new cart
       cart = new Cart({
-        user: userId,
-        items: [{
-          product: productId,
-          quantity: parseInt(quantity),
-          price: product.salePrice || product.regularPrice
-        }]
+        userId: userId,
+        items: [cartItem],
+        cartTotal: totalPrice,
+        finalCartTotal: finalPrice,
+        totalOfferDiscount: 0,
+        couponDiscount: 0
       });
-      await cart.save();
     }
 
-    const populatedCart = await Cart.findById(cart._id).populate('items.product');
+    await cart.save();
+    const populatedCart = await Cart.findById(cart._id).populate('items.productId');
 
     res.json({ 
       success: true, 

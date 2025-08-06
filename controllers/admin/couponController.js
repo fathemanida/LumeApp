@@ -67,7 +67,14 @@ const createCoupon = async (req, res) => {
         message: 'Coupon code already exists'
       });
     }
-
+    const couponCode = code.toUpperCase();
+ss
+if (couponCode.length < 5 || couponCode.length > 8) {
+  return res.status(400).json({
+    success: false,
+    message: 'Coupon code must be between 5 and 8 characters'
+  });
+}
     const coupon = new Coupon({
       code: code.toUpperCase(),
       description,
