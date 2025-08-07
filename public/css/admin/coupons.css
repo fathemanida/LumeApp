@@ -165,13 +165,11 @@ body {
 }
 
 .btn-edit {
-    background-color: var(--accent-color);
-    color: var(--bg-primary);
+    color: floralwhite;
 }
 
 .btn-delete {
-    background-color: var(--error-color);
-    color: white;
+    color: rgb(129, 40, 40);
 }
 
 .btn-edit:hover, .btn-delete:hover {

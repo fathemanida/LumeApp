@@ -56,6 +56,22 @@
       </div>
     </div>
   </div>
+  <script>
+  setInterval(async () => {
+    try {
+      const response = await fetch('/check-block-status');
+      const data = await response.json();
+
+      if (data.isBlocked) {
+        alert("Your account is blocked by admin.");
+        window.location.href = "/";
+      }
+    } catch (error) {
+      console.error("Error checking block status:", error);
+    }
+  }, 3000); 
+</script>
+
 </footer>
 <style>
 .site-footer {

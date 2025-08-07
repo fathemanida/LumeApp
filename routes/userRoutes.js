@@ -81,6 +81,27 @@ router.get(
   }
 );
 
+
+router.get('/check-block-status', async (req, res) => {
+  try {
+    if (!req.session.user) {
+      return res.json({ isBlocked: false }); 
+    }
+
+    const user = await User.findById(req.session.user._id);
+
+    if (!user) {
+      return res.status(404).json({ isBlocked: false });
+    }
+
+    return res.json({ isBlocked: user.isBlocked });
+  } catch (err) {
+    console.error("Error checking block status:", err);
+    res.status(500).json({ isBlocked: false });
+  }
+});
+
+
 router.get('/',userController.loadHome);
 router.get('/shopAll',userController.loadShopAll)
 router.get("/filter", userController.filterProduct);

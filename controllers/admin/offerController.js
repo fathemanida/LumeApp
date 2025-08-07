@@ -5,13 +5,26 @@ const Offer = require('../../models/offerSchema');
 const getAllOffers = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
+    const status = req.query.status;
     const limit = 10;
     const skip = (page - 1) * limit;
 
-    const totalOffers = await Offer.countDocuments();
+    let query = {};
+    
+    if (status === 'active') {
+      query.isActive = true;
+      query.endDate = { $gte: new Date() };
+    } else if (status === 'inactive') {
+      query.$or = [
+        { isActive: false },
+        { endDate: { $lt: new Date() } } 
+      ];
+    }
+
+    const totalOffers = await Offer.countDocuments(query);
     const totalPages = Math.ceil(totalOffers / limit);
 
-    const offers = await Offer.find()
+    const offers = await Offer.find(query)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)

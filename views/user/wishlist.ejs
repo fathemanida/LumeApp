@@ -10,7 +10,7 @@
   :root {
     --primary-color: #d4b78f;
     --primary-dark: #b39973;
-    --text-dark: #2c2c2c;
+    --text-dark: #333333;
     --text-light: #666666;
     --light-bg: #f9f5f0;
     --border-color: #e0d6c9;
@@ -18,10 +18,12 @@
     --danger: #f44336;
     --white: #ffffff;
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
-    --main-font: 'Aboreto', cursive, sans-serif;
+    --main-font: 'Jost', sans-serif;
+    --heading-font: 'Aboreto', cursive, sans-serif;
     --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
     --transition: all 0.3s ease;
     --offer-red: #e74c3c;
+    --product-name-color: #2c2c2c;
   }
   
   * {
@@ -54,13 +56,14 @@
   }
   
   .wishlist-title {
-    font-family: 'Aboreto', cursive;
+    font-family: var(--heading-font);
     color: var(--text-dark);
     font-size: 2.5rem;
-    font-weight: 400;
+    font-weight: 500;
     margin-bottom: 0.5rem;
     position: relative;
     display: inline-block;
+    text-transform: uppercase;
   }
   
   .wishlist-title:after {
@@ -123,20 +126,16 @@
   .wishlist-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 2rem;
+    gap: 1.5rem;
     margin-top: 2rem;
   }
   
   /* Product Card */
   .wishlist-item {
-    background: white;
-    border-radius: 12px;
+    background: var(--white);
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: var(--transition);
     border: 1px solid var(--border-color);
   }
   
@@ -176,12 +175,11 @@
   }
   
   .product-name {
-    font-family: var(--main-font);
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     font-weight: 600;
-    color: var(--text-dark);
-    margin-bottom: 0.25rem;
-    line-height: 1.4;
+    margin-bottom: 0.5rem;
+    color: var(--product-name-color);
+    font-family: var(--main-font);
     letter-spacing: 0.5px;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -190,11 +188,12 @@
   }
   
   .product-category {
-    font-family: 'Jost', sans-serif;
     font-size: 0.85rem;
     color: var(--text-light);
     margin-bottom: 0.75rem;
-    text-transform: capitalize;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-family: var(--main-font);
   }
   
   .product-price-container {
@@ -270,18 +269,15 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.7rem 1.25rem;
-    border-radius: 6px;
+    padding: 0.6rem 1.25rem;
     font-size: 0.9rem;
-    font-weight: 600;
+    font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    transition: var(--transition);
-    cursor: pointer;
     border: none;
-    outline: none;
-    text-decoration: none;
-    gap: 0.5rem;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: var(--main-font);
   }
   
   .btn i {
