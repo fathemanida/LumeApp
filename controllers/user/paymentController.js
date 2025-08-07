@@ -180,7 +180,7 @@ console.log('====cart data',cartData);
     });
 
   } catch (error) {
-    console.error('❌ Error in paymentMethod:', error);
+    console.error(' Error in paymentMethod:', error);
     req.flash('error', 'Something went wrong. Please try again');
     return res.redirect('/cart');
   }
@@ -573,7 +573,7 @@ const paymentConfirmation = async (req, res) => {
     const { orderId } = req.query;
 
     if (!orderId) {
-      console.log('❌ No order ID provided');
+      console.log(' No order ID provided');
       return res.redirect('/orders');
     }
 
@@ -610,11 +610,11 @@ const paymentConfirmation = async (req, res) => {
       .lean();
 
     if (!order) {
-      console.log('❌ Order not found or does not belong to user.');
+      console.log('Order not found or does not belong to user.');
       return res.redirect('/orders');
     }
 
-    console.log(`✅ Order ${order._id} found for user ${userId}`);
+    console.log(`Order ${order._id} found for user ${userId}`);
     
     const formattedItems = order.items.map(item => {
       const product = item.productId || {};

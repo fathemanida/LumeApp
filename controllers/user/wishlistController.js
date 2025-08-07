@@ -40,7 +40,6 @@ const addToWishlist = async (req, res) => {
 
     await wishlist.save();
     
-    // Get the updated wishlist count
     const updatedWishlist = await Wishlist.findOne({ userId });
     const wishlistCount = updatedWishlist ? updatedWishlist.items.length : 0;
     
@@ -60,13 +59,12 @@ const getWishlist = async (req, res) => {
   try {
     const userId = req.session.user.id;
     
-    // Find the wishlist and populate the product data
     const wishlist = await Wishlist.findOne({ userId })
       .populate({
         path: 'items.productId',
         model: 'Product',
         select: 'productName productImage regularPrice salePrice isListed quantity',
-        match: { isListed: true } // Only include listed products
+        match: { isListed: true }
       });
 
     if (!wishlist) {
@@ -76,7 +74,6 @@ const getWishlist = async (req, res) => {
       });
     }
 
-    // Filter out any items where the product is missing or unlisted
     const validItems = wishlist.items.filter(item => {
       return item.productId && 
              item.productId.isListed !== false &&
@@ -84,16 +81,14 @@ const getWishlist = async (req, res) => {
              item.productId.productImage.length > 0;
     });
 
-    // Create a new wishlist object with only valid items
     const populatedWishlist = {
       ...wishlist.toObject(),
       items: validItems.map(item => ({
         ...item.toObject(),
-        productId: item.productId // Already populated by Mongoose
+        productId: item.productId
       }))
     };
 
-    // Update the wishlist in the database to remove any invalid items
     if (validItems.length !== wishlist.items.length) {
       wishlist.items = validItems;
       await wishlist.save();
@@ -127,14 +122,12 @@ const removeFromWishlist = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Wishlist not found' });
     }
 
-    // Remove the item from the wishlist
     wishlist.items = wishlist.items.filter(
       item => item.productId.toString() !== productId.toString()
     );
 
     await wishlist.save();
     
-    // Get the updated wishlist with product details
     const updatedWishlist = await Wishlist.findOne({ userId })
       .populate('items.productId')
       .lean();
