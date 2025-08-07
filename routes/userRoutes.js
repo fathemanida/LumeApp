@@ -126,7 +126,7 @@ router.post('/remove-address', userAuth.isLogin, profileController.removeAddress
 
 ///cart///
 router.get('/cart', userAuth.isLogin, cartController.cart);
-router.post('/add-to-cart', userAuth.isLogin, cartController.addToCart);
+router.post('/cart/add', userAuth.isLogin, cartController.addToCart);
 router.post('/buy-now', userAuth.isLogin, cartController.buyNow);
 router.post('/update-quantity', userAuth.isLogin, cartController.updateQuantity);
 router.post('/remove-item', userAuth.isLogin, cartController.removeItem);
