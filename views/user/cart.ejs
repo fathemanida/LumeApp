@@ -17,6 +17,11 @@
       --offer-red: #e63946;
       --dark-text: #2c1810;
       --darker-text: #1a0f0a;
+      --light-bg: #f8f5f2;
+      --border-color: #e0d8cc;
+      --offer-red: #e63946;
+      --dark-text: #2c1810;
+      --darker-text: #1a0f0a;
     }
 
     html, body {
@@ -883,7 +888,7 @@
                             </div>
                         <% } %>
                     </div>
-                    <div class="available-coupons">
+                    <div class="available-coupons mt-4">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h4 class="coupon-title mb-0">Available Coupons</h4>
                             <button class="show-coupons-btn" onclick="toggleCoupons()">
@@ -893,15 +898,18 @@
                         </div>
                         <div class="coupon-list" id="couponList" style="display: none;">
                             <% if (coupons && coupons.length > 0) { %>
-                                <% coupons.forEach(coupon => { %>
-                                    <div class="coupon-item <%= couponApplied && couponApplied.code === coupon.code ? 'applied' : '' %> <%= coupon.usedBy && coupon.usedBy.includes(user.id) ? 'used' : '' %>"
-                                        style="<%= coupon.usedBy && coupon.usedBy.includes(user.id) ? 'pointer-events: none; opacity: 0.7; cursor: not-allowed;' : '' %>"
-                                        onclick="<%= (!couponApplied && !(coupon.usedBy && coupon.usedBy.includes(user.id))) ? `selectCoupon('${coupon.code}')` : '' %>">
+                                <% coupons.forEach(coupon => { 
+                                    const isUsed = coupon.usedBy && coupon.usedBy.some(id => id.toString() === user._id.toString());
+                                    const isApplied = couponApplied && couponApplied._id.toString() === coupon._id.toString();
+                                %>
+                                    <div class="coupon-item <%= isApplied ? 'applied' : '' %> <%= isUsed ? 'used' : '' %>"
+                                        style="<%= isUsed ? 'pointer-events: none; opacity: 0.7; cursor: not-allowed;' : '' %>"
+                                        onclick="<%= (!isUsed && !isApplied) ? `applyCouponCode('${coupon.code}')` : '' %>">
                                         <div class="d-flex align-items-center justify-content-between">
                                             <div class="coupon-code">
                                                 <i class="fas fa-tag"></i>
                                                 <%= coupon.code %>
-                                                <% if (coupon.usedBy && coupon.usedBy.includes(user.id)) { %>
+                                                <% if (isUsed) { %>
                                                     <span class="badge bg-secondary ms-2">Already Used</span>
                                                 <% } %>
                                             </div>
@@ -911,19 +919,19 @@
                                         </div>
                                         <div class="coupon-details">
                                             <span class="coupon-discount">
-                                                <%= coupon.discountType === 'percentage' ? 
+                                                <%= coupon.discountType === 'PERCENTAGE' ? 
                                                     `${coupon.discountValue}% OFF` : 
                                                     `₹${coupon.discountValue} OFF` %>
                                             </span>
                                             <% if (coupon.maxDiscount) { %>
                                                 <span class="coupon-min-order">
-                                                    (Max discount: ₹<%= coupon.maxDiscount %>)
+                                                    (Max discount: ₹<%= coupon.maxDiscount.toLocaleString() %>)
                                                 </span>
                                             <% } %>
                                         </div>
                                         <% if (coupon.minOrderAmount) { %>
                                             <div class="coupon-min-order">
-                                                Min. order: ₹<%= coupon.minOrderAmount %>
+                                                Min. order: ₹<%= coupon.minOrderAmount.toLocaleString() %>
                                             </div>
                                         <% } %>
                                         <% if (coupon.expiryDate) { %>
@@ -931,15 +939,15 @@
                                                 Expires: <%= new Date(coupon.expiryDate).toLocaleDateString() %>
                                             </div>
                                         <% } %>
-                                        <% if (coupon.usedBy && coupon.usedBy.includes(user.id)) { %>
+                                        <% if (isUsed) { %>
                                             <div class="text-muted mt-2">
                                                 <small><i class="fas fa-info-circle"></i> You have already used this coupon in a previous order</small>
                                             </div>
                                         <% } %>
                                     </div>
-                                <% }) %>
+                                <% }); %>
                             <% } else { %>
-                                <p class="text-muted">No coupons available at the moment</p>
+                                <p class="text-muted">No coupons available</p>
                             <% } %>
                         </div>
                     </div>
