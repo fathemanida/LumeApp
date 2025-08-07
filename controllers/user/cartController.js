@@ -333,11 +333,11 @@ const cart = async (req, res) => {
       "code discountType discountValue maxDiscount minOrderAmount expiryDate usedBy"
     );
     
-    const filteredCoupons = availableCoupons.filter(coupon => {
+    const filteredCoupons = coupons.filter(coupon => {
       return !coupon.usedBy || !coupon.usedBy.some(id => id.toString() === userId.toString());
     });
     
-    console.log('Available coupons:', filteredCoupons.length, 'out of', availableCoupons.length, 'active coupons');
+    console.log('Available coupons:', filteredCoupons.length, 'out of', coupons.length, 'active coupons');
     console.log('Cart total after offers:', totalPrice - totalOfferDiscount);
 
     res.render("cart", {
