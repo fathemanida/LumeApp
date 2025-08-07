@@ -818,17 +818,38 @@
                         <span>Subtotal</span>
                         <span id="subtotal">₹<%= totalPrice.toLocaleString() %></span>
                     </div>
-                    <div class="summary-row text-success" id="offer-discount-row" style="display: <%= totalOfferDiscount > 0 ? 'flex' : 'none' %>;">
+                    <% if (totalOfferDiscount > 0) { %>
+                    <div class="summary-row">
                         <span>Offer Discount</span>
-                        <span id="offer-discount">-₹<%= totalOfferDiscount.toLocaleString() %></span>
+                        <span class="text-success">-₹<%= totalOfferDiscount.toLocaleString() %></span>
                     </div>
-                    <div class="summary-row text-success" id="coupon-discount-row" style="display: <%= totalCouponDiscount > 0 ? 'flex' : 'none' %>;">
-                        <span>Coupon Discount</span>
-                        <span id="coupon-discount">-₹<%= totalCouponDiscount.toLocaleString() %></span>
+                    <% } %>
+                    <% if (couponApplied) { %>
+                    <div class="applied-coupon bg-light p-3 mb-3 rounded">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="fw-bold"><%= appliedCouponDetails.code %></span>
+                                <span class="text-success ms-2">
+                                    -<%= appliedCouponDetails.discountType === 'PERCENTAGE' ? 
+                                        appliedCouponDetails.discountValue + '%' : 
+                                        '₹' + appliedCouponDetails.discountValue.toLocaleString() %>
+                                    <% if (appliedCouponDetails.maxDiscount) { %>
+                                        (Max ₹<%= appliedCouponDetails.maxDiscount.toLocaleString() %>)
+                                    <% } %>
+                                </span>
+                            </div>
+                            <button class="btn btn-sm btn-outline-danger" onclick="removeCoupon()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="coupon-savings text-success small mt-1">
+                            Saved ₹<%= totalCouponDiscount.toLocaleString() %>
+                        </div>
                     </div>
+                    <% } %>
                     <div class="summary-row">
                         <span>Shipping</span>
-                        <span id="shipping"><%= shipping === 0 ? 'Free' : '₹' + shipping.toLocaleString() %></span>
+                        <span id="shipping"><%= shipping === 0 ? 'Free' : `₹${shipping.toLocaleString()}` %></span>
                     </div>
                     <div class="summary-row summary-total">
                         <span>Total</span>
