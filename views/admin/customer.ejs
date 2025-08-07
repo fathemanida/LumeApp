@@ -74,40 +74,45 @@
               <th>Action</th>
             </tr>
           </thead>
-          <tbody>
-            <% users.forEach(user => { %>
-              <tr>
-                <td>
-                  <% if (user.profileImage) { %>
-                    <img src="/uploads/user/<%= user.profileImage %>" alt="<%= user.username || 'User' %>" class="user-avatar">
-                  <% } else { %>
-                    <div class="default-avatar">
-                      <i class="fas fa-user-circle"></i>
-                    </div>
-                  <% } %>
-                </td>
-                <td><%= user.username || 'N/A' %></td>
-                <td><%= user.email %></td>
-                <td><%= user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' }) : 'N/A' %></td>
-                <td>  
-                  <span class="status-badge <%= user.isBlocked ? 'status-blocked' : 'status-active' %>">
-                    <%= user.isBlocked ? 'Blocked' : 'Active' %>
-                  </span>
-                </td>
-                <td>
-                  <% if(!user.isBlocked) { %>
-                    <a href="/admin/customerBlocked?id=<%= user._id %>" class="action-btn block-btn" title="Block User">
-                      Block
-                    </a>
-                  <% } else { %>
-                    <button class="action-btn unblock-btn" title="Unblock User" data-url="/admin/customerUnblocked?id=<%= user._id %>" data-action="unblock">
-                      Unblock
-                    </button>
-                  <% } %>
-                </td>
-              </tr>
-            <% } %>
-          </tbody>
+<tbody>
+  <% users.forEach(user => { %>
+    <tr>
+      <td>
+        <% if (user.profileImage) { %>
+          <img src="/uploads/user/<%= user.profileImage %>" alt="<%= user.username || 'User' %>" class="user-avatar">
+        <% } else { %>
+          <div class="default-avatar">
+            <i class="fas fa-user-circle"></i>
+          </div>
+        <% } %>
+      </td>
+      <td><%= user.username || 'N/A' %></td>
+      <td><%= user.email %></td>
+      <td>
+        <% if (user.createdAt) { %>
+          <%= new Date(user.createdAt).toLocaleDateString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' }) %>
+        <% } else { %>
+          N/A
+        <% } %>
+      </td>
+      <td>  
+        <span class="status-badge <%= user.isBlocked ? 'status-blocked' : 'status-active' %>">
+          <%= user.isBlocked ? 'Blocked' : 'Active' %>
+        </span>
+      </td>
+      <td>
+        <% if (!user.isBlocked) { %>
+          <a href="/admin/customerBlocked?id=<%= user._id %>" class="action-btn block-btn" title="Block User">Block</a>
+        <% } else { %>
+          <button class="action-btn unblock-btn" title="Unblock User" data-url="/admin/customerUnblocked?id=<%= user._id %>" data-action="unblock">
+            Unblock
+          </button>
+        <% } %>
+      </td>
+    </tr>
+  <% }); %>
+</tbody>
+
         </table>
 
         <div class="pagination">

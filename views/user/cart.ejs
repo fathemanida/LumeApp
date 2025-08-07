@@ -999,19 +999,36 @@
                     confirmButtonText: 'Yes, remove it!'
                 });
                 if (!result.isConfirmed) return;
-                const response = await fetch('/cart/remove/' + itemId, {
+                
+                const response = await fetch('/remove-item', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ itemId })
                 });
+                
                 const data = await response.json();
+                
                 if (data.success) {
+                    // Remove the item from the UI
                     const cartItem = document.querySelector(`.cart-item[data-id="${itemId}"]`);
                     if (cartItem) cartItem.remove();
-                    document.getElementById('subtotal').textContent = `₹${data.totals.subtotal.toLocaleString()}`;
-                    document.getElementById('shipping').textContent = data.totals.shipping === 0 ? 'Free' : `₹${data.totals.shipping.toLocaleString()}`;
-                    document.getElementById('finalPrice').textContent = `₹${data.totals.finalPrice.toLocaleString()}`;
-                    updateSummaryDiscounts(data.totals.offerDiscount, data.totals.couponDiscount);
+                    
+                    // Update the cart summary
+                    if (data.totals) {
+                        document.getElementById('subtotal').textContent = `₹${data.totals.subtotal?.toLocaleString() || '0'}`;
+                        document.getElementById('shipping').textContent = data.totals.shipping === 0 ? 'Free' : `₹${data.totals.shipping?.toLocaleString() || '0'}`;
+                        document.getElementById('finalPrice').textContent = `₹${data.totals.finalPrice?.toLocaleString() || '0'}`;
+                        
+                        // Update discounts if they exist
+                        if (data.totals.offerDiscount !== undefined || data.totals.couponDiscount !== undefined) {
+                            updateSummaryDiscounts(
+                                data.totals.offerDiscount || 0, 
+                                data.totals.couponDiscount || 0
+                            );
+                        }
+                    }
+                    
+                    // Check if cart is empty
                     const remainingItems = document.querySelectorAll('.cart-item');
                     if (remainingItems.length === 0) {
                         document.querySelector('.col-lg-8').innerHTML = `
@@ -1022,14 +1039,30 @@
                                 <a href="/shopAll" class="continue-shopping-btn">Continue Shopping</a>
                             </div>
                         `;
-                        document.querySelector('.checkout-btn').disabled = true;
+                        const checkoutBtn = document.querySelector('.checkout-btn');
+                        if (checkoutBtn) {
+                            checkoutBtn.disabled = true;
+                        }
                     }
-                    showNotification(data.message, 'success');
+                    
+                    // Update cart count in header
+                    const cartCount = document.querySelector('.cart-count');
+                    if (cartCount) {
+                        const currentCount = parseInt(cartCount.textContent) || 0;
+                        const newCount = Math.max(0, currentCount - 1);
+                        cartCount.textContent = newCount;
+                        if (newCount === 0) {
+                            cartCount.style.display = 'none';
+                        }
+                    }
+                    
+                    showNotification(data.message || 'Item removed from cart', 'success');
                 } else {
                     showNotification(data.message || 'Failed to remove item', 'error');
                 }
             } catch (error) {
-                console.log('An error occurred while removing item', error);
+                console.error('Error removing item:', error);
+                showNotification('An error occurred while removing the item', 'error');
             }
         }
 
