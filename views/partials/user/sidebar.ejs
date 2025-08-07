@@ -78,10 +78,12 @@
         document.getElementById('confirmDelete').addEventListener('click', async function() {
             try {
                 const response = await fetch('/delete-account', {
-                    method: 'GET',
+                    method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
-                    }
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'same-origin'  // Important for including cookies/session
                 });
                 
                 const data = await response.json();

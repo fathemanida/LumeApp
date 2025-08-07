@@ -48,7 +48,6 @@ const addToCart = async (req, res) => {
   try {
     const userId = req.session.user.id;
     const { productId, selectedSize, quantity, fromWishlist } = req.body;
-    
 
     const product = await Product.findById(productId).populate({
       path: "category",
@@ -264,7 +263,7 @@ const cart = async (req, res) => {
     for (let item of cart.items) {
       const product = item.productId;
       const quantity = item.quantity;
-      const unitPrice = product.finalPrice;
+      const unitPrice = product.salePrice;
 
       const matchedOffers = offers.filter((offer) => {
         if (offer.applicableOn === "all") return true;
