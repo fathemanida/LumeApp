@@ -149,7 +149,7 @@ router.post('/remove-address', userAuth.isLogin, profileController.removeAddress
 
 ///cart///
 router.get('/cart',userAuth.isLogin,cartController.cart);
-router.post('/add-to-cart',userAuth.isLogin,cartController.addToCart);
+router.post('/cart/add',userAuth.isLogin,cartController.addToCart);
 router.post('/cart/update-quantity',userAuth.isLogin,cartController.updateQuantity);
 router.post('/remove-item',userAuth.isLogin,cartController.removeItem);
 router.post('/apply-coupon',userAuth.isLogin,cartController.applyCoupon);
