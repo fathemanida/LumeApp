@@ -148,15 +148,14 @@ router.post('/set-default-address', userAuth.isLogin, profileController.setDefau
 router.post('/remove-address', userAuth.isLogin, profileController.removeAddress);
 
 ///cart///
-router.get('/cart', userAuth.isLogin, cartController.cart);
-router.post('/cart/add', userAuth.isLogin, cartController.addToCart);
-router.post('/buy-now', userAuth.isLogin, cartController.buyNow);
-router.post('/update-quantity', userAuth.isLogin, cartController.updateQuantity);
-router.post('/remove-item', userAuth.isLogin, cartController.removeItem);
-router.get('/checkout', userAuth.isLogin, cartController.getCheckout);
-
-router.post('/apply-coupon', cartController.applyCoupon);
-router.post('/remove-coupon',userAuth.isLogin, cartController.removeCoupon);
+router.get('/cart',userAuth.isLogin,cartController.cart);
+router.post('/add-to-cart',userAuth.isLogin,cartController.addToCart);
+router.post('/cart/update-quantity',userAuth.isLogin,cartController.updateQuantity);
+router.post('/remove-item',userAuth.isLogin,cartController.removeItem);
+router.post('/apply-coupon',userAuth.isLogin,cartController.applyCoupon);
+router.post('/remove-coupon',userAuth.isLogin,cartController.removeCoupon);
+router.get('/checkout',userAuth.isLogin,cartController.getCheckout);
+router.post('/buy-now',userAuth.isLogin,cartController.buyNow);
 
 // Payment routes
 router.get('/proceed-payment', userAuth.isLogin, paymentController.paymentMethod);

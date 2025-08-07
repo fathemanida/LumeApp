@@ -1128,7 +1128,7 @@ const deleteUserAccount = async (req, res) => {
     if (!userId) {
       return res.status(400).json({ success: false, message: 'User ID missing' });
     }
-
+   
     await Promise.all([
       Cart.deleteOne({ user: userId }),
       Wishlist.deleteOne({ user: userId }),
@@ -1136,7 +1136,7 @@ const deleteUserAccount = async (req, res) => {
       Wallet.deleteOne({ user: userId }),
       Order.deleteMany({ user: userId }),
     ]);
-
+    console.log('==cleared all things');
     await User.findByIdAndDelete(userId);
 
     res.status(200).json({ success: true, message: 'User account and related data deleted successfully' });
