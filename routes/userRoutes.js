@@ -13,6 +13,7 @@ const path = require('path');
 const walletController = require('../controllers/user/walletController.js')
 const footerController=require('../controllers/user/footerController.js')
 const refundController=require('../controllers/user/refundController.js')
+const User=require('../models/userSchema.js')
 
 
 const storage = multer.diskStorage({
