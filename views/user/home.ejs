@@ -1699,7 +1699,7 @@
       });
     <% } %>
 
-    function addToCart(productId, size = null) {
+    function addToCart(productId, selectedSize = null) {
       fetch('/check-auth')
         .then(response => response.json())
         .then(data => {
@@ -1724,7 +1724,7 @@
             body: JSON.stringify({
               productId: productId,
               quantity: 1,
-              size: size
+              selectedSize: selectedSize
             })
           })
             .then(response => {
