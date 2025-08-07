@@ -52,25 +52,46 @@
         For Queries on your order, Checking order status or for Returns/Exchange Email at <a href="mailto:lume.elegence@gmail.com" style="color: #d4b996; text-decoration: underline;">lume.elegence@gmail.com</a>
       </div>
       <div style="font-size: 0.95rem; color: #d4b996;">
-        All Rights Reserved © Copyright 2025
+        All Rights Reserved &copy; Copyright 2025
       </div>
     </div>
   </div>
-  <script>
-  setInterval(async () => {
-    try {
-      const response = await fetch('/check-block-status');
-      const data = await response.json();
+<script>
+  if (typeof Toastify === 'function') {
+    const intervalId = setInterval(async () => {
+      try {
+        const response = await fetch('/check-block-status');
+        const data = await response.json();
 
-      if (data.isBlocked) {
-        alert("Your account is blocked by admin.");
-        window.location.href = "/";
+        if (data.isBlocked) {
+          clearInterval(intervalId); 
+
+          Toastify({
+            text: "Your account has been blocked by the administrator. You will be logged out.",
+            duration: 5000,
+            gravity: "top",
+            position: "center",
+            backgroundColor: "#e63946",
+            stopOnFocus: true,
+            close: true,
+            onClick: function () {
+              window.location.href = "/";
+            }
+          }).showToast();
+
+          setTimeout(() => {
+            window.location.href = "/";
+          }, 3000);
+        }
+      } catch (error) {
+        console.error("Error checking block status:", error);
       }
-    } catch (error) {
-      console.error("Error checking block status:", error);
-    }
-  }, 3000); 
+    }, 5000);
+  } else {
+    console.warn("Toastify is not loaded. Blocked account notifications will not be shown.");
+  }
 </script>
+
 
 </footer>
 <style>

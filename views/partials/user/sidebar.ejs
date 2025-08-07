@@ -89,26 +89,31 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    // Show success message and redirect to home page
-                    Swal.fire({
-                        title: 'Account Deleted',
+                    // Show success message with Toastify
+                    Toastify({
                         text: 'Your account has been successfully deleted.',
-                        icon: 'success',
-                        confirmButtonText: 'OK'
-                    }).then(() => {
-                        window.location.href = '/';
-                    });
+                        duration: 3000,
+                        gravity: 'top',
+                        position: 'right',
+                        backgroundColor: '#4CAF50',
+                        stopOnFocus: true,
+                        callback: () => {
+                            window.location.href = '/';
+                        }
+                    }).showToast();
                 } else {
                     throw new Error(data.message || 'Failed to delete account');
                 }
             } catch (error) {
                 console.error('Error deleting account:', error);
-                Swal.fire({
-                    title: 'Error',
+                Toastify({
                     text: error.message || 'An error occurred while deleting your account',
-                    icon: 'error',
-                    confirmButtonText: 'OK'
-                });
+                    duration: 5000,
+                    gravity: 'top',
+                    position: 'right',
+                    backgroundColor: '#f44336',
+                    stopOnFocus: true
+                }).showToast();
             } finally {
                 modal.style.display = 'none';
             }
