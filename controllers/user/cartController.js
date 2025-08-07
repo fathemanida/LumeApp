@@ -42,14 +42,12 @@ const upload = multer({
 }).single("profileImage");
 
 
+const Wishlist = require('../../models/wishlistSchema');
+
 const addToCart = async (req, res) => {
   try {
-     console.log('======');
-    console.log('======');
-    console.log('======');
-    console.log('======');
     const userId = req.session.user.id;
-    const { productId, selectedSize, quantity } = req.body;
+    const { productId, selectedSize, quantity, fromWishlist } = req.body;
 
     const product = await Product.findById(productId).populate({
       path: "category",
@@ -193,7 +191,20 @@ const addToCart = async (req, res) => {
 
     await cart.save();
 
-    return res.status(200).json({ success: true, message: "Product added to cart" });
+    // If added from wishlist, remove it from wishlist
+    if (fromWishlist) {
+      await Wishlist.findOneAndUpdate(
+        { userId },
+        { $pull: { items: { productId } } },
+        { new: true }
+      );
+    }
+
+    return res.status(200).json({ 
+      success: true, 
+      message: "Product added to cart",
+      fromWishlist: !!fromWishlist
+    });
 
   } catch (error) {
     console.error("Error adding to cart:", error);
