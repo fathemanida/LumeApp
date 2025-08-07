@@ -760,72 +760,69 @@
       }
     }
 
-    function addToCart(productId) {
-      fetch('/check-auth')
-        .then(response => response.json())
-        .then(data => {
-          if (!data.isAuthenticated) {
-            Toastify({
-              text: "Login required to add items to cart",
-              duration: 3000,
-              gravity: "top",
-              position: "right",
-              backgroundColor: "#A9BA9D",
-              stopOnFocus: true
-            }).showToast();
-            return;
-          }
-          fetch('/cart/add', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json'
-            },
-            body: JSON.stringify({ productId: productId, quantity: 1 })
-          })
-            .then(response => response.ok ? response.json() : response.json().then(err => Promise.reject(err)))
-            .then(data => {
-              if (data.success) {
-                Toastify({
-                  text: data.message || 'Added to Cart',
-                  duration: 2000,
-                  gravity: "top",
-                  position: "right",
-                  backgroundColor: "#A9BA9D",
-                  stopOnFocus: true
-                }).showToast();
-              } else {
-                Toastify({
-                  text: data.message || 'Failed to add to cart',
-                  duration: 3000,
-                  gravity: "top",
-                  position: "right",
-                  backgroundColor: "#e63946",
-                  stopOnFocus: true
-                }).showToast();
-              }
-            })
-            .catch(error => {
-              Toastify({
-                text: error.message || 'Failed to add item to cart',
-                duration: 3000,
-                gravity: "top",
-                position: "right",
-                backgroundColor: "#e63946",
-                stopOnFocus: true
-              }).showToast();
-            });
-        })
-        .catch(error => {
+    async function addToCart(productId) {
+      try {
+        // First check authentication
+        const authCheck = await fetch('/check-auth');
+        const authData = await authCheck.json();
+        
+        if (!authData.isAuthenticated) {
           Toastify({
-            text: 'Failed to check authentication status',
+            text: "Please login to add items to cart",
             duration: 3000,
             gravity: "top",
             position: "right",
-            backgroundColor: "#e63946",
+            backgroundColor: "#8a9b7d",
             stopOnFocus: true
           }).showToast();
+          return;
+        }
+
+        // Make the add to cart request
+        const response = await fetch('/cart/add', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          credentials: 'same-origin',
+          body: JSON.stringify({ productId, quantity: 1 })
         });
+
+        // Check if response is JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          const errorText = await response.text();
+          console.error('Non-JSON response:', errorText);
+          throw new Error('Invalid response from server. Please try again.');
+        }
+
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.message || 'Failed to add to cart');
+        }
+        
+        Toastify({
+          text: data.message || 'Added to Cart',
+          duration: 2000,
+          gravity: "top",
+          position: "right",
+          backgroundColor: "#A9BA9D",
+          stopOnFocus: true
+        }).showToast();
+      } catch (error) {
+        console.error('Add to cart error:', error);
+        Toastify({
+          text: error.message || 'Failed to add item to cart',
+          duration: 3000,
+          gravity: "top",
+          position: "right",
+          backgroundColor: "#e63946",
+          stopOnFocus: true
+        }).showToast();
+      }
     }
 
     document.addEventListener('DOMContentLoaded', function() {

@@ -1767,16 +1767,12 @@
           // Update cart count in header
           const cartCount = document.querySelector('.cart-count');
           if (cartCount) {
-            // Only increment count if it's a new item (not a quantity update)
             if (data.quantityUpdated === false) {
               const currentCount = parseInt(cartCount.textContent) || 0;
               cartCount.textContent = currentCount + 1;
               cartCount.style.display = 'flex';
             } else {
-              // for quantity updates, we can either:
-              // eep the count the same (since we're just updating quantity)
-              // Or fetch the latest cart count from the server
-              // we'll keep it simple and do nothing for quantity updates
+              
             }
           }
 
