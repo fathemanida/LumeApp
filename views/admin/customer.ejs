@@ -102,7 +102,9 @@
       </td>
       <td>
         <% if (!user.isBlocked) { %>
-          <a href="/admin/customerBlocked?id=<%= user._id %>" class="action-btn block-btn" title="Block User">Block</a>
+          <button class="action-btn block-btn" title="Block User" data-url="/admin/customerBlocked?id=<%= user._id %>" data-action="block">
+            Block
+          </button>
         <% } else { %>
           <button class="action-btn unblock-btn" title="Unblock User" data-url="/admin/customerUnblocked?id=<%= user._id %>" data-action="unblock">
             Unblock
