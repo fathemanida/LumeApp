@@ -89,11 +89,22 @@
                                     <% } %>
                                 </td>
                                 <td><%= new Date(offer.startDate).toLocaleDateString() %></td>
-                                <td><%= new Date(offer.endDate).toLocaleDateString() %></td>
+                                <td class="<%= new Date(offer.endDate) < new Date() ? 'text-danger' : '' %>">
+                                    <%= new Date(offer.endDate).toLocaleDateString() %>
+                                    <% if (new Date(offer.endDate) < new Date()) { %>
+                                        <br><small class="expired-badge">(Expired)</small>
+                                    <% } %>
+                                </td>
                                 <td>
-                                    <span class="status-badge <%= offer.isActive ? 'status-active' : 'status-inactive' %>">
-                                        <%= offer.isActive ? 'Active' : 'Inactive' %>
-                                    </span>
+                                    <% if (new Date(offer.endDate) < new Date()) { %>
+                                        <span class="status-badge status-expired">
+                                            Expired
+                                        </span>
+                                    <% } else { %>
+                                        <span class="status-badge <%= offer.isActive ? 'status-active' : 'status-inactive' %>">
+                                            <%= offer.isActive ? 'Active' : 'Inactive' %>
+                                        </span>
+                                    <% } %>
                                 </td>
                                 <td>
                                     <button class="action-btn btn-edit" onclick="editOffer('<%= offer._id %>')">

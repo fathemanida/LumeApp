@@ -59,15 +59,26 @@
                             <td><%= coupon.code %></td>
                             <td><%= coupon.discountType === 'PERCENTAGE' ? `${coupon.discountValue}%` : `$${coupon.discountValue}` %></td>
                             <td><%= new Date(coupon.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %></td>
-                            <td><%= new Date(coupon.expiryDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %></td>
+                            <td class="<%= new Date(coupon.expiryDate) < new Date() ? 'text-danger' : '' %>">
+                                <%= new Date(coupon.expiryDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %>
+                                <% if (new Date(coupon.expiryDate) < new Date()) { %>
+                                    <br><small class="expired-badge">(Expired)</small>
+                                <% } %>
+                            </td>
                             <td>
-                                <label class="switch">
-                                    <input type="checkbox" 
-                                           class="status-toggle" 
-                                           data-coupon-id="<%= coupon._id %>"
-                                           <%= coupon.isActive ? 'checked' : '' %>>
-                                    <span class="slider round"></span>
-                                </label>
+                                <% if (new Date(coupon.expiryDate) < new Date()) { %>
+                                    <span class="status-badge status-expired">
+                                        Expired
+                                    </span>
+                                <% } else { %>
+                                    <label class="switch">
+                                        <input type="checkbox" 
+                                               class="status-toggle" 
+                                               data-coupon-id="<%= coupon._id %>"
+                                               <%= coupon.isActive ? 'checked' : '' %>>
+                                        <span class="slider round"></span>
+                                    </label>
+                                <% } %>
                             </td>
                             <td>
                                 <a href="/admin/coupons/edit/<%= coupon._id %>" class="action-btn btn-edit" title="Edit Coupon">
@@ -255,12 +266,33 @@
         .slider:before {
             position: absolute;
             content: "";
-            height: 20px;
-            width: 20px;
-            left: 2px;
-            bottom: 2px;
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
             background-color: white;
             transition: .4s;
+            border-radius: 50%;
+        }
+        
+        .status-expired {
+            background-color: #f5f5f5;
+            color: #757575;
+            border: 1px solid #e0e0e0;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .expired-badge {
+            color: #f44336;
+            font-weight: 500;
+            font-size: 0.8em;
+        }
+        
+        .text-danger {
+            color: #f44336;
         }
 
         input:checked + .slider {
