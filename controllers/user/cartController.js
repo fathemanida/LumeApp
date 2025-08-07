@@ -48,9 +48,7 @@ const addToCart = async (req, res) => {
   try {
     const userId = req.session.user.id;
     const { productId, selectedSize, quantity, fromWishlist } = req.body;
-    if(selectedSize===undefined){
-      selectedSize=1
-    }
+    
 
     const product = await Product.findById(productId).populate({
       path: "category",
