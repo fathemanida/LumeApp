@@ -136,7 +136,7 @@ function updateCartTotalsDOM(data) {
 // Remove item from cart
 window.removeItem = async function(itemId) {
   try {
-    const response = await fetch('/cart/remove-item', {
+    const response = await fetch('/remove-item', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -732,11 +732,11 @@
           iconElement.classList.toggle('fa-regular');
           iconElement.classList.toggle('fa-solid');
           Toastify({
-            text: iconElement.classList.contains('fa-solid') ? "Added to Wishlist 💖" : "Removed from Wishlist ❌",
+            text: iconElement.classList.contains('fa-solid') ? "Added to Wishlist" : "Removed from Wishlist",
             duration: 3000,
             gravity: "top",
             position: "right",
-            backgroundColor: iconElement.classList.contains('fa-solid') ? "#4CAF50" : "#f44336",
+            backgroundColor: "#A9BA9D",
             stopOnFocus: true
           }).showToast();
         } else {
