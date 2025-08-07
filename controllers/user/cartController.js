@@ -326,12 +326,12 @@ const cart = async (req, res) => {
     cart.appliedCouponDetails = appliedCouponDetails;
     await cart.save(); 
 
-    const availableCoupons = await Coupon.find({
+    const coupons = await Coupon.find({
       isActive: true,
       expiryDate: { $gt: now },
-      minOrderAmount: { $lte: totalPrice - totalOfferDiscount }
-    }).select('code discountType discountValue maxDiscount minOrderAmount expiryDate usedBy')
-      .lean();
+    }).select(
+      "code discountType discountValue maxDiscount minOrderAmount expiryDate usedBy"
+    );
     
     const filteredCoupons = availableCoupons.filter(coupon => {
       return !coupon.usedBy || !coupon.usedBy.some(id => id.toString() === userId.toString());
@@ -348,7 +348,7 @@ const cart = async (req, res) => {
       totalCouponDiscount,
       shipping,
       finalPrice,
-      coupons: availableCoupons,
+      coupons: coupons,
       couponApplied: couponApplied,
       discount: totalCouponDiscount,
     });
