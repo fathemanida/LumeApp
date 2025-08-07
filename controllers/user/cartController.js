@@ -48,7 +48,7 @@ const addToCart = async (req, res) => {
   try {
     const userId = req.session.user.id;
     const { productId, selectedSize, quantity, fromWishlist } = req.body;
-    if(selectedSize===undefned){
+    if(selectedSize===undefined){
       selectedSize=1
     }
 
