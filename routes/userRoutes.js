@@ -90,7 +90,7 @@ router.get('/check-block-status', async (req, res) => {
       return res.json({ isBlocked: false }); 
     }
 
-    const user = await User.findById(req.session.user._id);
+    const user = await User.findById(req.session.user.id);
 
     if (!user) {
       return res.status(404).json({ isBlocked: false });

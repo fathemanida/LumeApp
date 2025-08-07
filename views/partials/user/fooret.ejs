@@ -59,7 +59,7 @@
   <script>
   setInterval(async () => {
     try {
-      const response = await fetch('/check-auth');
+      const response = await fetch('/check-block-status');
       const data = await response.json();
 
       if (data.isBlocked) {

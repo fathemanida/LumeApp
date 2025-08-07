@@ -115,9 +115,11 @@ const addToCart = async (req, res) => {
         couponDiscount: 0
       });
     }
-
+  console.log('selectedsize',selectedSize);
     const existingItem = cart.items.find(
+      
       item => item.productId.equals(productId) && item.size === selectedSize
+      
     );
     console.log(existingItem,'====existing item')
 
@@ -191,7 +193,6 @@ const addToCart = async (req, res) => {
 
     await cart.save();
 
-    // If added from wishlist, remove it from wishlist
     if (fromWishlist) {
       await Wishlist.findOneAndUpdate(
         { userId },
