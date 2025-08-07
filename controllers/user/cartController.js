@@ -202,8 +202,9 @@ const addToCart = async (req, res) => {
 
     return res.status(200).json({ 
       success: true, 
-      message: "Product added to cart",
-      fromWishlist: !!fromWishlist
+      message: existingItem ? "Product quantity updated in cart" : "Product added to cart",
+      fromWishlist: !!fromWishlist,
+      quantityUpdated: !!existingItem
     });
 
   } catch (error) {

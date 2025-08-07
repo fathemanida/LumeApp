@@ -79,14 +79,14 @@
     <tr>
       <td>
         <% if (user.profileImage) { %>
-          <img src="/uploads/user/<%= user.profileImage %>" alt="<%= user.username || 'User' %>" class="user-avatar">
+          <img src="/uploads/user/<%= user.profileImage %>" alt="<%= user.name || 'User' %>" class="user-avatar">
         <% } else { %>
           <div class="default-avatar">
             <i class="fas fa-user-circle"></i>
           </div>
         <% } %>
       </td>
-      <td><%= user.username || 'N/A' %></td>
+      <td><%= user.name || 'User' %></td>
       <td><%= user.email %></td>
       <td>
         <% if (user.createdAt) { %>
