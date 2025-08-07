@@ -84,6 +84,7 @@ router.get(
 
 router.get('/check-block-status', async (req, res) => {
   try {
+    console.log('==each 3 sec it is calling...');
     if (!req.session.user) {
       return res.json({ isBlocked: false }); 
     }

@@ -6,6 +6,7 @@ const getAllOffers = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const status = req.query.status;
+    const type = req.query.type;
     const limit = 10;
     const skip = (page - 1) * limit;
 
@@ -16,9 +17,15 @@ const getAllOffers = async (req, res) => {
       query.endDate = { $gte: new Date() };
     } else if (status === 'inactive') {
       query.$or = [
-        { isActive: false },
+       
         { endDate: { $lt: new Date() } } 
       ];
+    }
+
+    if (type === 'category') {
+      query.applicableOn = 'categories';
+    } else if (type === 'product') {
+      query.applicableOn = 'products';
     }
 
     const totalOffers = await Offer.countDocuments(query);
