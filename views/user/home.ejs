@@ -1699,23 +1699,34 @@
       });
     <% } %>
 
-    function addToCart(productId, selectedSize = null) {
+    function addToCart(productId, size = null) {
+      // Show loading state
+      const buttons = document.querySelectorAll(`[onclick*="addToCart('${productId}'"]`);
+      buttons.forEach(button => {
+        const originalText = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+        
+        // Store original text in data attribute
+        button.dataset.originalText = originalText;
+      });
+
       fetch('/check-auth')
-        .then(response => response.json())
+        .then(response => {
+          if (!response.ok) {
+            return response.text().then(text => {
+              throw new Error('Authentication check failed');
+            });
+          }
+          return response.json();
+        })
         .then(data => {
           if (!data.isAuthenticated) {
-            Toastify({
-              text: "Login required to add items to cart",
-              duration: 3000,
-              gravity: "top",
-              position: "right",
-              backgroundColor: "#A9BA9D",
-              stopOnFocus: true
-            }).showToast();
+            window.location.href = '/login';
             return;
           }
 
-          fetch('/cart/add', {
+          return fetch('/cart/add', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -1724,56 +1735,69 @@
             body: JSON.stringify({
               productId: productId,
               quantity: 1,
-              selectedSize: selectedSize
+              size: size
             })
-          })
-            .then(response => {
-              if (!response.ok) {
-                return response.json().then(err => Promise.reject(err));
-              }
-              return response.json();
-            })
-            .then(data => {
-              if (data.success) {
-                Toastify({
-                  text: data.message || 'Added to Cart',
-                  duration: 2000,
-                  gravity: "top",
-                  position: "right",
-                  backgroundColor: "#4CAF50",
-                  stopOnFocus: true
-                }).showToast();
-              } else {
-                Toastify({
-                  text: data.message || 'Failed to add to cart',
-                  duration: 3000,
-                  gravity: "top",
-                  position: "right",
-                  backgroundColor: "#e63946",
-                  stopOnFocus: true
-                }).showToast();
-              }
-            })
-            .catch(error => {
-              Toastify({
-                text: error.message || 'Failed to add item to cart',
-                duration: 3000,
-                gravity: "top",
-                position: "right",
-                backgroundColor: "#e63946",
-                stopOnFocus: true
-              }).showToast();
-            });
+          });
+        })
+        .then(async response => {
+          const contentType = response.headers.get('content-type');
+          let data;
+          
+          if (contentType && contentType.includes('application/json')) {
+            data = await response.json();
+          } else {
+            const text = await response.text();
+            try {
+              data = JSON.parse(text);
+            } catch (e) {
+              throw new Error('Invalid response from server');
+            }
+          }
+
+          if (!response.ok) {
+            throw new Error(data.message || 'Failed to add to cart');
+          }
+          
+          return data;
+        })
+        .then(data => {
+          // Update cart count in header
+          const cartCount = document.querySelector('.cart-count');
+          if (cartCount) {
+            const currentCount = parseInt(cartCount.textContent) || 0;
+            cartCount.textContent = currentCount + 1;
+            cartCount.style.display = 'flex';
+          }
+
+          Toastify({
+            text: data.message || 'Added to Cart',
+            duration: 2000,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#4CAF50",
+            stopOnFocus: true
+          }).showToast();
         })
         .catch(error => {
+          console.error('Add to cart error:', error);
           Toastify({
-            text: 'Failed to check authentication status',
+            text: error.message || 'Failed to add item to cart',
             duration: 3000,
             gravity: "top",
             position: "right",
             backgroundColor: "#e63946",
             stopOnFocus: true
           }).showToast();
+        })
+        .finally(() => {
+          // Reset button states
+          buttons.forEach(button => {
+            if (button.dataset.originalText) {
+              button.innerHTML = button.dataset.originalText;
+              button.disabled = false;
+              delete button.dataset.originalText;
+            }
+          });
         });
     }
 

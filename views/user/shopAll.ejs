@@ -662,19 +662,11 @@
                   </div>
                 </a>
 
-                <% if (product.sizes && product.sizes.length > 0) { %>
-                  <button class="btn w-100"
-                          <%= !product.isListed || product.quantity <= 0 ? 'disabled' : '' %>
-                          onclick="event.stopPropagation(); showSizeSelection('<%= product._id %>')">
-                    <%= !product.isListed ? 'Not Available' : (product.quantity <= 0 ? 'Out of Stock' : 'Select Size') %>
-                  </button>
-                <% } else { %>
-                  <button class="btn w-100"
-                          <%= !product.isListed || product.quantity <= 0 ? 'disabled' : '' %>
-                          onclick="event.stopPropagation(); addToCart('<%= product._id %>')">
-                    <%= !product.isListed ? 'Not Available' : (product.quantity <= 0 ? 'Out of Stock' : 'Add to Cart') %>
-                  </button>
-                <% } %>
+                <button class="btn w-100"
+                        <%= !product.isListed || product.quantity <= 0 ? 'disabled' : '' %>
+                        onclick="event.stopPropagation(); addToCart('<%= product._id %>')">
+                  <%= !product.isListed ? 'Not Available' : (product.quantity <= 0 ? 'Out of Stock' : 'Add to Cart') %>
+                </button>
               </div>
             </div>
             <% }) %>
@@ -768,7 +760,7 @@
       }
     }
 
-    function addToCart(productId, selectedSize = null) {
+    function addToCart(productId) {
       fetch('/check-auth')
         .then(response => response.json())
         .then(data => {
@@ -789,11 +781,7 @@
               'Content-Type': 'application/json',
               'Accept': 'application/json'
             },
-            body: JSON.stringify({ 
-              productId: productId, 
-              quantity: 1,
-              selectedSize: selectedSize 
-            })
+            body: JSON.stringify({ productId: productId, quantity: 1 })
           })
             .then(response => response.ok ? response.json() : response.json().then(err => Promise.reject(err)))
             .then(data => {
@@ -840,105 +828,6 @@
         });
     }
 
-    function showSizeSelection(productId) {
-      // Get the product card that was clicked
-      const productCard = document.querySelector(`[data-product-id="${productId}"]`);
-      
-      // Check if we already have size buttons
-      let sizeContainer = productCard.querySelector('.size-selection-container');
-      
-      if (sizeContainer) {
-        // Toggle visibility if size container already exists
-        sizeContainer.style.display = sizeContainer.style.display === 'none' ? 'block' : 'none';
-        return;
-      }
-      
-      // Create size selection container
-      sizeContainer = document.createElement('div');
-      sizeContainer.className = 'size-selection-container';
-      sizeContainer.style.marginTop = '10px';
-      
-      // Create size buttons
-      const sizeButtons = document.createElement('div');
-      sizeButtons.className = 'size-buttons';
-      sizeButtons.style.display = 'flex';
-      sizeButtons.style.gap = '5px';
-      sizeButtons.style.justifyContent = 'center';
-      sizeButtons.style.marginBottom = '10px';
-      
-      // Example sizes - in a real app, these would come from your product data
-      const sizes = ['S', 'M', 'L', 'XL'];
-      
-      sizes.forEach(size => {
-        const btn = document.createElement('button');
-        btn.textContent = size;
-        btn.className = 'btn btn-sm btn-outline-secondary size-btn';
-        btn.style.padding = '2px 8px';
-        btn.style.minWidth = '30px';
-        btn.onclick = (e) => {
-          e.stopPropagation();
-          // Remove active class from all buttons
-          sizeButtons.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
-          // Add active class to clicked button
-          btn.classList.add('active');
-          // Store selected size in data attribute
-          productCard.dataset.selectedSize = size;
-        };
-        sizeButtons.appendChild(btn);
-      });
-      
-      // Add to cart button
-      const addToCartBtn = document.createElement('button');
-      addToCartBtn.className = 'btn btn-sm w-100';
-      addToCartBtn.style.backgroundColor = '#A9BA9D';
-      addToCartBtn.style.color = 'white';
-      addToCartBtn.style.border = 'none';
-      addToCartBtn.textContent = 'Add to Cart';
-      addToCartBtn.onclick = (e) => {
-        e.stopPropagation();
-        const selectedSize = productCard.dataset.selectedSize;
-        if (!selectedSize) {
-          Toastify({
-            text: 'Please select a size',
-            duration: 2000,
-            gravity: 'top',
-            position: 'right',
-            backgroundColor: '#e63946',
-            stopOnFocus: true
-          }).showToast();
-          return;
-        }
-        addToCart(productId, selectedSize);
-        // Remove the size selection UI after adding to cart
-        sizeContainer.remove();
-        // Reset the button text
-        const mainButton = productCard.querySelector('.btn.w-100');
-        if (mainButton) {
-          mainButton.textContent = 'Add to Cart';
-        }
-      };
-      
-      // Add elements to container
-      sizeContainer.appendChild(sizeButtons);
-      sizeContainer.appendChild(addToCartBtn);
-      
-      // Add container after the main button
-      const mainButton = productCard.querySelector('.btn.w-100');
-      mainButton.insertAdjacentElement('afterend', sizeContainer);
-      
-      // Change the main button text
-      mainButton.textContent = 'Cancel';
-      mainButton.onclick = (e) => {
-        e.stopPropagation();
-        sizeContainer.remove();
-        mainButton.textContent = 'Select Size';
-        mainButton.onclick = (e) => {
-          e.stopPropagation();
-          showSizeSelection(productId);
-        };
-      };
-    }
-    
     document.addEventListener('DOMContentLoaded', function() {
       const sidebar = document.getElementById('sidebar');
       const overlay = document.getElementById('overlay');
