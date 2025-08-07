@@ -999,221 +999,7 @@ const removeCoupon = async (req, res) => {
 
 
 
-// const placeOrder = async (req, res) => {
-//   console.log("sdffhgvmbgfgsdfadgfdhgmhvfgdsdggfh");
-//   try {
-//     const userId = req.session.user.id;
-//     const { addressId, paymentMethod } = req.body;
 
-//     if (!addressId || !paymentMethod) {
-//       return res
-//         .status(400)
-//         .json({
-//           success: false,
-//           message: "Address and payment method are required",
-//         });
-//     }
-
-//     const cart = await Cart.findOne({ userId }).populate({
-//       path: "items.productId",
-//       populate: [
-//         { path: "offer" },
-//         { path: "category", populate: { path: "categoryOffer" } },
-//       ],
-//     });
-
-//     if (!cart || cart.items.length === 0) {
-//       return res.status(400).json({ success: false, message: "Cart is empty" });
-//     }
-
-//     const now = new Date();
-//     const offers = await Offer.find({
-//       isActive: true,
-//       startDate: { $lte: now },
-//       endDate: { $gte: now },
-//     });
-
-//     let totalPrice = 0;
-//     let totalOfferDiscount = 0;
-//     let totalQuantities = 0;
-//     const processedItems = [];
-
-//     for (const item of cart.items) {
-//       const product = item.productId;
-//       const quantity = item.quantity;
-//       const basePrice =
-//         product.salePrice && product.salePrice < product.regularPrice
-//           ? product.salePrice
-//           : product.regularPrice;
-//       const originalPrice = basePrice * quantity;
-//       totalPrice += originalPrice;
-//       totalQuantities += quantity;
-
-//       const { maxDiscount, bestOffer, offerType } = getBestOffer(
-//         product,
-//         offers,
-//         quantity
-//       );
-//       totalOfferDiscount += maxDiscount;
-
-//       processedItems.push({
-//         productId: product._id,
-//         quantity: quantity,
-//         originalPrice: originalPrice,
-//         price: basePrice,
-//         appliedOffer: bestOffer
-//           ? {
-//               offerId: bestOffer._id,
-//               offerType: offerType,
-//               offerName: bestOffer.offerName,
-//               discountType: bestOffer.discountType,
-//               discountValue: bestOffer.discountValue,
-//               discountAmount: maxDiscount,
-//             }
-//           : null,
-//       });
-//     }
-
-//     const shipping = totalPrice >= 1500 ? 0 : 40;
-//     let couponDiscount = 0;
-//     let usedCoupon = null;
-//     if (cart.appliedCoupon) {
-//       const coupon = await Coupon.findById(cart.appliedCoupon);
-//       if (coupon) {
-//         if (coupon.usedBy && coupon.usedBy.includes(userId)) {
-//           return res.status(400).json({
-//             success: false,
-//             message: "You have already used this coupon in a previous order",
-//           });
-//         }
-//         const priceAfterOffer = totalPrice - totalOfferDiscount;
-//         if (coupon.discountType === "PERCENTAGE") {
-//           couponDiscount = (priceAfterOffer * coupon.discountValue) / 100;
-//           if (coupon.maxDiscount) {
-//             couponDiscount = Math.min(couponDiscount, coupon.maxDiscount);
-//           }
-//         } else {
-//           couponDiscount = coupon.discountValue;
-//         }
-//         try {
-//           usedCoupon = coupon._id;
-//         } catch (error) {
-//           console.error("Error updating coupon usedBy:", error);
-//           return res.status(500).json({
-//             success: false,
-//             message: "Error processing coupon",
-//           });
-//         }
-//       }
-//     }
-
-//     const finalPrice =
-//       totalPrice - totalOfferDiscount - couponDiscount + shipping;
-//     const couponPerUnit =
-//       totalQuantities > 0 ? couponDiscount / totalQuantities : 0;
-
-//     const finalItems = processedItems.map((item) => {
-//       // Calculate offer details if any
-//       let appliedOffer = null;
-//       if (item.appliedOffer) {
-//         appliedOffer = {
-//           offerId: item.appliedOffer._id || item.appliedOffer.offerId,
-//           offerType:
-//             item.appliedOffer.offerType || item.appliedOffer.type || "product",
-//           offerName:
-//             item.appliedOffer.name || item.appliedOffer.code || "Special Offer",
-//           discountType: item.appliedOffer.discountType || "fixed",
-//           discountValue: item.appliedOffer.discountValue || 0,
-//           discountAmount: item.appliedOffer.discountAmount || 0,
-//         };
-//       }
-
-//       const itemCouponDiscount = couponPerUnit * item.quantity;
-//       const itemFinalPrice =
-//         (item.originalPrice - (appliedOffer?.discountAmount || 0)) *
-//           item.quantity -
-//         itemCouponDiscount;
-
-//       return {
-//         productId: item.productId._id || item.productId,
-//         quantity: item.quantity,
-//         originalPrice: item.originalPrice,
-//         price: item.originalPrice - (appliedOffer?.discountAmount || 0), // Price per unit after offers
-//         appliedOffer: appliedOffer,
-//         couponPerUnit: couponPerUnit,
-//         totalCouponDiscount: itemCouponDiscount,
-//         finalPrice: itemFinalPrice / item.quantity, // Final price per unit after all discounts
-//         status: "Processing",
-//       };
-//     });
-
-//     const order = new Order({
-//       userId,
-//       items: finalItems,
-//       totalAmount: finalPrice,
-//       shippingAddress: addressId,
-//       paymentMethod,
-//       status: "Pending",
-//       usedCoupon: usedCoupon,
-//       couponDiscount: couponDiscount,
-//       offerDiscount: totalOfferDiscount,
-//       subtotal: totalPrice,
-//       shipping: shipping,
-//       couponApplied: !!usedCoupon,
-//       // Add additional fields for better tracking
-//       paymentStatus: "Pending",
-//       orderDate: new Date(),
-//     });
-
-//     await order.save();
-
-//     for (const item of cart.items) {
-//       const product = item.productId;
-//       if (product) {
-//         const newStock = (product.quantity || 0) - item.quantity;
-//         await Product.findByIdAndUpdate(product._id, {
-//           quantity: newStock < 0 ? 0 : newStock,
-//           status: newStock > 0 ? "Available" : "Out of Stock",
-//         });
-//       }
-//     }
-
-//     if (usedCoupon) {
-//       try {
-//         await Coupon.findByIdAndUpdate(usedCoupon, {
-//           $addToSet: { usedBy: userId },
-//         });
-//       } catch (error) {
-//         console.error("Error marking coupon as used:", error);
-//       }
-//     }
-
-//     cart.items = [];
-//     cart.appliedCoupon = null;
-//     cart.discount = 0;
-//     await cart.save();
-
-//     res.json({
-//       success: true,
-//       message: "Order placed successfully",
-//       orderId: order._id,
-//     });
-//   } catch (error) {
-//     console.error("Error in placeOrder:", error);
-//     res.status(500).json({
-//       success: false,
-//       message: "Error placing order",
-//     });
-//   }
-// };
-
-/**
- * Finds the best applicable offer for a product
- * @param {Object} product - The product to find offers for
- * @param {Array} offers - Array of offer objects
- * @param {number} [quantity=1] - Quantity of the product
- * @returns {Object} Object containing maxDiscount, bestOffer, and offerType
- */
 function getBestOffer(product, offers = [], quantity = 1) {
   if (!product || !Array.isArray(offers)) {
     console.warn("Invalid input to getBestOffer:", { product, offers });
@@ -1372,12 +1158,10 @@ const buyNow = async (req, res) => {
       });
     }
 
-    // Calculate prices
     const price = product.salePrice || product.regularPrice;
     const totalPrice = price * quantity;
-    const finalPrice = totalPrice; // No discount applied initially
+    const finalPrice = totalPrice; 
 
-    // Prepare cart item with all required fields
     const cartItem = {
       productId: product._id,
       size: 'default',
@@ -1389,13 +1173,10 @@ const buyNow = async (req, res) => {
       status: 'In Cart'
     };
 
-    // Update or create cart
     let cart = await Cart.findOne({ userId: userId });
     
     if (cart) {
-      // Clear existing items and add the new one
       cart.items = [cartItem];
-      // Reset cart totals
       cart.cartTotal = totalPrice;
       cart.finalCartTotal = finalPrice;
       cart.totalOfferDiscount = 0;
@@ -1403,7 +1184,6 @@ const buyNow = async (req, res) => {
       cart.couponApplied = undefined;
       cart.appliedCoupnonDetails = undefined;
     } else {
-      // Create new cart
       cart = new Cart({
         userId: userId,
         items: [cartItem],

@@ -610,6 +610,7 @@ async function addToCartFromWishlist(productId, button) {
     const data = await response.json();
     
     if (data.success) {
+      // Show success message
       Toastify({
         text: data.message || 'Product added to cart successfully',
         duration: 3000,
@@ -625,11 +626,37 @@ async function addToCartFromWishlist(productId, button) {
         }
       }).showToast();
       
+      // Update cart count in header
       const cartCount = document.querySelector('.cart-count');
       if (cartCount) {
         const currentCount = parseInt(cartCount.textContent) || 0;
         cartCount.textContent = currentCount + 1;
         cartCount.style.display = 'flex';
+      }
+      
+      // Remove the item from wishlist UI
+      const wishlistItem = button.closest('.wishlist-item');
+      if (wishlistItem) {
+        wishlistItem.style.opacity = '0';
+        setTimeout(() => {
+          wishlistItem.remove();
+          
+          // Update wishlist count
+          const wishlistCount = document.querySelector('.wishlist-count');
+          if (wishlistCount) {
+            const currentWishlistCount = parseInt(wishlistCount.textContent) || 0;
+            const newCount = Math.max(0, currentWishlistCount - 1);
+            wishlistCount.textContent = newCount;
+            wishlistCount.style.display = newCount > 0 ? 'flex' : 'none';
+          }
+          
+          // Reload if wishlist is empty
+          if (document.querySelectorAll('.wishlist-item').length === 0) {
+            setTimeout(() => {
+              window.location.reload();
+            }, 500);
+          }
+        }, 300);
       }
     } else {
       throw new Error(data.message || 'Failed to add product to cart');
