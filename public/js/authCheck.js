@@ -1,12 +1,13 @@
 document.addEventListener('DOMContentLoaded', function() {
     checkAuthStatus();
-    
-    setInterval(checkAuthStatus, 60000);
+    console.log('===function called');
+    setInterval(checkAuthStatus, 3000);
 });
 
 async function checkAuthStatus() {
     try {
         const response = await fetch('/check-auth');
+        console.log('===it is working everry 3 secs');
         if (!response.ok) throw new Error('Network response was not ok');
         
         const data = await response.json();
