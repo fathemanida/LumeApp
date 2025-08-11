@@ -4,6 +4,7 @@ const path = require("path");
 const Offer = require('../../models/offerSchema');
 
 const multer = require("multer");
+const Product = require("../../models/productSchema");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -355,7 +356,12 @@ const deleteCategory = async (req, res) => {
       req.flash("error", "No category ID provided");
       return res.redirect("/admin/category");
     }
-
+    
+    for(let item of products){
+      if(item.category.id===id&& item.salePrice>1000 || item.salePrice<10000){
+        delete products.item
+      }
+    }
     const deleted = await Category.findByIdAndDelete(id);
     if (!deleted) {
       req.flash("error", "Category not found");

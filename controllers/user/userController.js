@@ -633,8 +633,8 @@ const loadShopAll = async (req, res) => {
 const filterProduct = async (req, res) => {
   console.log("req received here");
   try {
-    const userData = req.session.user?._id
-      ? await User.findById(req.session.user._id)
+    const userData = req.session.user?.id
+      ? await User.findById(req.session.user.id)
       : null;
 
     const categories = await Category.find({ isListed: true });

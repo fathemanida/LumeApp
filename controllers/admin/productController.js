@@ -152,7 +152,6 @@ const addProduct = async (req, res) => {
     } = req.body;
         const productId = req.params.id;
 
-console.log(isNew);
     if (!productName || !description || !category || !regularPrice || !quantity) {
       return res.status(400).json({ message: 'Please fill all required fields' });
     }

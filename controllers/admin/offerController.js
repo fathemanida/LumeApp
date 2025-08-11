@@ -38,6 +38,9 @@ const getAllOffers = async (req, res) => {
       .populate('categories', 'name')
       .populate('products', 'productName');
 
+
+
+      console.log('==totao,current',totalPages,page);
     res.render('admin/offers', {
       offers,
       currentPage: page,
@@ -350,6 +353,10 @@ const deleteOffer = async (req, res) => {
         });
     }
 };
+
+
+  
+
 
 module.exports = {
   getAllOffers,

@@ -68,7 +68,6 @@ const createCoupon = async (req, res) => {
       });
     }
     const couponCode = code.toUpperCase();
-ss
 if (couponCode.length < 5 || couponCode.length > 8) {
   return res.status(400).json({
     success: false,
