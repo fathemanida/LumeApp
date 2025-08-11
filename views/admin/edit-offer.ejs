@@ -82,18 +82,15 @@
                     </div>
                 </div>
 
-                <!-- Dynamic Selection Sections -->
                 <div id="category-selection" class="selection-section <%= offer.applicableOn === 'categories' ? '' : 'hidden' %>">
                     <h3 class="form-label">Select Categories</h3>
                     <div class="selection-grid" id="category-grid">
-                        <!-- Categories will be loaded here dynamically -->
                     </div>
                 </div>
 
                 <div id="product-selection" class="selection-section <%= offer.applicableOn === 'products' ? '' : 'hidden' %>">
                     <h3 class="form-label">Select Products</h3>
                     <div class="selection-grid" id="product-grid">
-                        <!-- Products will be loaded here dynamically -->
                     </div>
                 </div>
 
@@ -106,7 +103,6 @@
     </main>
 
     <script>
-        // DOM Elements
         const applicableOnSelect = document.getElementById('applicable-on');
         const categorySelection = document.getElementById('category-selection');
         const productSelection = document.getElementById('product-selection');
@@ -117,7 +113,6 @@
         const discountValueError = document.getElementById('discount-value-error');
         const offerId = document.getElementById('offer-id').value;
 
-        // Toastify configuration
         const showToast = (message, type = 'success') => {
             const backgroundColor = type === 'success' ? '#4CAF50' : '#f44336';
             Toastify({
@@ -130,10 +125,8 @@
             }).showToast();
         };
 
-        // Initialize the page
         document.addEventListener('DOMContentLoaded', async function() {
             try {
-                // Fetch categories and products from the backend
                 const [categoriesResponse, productsResponse] = await Promise.all([
                     fetch('/admin/category?search=&page=1&limit=100&json=true', {
                         headers: {
@@ -155,15 +148,12 @@
                 const productsData = await productsResponse.json();
 
                 if (categoriesData.success && productsData.success) {
-                    // Store the data globally
                     window.categories = categoriesData.categories;
                     window.products = productsData.products;
 
-                    // Initial render
                     renderCategories();
                     renderProducts();
 
-                    // Pre-select categories and products
                     const offer = <%- JSON.stringify(offer) %>;
                     if (offer.categories && offer.categories.length > 0) {
                         offer.categories.forEach(catId => {
@@ -188,16 +178,13 @@
                     throw new Error('Failed to fetch data');
                 }
 
-                // Set minimum date for start date (today)
                 const today = new Date().toISOString().split('T')[0];
                 document.getElementById('start-date').min = today;
 
-                // Set minimum date for end date (same as start date)
                 document.getElementById('start-date').addEventListener('change', function() {
                     document.getElementById('end-date').min = this.value;
                 });
 
-                // Handle discount value validation
                 discountValueInput.addEventListener('input', validateDiscountValue);
                 discountTypeSelect.addEventListener('change', validateDiscountValue);
             } catch (error) {
@@ -206,7 +193,6 @@
             }
         });
 
-        // Handle applicable on selection change
         applicableOnSelect.addEventListener('change', function() {
             categorySelection.classList.add('hidden');
             productSelection.classList.add('hidden');
@@ -218,7 +204,6 @@
             }
         });
 
-        // Render categories with search functionality
         function renderCategories(searchTerm = '') {
             categoryGrid.innerHTML = '';
             const filteredCategories = window.categories.filter(category => 
@@ -240,7 +225,6 @@
                     </label>
                 `;
                 
-                // Add click handler for the entire item
                 item.addEventListener('click', function(e) {
                     const checkbox = this.querySelector('input[type="checkbox"]');
                     checkbox.checked = !checkbox.checked;
@@ -251,7 +235,6 @@
             });
         }
 
-        // Render products with search functionality
         function renderProducts(searchTerm = '') {
             productGrid.innerHTML = '';
             const filteredProducts = window.products.filter(product => 
@@ -274,7 +257,6 @@
                     </label>
                 `;
                 
-                // Add click handler for the entire item
                 item.addEventListener('click', function(e) {
                     const checkbox = this.querySelector('input[type="checkbox"]');
                     checkbox.checked = !checkbox.checked;
@@ -285,7 +267,6 @@
             });
         }
 
-        // Add search functionality with improved styling
         const categorySearch = document.createElement('input');
         categorySearch.type = 'text';
         categorySearch.className = 'form-input mt-2 mb-4';
@@ -300,7 +281,6 @@
         productSearch.addEventListener('input', (e) => renderProducts(e.target.value));
         productGrid.parentElement.insertBefore(productSearch, productGrid);
 
-        // Validate discount value
         function validateDiscountValue() {
             const value = parseFloat(discountValueInput.value);
             const type = discountTypeSelect.value;
@@ -310,8 +290,8 @@
                 return false;
             }
 
-            if (type === 'percentage' && (value < 0 || value > 100)) {
-                discountValueError.textContent = 'Percentage must be between 0 and 100';
+            if (type === 'percentage' && (value < 0 || value > 65)) {
+                discountValueError.textContent = 'Percentage must be between 0 and 65';
                 return false;
             }
 
@@ -319,12 +299,15 @@
                 discountValueError.textContent = 'Amount must be positive';
                 return false;
             }
+            if (type === 'flat' && value > 4000) {
+                discountValueError.textContent = 'Amount can not be exceeds 4000';
+                return false;
+            }
 
             discountValueError.textContent = '';
             return true;
         }
 
-        // Form submission
         document.getElementById('offer-form').addEventListener('submit', async function(e) {
             e.preventDefault();
 
@@ -332,7 +315,6 @@
                 return;
             }
 
-            // Collect form data
             const formData = {
                 name: document.getElementById('offer-name').value,
                 code: document.getElementById('offer-code').value,
@@ -345,7 +327,6 @@
                 products: []
             };
 
-            // Get selected categories if applicable
             if (formData.applicableOn === 'categories') {
                 const selectedCategories = document.querySelectorAll('input[name="categories"]:checked');
                 selectedCategories.forEach(cat => {
@@ -353,7 +334,6 @@
                 });
             }
 
-            // Get selected products if applicable
             if (formData.applicableOn === 'products') {
                 const selectedProducts = document.querySelectorAll('input[name="products"]:checked');
                 selectedProducts.forEach(prod => {
@@ -386,7 +366,6 @@
             }
         });
 
-        // Cancel button
         document.querySelector('.btn-secondary').addEventListener('click', function() {
             if (confirm('Are you sure you want to cancel? All changes will be lost.')) {
                 window.location.href = '/admin/offers';

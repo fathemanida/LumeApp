@@ -160,7 +160,6 @@
                 }
             });
 
-            // Date validation
             const fromDate = new Date(formData.get('fromDate'));
             const expiryDate = new Date(formData.get('expiryDate'));
             const today = new Date();
@@ -172,7 +171,6 @@
                 hasErrors = true;
             }
 
-            // Numeric validations
             const discountValue = Number(formData.get('discountValue'));
             const minOrderAmount = Number(formData.get('minOrderAmount'));
             const maxDiscount = Number(formData.get('maxDiscount'));
@@ -182,9 +180,12 @@
                 hasErrors = true;
             }
 
-            if (formData.get('discountType') === 'PERCENTAGE' && discountValue > 100) {
-                showError('discountValue', 'Percentage discount cannot exceed 100%');
+            if (formData.get('discountType') === 'PERCENTAGE' && discountValue > 65) {
+                showError('discountValue', 'Percentage discount cannot exceed 65%');
                 hasErrors = true;
+            }
+            if(maxDiscount>4000){
+                showError('maxDiscount','Maximium discount cannnot exceed 4000')
             }
 
             if (minOrderAmount < 0) {
@@ -224,7 +225,6 @@
                     data.maxDiscount = Number(formData.get('maxDiscount'));
                 }
 
-                // Check if any changes were made
                 const originalValues = {
                     code: document.getElementById('code').defaultValue,
                     description: document.getElementById('description').defaultValue,

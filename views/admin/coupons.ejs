@@ -32,7 +32,6 @@
             </a>
         </div>
         
-        <!-- Search and Filter Section -->
         <div class="search-filter-section">
             <div class="search-box">
                 <i class="fas fa-search search-icon"></i>
@@ -40,7 +39,6 @@
             </div>
         </div>
 
-        <!-- Table Container -->
         <div class="table-container">
                 <table class="table">
                     <thead>
@@ -96,8 +94,8 @@
 
         <!-- Pagination -->
         <div class="pagination">
-            <% if (totalPages > 1) { %>
-                <% if (currentPage > 1) { %>
+            <% if (totalPages >= 1) { %>
+                <% if (currentPage >= 1) { %>
                     <button class="pagination-btn" data-page="<%= currentPage - 1 %>">Previous</button>
                 <% } %>
                 
@@ -119,7 +117,6 @@
     </main>
 
     <script>
-        // Search functionality
         const searchInput = document.getElementById('searchInput');
         if (searchInput) {
             searchInput.addEventListener('input', function() {
@@ -137,7 +134,7 @@
             });
         }
 
-        // Pagination
+        // 
         const paginationButtons = document.querySelectorAll('.pagination-btn');
         if (paginationButtons.length > 0) {
             paginationButtons.forEach(btn => {
@@ -150,7 +147,6 @@
             });
         }
 
-        // Toggle Coupon Status
         document.querySelectorAll('.status-toggle').forEach(toggle => {
             toggle.addEventListener('change', async function() {
                 const couponId = this.dataset.couponId;
@@ -171,12 +167,10 @@
                     if (response.ok) {
                         showToast(`Coupon ${newStatus ? 'activated' : 'deactivated'} successfully`);
                     } else {
-                        // Revert the toggle if the request failed
                         this.checked = !newStatus;
                         showToast(result.message || 'Error updating coupon status', 'error');
                     }
                 } catch (error) {
-                    // Revert the toggle if there was an error
                     this.checked = !newStatus;
                     console.error('Error:', error);
                     showToast('Error updating coupon status', 'error');
@@ -184,11 +178,9 @@
             });
         });
         
-        // Delete functionality with SweetAlert2
         document.querySelectorAll('.btn-delete').forEach(btn => {
             btn.addEventListener('click', async function() {
                 const couponId = this.dataset.couponId;
-                // Use SweetAlert2 for confirmation
                 Swal.fire({
                     title: 'Are you sure?',
                     text: 'Do you really want to delete this coupon? This action cannot be undone.',

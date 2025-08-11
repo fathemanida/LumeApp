@@ -129,22 +129,19 @@
 
         <!-- Pagination -->
         <div class="pagination">
-            <% if (totalPages > 1) { %>
-                <!-- First Page -->
-                <% if (currentPage > 1) { %>
+            <% if (totalPages >= 1) { %>
+                <% if (currentPage >= 1) { %>
                     <a href="/admin/offers?page=1" class="pagination-btn">
                         <i class="fas fa-angle-double-left"></i>
                     </a>
                 <% } %>
 
-                <!-- Previous Page -->
                 <% if (currentPage > 1) { %>
                     <a href="/admin/offers?page=<%= currentPage - 1 %>" class="pagination-btn">
                         <i class="fas fa-chevron-left"></i>
                     </a>
                 <% } %>
 
-                <!-- Page Numbers -->
                 <% 
                     let startPage = Math.max(1, currentPage - 2);
                     let endPage = Math.min(totalPages, startPage + 4);
