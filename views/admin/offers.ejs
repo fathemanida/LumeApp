@@ -376,7 +376,6 @@
             }).showToast();
         };
 
-    // Sidebar toggle functionality (mobile/tablet)
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
     const sidebar = document.querySelector('.sidebar');
     const sidebarOverlay = document.getElementById('sidebarOverlay');
@@ -396,7 +395,6 @@
     if (sidebarOverlay) {
       sidebarOverlay.addEventListener('click', toggleSidebar);
     }
-    // Close sidebar when clicking anywhere on body (mobile/tablet only)
     document.body.addEventListener('click', function(e) {
       if (window.innerWidth <= 991 && sidebar.classList.contains('active')) {
         if (!sidebar.contains(e.target) && e.target !== mobileMenuBtn && !mobileMenuBtn.contains(e.target)) {
@@ -406,11 +404,9 @@
         }
       }
     });
-    // Prevent sidebar click from closing itself
     sidebar.addEventListener('click', function(e) {
       e.stopPropagation();
     });
-    // Close sidebar when clicking on a nav link (for mobile)
     document.querySelectorAll('.nav-link').forEach(link => {
       link.addEventListener('click', () => {
         if (window.innerWidth <= 768) {
@@ -418,7 +414,6 @@
         }
       });
     });
-    // Close sidebar when window is resized to desktop size
     window.addEventListener('resize', () => {
       if (window.innerWidth > 768) {
         sidebar.classList.remove('active');
@@ -428,7 +423,6 @@
     </script>
     
     <script>
-        // Function to handle offer deletion
         async function deleteOffer(offerId) {
             try {
                 const result = await Swal.fire({
@@ -452,13 +446,11 @@
                     const data = await response.json();
                     
                     if (data.success) {
-                        // Show success message
                         await Swal.fire(
                             'Deleted!',
                             'The offer has been deleted.',
                             'success'
                         );
-                        // Reload the page to reflect changes
                         window.location.reload();
                     } else {
                         throw new Error(data.message || 'Failed to delete offer');

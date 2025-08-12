@@ -713,7 +713,7 @@
                     }
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        fetch(`/orders/cancel/<%= order._id %>`, {
+                        fetch(`/orders/cancel/<%= orders._id %>`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -769,7 +769,7 @@
 
             searchInput.addEventListener('input', performSearch);
 
-\            searchForm.addEventListener('submit', function(e) {
+             searchForm.addEventListener('submit', function(e) {
                 if (!searchInput.value.trim()) {
                     e.preventDefault();
                 }
