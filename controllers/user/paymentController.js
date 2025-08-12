@@ -15,7 +15,7 @@ const Coupon = require('../../models/couponSchema');
 const Wallet = require('../../models/walletSchema');
 const Razorpay = require('razorpay');
 const Offer = require('../../models/offerSchema');
-const MESSAGES = require("../constants/messages");
+const MESSAGES = require('../../constants/message');
 
 
 const razorpay = new Razorpay({
