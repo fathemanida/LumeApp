@@ -310,6 +310,7 @@
             });
         });
 
+        // Delete offer function
         function deleteOffer(offerId) {
             Swal.fire({
                 title: 'Are you sure?',
@@ -322,7 +323,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     fetch(`/delete-offer/${offerId}`, {
-                        method: 'POST',
+                        method: 'DELETE',
                         headers: {
                             'Content-Type': 'application/json'
                         }

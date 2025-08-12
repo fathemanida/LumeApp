@@ -75,7 +75,7 @@ router.get('/add-offer', adminAuth, offerController.getAddOffer);
 router.post('/add-offer', adminAuth, offerController.createOffer);
 router.get('/edit-offer/:id', adminAuth, offerController.getEditOffer);
 router.put('/edit-offer/:id', adminAuth, offerController.updateOffer);
-router.post('/delete-offer/:id', adminAuth, offerController.deleteOffer);
+router.delete('/delete-offer/:id', adminAuth, offerController.deleteOffer);
 
 router.get('/coupons', adminAuth, couponController.listCoupons);
 router.get('/coupons/add', adminAuth, couponController.showAddForm);
