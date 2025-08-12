@@ -10,15 +10,17 @@ const getAllOffers = async (req, res) => {
     const limit = 6;
     const skip = (page - 1) * limit;
 
-    let query = {};
+    let query = {
+      applicableOn: { $ne: 'all' }
+    };
     
     if (status === 'active') {
       query.isActive = true;
       query.endDate = { $gte: new Date() };
     } else if (status === 'inactive') {
       query.$or = [
-       
-        { endDate: { $lt: new Date() } } 
+        { endDate: { $lt: new Date() } },
+        { isActive: false }
       ];
     }
 
@@ -38,9 +40,6 @@ const getAllOffers = async (req, res) => {
       .populate('categories', 'name')
       .populate('products', 'productName');
 
-
-
-      console.log('==totao,current',totalPages,page);
     res.render('admin/offers', {
       offers,
       currentPage: page,
@@ -55,6 +54,7 @@ const getAllOffers = async (req, res) => {
     });
   }
 };
+
 
 const getAddOffer = async (req, res) => {
   try {

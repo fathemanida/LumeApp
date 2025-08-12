@@ -75,7 +75,6 @@
                         <label for="applicable-on" class="form-label">Applicable On</label>
                         <select id="applicable-on" class="form-input">
                             <option value="">Select option</option>
-                            <option value="all" <%= offer.applicableOn === 'all' ? 'selected' : '' %>>All Products</option>
                             <option value="categories" <%= offer.applicableOn === 'categories' ? 'selected' : '' %>>Selected Categories</option>
                             <option value="products" <%= offer.applicableOn === 'products' ? 'selected' : '' %>>Selected Products</option>
                         </select>
