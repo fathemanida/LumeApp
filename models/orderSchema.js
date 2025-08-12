@@ -3,7 +3,6 @@ const { Schema } = mongoose;
 const { v4: uuidv4 } = require("uuid");
 
 const orderSchema = new mongoose.Schema({
-    // Order Identification
     orderId: {
         type: String,
         default: () => uuidv4(),
@@ -108,18 +107,15 @@ const orderSchema = new mongoose.Schema({
         required: true,
         enum: ['COD',  'Razorpay', 'Wallet']
     },
-    // Order Status
     status: {
         type: String,
         required: true,
         enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Partially Cancelled', 'Returned', 'Partially Returned', 'Return Requested', 'Return Rejected', 'Failed'],
         default: 'Pending'
     },
-    // Order Level Cancellation Details
     cancelledAt: Date,
     cancellationReason: String,
     cancellationNotes: String,
-    // Order Level Return Details
     returnedAt: Date,
     returnReason: String,
     returnNotes: String,
@@ -200,10 +196,7 @@ const orderSchema = new mongoose.Schema({
         type: { type: String }
     },
    
-  address: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Address'
-  },
+  
 });
 
 const Order = mongoose.model("Order", orderSchema);

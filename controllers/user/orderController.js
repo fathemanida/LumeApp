@@ -264,13 +264,24 @@ const cancelOrder = async (req, res) => {
         if (!order) {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
-if (!['Processing', 'Active', 'Pending'].includes(order.status)) {
+if (!['Processing', 'Active', 'Pending','Failed'].includes(order.status)) {
     return res.status(400).json({ 
         success: false, 
         message: `Cannot cancel item with status: ${order.status}` 
     });
 }
+        if(order.status==='Failed'){
+            for(let item of order.items){
+                item.status='Cancelled'
+            }
+            order.status='Cancelled';
+            await order.save();
 
+            return res.status(200).json({
+                success:false,
+                message:`Order Canceled successfully`
+            })
+        }
 
         let refundAmount = 0;
        if (order.paymentMethod !== 'COD' && 
