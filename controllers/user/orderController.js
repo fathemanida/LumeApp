@@ -812,6 +812,7 @@ const downloadInvoice = async (req, res) => {
     const pageBottom = doc.page.height - 40;
     const col1 = 45;
     const col2 = 280;
+
     const col3 = 350;
     const col4 = 420;
     const col5 = 490;
@@ -857,7 +858,7 @@ const downloadInvoice = async (req, res) => {
     const summaryY = y + 10;
     const lineGap = 10;
     doc.text('Subtotal:', col4 - 70, summaryY, { width: 80, align: 'left' });
-    doc.text(`Rs.${totalAmount.toFixed(2)}`, col5 - 50, summaryY, { width: 60, align: 'right' });
+    doc.text(`Rs.${finalAmount.toFixed(2)}`, col5 - 50, summaryY, { width: 60, align: 'right' });
     doc.text('Offer Discount:', col4 - 70, summaryY + 20, { width: 80, align: 'left' });
     doc.text(`-Rs.${offerDiscount.toFixed(2)}`, col5 - 50, summaryY + 20, { width: 60, align: 'right' });
     doc.text('Coupon Discount:', col4 - 70, summaryY + 40, { width: 80, align: 'left' });
