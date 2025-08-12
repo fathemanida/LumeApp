@@ -328,7 +328,7 @@
                             'Content-Type': 'application/json'
                         }
                     })
-                    .then(response => response.ok)
+                    .then(response => response.json())
                     .then(data => {
                         if (data.success) {
                             Swal.fire({
