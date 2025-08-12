@@ -310,6 +310,8 @@
   background-color: brown;
   color: white;
   transition: background-color 0.3s ease;
+  text-decoration: none;
+  
 }
 
 .custom-btn:hover {
@@ -566,9 +568,11 @@
                         <button class="custom-btn me-2" onclick="printInvoice()">
                             <i class="fas fa-print me-2"></i>Print Invoice
                         </button>
-                        <a href="/orders/<%= order._id %>/invoice" class="custom-btn me-2" download>
+                        <%if(order.status!=="Failed"){ %>
+                            <a href="/orders/<%= order._id %>/invoice" class="custom-btn me-2" download>
                             <i class="fas fa-download me-2"></i>Download Invoice
                         </a>
+                        <% } %>
                         <% if (canCancelOrder) { %>
                             <button class="custom-btn me-2 cancel-order-btn" data-item-id="<%= order._id %>"
                                 data-item-name="Order #<%= order.orderId %>" data-type="order">
