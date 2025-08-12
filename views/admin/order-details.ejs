@@ -298,11 +298,11 @@
                                     <div class="payment-details">
                                         <p class="mb-1">
                                             <i class="fas fa-credit-card me-2"></i>
-                                            <strong>Method:</strong> <%= order.paymentMethod ? order.paymentMethod : 'N/A' %>
+                                            Method: <%= order.paymentMethod ? order.paymentMethod : 'N/A' %>
                                         </p>
                                         <p class="mb-1">
                                             <i class="fas fa-info-circle me-2"></i>
-                                            <strong>Status:</strong>
+                                            Status:
                                             <span class="badge <%= order.payment && order.payment.status === 'Paid' ? 'bg-success' : 'bg-warning' %> ms-1">
                                                 <%= order.payment && order.payment.status || 'Pending' %>
                                             </span>
@@ -321,129 +321,111 @@
                     <div class="order-section">
                         <h5 class="section-title">Order Items</h5>
                         <div class="table-responsive">
-                            <table class="table table-dark table-hover align-middle"
-                                style="--bs-table-bg: #1a1d20; --bs-table-striped-bg: #1e2124; --bs-table-hover-bg: #2c3034;">
-                                <thead class="table-dark">
-                                    <tr style="--bs-table-bg: #141619;">
-                                        <th>Product</th>
-                                        <th>Price</th>
-                                        <th>Quantity</th>
-                                        <th>Discount</th>
-                                        <th>Total</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <% order.items.forEach((item, index)=> { %>
-                                        <tr style="--bs-table-bg: #1a1d20;">
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <img src="/uploads/product/<%= item.productId.productImage[0]  %>"
-                                                        alt="<%= item.productId.productName %>"
-                                                        class="img-thumbnail me-3"
-                                                        style="width: 60px; height: 60px; object-fit: cover;">
-                                                    <div>
-                                                        <h6 class="mb-0">
-                                                            <%= item.productId.productName %>
-                                                        </h6>
-                                                        <% if (item.appliedOffer) { %>
-                                                            <small class="text-muted">Offer: <%=
-                                                                    item.appliedOffer.offerName %></small>
-                                                            <% } %>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>₹<%= item.price.toFixed(2) %>
-                                            </td>
-                                            <td>
-                                                <%= item.quantity %>
-                                            </td>
-                                            <td>
-                                                <% if (item.appliedOffer) { %>
-                                                    <% if (item.appliedOffer.discountType==='percentage' ) { %>
-                                                        <%= item.appliedOffer.discountValue %>%
-                                                            <% } else { %>
-                                                                ₹<%= item.appliedOffer.discountValue.toFixed(2) %>
-                                                                    <% } %>
-                                                                        <% } else { %>
-                                                                            -
-                                                                            <% } %>
-                                            </td>
-                                            <td>₹<%= (item.finalPrice * item.quantity).toFixed(2) %>
-                                            </td>
-                                            <td>
-                                                <span
-                                                    class="status-badge badge-<%= item.status.toLowerCase().replace(' ', '-') %>">
-                                                    <%= item.status %>
-                                                </span>
-                                            </td>
-                                            <td class="action-buttons">
-                                                <% if (item.status==='Return Requested' ) { %>
-                                                    <button class="btn btn-sm btn-success"
-                                                        onclick="handleReturnAction('<%= order._id %>', '<%= item._id %>', 'approve')">
-                                                        Approve Return
-                                                    </button>
-                                                    <button class="btn btn-sm btn-danger"
-                                                        onclick="handleReturnAction('<%= order._id %>', '<%= item._id %>', 'reject')">
-                                                        Reject
-                                                    </button>
-                                                    <% } else if (item.status==='Active' || item.status==='Processing' )
-                                                        { %>
-                                                        <select class="form-select form-select-sm"
-                                                            onchange="updateItemStatus('<%= order._id %>', '<%= item._id %>', this.value)">
-                                                            <option value="Processing" <%=item.status==='Processing'
-                                                                ? 'selected' : '' %>>Processing</option>
-                                                            <option value="Shipped" <%=item.status==='Shipped'
-                                                                ? 'selected' : '' %>>Shipped</option>
-                                                            <option value="Delivered" <%=item.status==='Delivered'
-                                                                ? 'selected' : '' %>>Delivered</option>
-                                                            <option value="Cancelled" <%=item.status==='Cancelled'
-                                                                ? 'selected' : '' %>>Cancel</option>
-                                                        </select>
-                                                        <% } %>
-                                            </td>
-                                        </tr>
-                                        <% }) %>
-                                </tbody>
-                                <tfoot>
-                                    <tr class="table-active" style="--bs-table-bg: #141619;">
-                                        <td colspan="4" class="text-end"><strong>Subtotal:</strong></td>
-                                        <td colspan="3">₹<%= order.totalAmount ? order.totalAmount.toFixed(2) :
-                                                order.totalAmount.toFixed(2) %>
-                                        </td>
-                                    </tr>
-                                    <% if (order.offerDiscount> 0) { %>
-                                        <tr style="--bs-table-bg: #1a1d20;">
-                                            <td colspan="4" class="text-end"><strong>Offer Discount:</strong></td>
-                                            <td colspan="3">-₹<%= order.offerDiscount.toFixed(2) %>
-                                            </td>
-                                        </tr>
-                                        <% } %>
-                                            <tr>
-                                                <% if (order.couponDiscount> 0) { %>
-                                            <tr style="--bs-table-bg: #1a1d20;">
-                                                <td colspan="4" class="text-end"><strong>Coupon Discount:</strong></td>
-                                                <td colspan="3">-₹<%= order.couponDiscount.toFixed(2) %>
-                                                </td>
-                                            </tr>
-                                            <% } %>
-                                                <td colspan="4" class="text-end"><strong>Shipping:</strong></td>
-                                                <td colspan="3">
-                                                    <% if (order.shipping===0) { %>
-                                                        Free
-                                                        <% } else { %>
-                                                            ₹<%= (order.shipping || 0).toFixed(2) %>
-                                                                <% } %>
-                                                </td>
-                                                </tr>
-                                                <tr class="table-active">
-                                                    <td colspan="4" class="text-end"><strong>Total:</strong></td>
-                                                    <td colspan="3"><strong>₹<%= order.totalAmount.toFixed(2) %>
-                                                                </strong></td>
-                                                </tr>
-                                </tfoot>
-                            </table>
+<table class="table table-dark table-hover align-middle" style="background-color: black;">
+    <thead class="table-dark">
+        <tr>
+            <th>Product</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Discount</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% order.items.forEach((item, index) => { %>
+            <tr>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <img src="/uploads/product/<%= item.productId.productImage[0] %>"
+                             alt="<%= item.productId.productName %>"
+                             class="img-thumbnail me-3"
+                             style="width: 60px; height: 60px; object-fit: cover;">
+                        <div>
+                            <h6 class="mb-0"><%= item.productId.productName %></h6>
+                            <% if (item.appliedOffer) { %>
+                                <small class="text-muted">Offer: <%= item.appliedOffer.offerName %></small>
+                            <% } %>
+                        </div>
+                    </div>
+                </td>
+                <td>₹<%= item.price.toFixed(2) %></td>
+                <td><%= item.quantity %></td>
+                <td>
+                    <% if (item.appliedOffer) { %>
+                        <% if (item.appliedOffer.discountType === 'percentage') { %>
+                            <%= item.appliedOffer.discountValue %>%
+                        <% } else { %>
+                            ₹<%= item.appliedOffer.discountValue.toFixed(2) %>
+                        <% } %>
+                    <% } else { %>
+                        -
+                    <% } %>
+                </td>
+                <td>₹<%= (item.finalPrice * item.quantity).toFixed(2) %></td>
+                <td>
+                    <span class="status-badge badge-<%= item.status.toLowerCase().replace(' ', '-') %>">
+                        <%= item.status %>
+                    </span>
+                </td>
+                <td class="action-buttons">
+                    <% if (item.status === 'Return Requested') { %>
+                        <button class="btn btn-sm btn-success"
+                                onclick="handleReturnAction('<%= order._id %>', '<%= item._id %>', 'approve')">
+                            Approve Return
+                        </button>
+                        <button class="btn btn-sm btn-danger"
+                                onclick="handleReturnAction('<%= order._id %>', '<%= item._id %>', 'reject')">
+                            Reject
+                        </button>
+                    <% } else if (item.status === 'Active' || item.status === 'Processing') { %>
+                        <select class="form-select form-select-sm"
+                                onchange="updateItemStatus('<%= order._id %>', '<%= item._id %>', this.value)">
+                            <option value="Processing" <%= item.status === 'Processing' ? 'selected' : '' %>>Processing</option>
+                            <option value="Shipped" <%= item.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                            <option value="Delivered" <%= item.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                            <option value="Cancelled" <%= item.status === 'Cancelled' ? 'selected' : '' %>>Cancel</option>
+                        </select>
+                    <% } %>
+                </td>
+            </tr>
+        <% }) %>
+    </tbody>
+    <tfoot>
+        <tr class="table-active">
+            <td colspan="4" class="text-end">Subtotal:</td>
+            <td colspan="3">₹<%= order.totalAmount.toFixed(2) %></td>
+        </tr>
+        <% if (order.offerDiscount > 0) { %>
+            <tr>
+                <td colspan="4" class="text-end">Offer Discount:</td>
+                <td colspan="3">-₹<%= order.offerDiscount.toFixed(2) %></td>
+            </tr>
+        <% } %>
+        <% if (order.couponDiscount > 0) { %>
+            <tr>
+                <td colspan="4" class="text-end">Coupon Discount:</td>
+                <td colspan="3">-₹<%= order.couponDiscount.toFixed(2) %></td>
+            </tr>
+        <% } %>
+        <tr>
+            <td colspan="4" class="text-end">Shipping:</td>
+            <td colspan="3">
+                <% if (order.shipping === 0) { %>
+                    Free
+                <% } else { %>
+                    ₹<%= (order.shipping || 0).toFixed(2) %>
+                <% } %>
+            </td>
+        </tr>
+        <tr class="table-active">
+            <td colspan="4" class="text-end"><strong>Total:</strong></td>
+            <td colspan="3"><strong>₹<%= order.totalAmount.toFixed(2) %></strong></td>
+        </tr>
+    </tfoot>
+</table>
+
                         </div>
                     </div>
 
