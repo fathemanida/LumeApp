@@ -426,5 +426,53 @@
       }
     });
     </script>
+    
+    <script>
+        // Function to handle offer deletion
+        async function deleteOffer(offerId) {
+            try {
+                const result = await Swal.fire({
+                    title: 'Are you sure?',
+                    text: 'You won\'t be able to revert this!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                });
+
+                if (result.isConfirmed) {
+                    const response = await fetch(`/admin/delete-offer/${offerId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        // Show success message
+                        await Swal.fire(
+                            'Deleted!',
+                            'The offer has been deleted.',
+                            'success'
+                        );
+                        // Reload the page to reflect changes
+                        window.location.reload();
+                    } else {
+                        throw new Error(data.message || 'Failed to delete offer');
+                    }
+                }
+            } catch (error) {
+                console.error('Error deleting offer:', error);
+                Swal.fire(
+                    'Error!',
+                    error.message || 'Failed to delete offer',
+                    'error'
+                );
+            }
+        }
+    </script>
 </body>
 </html>
