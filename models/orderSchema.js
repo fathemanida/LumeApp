@@ -196,7 +196,10 @@ const orderSchema = new mongoose.Schema({
         type: { type: String }
     },
    
-  
+  address: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Address'
+  },
 });
 
 const Order = mongoose.model("Order", orderSchema);
