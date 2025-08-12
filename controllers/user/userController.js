@@ -13,7 +13,7 @@ const Order = require('../../models/orderSchema');
 const Cart = require('../../models/cartSchema');
 const Wishlist = require('../../models/wishlistSchema');
 const Address = require('../../models/addressSchema');
-const MESSAGES = require("../constants/message");
+const MESSAGES = require('../../constants/message');
 
 
 const loadLogin = async (req, res) => {
