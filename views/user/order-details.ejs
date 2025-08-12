@@ -849,7 +849,6 @@
         <script>
             // Add event listeners when the DOM is fully loaded
             document.addEventListener('DOMContentLoaded', function () {
-                // Handle cancel item buttons
                 document.querySelectorAll('.cancel-item-btn, .cancel-order-btn').forEach(button => {
                     button.addEventListener('click', function () {
                         const itemId = this.getAttribute('data-item-id');
@@ -859,7 +858,6 @@
                     });
                 });
 
-                // Handle return item buttons
                 document.querySelectorAll('.return-item-btn, .return-order-btn').forEach(button => {
                     button.addEventListener('click', function () {
                         const itemId = this.getAttribute('data-item-id');
@@ -870,7 +868,6 @@
                 });
             });
 
-            // Function to show toast messages
             function showToast(message, isSuccess = true) {
                 Toastify({
                     text: message,
@@ -882,7 +879,6 @@
                 }).showToast();
             }
 
-            // Cancel Order
             function cancelOrder() {
                 Swal.fire({
                     title: 'Cancel Order',

@@ -693,30 +693,49 @@
             window.location.href = `/orders/${orderId}`;
         }
 
-        function cancelOrder(orderId) {
-            if (confirm('Are you sure you want to cancel this order?')) {
-                fetch(`/orders/${orderId}/cancel`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        window.location.reload();
-                    } else {
-                        alert(data.message || 'Failed to cancel order');
+        function cancelOrder() {
+                Swal.fire({
+                    title: 'Cancel Order',
+                    text: 'Are you sure you want to cancel this order?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#6c5ce7',
+                    cancelButtonColor: '#dc3545',
+                    confirmButtonText: 'Yes, cancel it!',
+                    cancelButtonText: 'No, keep it',
+                    background: '#1e1e1e',
+                    color: '#e0e0e0',
+                    customClass: {
+                        title: 'swal2-title',
+                        content: 'swal2-content',
+                        confirmButton: 'swal2-confirm',
+                        cancelButton: 'swal2-cancel'
                     }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while processing your request');
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch(`/orders/cancel/<%= order._id %>`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    showToast('Order cancelled successfully', true);
+                                    setTimeout(() => window.location.reload(), 1500);
+                                } else {
+                                    showToast(data.message || 'Failed to cancel order', false);
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                showToast('An error occurred while cancelling the order', false);
+                            });
+                    }
                 });
             }
-        }
 
-        // Add search functionality
         document.addEventListener('DOMContentLoaded', function() {
             const searchInput = document.getElementById('searchInput');
             const searchForm = document.getElementById('searchForm');
@@ -742,18 +761,15 @@
                     }
                 });
 
-                // Update the count display
                 const countElement = document.querySelector('.d-flex.justify-content-between span');
                 if (countElement) {
                     countElement.textContent = `Showing ${visibleCount} of ${orderRows.length} orders`;
                 }
             }
 
-            // Perform search on input change
             searchInput.addEventListener('input', performSearch);
 
-            // Prevent form submission if search is empty
-            searchForm.addEventListener('submit', function(e) {
+\            searchForm.addEventListener('submit', function(e) {
                 if (!searchInput.value.trim()) {
                     e.preventDefault();
                 }

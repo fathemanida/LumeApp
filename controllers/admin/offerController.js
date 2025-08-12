@@ -340,6 +340,7 @@ const deleteOffer = async (req, res) => {
         }
 
         await Offer.findByIdAndDelete(offerId);
+        console.log('offer deleted succesfully');
 
         res.status(200).json({
             success: true,
