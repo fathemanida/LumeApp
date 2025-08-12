@@ -323,7 +323,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     fetch(`/delete-offer/${offerId}`, {
-                        method: 'DELETE',
+                        method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
                         }

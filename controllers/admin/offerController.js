@@ -316,6 +316,7 @@ const updateOffer = async (req, res) => {
 const deleteOffer = async (req, res) => {
     try {
         const offerId = req.params.id;
+        console.log('offerid',offerId);
         
         const offer = await Offer.findById(offerId);
         if (!offer) {
