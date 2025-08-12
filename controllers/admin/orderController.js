@@ -403,7 +403,7 @@ const handleOrderItemReturn = async (req, res) => {
         const { action, reason } = req.body;
         console.log('====item,action,reason',itemId,action,reason);
 
-        if (!mongoose.Types.ObjectId.isValid(orderId) || !mongoose.Types.ObjectId.isValid(itemId)) {
+        if (!orderId || !itemId) {
             return res.status(400).json({ success: false, message: 'Invalid order or item ID' });
         }
 
@@ -439,7 +439,7 @@ const handleOrderItemReturn = async (req, res) => {
                 });
             }
 
-            if (order.paymentMethod !== 'COD') {
+            
                 let refundAmount = item.finalPrice;
 
                 if (order.couponDiscount && order.couponDiscount > 0) {
@@ -462,7 +462,7 @@ const handleOrderItemReturn = async (req, res) => {
                     },
                     session: req.session
                 });
-            }
+            
 
             if (!item.isReturned && item.status !== 'Cancelled') {
                 if (item.productId) {

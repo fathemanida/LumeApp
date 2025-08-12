@@ -15,18 +15,15 @@
     <link rel="icon" href="/images/image.png" type="image/png">
 
     <style>
-        /* Remove border radius from all buttons */
         .btn, .btn-sm {
             border-radius: 0 !important;
         }
         
-        /* Update button hover states */
         .btn:hover, .btn-sm:hover {
             transform: translateY(-1px);
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         
-        /* Update specific button styles */
         .btn-primary {
             background-color: #173057;
             border: none;
@@ -412,7 +409,7 @@
                                 <tfoot>
                                     <tr class="table-active" style="--bs-table-bg: #141619;">
                                         <td colspan="4" class="text-end"><strong>Subtotal:</strong></td>
-                                        <td colspan="3">₹<%= order.subtotal ? order.subtotal.toFixed(2) :
+                                        <td colspan="3">₹<%= order.totalAmount ? order.totalAmount.toFixed(2) :
                                                 order.totalAmount.toFixed(2) %>
                                         </td>
                                     </tr>
@@ -433,10 +430,10 @@
                                             <% } %>
                                                 <td colspan="4" class="text-end"><strong>Shipping:</strong></td>
                                                 <td colspan="3">
-                                                    <% if (order.shippingCharge===0) { %>
+                                                    <% if (order.shipping===0) { %>
                                                         Free
                                                         <% } else { %>
-                                                            ₹<%= (order.shippingCharge || 0).toFixed(2) %>
+                                                            ₹<%= (order.shipping || 0).toFixed(2) %>
                                                                 <% } %>
                                                 </td>
                                                 </tr>

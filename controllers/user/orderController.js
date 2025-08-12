@@ -275,7 +275,7 @@ if (!['Processing', 'Active', 'Pending'].includes(order.status)) {
         let refundAmount = 0;
        if (order.paymentMethod !== 'COD' && 
     (order.paymentMethod === 'Wallet' || order.paymentMethod === 'Razorpay')) {
-            refundAmount = (item.finalPrice || item.price) * item.quantity;
+            refundAmount = order.totalAmount;
         }
 
         if (refundAmount > 0) {
@@ -846,7 +846,7 @@ const downloadInvoice = async (req, res) => {
     const summaryY = y + 10;
     const lineGap = 10;
     doc.text('Subtotal:', col4 - 70, summaryY, { width: 80, align: 'left' });
-    doc.text(`Rs.${subtotal.toFixed(2)}`, col5 - 50, summaryY, { width: 60, align: 'right' });
+    doc.text(`Rs.${totalAmount.toFixed(2)}`, col5 - 50, summaryY, { width: 60, align: 'right' });
     doc.text('Offer Discount:', col4 - 70, summaryY + 20, { width: 80, align: 'left' });
     doc.text(`-Rs.${offerDiscount.toFixed(2)}`, col5 - 50, summaryY + 20, { width: 60, align: 'right' });
     doc.text('Coupon Discount:', col4 - 70, summaryY + 40, { width: 80, align: 'left' });

@@ -15,6 +15,8 @@ const Coupon = require('../../models/couponSchema');
 const Wallet = require('../../models/walletSchema');
 const Razorpay = require('razorpay');
 const Offer = require('../../models/offerSchema');
+const MESSAGES = require("../constants/messages");
+
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -23,7 +25,7 @@ const razorpay = new Razorpay({
 });
 const paymentMethod = async (req, res) => {
   try {
-    console.log('🔔 Payment method called');
+    console.log('payment method called');
     
     if (!req.session.user) {
       return res.redirect('/login');
@@ -156,6 +158,7 @@ console.log('====cart data',cartData);
     const shipping = subtotal >= 1500 ? 0 : 40;
     const totalDiscount = totalOfferDiscount + couponDiscount;
     const finalTotal = Math.max(0, subtotal - totalDiscount + shipping);
+    
 
     const cartData = {
       items,
@@ -197,7 +200,7 @@ const createOrder = async (req, res) => {
     console.log('Request body:', JSON.stringify(req.body, null, 2));
 
     if (!req.session.user) {
-      return res.status(401).json({ success: false, message: 'User not authenticated' });
+      return res.status(401).json({ success: false, message: MESSAGES.USER_NOT_FOUND });
     }
 
     const userId = req.session.user.id;
@@ -923,20 +926,6 @@ function getBestOffer(product, offers = [], quantity = 1) {
   let offerType = null;
   const now = new Date();
 
-  console.log(
-    `\n=== getBestOffer for ${product.productName} (${product._id}) ===`
-  );
-  console.log(
-    `- Category: ${product.category?.name || "None"} (${
-      product.category?._id || "N/A"
-    })`
-  );
-  console.log(
-    `- Regular Price: ${product.regularPrice}, Sale Price: ${
-      product.salePrice || "None"
-    }`
-  );
-  console.log(`- Quantity: ${quantity}`);
 
   const sortedOffers = [...offers].sort((a, b) => {
     const aValue =
@@ -975,9 +964,7 @@ function getBestOffer(product, offers = [], quantity = 1) {
     if (offer.applicableOn === "all") {
       applies = true;
       currentOfferType = "all_products";
-      console.log(
-        `\nOffer ${offer.name || offer._id}: Applies to all products`
-      );
+     
     } else if (offer.applicableOn === "categories" && product?.category?._id) {
       const categoryMatch =
         Array.isArray(offer.categories) &&
@@ -988,11 +975,7 @@ function getBestOffer(product, offers = [], quantity = 1) {
       if (categoryMatch) {
         applies = true;
         currentOfferType = "category";
-        console.log(
-          `\nOffer ${offer.name || offer._id}: Applies to category ${
-            product.category.name
-          }`
-        );
+       
       }
     } else if (offer.applicableOn === "products" && product?._id) {
       const productMatch =
@@ -1036,11 +1019,6 @@ function getBestOffer(product, offers = [], quantity = 1) {
     }
   }
 
-  console.log(`\n=== Best Offer for ${product.productName} ===`);
-  console.log(`- Offer: ${bestOffer?.name || "None"}`);
-  console.log(`- Type: ${offerType || "None"}`);
-  console.log(`- Max Discount: ${maxDiscount}`);
-  console.log("==============================\n");
 
   return {
     maxDiscount: Math.max(0, maxDiscount), 

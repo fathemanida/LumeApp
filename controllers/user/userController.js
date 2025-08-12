@@ -13,6 +13,8 @@ const Order = require('../../models/orderSchema');
 const Cart = require('../../models/cartSchema');
 const Wishlist = require('../../models/wishlistSchema');
 const Address = require('../../models/addressSchema');
+const MESSAGES = require("../constants/messages");
+
 
 const loadLogin = async (req, res) => {
   try {
@@ -39,7 +41,7 @@ const login = async (req, res) => {
       console.log(userById);
     }
     if (!findUser) {
-      return res.render("login", { message: "User not found! " });
+      return res.render("login", { message:MESSAGES.USER_NOT_FOUND});
     }
 
     if (findUser.isBlocked) {

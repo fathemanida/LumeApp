@@ -7,7 +7,7 @@ const getAllOffers = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const status = req.query.status;
     const type = req.query.type;
-    const limit = 10;
+    const limit = 6;
     const skip = (page - 1) * limit;
 
     let query = {};
@@ -89,7 +89,7 @@ const createOffer = async (req, res) => {
       categories,
       products
     } = req.body;
-console.log('=admin @ offer add');
+    
     if (!name || !code || !discountType || !discountValue || !startDate || !endDate || !applicableOn) {
       return res.status(400).json({
         success: false,

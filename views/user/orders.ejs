@@ -630,13 +630,18 @@
                                                     <i class="fas fa-undo"></i>
                                                 </button>
                                             <% } %>
-                                            <% if (order.status === 'Failed') { %>
-                                                <form action="/proceed-payment" method="GET" style="display: inline;">
-                                                    <input type="hidden" name="orderId" value="<%= order._id %>">
-                                                    <button type="submit" class="btn-try-again" style="margin-left: 10px;">
-                                                        <i class="fas fa-redo-alt"></i> Try Again
+                                            <% if (order.status === 'Failed' || (order.paymentStatus && order.paymentStatus.toLowerCase() === 'failed')) { %>
+                                                <div style="display: flex; gap: 10px; margin-top: 5px;">
+                                                    <form action="/proceed-payment" method="GET" style="display: inline;">
+                                                        <input type="hidden" name="orderId" value="<%= order._id %>">
+                                                        <button type="submit" class="btn-try-again">
+                                                            <i class="fas fa-redo-alt"></i> Try Again
+                                                        </button>
+                                                    </form>
+                                                    <button onclick="cancelOrder('<%= order._id %>')" class="btn-try-again" style="background-color: #dc3545;">
+                                                        <i class="fas fa-times"></i> Cancel Order
                                                     </button>
-                                                </form>
+                                                </div>
                                             <% } %>
                                         </td>
                                     </tr>
@@ -686,6 +691,29 @@
 
         function requestReturn(orderId) {
             window.location.href = `/orders/${orderId}`;
+        }
+
+        function cancelOrder(orderId) {
+            if (confirm('Are you sure you want to cancel this order?')) {
+                fetch(`/orders/${orderId}/cancel`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.reload();
+                    } else {
+                        alert(data.message || 'Failed to cancel order');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while processing your request');
+                });
+            }
         }
 
         // Add search functionality

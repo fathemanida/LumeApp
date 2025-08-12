@@ -3,7 +3,7 @@ const Coupon = require('../../models/couponSchema');
 const listCoupons = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = 10;
+    const limit = 6;
     const search = req.query.search || '';
 
     const searchQuery = {
