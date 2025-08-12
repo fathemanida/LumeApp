@@ -315,6 +315,7 @@ const updateOffer = async (req, res) => {
 
 const deleteOffer = async (req, res) => {
     try {
+      console.log('not reched');
         const offerId = req.params.id;
         console.log('offerid',offerId);
         
