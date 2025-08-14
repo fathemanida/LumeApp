@@ -28,26 +28,23 @@
   </div>
 
   <div class="nav-icons">
-    <div class="icon-links">
-      <a href="#" class="search-toggle" id="searchToggle">
-        <i class="fas fa-search"></i>
-      </a>
     <div class="search-container" id="searchContainer">
-  <form action="/shopAll" method="get" style="display: flex; align-items: center;">
-    <input type="text" name="search" id="searchInput" placeholder="Search..." class="search-input">
+      <form action="/shopAll" method="get" style="display: flex; align-items: center;">
+        <div class="search-input-container">
+          <input type="text" name="search" id="searchInput" placeholder="Search..." class="search-input" value="<%= locals.searchQuery || '' %>">
+          <% if (locals.searchQuery) { %>
+            <button type="button" class="clear-search" id="clearSearch">
+              <i class="fas fa-times"></i>
+            </button>
+          <% } %>
+        </div>
+        <button type="submit" class="search-button">
+          <i class="fas fa-search"></i>
+        </button>
+      </form>
+    </div>
 
-    <button type="button" id="clearSearch" style="background: none; border: none; margin-left: -2rem; cursor: pointer;">
-      <i class="fas fa-times"></i>
-    </button>
-
-    <button type="submit" class="search-button" style="background: none; border: none; margin-left: 0.5rem;">
-      <i class="fas fa-search"></i>
-    </button>
-  </form>
-</div>
-
-
-
+    <div class="icon-links">
       <a href="/wishlist" class="icon-link"><i class="far fa-heart"></i></a>
       <a href="/cart" class="icon-link"><i class="fas fa-shopping-cart"></i></a>
       <div class="icon-link profile-icon profile-dropdown" tabindex="0" id="profileDropdown">
@@ -85,7 +82,14 @@
       <a href="/profile" class="mobile-link"><i class="fas fa-user"></i> Profile</a>
       <div class="mobile-search">
         <form action="/shopAll" method="get" style="display: flex; width: 100%;">
-          <input type="text" name="search" placeholder="Search..." class="search-input" style="flex-grow: 1;">
+          <div class="search-input-container">
+            <input type="text" name="search" placeholder="Search..." class="search-input" style="flex-grow: 1;" value="<%= locals.searchQuery || '' %>">
+            <% if (locals.searchQuery) { %>
+              <button type="button" class="clear-search" id="clearSearchMobile">
+                <i class="fas fa-times"></i>
+              </button>
+            <% } %>
+          </div>
           <button type="submit" class="search-button" style="background: none; border: none; margin-left: 0.5rem;">
             <i class="fas fa-search"></i>
           </button>
@@ -187,6 +191,7 @@ body, html {
 .nav-icons {
   display: flex;
   align-items: center;
+  gap: 1.5rem;
 }
 
 .icon-links {
@@ -195,35 +200,72 @@ body, html {
   gap: 1.5rem;
 }
 
-.icon-link, .search-toggle {
+.icon-link {
   color: #1a0f0a;
   font-size: 1.1rem;
   text-decoration: none;
   transition: color 0.3s ease;
 }
 
-.icon-link:hover, .search-toggle:hover {
+.icon-link:hover {
   color: #A9BA9D;
 }
 
 /* Search */
 .search-container {
-  display: none;
-  position: absolute;
-  right: 0;
-  top: 100%;
-  background: white;
-  padding: 1rem;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  margin-right: 1rem;
+}
+
+.search-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .search-input {
   border: 1px solid #e0d8cc;
   padding: 0.5rem 1rem;
+  padding-right: 2rem;
   border-radius: 20px;
   font-family: 'Jost', sans-serif;
   width: 200px;
+  transition: width 0.3s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #A9BA9D;
+  width: 250px;
+}
+
+.clear-search {
+  position: absolute;
+  right: 0.5rem;
+  background: none;
+  border: none;
+  color: #ccc;
+  cursor: pointer;
+  padding: 0.2rem;
+  transition: color 0.2s;
+}
+
+.clear-search:hover {
+  color: #888;
+}
+
+.search-button {
+  background: none;
+  border: none;
+  color: #1a0f0a;
+  cursor: pointer;
+  margin-left: 0.5rem;
+  transition: color 0.3s;
+}
+
+.search-button:hover {
+  color: #A9BA9D;
 }
 
 /* Profile Dropdown */
@@ -352,15 +394,27 @@ body, html {
 .mobile-search {
   display: flex;
   margin-top: 1rem;
+  width: 100%;
+}
+
+.mobile-search .search-input-container {
+  flex-grow: 1;
+  position: relative;
 }
 
 .mobile-search .search-input {
-  flex-grow: 1;
+  width: 100%;
+  padding-right: 2rem;
+}
+
+.mobile-search .clear-search {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .mobile-search .search-button {
-  background: none;
-  border: none;
   margin-left: 0.5rem;
 }
 
@@ -385,6 +439,10 @@ body, html {
   }
   
   .nav-links-container {
+    display: none;
+  }
+  
+  .search-container {
     display: none;
   }
   
@@ -466,20 +524,8 @@ body, html {
 </style>
 
 <script>
-   setInterval(async () => {
-    try {
-      const response = await fetch('/check-auth');
-      const data = await response.json();
-
-      if (data.isBlocked) {
-        alert("Your account is blocked by admin.");
-        window.location.href = "/";
-      }
-    } catch (error) {
-      console.error("Error checking block status:", error);
-    }
-  }, 3000); 
 document.addEventListener('DOMContentLoaded', function() {
+  // Mobile menu toggle functionality
   const mobileToggle = document.getElementById('mobileToggle');
   const mobileMenu = document.querySelector('.mobile-menu');
   const toggleLines = document.querySelectorAll('.toggle-line');
@@ -500,19 +546,26 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  const searchToggle = document.getElementById('searchToggle');
-  const searchContainer = document.getElementById('searchContainer');
+  // Clear search functionality for desktop
+  const clearSearch = document.getElementById('clearSearch');
+  const searchForm = document.querySelector('.search-container form');
   
-  searchToggle.addEventListener('click', function(e) {
-    e.preventDefault();
-    searchContainer.style.display = searchContainer.style.display === 'block' ? 'none' : 'block';
-  });
-
-  document.addEventListener('click', function(e) {
-    if (!searchToggle.contains(e.target) && !searchContainer.contains(e.target)) {
-      searchContainer.style.display = 'none';
-    }
-  });
+  if (clearSearch && searchForm) {
+    clearSearch.addEventListener('click', function() {
+      document.getElementById('searchInput').value = '';
+      searchForm.submit(); // Submit form with empty search to show all products
+    });
+  }
+  
+  const clearSearchMobile = document.getElementById('clearSearchMobile');
+  const mobileSearchForm = document.querySelector('.mobile-search form');
+  
+  if (clearSearchMobile && mobileSearchForm) {
+    clearSearchMobile.addEventListener('click', function() {
+      document.querySelector('.mobile-search .search-input').value = '';
+      mobileSearchForm.submit();
+    });
+  }
 
   const profileDropdown = document.getElementById('profileDropdown');
   if (profileDropdown) {
@@ -530,12 +583,19 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
-});
-  const searchInput = document.getElementById('searchInput');
-  const clearBtn = document.getElementById('clearSearch');
 
-  clearBtn.addEventListener('click', () => {
-    searchInput.value = '';
-    searchInput.focus();
-  });
+  setInterval(async () => {
+    try {
+      const response = await fetch('/check-auth');
+      const data = await response.json();
+
+      if (data.isBlocked) {
+        alert("Your account is blocked by admin.");
+        window.location.href = "/";
+      }
+    } catch (error) {
+      console.error("Error checking block status:", error);
+    }
+  }, 3000);
+});
 </script>
