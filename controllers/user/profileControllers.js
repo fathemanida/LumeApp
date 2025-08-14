@@ -131,6 +131,13 @@ const forgotEmailValid = async (req, res) => {
   }
 };
 
+const verifypassOTPpage=async (req,res) => {
+  try {
+    res.render('forgotPass-otp')
+  } catch (error) {
+    console.log(error,'at otp page rendering');
+  }
+}
 
 const verifypassOTP = async (req, res) => {
   try {
