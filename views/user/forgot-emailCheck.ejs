@@ -120,39 +120,22 @@
   <div class="auth-container">
     <h1 class="auth-heading">Reset Password</h1>
     
-    <form action="/forgot-password" method="POST">
-      <input 
-        type="email" 
-        id="email"
-        name="email" 
-        placeholder="Email" 
-        required 
-        class="form-control"
-      >
-      
-     
-      <% if (locals.message && message.length > 0) { %>
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      Swal.fire({
-        icon: 'error', 
-        title: 'Oops...',
-        text: '<%= message %>'
-      });
-    });
-  </script>
-<% } %>
+    <form id="forgotForm">
+  <input 
+    type="email" 
+    id="email"
+    name="email" 
+    placeholder="Email" 
+    required 
+    class="form-control"
+  >
+  <button type="submit" class="auth-btn">Submit</button>
+</form>
 
-      
-      
-      <button type="submit" class="auth-btn">Submit</button>
-    </form>
-
-  
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-  document.querySelector('form').addEventListener('submit', async function(e) {
+  document.getElementById('forgotForm').addEventListener('submit', async function(e) {
     e.preventDefault();
 
     let email = document.getElementById('email').value.trim();
@@ -173,17 +156,22 @@ document.addEventListener('DOMContentLoaded', function () {
       });
 
       let data = await res.json();
+
       Swal.fire({
         icon: data.success ? 'success' : 'error',
         title: data.success ? 'Success' : 'Error',
         text: data.message
+      }).then(() => {
+        if (data.success) {
+          window.location.href = '/verify-passForgot-otp';
+        }
       });
 
     } catch (err) {
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: 'Something went wrong'
+        text: 'Something went wrong. Please try again.'
       });
     }
   });
