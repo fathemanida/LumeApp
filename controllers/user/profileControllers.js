@@ -897,5 +897,6 @@ module.exports = {
   setDefaultAddress,
   removeAddress,
   getChangePassword,
-  changePassword
+  changePassword,
+  verifypassOTPpage
 };
