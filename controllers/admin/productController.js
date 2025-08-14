@@ -460,8 +460,8 @@ const getListProduct = async (req, res) => {
       }
       
       const discountValue = typeof product.productOffer.discountValue === 'number' && 
-                          !isNaN(product.productOffer.discountValue) ?
-                          Math.max(0, product.productOffer.discountValue) : 0;
+     !isNaN(product.productOffer.discountValue) ?
+     Math.max(0, product.productOffer.discountValue) : 0;
       
       product.productOffer = {
         active: true,

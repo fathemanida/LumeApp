@@ -132,10 +132,17 @@
       
      
       <% if (locals.message && message.length > 0) { %>
-        <div class="alert alert-danger text-message" id="message">
-          <%= message %>
-        </div>
-      <% } %>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      Swal.fire({
+        icon: 'error', 
+        title: 'Oops...',
+        text: '<%= message %>'
+      });
+    });
+  </script>
+<% } %>
+
       
       
       <button type="submit" class="auth-btn">Submit</button>

@@ -95,6 +95,12 @@ const forgotEmailValid = async (req, res) => {
   try {
     const { email } = req.body;
     const findUser = await User.findOne({ email });
+    if(!findUser){
+      return res.status(400).json({
+        success:false,
+        message:`User not found.Please provide valid email`
+      })
+    }
     console.log(findUser);
     if (findUser) {
       const otp = generateOtp();
@@ -114,7 +120,7 @@ const forgotEmailValid = async (req, res) => {
       }
     } else {
       console.log("user entered to otp page");
-      res.render("forgot-password", {
+      res.render("forgotPass-otp", {
         message: "Userwith this email does not exists",
       });
     }
