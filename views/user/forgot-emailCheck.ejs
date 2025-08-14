@@ -150,39 +150,46 @@
 
   
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const messageEl = document.getElementById('message');
-if (messageEl) {
-  const message = messageEl.textContent.trim();
-  if (message) {
-    Swal.fire(message);
-  }
-}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelector('form').addEventListener('submit', async function(e) {
+    e.preventDefault();
 
-      document.querySelector('form').addEventListener('submit', formValidate)
-    })
-  
-  
-    function formValidate(e) {
-  e.preventDefault();
+    let email = document.getElementById('email').value.trim();
+    if (!email) {
+      return Swal.fire({
+        icon: 'warning',
+        title: 'Email is required'
+      });
+    }
 
-  let email = document.getElementById('email').value.trim();
+    try {
+      let res = await fetch('/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email })
+      });
 
-  if (email === '') {
-    Swal.fire('Email is required');
-    return false;
-  }
+      let data = await res.json();
+      Swal.fire({
+        icon: data.success ? 'success' : 'error',
+        title: data.success ? 'Success' : 'Error',
+        text: data.message
+      });
 
-  
+    } catch (err) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Something went wrong'
+      });
+    }
+  });
+});
+</script>
 
-  e.target.submit();
-  return true;
-}
-  
-  
-  
-  </script>
 </body>
 
 </html>

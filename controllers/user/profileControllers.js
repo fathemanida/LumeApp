@@ -96,9 +96,10 @@ const forgotEmailValid = async (req, res) => {
     const { email } = req.body;
     const findUser = await User.findOne({ email });
     if(!findUser){
-     res.render('forgot-emailCheck',{
-      message:`User not found.Please provide valid email`
-     })
+      return res.status(400).json({
+        success:false,
+        message:`User not found.Please provide valid email`
+      })
     }
     console.log(findUser);
     if (findUser) {
