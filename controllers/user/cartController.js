@@ -47,7 +47,8 @@ const Wishlist = require('../../models/wishlistSchema');
 const addToCart = async (req, res) => {
   try {
     const userId = req.session.user.id;
-    const { productId, selectedSize, quantity, fromWishlist } = req.body;
+    const { productId,  quantity, fromWishlist } = req.body;
+    let {selectedSize}=req.body
     console.log('===selected size',selectedSize);
     if(!selectedSize){
       selectedSize="default"
