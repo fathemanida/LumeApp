@@ -503,20 +503,50 @@
       opacity: 0.5;
       cursor: not-allowed;
     }
+    .clear-search-btn {
+  position: absolute;
+  right: 50px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  padding: 0 5px;
+  z-index: 10;
+}
+
+.clear-search-btn:hover {
+  color: #333;
+}
+
+.input-group {
+  position: relative;
+}
+
+.search-input {
+  padding-right: 80px !important;
+}
   </style>
 </head>
 <body>
   <div class="overlay" id="overlay"></div>
 
-  <div class="sidebar" id="sidebar">
+<div class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <div class="brand">LUME</div>
     </div>
     <div class="sidebar-menu">
       <div class="sidebar-category mb-4">
-        <form id="sidebarSearchForm" onsubmit="return false;">
-          <div class="input-group">
-            <input type="text" class="form-control search-input" placeholder="Search products..." id="sidebarSearch" name="search">
+        <form id="sidebarSearchForm" action="/shopAll" method="get">
+          <div class="input-group" style="position: relative;">
+            <input type="text" class="form-control search-input" placeholder="Search products..." 
+                   id="sidebarSearch" name="search" value="<%= locals.searchQuery || '' %>">
+            <% if (locals.searchQuery) { %>
+              <button type="button" class="clear-search-btn" id="sidebarClearSearch">
+                <i class="fas fa-times"></i>
+              </button>
+            <% } %>
             <button class="btn btn-outline-dark" type="submit" id="sidebarSearchBtn">
               <i class="fas fa-search"></i>
             </button>
@@ -583,7 +613,6 @@
   <div class="container-fluid py-4 main-content-container">
     <div class="row">
       <div class="col-12">
-        <!-- Filter Button - Visible on all screen sizes -->
         <div class="text-center mb-4">
           <button id="filterToggleBtn" class="filter-btn" type="button">
             <i class="fas fa-filter"></i> Filter Products
@@ -707,7 +736,6 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
   <script>
-    // Move these functions outside DOMContentLoaded so they are globally accessible
     async function toggleWishlist(iconElement, productId) {
       try {
              const authCheck = await fetch('/check-auth');
@@ -764,7 +792,6 @@
 
     async function addToCart(productId) {
       try {
-        // First check authentication
         const authCheck = await fetch('/check-auth');
         const authData = await authCheck.json();
         
@@ -780,7 +807,6 @@
           return;
         }
 
-        // Make the add to cart request
         const response = await fetch('/cart/add', {
           method: 'POST',
           headers: {
@@ -792,7 +818,6 @@
           body: JSON.stringify({ productId, quantity: 1 })
         });
 
-        // Check if response is JSON
         const contentType = response.headers.get('content-type');
         if (!contentType || !contentType.includes('application/json')) {
           const errorText = await response.text();
@@ -832,20 +857,16 @@
       const overlay = document.getElementById('overlay');
       const filterToggleBtn = document.getElementById('filterToggleBtn');
       
-      // Toggle sidebar on filter button click
       filterToggleBtn.addEventListener('click', function() {
         if (window.innerWidth >= 768) {
-          // Desktop/tablet - slide from left
           sidebar.classList.toggle('open');
           overlay.classList.toggle('active');
         } else {
-          // Mobile - show/hide fixed at top
           sidebar.classList.toggle('open');
           overlay.classList.toggle('active');
         }
       });
       
-      // Close sidebar when clicking outside
       overlay.addEventListener('click', function() {
         sidebar.classList.remove('open');
         overlay.classList.remove('active');
@@ -865,7 +886,6 @@
         });
       });
 
-      // Sidebar search form handler
       const sidebarSearchForm = document.getElementById('sidebarSearchForm');
       if (sidebarSearchForm) {
         sidebarSearchForm.addEventListener('submit', function(e) {
@@ -878,7 +898,6 @@
         });
       }
 
-      // Sidebar New Arrivals and Best Sellers filtering
       const newArrivalsBtn = document.getElementById('sidebarNewArrivals');
       const bestSellersBtn = document.getElementById('sidebarBestSellers');
       const productItems = document.querySelectorAll('.product-item');
@@ -895,7 +914,6 @@
       }
       if (bestSellersBtn) {
         bestSellersBtn.addEventListener('click', function() {
-          // Find the product-item with the highest data-orders attribute
           let maxOrders = -1;
           let bestItem = null;
           productItems.forEach(item => {
@@ -915,6 +933,38 @@
         });
       }
     });
+    document.addEventListener('DOMContentLoaded', function() {
+  const sidebarClearSearch = document.getElementById('sidebarClearSearch');
+  const sidebarSearchForm = document.getElementById('sidebarSearchForm');
+  
+  if (sidebarClearSearch) {
+    sidebarClearSearch.addEventListener('click', function() {
+      document.getElementById('sidebarSearch').value = '';
+      sidebarSearchForm.submit(); 
+    });
+  }
+  
+  const sidebarSearchInput = document.getElementById('sidebarSearch');
+  if (sidebarSearchInput) {
+    sidebarSearchInput.addEventListener('input', function() {
+      const clearBtn = document.getElementById('sidebarClearSearch');
+      if (this.value.trim() !== '' && !clearBtn) {
+        const newClearBtn = document.createElement('button');
+        newClearBtn.type = 'button';
+        newClearBtn.className = 'clear-search-btn';
+        newClearBtn.id = 'sidebarClearSearch';
+        newClearBtn.innerHTML = '<i class="fas fa-times"></i>';
+        newClearBtn.addEventListener('click', function() {
+          sidebarSearchInput.value = '';
+          sidebarSearchForm.submit();
+        });
+        this.parentNode.insertBefore(newClearBtn, this.nextSibling);
+      } else if (this.value.trim() === '' && clearBtn) {
+        clearBtn.remove();
+      }
+    });
+  }
+});
   </script>
   <% if (locals.user && locals.user.isBlocked) { %>
     <script>
