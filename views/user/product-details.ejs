@@ -145,13 +145,11 @@
       <div class="col-md-6">
         <div class="product-images">
           <div class="main-image mb-3 position-relative">
-            <!-- Product Image with Status Overlay -->
             <img src="/uploads/product/<%= product.productImage[0] %>"
                  alt="<%= product.productName %>"
                  class="img-fluid"
                  id="mainProductImage"
                  style="transition: transform 0.2s ease; transform-origin: center center;">
-            <!-- Status Badge Overlay -->
             <% if (!product.isListed) { %>
               <div class="product-status-badge bg-danger">
                 <i class="fas fa-ban me-1"></i> Unavailable
@@ -182,7 +180,6 @@
         <div class="product-info">
           <h1 class="mb-3"><%= product.productName %></h1>
           
-          <!-- Offer Badges/Box -->
           <% if (product.offer || (product.category && product.category.categoryOffer)) { %>
             <div class="offer-badges">
               <% if (product.offer) { %>
@@ -212,7 +209,6 @@
             </div>
           <% } %>
 
-          <!-- Status Badge -->
           <% if (!product.isListed) { %>
             <div class="status-badge unavailable">
               <i class="fas fa-ban"></i> This product is currently unavailable
@@ -471,7 +467,6 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
   <script>
-    // Initialize selectedSize at the top level scope
     let selectedSize = null;
     
     function showToast({ title, message, type, timer = 2000 }) {
@@ -514,19 +509,14 @@
       </script>
     <% } %>
     <script>
-  // Handle Buy Now functionality
   async function handleBuyNow(productId) {
     try {
-      // Get the quantity from the input field
-      const quantity = parseInt(document.getElementById('quantity').value) || 1;
-      
-      // Show loading state
+      const quantity = parseInt(document.getElementById('quantity').value) || 1;      
       const buyNowBtn = document.querySelector('button[onclick*="handleBuyNow"]');
       const originalText = buyNowBtn.innerHTML;
       buyNowBtn.disabled = true;
       buyNowBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
 
-      // Call the buy-now endpoint
       const response = await fetch('/buy-now', {
         method: 'POST',
         headers: {
@@ -541,10 +531,8 @@
       const data = await response.json();
 
       if (data.success) {
-        // Redirect to checkout page
         window.location.href = data.redirect;
       } else {
-        // Show error message
         Toastify({
           text: data.message || 'Failed to process Buy Now request',
           duration: 3000,
@@ -565,14 +553,12 @@
         stopOnFocus: true
       }).showToast();
     } finally {
-      // Reset button state
       if (buyNowBtn) {
         buyNowBtn.disabled = false;
         buyNowBtn.innerHTML = originalText;
       }
     }
   }
-</script>
 
     const imageContainer = document.querySelector('.main-image');
     const image = document.getElementById('mainProductImage');
@@ -678,7 +664,6 @@
           const icon = button.querySelector('i');
           const isAdded = !icon.classList.contains('fas');
           
-          // Toggle the heart icon
           if (isAdded) {
             icon.classList.remove('far');
             icon.classList.add('fas', 'text-danger');
@@ -687,7 +672,6 @@
             icon.classList.add('far');
           }
 
-          // Show appropriate toast message
           Toastify({
             text: isAdded ? "Added to Wishlist" : "Removed from Wishlist",
             duration: 3000,
@@ -697,7 +681,6 @@
             stopOnFocus: true
           }).showToast();
           
-          // Update wishlist count in header if element exists
           const wishlistCountElement = document.querySelector('.wishlist-count');
           if (wishlistCountElement && data.wishlistCount !== undefined) {
             wishlistCountElement.textContent = data.wishlistCount;
@@ -812,7 +795,6 @@ function decrementQuantity() {
         const data = await response.json();
 
         if (response.ok) {
-          // Redirect to checkout page
           window.location.href = '/checkout';
         } else {
           showToast({
