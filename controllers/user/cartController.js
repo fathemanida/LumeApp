@@ -48,6 +48,10 @@ const addToCart = async (req, res) => {
   try {
     const userId = req.session.user.id;
     const { productId, selectedSize, quantity, fromWishlist } = req.body;
+    console.log('===selected size',selectedSize);
+    if(!selectedSize){
+      selectedSize="default"
+    }
 
     const product = await Product.findById(productId).populate({
       path: "category",
@@ -115,7 +119,7 @@ const addToCart = async (req, res) => {
         couponDiscount: 0
       });
     }
-  console.log('selectedsize',selectedSize);
+  console.log('selectedsize,existig items',selectedSize,existingItem);
     const existingItem = cart.items.find(
       
       item => item.productId.equals(productId) && item.size === selectedSize
