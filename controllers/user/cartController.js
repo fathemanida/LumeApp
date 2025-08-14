@@ -120,13 +120,12 @@ const addToCart = async (req, res) => {
         couponDiscount: 0
       });
     }
-  console.log('selectedsize,existig items',selectedSize,existingItem);
     const existingItem = cart.items.find(
       
       item => item.productId.equals(productId) && item.size === selectedSize
       
     );
-    console.log(existingItem,'====existing item')
+  console.log('selectedsize,existig items',selectedSize,existingItem);
 
     if (existingItem) {
       const newTotalQuantity = existingItem.quantity + Number(quantity);
