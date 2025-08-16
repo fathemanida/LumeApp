@@ -591,7 +591,7 @@ const updateQuantity = async (req, res) => {
 
      const coupons = await Coupon.find({
       isActive: true,
-      expiryDate: { $gt: now },
+      expiryDate: { $gt: new Date() },
     }).select(
       "code discountType discountValue maxDiscount minOrderAmount expiryDate usedBy"
     );
