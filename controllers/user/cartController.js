@@ -314,11 +314,12 @@ const cart = async (req, res) => {
     let appliedCouponDetails = null;
 
     if (couponApplied) {
+
       const coupon = await Coupon.findOne({
         _id: couponApplied,
         isActive: true,
-        startDate: { $lte: now },
-        endDate: { $gte: now },
+        startDate: { $lte: new Date() },
+        endDate: { $gte: new Date()},
         minPurchase: { $lte: totalPrice - totalOfferDiscount },
       }).lean();
 
