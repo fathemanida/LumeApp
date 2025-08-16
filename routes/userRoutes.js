@@ -120,7 +120,7 @@ router.get('/product-details', userController.productDetails)
 
 router.get("/forgot-password",profileController.getForgotPasspage);
 router.post("/forgot-password",profileController.forgotEmailValid);
-router.get('/verify-passForgot-otp',profileController.verifypassOTPpage);
+router.get('/verify-passForgot-otp',profileController.verifypassOTP);
 router.post('/verify-passForgot-otp',profileController.verifypassOTP);
 router.post("/resend-forgotPass-otp",profileController.forgotresendOtp)
 router.get("/reset-password",profileController.getResetPassword)
