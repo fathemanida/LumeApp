@@ -561,7 +561,7 @@ const updateQuantity = async (req, res) => {
       const itemEffectivePrice = Math.max(itemBasePrice - itemOfferDiscount, 0);
       return total + itemEffectivePrice * item.quantity;
     }, 0);
-
+    let totalCouponDiscount=0
     let couponApplied = cart.couponApplied;
     let appliedCouponDetails = null;
 
