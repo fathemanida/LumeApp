@@ -497,12 +497,11 @@ const processPayment = async (req, res) => {
           const wallet = await Wallet.findOne({ userId });
           console.log('======wallet',wallet);
           if (!wallet || wallet.balance < order.totalAmount) {
-  await Order.findByIdAndDelete(order._id); 
-  return res.status(400).json({ 
-    success: false, 
-    message: 'Insufficient wallet balance' 
-  });
-}
+           return res.status(400).json({ 
+           success: false, 
+           message: 'Insufficient wallet balance' 
+           });
+          }
 
           
           

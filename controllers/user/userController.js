@@ -461,6 +461,10 @@ const loadHome = async (req, res) => {
       .sort({ createdAt: -1 })
       .limit(1);
     let spotlightProduct = await attachBestOffer(spotlightProductRaw);
+     
+     const breadcrumbs = [
+      { label: "Home", url: "/" },
+    ];
 
     res.render("home", {
       user,
@@ -475,6 +479,7 @@ const loadHome = async (req, res) => {
       blocked: isBlocked,
       offers: activeOffers,
       spotlightProduct: spotlightProduct || [],
+      breadcrumbs
     });
   } catch (error) {
     console.error("Error loading home page:", error);
@@ -590,6 +595,10 @@ const loadShopAll = async (req, res) => {
       name: c.name,
       image: c.image,
     }));
+     const breadcrumbs = [
+      { label: "Home", url: "/" },
+      { label: "Collections", url: "/shopAll" }
+    ];
 
     res.render("shopAll", {
       user: userData,
@@ -601,6 +610,7 @@ const loadShopAll = async (req, res) => {
       selectedCategory: categoryId || null,
       selectedSort: sortBy || null,
       searchQuery,
+      breadcrumbs
     });
 
   } catch (error) {
@@ -1102,6 +1112,11 @@ const featured = async (req, res) => {
       })
     );
 
+     const breadcrumbs = [
+      { label: "Home", url: "/" },
+      { label: "Featured", url: "/featured" }
+    ];
+
     res.render("featured", {
       products: featuredWithPrices,
       currentPage: page,
@@ -1112,6 +1127,7 @@ const featured = async (req, res) => {
       category: categories,
       selectedCategory: null,
       selectedSort: null,
+      breadcrumbs
     });
   } catch (error) {
     console.log("Error in featured products:", error);

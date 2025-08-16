@@ -184,7 +184,10 @@ const getWallet = async (req, res) => {
     }
 
           const sortedTransactions = wallet.transactions.sort((a, b) => b.createdAt - a.createdAt);
-
+ const breadcrumbs = [
+      { label: "Home", url: "/" },
+      { label: "Wallet", url: "/wallet" }
+    ];
     res.render('wallet', {
       user: user,
       wallet: wallet || { balance: 0, transactions: [] },
