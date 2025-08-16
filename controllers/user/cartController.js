@@ -569,8 +569,8 @@ const updateQuantity = async (req, res) => {
       const coupon = await Coupon.findOne({
         _id: couponApplied,
         isActive: true,
-        startDate: { $lte: now },
-        endDate: { $gte: now },
+        startDate: { $lte: new Date() },
+      endDate: { $gte: new Date() },
         minPurchase: { $lte: totalPrice - totalOfferDiscount },
       }).lean();
 
@@ -934,19 +934,6 @@ const applyCoupon = async (req, res) => {
     cart.appliedCouponDetails = coupon;
     cart.discount = couponDiscount;
     await cart.save();
-
-    await Coupon.findByIdAndUpdate(coupon._id, {
-      $addToSet: { usedBy: userId },
-    });
-
-    await User.findByIdAndUpdate(userId, {
-      $addToSet: {
-        usedCoupons: {
-          code: coupon.code.toUpperCase(),
-          usedOn: new Date(),
-        },
-      },
-    });
 
     const shipping = totalPrice >= 1500 ? 0 : 40;
     const finalPrice = totalPrice - totalOfferDiscount - couponDiscount + shipping;

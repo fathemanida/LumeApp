@@ -352,6 +352,7 @@ const createOrder = async (req, res) => {
         offerDiscount: totalOfferDiscount,
         subtotal: totalPrice
       });
+      
 
       await order.save();
 
@@ -533,6 +534,7 @@ const processPayment = async (req, res) => {
         order.status = 'Processing';
         order.paymentMethod = method;
         await order.save();
+        
 
         await Cart.findOneAndUpdate(
           { userId },
