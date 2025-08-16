@@ -622,9 +622,10 @@ const filterProduct = async (req, res) => {
     const categoryId = req.query.category;
     const sortBy = req.query.sort;
 
+    console.log("\nChecking product categories...");
     const allProducts = await Product.find({});
-    const categoryRules = await Category.find({ isListed: true }).lean();
 
+    const categoryRules = await Category.find({ isListed: true }).lean();
     const categoryMapping = categoryRules.map((category) => ({
       _id: category._id,
       keywords: category.keywords || [category.name.toLowerCase()],
@@ -659,6 +660,39 @@ const filterProduct = async (req, res) => {
       }
     }
 
+    let query = {
+      isListed: true,
+      isBlocked: false,
+      quantity: { $gt: 0 },
+    };
+
+    if (categoryId) {
+      try {
+        const categoryObjectId = new mongoose.Types.ObjectId(categoryId);
+        const simpleCategoryCount = await Product.countDocuments({
+          category: categoryObjectId,
+        });
+        console.log(`Products with just this category: ${simpleCategoryCount}`);
+
+        query.category = categoryObjectId;
+
+        const fullQueryCount = await Product.countDocuments(query);
+        console.log(`Products with all filters: ${fullQueryCount}`);
+
+        const categoryProducts = await Product.find({
+          category: categoryObjectId,
+        });
+        console.log("\nProducts in this category:");
+        categoryProducts.forEach((product) => {
+          console.log(
+            `- ${product.productName} (Category: ${product.category})`
+          );
+        });
+      } catch (error) {
+        console.error("Error in category filtering:", error);
+      }
+    }
+
     const sortOptions = {
       "price-low": { salePrice: 1 },
       "price-high": { salePrice: -1 },
@@ -667,23 +701,87 @@ const filterProduct = async (req, res) => {
       newest: { createdOn: -1 },
     };
 
-    let filterConditions = {};
-    if (categoryId) filterConditions.category = categoryId;
+    const sort = sortOptions[sortBy] || { createdOn: -1 };
+    const page = parseInt(req.query.page) || 1;
+    const limit = 12;
+    const skip = (page - 1) * limit;
 
-    const products = await Product.find(filterConditions)
-      .sort(sortOptions[sortBy] || {})
-      .lean();
+    const totalProducts = await Product.countDocuments(query);
+    const filteredProducts = await Product.find(query)
+      .sort(sort)
+      .skip(skip)
+      .limit(limit)
+      .populate("category", "name");
 
-    res.render("shop", {
-      categories,
-      products,
+    const now = new Date();
+    const offers = await Offer.find({
+      isActive: true,
+      startDate: { $lte: now },
+      endDate: { $gte: now },
+      applicableOn: { $in: ["all", "categories", "products"] },
+    })
+
+    const filteredProductsWithOffers = filteredProducts.map((product) => {
+      const matchedOffers = offers.filter((offer) => {
+        if (offer.applicableOn === "all") return true;
+        if (
+          offer.applicableOn === "categories" &&
+          offer.categories.some(cat => cat.toString() === product.category._id.toString())
+        ) return true;
+        if (
+          offer.applicableOn === "products" &&
+          offer.products.some(prod => prod.toString() === product._id.toString())
+        ) return true;
+        return false;
+      });
+
+      if (matchedOffers.length > 0) {
+        let maxDiscount = 0;
+        let bestOffer = null;
+
+        matchedOffers.forEach((offer) => {
+          let discount = 0;
+          if (offer.discountType === 'percentage') {
+            discount = (product.salePrice * offer.discountValue) / 100;
+          } else {
+            discount = offer.discountValue;
+          }
+
+          if (discount > maxDiscount) {
+            maxDiscount = discount;
+            bestOffer = offer;
+          }
+        });
+
+        if (bestOffer) {
+          product.offer = bestOffer;
+        }
+      }
+
+      return product;
+    });
+
+    const totalPages = Math.ceil(totalProducts / limit);
+
+    const categoryData = categories.map((c) => ({
+      _id: c._id,
+      name: c.name,
+      image: c.image,
+    }));
+
+    res.render("shopAll", {
       user: userData,
+      products: filteredProductsWithOffers,
+      totalProducts,
+      currentPage: page,
+      totalPages,
+      category: categoryData,
       selectedCategory: categoryId || null,
       selectedSort: sortBy || null,
     });
   } catch (error) {
-    console.error("Error in filterProduct controller:", error);
-    res.status(500).send("Internal Server Error");
+    console.error("Error in filterProduct:", error);
+    res.status(500).render("error", { message: "Cannot filter products" });
   }
 };
 
