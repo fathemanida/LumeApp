@@ -718,6 +718,8 @@ const filterProduct = async (req, res) => {
       };
     });
 
+    console.log('offerOrice',offerPrice);
+
     if (sortBy === "price-low") {
       products.sort((a, b) => a.offerPrice - b.offerPrice);
     } else if (sortBy === "price-high") {
