@@ -633,7 +633,6 @@ const loadShopAll = async (req, res) => {
 
 
 const filterProduct = async (req, res) => {
-  console.log("req received here");
   try {
     const userData = req.session.user?.id
       ? await User.findById(req.session.user.id)
@@ -642,44 +641,9 @@ const filterProduct = async (req, res) => {
     const categories = await Category.find({ isListed: true });
     const categoryId = req.query.category;
     const sortBy = req.query.sort;
-
-    console.log("\nChecking product categories...");
-    const allProducts = await Product.find({});
-
-    const categoryRules = await Category.find({ isListed: true }).lean();
-    const categoryMapping = categoryRules.map((category) => ({
-      _id: category._id,
-      keywords: category.keywords || [category.name.toLowerCase()],
-      excludeKeywords: category.excludeKeywords || [],
-    }));
-
-    for (const product of allProducts) {
-      const productName = product.productName.toLowerCase();
-      let newCategoryId = null;
-
-      for (const category of categoryMapping) {
-        const hasKeyword = category.keywords.some((keyword) =>
-          productName.includes(keyword.toLowerCase())
-        );
-        const hasExclusion = category.excludeKeywords.some((exclude) =>
-          productName.includes(exclude.toLowerCase())
-        );
-
-        if (hasKeyword && !hasExclusion) {
-          newCategoryId = category._id;
-          break;
-        }
-      }
-
-      if (newCategoryId && product.category.toString() !== newCategoryId) {
-        console.log(
-          `Updating ${product.productName} from ${product.category} to ${newCategoryId}`
-        );
-        await Product.findByIdAndUpdate(product._id, {
-          category: new mongoose.Types.ObjectId(newCategoryId),
-        });
-      }
-    }
+    const page = parseInt(req.query.page) || 1;
+    const limit = 12;
+    const skip = (page - 1) * limit;
 
     let query = {
       isListed: true,
@@ -688,48 +652,11 @@ const filterProduct = async (req, res) => {
     };
 
     if (categoryId) {
-      try {
-        const categoryObjectId = new mongoose.Types.ObjectId(categoryId);
-        const simpleCategoryCount = await Product.countDocuments({
-          category: categoryObjectId,
-        });
-        console.log(`Products with just this category: ${simpleCategoryCount}`);
-
-        query.category = categoryObjectId;
-
-        const fullQueryCount = await Product.countDocuments(query);
-        console.log(`Products with all filters: ${fullQueryCount}`);
-
-        const categoryProducts = await Product.find({
-          category: categoryObjectId,
-        });
-        console.log("\nProducts in this category:");
-        categoryProducts.forEach((product) => {
-          console.log(
-            `- ${product.productName} (Category: ${product.category})`
-          );
-        });
-      } catch (error) {
-        console.error("Error in category filtering:", error);
-      }
+      query.category = new mongoose.Types.ObjectId(categoryId);
     }
 
-    const sortOptions = {
-      "price-low": { salePrice: 1 },
-      "price-high": { salePrice: -1 },
-      "name-asc": { productName: 1 },
-      "name-desc": { productName: -1 },
-      newest: { createdOn: -1 },
-    };
-
-    const sort = sortOptions[sortBy] || { createdOn: -1 };
-    const page = parseInt(req.query.page) || 1;
-    const limit = 12;
-    const skip = (page - 1) * limit;
-
     const totalProducts = await Product.countDocuments(query);
-    const filteredProducts = await Product.find(query)
-      .sort(sort)
+    let products = await Product.find(query)
       .skip(skip)
       .limit(limit)
       .populate("category", "name");
@@ -740,21 +667,29 @@ const filterProduct = async (req, res) => {
       startDate: { $lte: now },
       endDate: { $gte: now },
       applicableOn: { $in: ["all", "categories", "products"] },
-    })
+    });
 
-    const filteredProductsWithOffers = filteredProducts.map((product) => {
+    products = products.map((product) => {
       const matchedOffers = offers.filter((offer) => {
         if (offer.applicableOn === "all") return true;
         if (
           offer.applicableOn === "categories" &&
-          offer.categories.some(cat => cat.toString() === product.category._id.toString())
-        ) return true;
+          offer.categories.some(
+            (cat) => cat.toString() === product.category._id.toString()
+          )
+        )
+          return true;
         if (
           offer.applicableOn === "products" &&
-          offer.products.some(prod => prod.toString() === product._id.toString())
-        ) return true;
+          offer.products.some(
+            (prod) => prod.toString() === product._id.toString()
+          )
+        )
+          return true;
         return false;
       });
+
+      let finalPrice = product.salePrice;
 
       if (matchedOffers.length > 0) {
         let maxDiscount = 0;
@@ -762,25 +697,40 @@ const filterProduct = async (req, res) => {
 
         matchedOffers.forEach((offer) => {
           let discount = 0;
-          if (offer.discountType === 'percentage') {
+          if (offer.discountType === "percentage") {
             discount = (product.salePrice * offer.discountValue) / 100;
           } else {
             discount = offer.discountValue;
           }
-
           if (discount > maxDiscount) {
             maxDiscount = discount;
             bestOffer = offer;
           }
         });
 
-        if (bestOffer) {
-          product.offer = bestOffer;
-        }
+        finalPrice = product.salePrice - maxDiscount;
+        product.offer = bestOffer;
       }
 
-      return product;
+      return {
+        ...product.toObject(),
+        offerPrice: finalPrice,
+      };
     });
+
+    if (sortBy === "price-low") {
+      products.sort((a, b) => a.offerPrice - b.offerPrice);
+    } else if (sortBy === "price-high") {
+      products.sort((a, b) => b.offerPrice - a.offerPrice);
+    } else if (sortBy === "name-asc") {
+      products.sort((a, b) => a.productName.localeCompare(b.productName));
+    } else if (sortBy === "name-desc") {
+      products.sort((a, b) => b.productName.localeCompare(a.productName));
+    } else if (sortBy === "newest") {
+      products.sort(
+        (a, b) => new Date(b.createdOn) - new Date(a.createdOn)
+      );
+    }
 
     const totalPages = Math.ceil(totalProducts / limit);
 
@@ -792,7 +742,7 @@ const filterProduct = async (req, res) => {
 
     res.render("shopAll", {
       user: userData,
-      products: filteredProductsWithOffers,
+      products,
       totalProducts,
       currentPage: page,
       totalPages,
@@ -805,6 +755,7 @@ const filterProduct = async (req, res) => {
     res.status(500).render("error", { message: "Cannot filter products" });
   }
 };
+
 
 const productDetails = async (req, res) => {
   try {
