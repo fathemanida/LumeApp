@@ -561,6 +561,44 @@ const updateQuantity = async (req, res) => {
       return total + itemEffectivePrice * item.quantity;
     }, 0);
 
+    let couponApplied = cart.couponApplied;
+    let appliedCouponDetails = null;
+
+    if (couponApplied) {
+      const coupon = await Coupon.findOne({
+        _id: couponApplied,
+        isActive: true,
+        startDate: { $lte: now },
+        endDate: { $gte: now },
+        minPurchase: { $lte: totalPrice - totalOfferDiscount },
+      }).lean();
+
+      if (coupon) {
+        if (coupon.discountType === "PERCENTAGE") {
+          totalCouponDiscount =
+            ((totalPrice - totalOfferDiscount) * coupon.discountValue) / 100;
+        } else {
+          totalCouponDiscount = coupon.discountValue;
+        }
+
+        appliedCouponDetails = coupon;
+      } else {
+        cart.couponApplied = null;
+      }
+    }
+    
+
+     const coupons = await Coupon.find({
+      isActive: true,
+      expiryDate: { $gt: now },
+    }).select(
+      "code discountType discountValue maxDiscount minOrderAmount expiryDate usedBy"
+    );
+    
+    const filteredCoupons = coupons.filter(coupon => {
+      return !coupon.usedBy || !coupon.usedBy.some(id => id.toString() === userId.toString());
+    });
+
     const shipping = totalPrice > 1500 ? 0 : 40;
     const discount = cart.discount || 0;
     const finalPrice = totalPrice - discount + shipping;
@@ -575,6 +613,10 @@ const updateQuantity = async (req, res) => {
       discount: discount,
       shipping: shipping,
       finalPrice: finalPrice,
+      coupons: coupons,
+      couponApplied: couponApplied,
+      discount: totalCouponDiscount,
+
     });
   } catch (error) {
     console.error("Error in updateQuantity:", error);
