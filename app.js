@@ -51,6 +51,17 @@ app.use(passport.session());
 
 app.use('/', userRoutes);     
 app.use('/admin', adminRouters);
+app.use((req, res, next) => {
+  const parts = req.path.split('/').filter(Boolean); 
+  res.locals.breadcrumbs = parts.map((part, i) => {
+    return {
+      label: part.charAt(0).toUpperCase() + part.slice(1), 
+      url: '/' + parts.slice(0, i + 1).join('/')
+    };
+  });
+  next();
+});
+
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);

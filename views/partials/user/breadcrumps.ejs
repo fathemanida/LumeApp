@@ -1,0 +1,6 @@
+<div class="breadcrumbs">
+  <a href="/">Home</a>
+  <% breadcrumbs.forEach((crumb, i) => { %>
+    › <a href="<%= crumb.url %>"><%= crumb.label %></a>
+  <% }) %>
+</div>
