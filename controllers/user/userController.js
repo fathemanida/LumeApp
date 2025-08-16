@@ -768,6 +768,10 @@ const filterProduct = async (req, res) => {
       name: c.name,
       image: c.image,
     }));
+     const breadcrumbs = [
+      { label: "Home", url: "/" },
+      { label: "Collections", url: "/shopAll" }
+    ];
 
     res.render("shopAll", {
       user: userData,
@@ -778,6 +782,7 @@ const filterProduct = async (req, res) => {
       category: categoryData,
       selectedCategory: categoryId || null,
       selectedSort: sortBy || null,
+      breadcrumbs
     });
   } catch (error) {
     console.error("Error in filterProduct:", error);
@@ -863,6 +868,11 @@ const productDetails = async (req, res) => {
     const categories = await Category.find({ isListed: true });
 const maxQuantity = product.quantity > 6 ? 6 : product.quantity;
 console.log(maxQuantity,'max quantity');
+ const breadcrumbs = [
+      { label: "Home", url: "/" },
+      { label: "Collections", url: "/shopAll" },
+      {label:"Product-details",url:"/product-details"}
+    ];
     res.render("product-details", {
       user: userData,
       product,
@@ -870,6 +880,7 @@ console.log(maxQuantity,'max quantity');
       category: categories,
       currentUser: userData,
       max: maxQuantity,
+      breadcrumbs
     });
   } catch (error) {
     console.error("Error in productDetails:", error);
@@ -972,6 +983,11 @@ const newArrivals = async (req, res) => {
         return finalProduct;
       })
     );
+
+     const breadcrumbs = [
+      { label: "Home", url: "/" },
+      { label: "New Arrivals", url: "/new-arrivals" }
+    ];
 
     res.render("new-arrivals", {
       products: featuredWithPrices,
