@@ -1006,17 +1006,17 @@ const removeCoupon = async (req, res) => {
     cart.appliedCouponDetails = null;
     cart.discount = 0;
 
-    if (couponId) {
-      await Coupon.findByIdAndUpdate(couponId, {
-        $pull: { usedBy: userId },
-      });
-    }
+    // if (couponId) {
+    //   await Coupon.findByIdAndUpdate(couponId, {
+    //     $pull: { usedBy: userId },
+    //   });
+    // }
 
-    if (couponCode) {
-      await User.findByIdAndUpdate(userId, {
-        $pull: { usedCoupons: { code: couponCode } },
-      });
-    }
+    // if (couponCode) {
+    //   await User.findByIdAndUpdate(userId, {
+    //     $pull: { usedCoupons: { code: couponCode } },
+    //   });
+    // }
 
     const shipping = totalPrice >= 1500 ? 0 : 40;
     const finalPrice = totalPrice + shipping;
