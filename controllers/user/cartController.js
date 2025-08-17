@@ -332,6 +332,7 @@ const cart = async (req, res) => {
         }
 
         appliedCouponDetails = coupon;
+        couponApplied=coupon
       } else {
         cart.couponApplied = null;
       }
@@ -356,7 +357,8 @@ const cart = async (req, res) => {
     });
     
     console.log('Available coupons:', filteredCoupons.length, 'out of', coupons.length, 'active coupons');
-    console.log('Cart total after offers:', totalPrice - totalOfferDiscount);
+    console.log('Cart total after offers:', totalPrice - totalOfferDiscount)
+    console.log('==couponApplied at cart',couponApplied);
 
     res.render("cart", {
       user,
@@ -819,6 +821,8 @@ const getCheckout = async (req, res) => {
     const nearestExpiry = futureExpiryDates.length
       ? new Date(Math.min(...futureExpiryDates.map((d) => d.getTime())))
       : null;
+
+      console.log('===couponapplied at checkout',cart.couponAppliedS);
 
     res.render("checkout", {
       user: req.session.user,
