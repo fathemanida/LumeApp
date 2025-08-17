@@ -822,7 +822,7 @@ const getCheckout = async (req, res) => {
       ? new Date(Math.min(...futureExpiryDates.map((d) => d.getTime())))
       : null;
 
-      console.log('===couponapplied at checkout',cart.couponAppliedS);
+      console.log('===couponapplied at checkout',cart.couponApplied);
 
     res.render("checkout", {
       user: req.session.user,
@@ -941,6 +941,8 @@ const applyCoupon = async (req, res) => {
 
     const shipping = totalPrice >= 1500 ? 0 : 40;
     const finalPrice = totalPrice - totalOfferDiscount - couponDiscount + shipping;
+
+    console.log('=================coupon,details,discount',cart.appliedCoupon,cart.appliedCouponDetails,cart.discount);
 
     return res.json({
       success: true,
