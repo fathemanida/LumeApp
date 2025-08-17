@@ -318,8 +318,8 @@ const cart = async (req, res) => {
       const coupon = await Coupon.findOne({
         _id: couponApplied,
         isActive: true,
-        startDate: { $lte: new Date() },
-        endDate: { $gte: new Date()},
+        createdAt: { $lte: new Date() },
+        expiryDate: { $gte: new Date()},
         minPurchase: { $lte: totalPrice - totalOfferDiscount },
       }).lean();
 
@@ -569,8 +569,8 @@ const updateQuantity = async (req, res) => {
       const coupon = await Coupon.findOne({
         _id: couponApplied,
         isActive: true,
-        startDate: { $lte: new Date() },
-      endDate: { $gte: new Date() },
+        createdAt: { $lte: new Date() },
+      expiryDate: { $gte: new Date() },
         minPurchase: { $lte: totalPrice - totalOfferDiscount },
       }).lean();
 

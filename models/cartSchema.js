@@ -22,7 +22,7 @@ const cartSchema = new mongoose.Schema({
     type: Schema.Types.ObjectId,
     ref: 'Coupon'
   },
-  appliedCoupnonDetails: {
+  appliedCouponDetails: {
     type: Object
   },
   couponDiscount: { 
