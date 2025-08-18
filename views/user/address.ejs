@@ -333,10 +333,11 @@
     <% if (locals.user) { %>
         <div class="main-container">
 <%-include('../partials/user/sidebar.ejs',{currentPage:'address'})  %>
-<%-include('../partials/user/breadcrumps.ejs')  %>
 
             <!-- Address Content Area -->
             <div class="content-area">
+                <%-include('../partials/user/breadcrumps.ejs')  %>
+
                 <div class="page-header">
                     <h1 class="page-title">My Addresses</h1>
                     <a href="/add-address" class="add-address-btn">
