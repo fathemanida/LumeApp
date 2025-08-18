@@ -323,7 +323,7 @@ const createOrder = async (req, res) => {
         const offerDiscount = Math.max(productOfferDiscount, categoryOfferDiscount);
         const finalPrice = originalPrice - offerDiscount;
 
-        console.log('--offerdis-----finalPrice',offerDiscount,finalAmount);
+        console.log('--offerdis-----finalPrice',offerDiscount,finalPrice);
 
         totalPrice += originalPrice;
         totalOfferDiscount += offerDiscount;
