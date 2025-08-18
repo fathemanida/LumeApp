@@ -324,7 +324,9 @@ const cart = async (req, res) => {
       }).lean();
 
       if (coupon) {
+        console.log('ifone----------------------');
         if (coupon.discountType === "PERCENTAGE") {
+          console.log('iftwo worked------');
           totalCouponDiscount =
             ((totalPrice - totalOfferDiscount) * coupon.discountValue) / 100;
         } else {
@@ -335,6 +337,7 @@ const cart = async (req, res) => {
         couponApplied=coupon
       } else {
         cart.couponApplied = null;
+        console.log('else worked----------');
       }
     }
 
