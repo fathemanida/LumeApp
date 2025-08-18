@@ -73,6 +73,14 @@ console.log('===order',items);
         couponApplied: order.couponApplied,
         
       };
+
+       const breadcrumbs = [
+      { label: "Home", url: "/" },
+      { label: "Collections", url: "/shopAll" },
+      { label: "Cart", url: "/cart" },
+      { label: 'Checkout' ,url: "/checkout"}
+      { label: `Payment`, url: `/checkout/payment` }
+    ];
 console.log('====cart data',cartData);
       return res.render('payment', {
         user,
@@ -82,7 +90,8 @@ console.log('====cart data',cartData);
         razorpayOrderId: null,
         amount: order.finalPrice * 100,
         currency: 'INR',
-        orderId: order._id
+        orderId: order._id,
+        breadcrumbs
       });
     }
 
@@ -170,6 +179,12 @@ console.log('====cart data',cartData);
       totalPrice: finalTotal,
       couponApplied: cart.couponApplied
     };
+     const breadcrumbs = [
+    { label: "Home", url: "/" },
+    { label: "Cart", url: "/cart" },
+    { label: "Checkout", url: "/checkout" },
+    { label: "Payment", url: "/checkout/payment" }
+  ];
 
     return res.render('payment', {
       user,
@@ -179,7 +194,8 @@ console.log('====cart data',cartData);
       razorpayOrderId: null,
       amount: finalTotal * 100,
       currency: 'INR',
-      orderId: null
+      orderId: null,
+      breadcrumbs
     });
 
   } catch (error) {

@@ -109,10 +109,17 @@ const orderDetails = async (req, res) => {
             orderDate: order.createdOn ? new Date(order.createdOn).toLocaleString() : 'N/A',
             paymentStatus: order.paymentStatus || (order.paymentMethod === 'COD' ? 'Pending' : 'Paid')
         };
+       const breadcrumbs = [
+      { label: "Home", url: "/" },
+      { label: "Collections", url: "/shopAll" },
+      { label: "My Orders", url: "/orders" },
+      { label: `Order #${orderId}`, url: `/orders/${orderId}` }
+    ];
 
-        res.render('user/order-details', {
+        res.render('order-details', {
             order: formattedOrder,
-            user: req.session.user
+            user: req.session.user,
+            breadcrumbs
         });
 
     } catch (error) {
@@ -226,6 +233,11 @@ const orders = async (req, res) => {
         } : null
       };
     });
+     const breadcrumbs = [
+      { label: "Home", url: "/" },
+      { label: "Collections", url: "/shopAll" },
+      { label: "My Orders", url: "/orders" },
+    ];
 
     res.render('orders', {
       orders: formattedOrders,
@@ -233,7 +245,8 @@ const orders = async (req, res) => {
       totalPages,
       totalOrders,
       searchQuery,
-      user: req.session.user
+      user: req.session.user,
+      breadcrumbs
     });
 
   } catch (error) {

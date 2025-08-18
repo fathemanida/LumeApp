@@ -338,11 +338,16 @@ const userId = req.session.user.id;
 const userData = await User.findById(userId).lean();
 
 console.log('user====',  userData);
-
+ const breadcrumbs = [
+    { label: "Home", url: "/" },
+    { label: "My Profile", url: "/profile" },
+   
+  ];
 
 
     res.render("profile", {
       users: userData,
+      breadcrumbs
     });
   } catch (error) {
     console.log("error in profile getting", error);
@@ -361,9 +366,15 @@ const editProfile = async (req, res) => {
     if (!userData) {
       return res.redirect("/login");
     }
+     const breadcrumbs = [
+    { label: "Home", url: "/" },
+    { label: "My Profile", url: "/profile" },
+    { label: "Edit profile", url: "/profile/update" },
+  ];
 
     res.render("profile-edit", {
       users: userData,
+      breadcrumbs
     });
   } catch (error) {
     console.error("Error in editProfile:", error);
@@ -462,10 +473,15 @@ const address = async (req, res) => {
     }
     const userId = req.session.user.id;
     const addresses = await Address.find({ userId }).sort({ isDefault: -1 });
-    
+     const breadcrumbs = [
+    { label: "Home", url: "/" },
+    { label: "Cart", url: "/cart" },
+    { label: "Address", url: "/address" }
+  ];
     res.render("address", {
       user: req.session.user,
-      addresses: addresses
+      addresses: addresses,
+      breadcrumbs
     });
   } catch (error) {
     console.log("error in address page", error);
@@ -476,7 +492,15 @@ const address = async (req, res) => {
 const getAddAdress = async (req, res) => {
   try {
     const from = req.query.from;
-    res.render("address-add", { from });
+       const breadcrumbs = [
+    { label: "Home", url: "/" },
+    { label: "Cart", url: "/cart" },
+    { label: "Address", url: "/address" },
+    { label: "Add Address", url: "/add-address"}
+  ];
+    res.render("address-add", { from ,
+      breadcrumbs
+    });
   } catch (error) {
     console.log("error in get add address", error);
     res.redirect("/pageError");
@@ -571,7 +595,7 @@ const getEditAddress = async (req, res) => {
     const from = req.query.from;
     
     const address = await Address.findById(addressId);
-    
+ 
     if (!address) {
       return res.redirect('/address');
     }
@@ -590,11 +614,18 @@ const getEditAddress = async (req, res) => {
       roadArea: address.roadArea || '',
       addressType: address.addressType || 'home'
     };
+             const breadcrumbs = [
+    { label: "Home", url: "/" },
+    { label: "Cart", url: "/cart" },
+    { label: "Address", url: "/address" },
+    { label: "Edit Address", url: `/update/address/${addressId}`}
+  ];
 
     res.render("address-edit", { 
       address: formattedAddress, 
       from,
-      user: req.session.user 
+      user: req.session.user ,
+      breadcrumbs
     });
   } catch (error) {
     console.log("Error in getEditAddress:", error);

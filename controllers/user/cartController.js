@@ -364,6 +364,12 @@ const cart = async (req, res) => {
     console.log('Cart total after offers:', totalPrice - totalOfferDiscount)
     console.log('==couponApplied at cart',couponApplied);
 
+
+     const breadcrumbs = [
+      { label: "Home", url: "/" },
+      { label: "Collections", url: "/shopAll" },
+      {label:"Cart",url:'/cart'}
+    ];
     res.render("cart", {
       user,
       items: cart.items,
@@ -375,6 +381,7 @@ const cart = async (req, res) => {
       coupons: coupons,
       couponApplied: couponApplied,
       discount: totalCouponDiscount,
+      breadcrumbs
     });
   } catch (err) {
     console.error("Error loading cart:", err);
@@ -827,7 +834,14 @@ const getCheckout = async (req, res) => {
       : null;
 
       console.log('===couponapplied at checkout',cart.couponApplied);
+  
 
+      const breadcrumbs = [
+      { label: "Home", url: "/" },
+      { label: "Collections", url: "/shopAll" },
+      {label:"Cart",url:'/cart'},
+      {label:"Checkout",url:"/checkout"}
+    ];
     res.render("checkout", {
       user: req.session.user,
       items: cart.items,
@@ -840,6 +854,7 @@ const getCheckout = async (req, res) => {
       couponApplied: cart.couponApplied,
       coupons,
       offerExpiryTime: nearestExpiry, 
+      breadcrumbs
     });
   } catch (error) {
     console.error("Error in getCheckout:", error);
@@ -1253,11 +1268,18 @@ const buyNow = async (req, res) => {
 
     await cart.save();
     const populatedCart = await Cart.findById(cart._id).populate('items.productId');
+    const breadcrumbs = [
+      { label: "Home", url: "/" },
+      { label: "Collections", url: "/shopAll" },
+      {label:"Cart",url:'/cart'},
+      {label :"Checkout",url:"/checkout"}
+    ];
 
     res.json({ 
       success: true, 
       redirect: '/checkout',
-      cart: populatedCart
+      cart: populatedCart,
+      breadcrumbs
     });
 
   } catch (error) {

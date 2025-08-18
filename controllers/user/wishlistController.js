@@ -66,11 +66,16 @@ const getWishlist = async (req, res) => {
         select: 'productName productImage regularPrice salePrice isListed quantity',
         match: { isListed: true }
       });
+               const breadcrumbs = [
+          { label: "Home", url: "/" },
+          { label: "Wislist", url: "/wishlist" },
+        ];
 
     if (!wishlist) {
-      return res.render('user/wishlist', {
+      return res.render('wishlist', {
         wishlist: { items: [] },
-        user: req.session.user
+        user: req.session.user,
+        breadcrumbs
       });
     }
 
@@ -94,9 +99,10 @@ const getWishlist = async (req, res) => {
       await wishlist.save();
     }
 
-    res.render('user/wishlist', {
+    res.render('wishlist', {
       wishlist: populatedWishlist,
-      user: req.session.user
+      user: req.session.user,
+      breadcrumbs
     });
   } catch (err) {
     console.error('Wishlist error:', err);
