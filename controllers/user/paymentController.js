@@ -197,7 +197,7 @@ const createOrder = async (req, res) => {
   try {
     console.log("=== Starting createAndProcessOrder ===");
     const { addressId, paymentMethod: rawMethod, orderId, } = req.body;
-
+console.log('------------------paymentMethod',paymentMethod);
     if (!req.session.user) {
       return res.status(401).json({ success: false, message: "User not logged in" });
     }
@@ -208,7 +208,7 @@ const createOrder = async (req, res) => {
       cod: "COD",
       razorpay: "Razorpay",
       wallet: "Wallet",
-      upi: "UPI",
+      
     };
     if (!(method in methodMap)) {
       return res.status(400).json({ success: false, message: "Invalid payment method" });
@@ -219,7 +219,6 @@ const createOrder = async (req, res) => {
       return res.status(400).json({ success: false, message: "Address and payment method required" });
     }
 
-    // ⚡ Re-try order (if orderId passed)
     let order = null;
     if (orderId) {
       order = await Order.findById(orderId);
@@ -233,7 +232,6 @@ const createOrder = async (req, res) => {
       await order.save();
     }
 
-    // ⚡ If new order (not retry)
     if (!order) {
       const cart = await Cart.findOne({ userId })
         .populate({
@@ -304,16 +302,15 @@ const createOrder = async (req, res) => {
       const finalAmount = Math.max(0, priceAfterOffer - totalCouponDiscount + shipping);
 
       if (method === "Wallet") {
-       
+     
         const wallet = await Wallet.findOne({ userId });
-        
-          if (!wallet) {
+        if (!wallet) {
   wallet = new Wallet({
     userId,
     balance: 0,
     transactions: []
   });
-        }
+}
         if (!wallet || wallet.balance < finalAmount) {
           return res.status(400).json({ success: false, message: "Insufficient wallet balance" });
         }
@@ -387,6 +384,7 @@ const createOrder = async (req, res) => {
         return res.status(500).json({ success: false, message: "Failed to create Razorpay order" });
       }
     }
+
     if (method === "Wallet") {
       const wallet = await Wallet.findOne({ userId });
       wallet.balance -= order.totalAmount;
@@ -898,6 +896,7 @@ function getBestOffer(product, offers = [], quantity = 1) {
 module.exports = {
   paymentMethod,
   createOrder,
+  processPayment,
   paymentConfirmation,
   verifyPayment,
   paymentFailure
