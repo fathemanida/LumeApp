@@ -896,7 +896,6 @@ function getBestOffer(product, offers = [], quantity = 1) {
 module.exports = {
   paymentMethod,
   createOrder,
-  processPayment,
   paymentConfirmation,
   verifyPayment,
   paymentFailure
