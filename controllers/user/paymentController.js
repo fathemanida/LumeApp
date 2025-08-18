@@ -75,8 +75,7 @@ console.log('===order',items);
       };
 
        const breadcrumbs = [
-      { label: "Home", url: "/" },
-      { label: "Collections", url: "/shopAll" },
+     
       { label: "Cart", url: "/cart" },
       { label: 'Checkout' ,url: "/checkout"},
       { label: `Payment`, url: `/checkout/payment` }
@@ -180,7 +179,6 @@ console.log('====cart data',cartData);
       couponApplied: cart.couponApplied
     };
      const breadcrumbs = [
-    { label: "Home", url: "/" },
     { label: "Cart", url: "/cart" },
     { label: "Checkout", url: "/checkout" },
     { label: "Payment", url: "/checkout/payment" }

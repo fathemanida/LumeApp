@@ -67,7 +67,6 @@ const getWishlist = async (req, res) => {
         match: { isListed: true }
       });
                const breadcrumbs = [
-          { label: "Home", url: "/" },
           { label: "Wislist", url: "/wishlist" },
         ];
 

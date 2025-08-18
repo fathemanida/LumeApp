@@ -110,8 +110,6 @@ const orderDetails = async (req, res) => {
             paymentStatus: order.paymentStatus || (order.paymentMethod === 'COD' ? 'Pending' : 'Paid')
         };
        const breadcrumbs = [
-      { label: "Home", url: "/" },
-      { label: "Collections", url: "/shopAll" },
       { label: "My Orders", url: "/orders" },
       { label: `Order #${orderId}`, url: `/orders/${orderId}` }
     ];
@@ -234,9 +232,7 @@ const orders = async (req, res) => {
       };
     });
      const breadcrumbs = [
-      { label: "Home", url: "/" },
-      { label: "Collections", url: "/shopAll" },
-      { label: "My Orders", url: "/orders" },
+\      { label: "My Orders", url: "/orders" },
     ];
 
     res.render('orders', {

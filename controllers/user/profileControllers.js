@@ -339,7 +339,6 @@ const userData = await User.findById(userId).lean();
 
 console.log('user====',  userData);
  const breadcrumbs = [
-    { label: "Home", url: "/" },
     { label: "My Profile", url: "/profile" },
    
   ];
@@ -366,9 +365,7 @@ const editProfile = async (req, res) => {
     if (!userData) {
       return res.redirect("/login");
     }
-     const breadcrumbs = [
-    { label: "Home", url: "/" },
-    { label: "My Profile", url: "/profile" },
+     const breadcrumbs = [    { label: "My Profile", url: "/profile" },
     { label: "Edit profile", url: "/profile/update" },
   ];
 
@@ -474,8 +471,6 @@ const address = async (req, res) => {
     const userId = req.session.user.id;
     const addresses = await Address.find({ userId }).sort({ isDefault: -1 });
      const breadcrumbs = [
-    { label: "Home", url: "/" },
-    { label: "Cart", url: "/cart" },
     { label: "Address", url: "/address" }
   ];
     res.render("address", {
@@ -493,8 +488,7 @@ const getAddAdress = async (req, res) => {
   try {
     const from = req.query.from;
        const breadcrumbs = [
-    { label: "Home", url: "/" },
-    { label: "Cart", url: "/cart" },
+   
     { label: "Address", url: "/address" },
     { label: "Add Address", url: "/add-address"}
   ];
@@ -615,8 +609,7 @@ const getEditAddress = async (req, res) => {
       addressType: address.addressType || 'home'
     };
              const breadcrumbs = [
-    { label: "Home", url: "/" },
-    { label: "Cart", url: "/cart" },
+   
     { label: "Address", url: "/address" },
     { label: "Edit Address", url: `/update/address/${addressId}`}
   ];

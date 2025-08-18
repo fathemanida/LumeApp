@@ -366,8 +366,7 @@ const cart = async (req, res) => {
 
 
      const breadcrumbs = [
-      { label: "Home", url: "/" },
-      { label: "Collections", url: "/shopAll" },
+\      { label: "Collections", url: "/shopAll" },
       {label:"Cart",url:'/cart'}
     ];
     res.render("cart", {
@@ -837,7 +836,6 @@ const getCheckout = async (req, res) => {
   
 
       const breadcrumbs = [
-      { label: "Home", url: "/" },
       { label: "Collections", url: "/shopAll" },
       {label:"Cart",url:'/cart'},
       {label:"Checkout",url:"/checkout"}
@@ -1269,8 +1267,6 @@ const buyNow = async (req, res) => {
     await cart.save();
     const populatedCart = await Cart.findById(cart._id).populate('items.productId');
     const breadcrumbs = [
-      { label: "Home", url: "/" },
-      { label: "Collections", url: "/shopAll" },
       {label:"Cart",url:'/cart'},
       {label :"Checkout",url:"/checkout"}
     ];

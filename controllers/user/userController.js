@@ -463,7 +463,6 @@ const loadHome = async (req, res) => {
     let spotlightProduct = await attachBestOffer(spotlightProductRaw);
      
      const breadcrumbs = [
-      { label: "Home", url: "/" },
     ];
 
     res.render("home", {
@@ -596,7 +595,6 @@ const loadShopAll = async (req, res) => {
       image: c.image,
     }));
      const breadcrumbs = [
-      { label: "Home", url: "/" },
       { label: "Collections", url: "/shopAll" }
     ];
 
@@ -779,7 +777,6 @@ const filterProduct = async (req, res) => {
       image: c.image,
     }));
      const breadcrumbs = [
-      { label: "Home", url: "/" },
       { label: "Collections", url: "/shopAll" }
     ];
 
@@ -879,8 +876,7 @@ const productDetails = async (req, res) => {
 const maxQuantity = product.quantity > 6 ? 6 : product.quantity;
 console.log(maxQuantity,'max quantity');
  const breadcrumbs = [
-      { label: "Home", url: "/" },
-      { label: "Collections", url: "/shopAll" },
+     
       {label:"Product-details",url:"/product-details"}
     ];
     res.render("product-details", {
@@ -995,7 +991,7 @@ const newArrivals = async (req, res) => {
     );
 
      const breadcrumbs = [
-      { label: "Home", url: "/" },
+    
       { label: "New Arrivals", url: "/new-arrivals" }
     ];
 
@@ -1114,7 +1110,6 @@ const featured = async (req, res) => {
     );
 
      const breadcrumbs = [
-      { label: "Home", url: "/" },
       { label: "Featured", url: "/featured" }
     ];
 
