@@ -320,8 +320,9 @@ const cart = async (req, res) => {
         isActive: true,
         createdAt: { $lte: new Date() },
         expiryDate: { $gte: new Date()},
-        minPurchase: { $lte: totalPrice - totalOfferDiscount },
       }).lean();
+
+      console.log('------------coupon,cpuponApplied',coupon,couponApplied);
 
       if (coupon) {
         console.log('ifone----------------------');
