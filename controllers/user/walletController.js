@@ -191,7 +191,8 @@ const getWallet = async (req, res) => {
     res.render('wallet', {
       user: user,
       wallet: wallet || { balance: 0, transactions: [] },
-      transactions: sortedTransactions || []
+      transactions: sortedTransactions || [],
+      breadcrumbs
     });
   } catch (error) {
     console.error('Error fetching wallet:', error);

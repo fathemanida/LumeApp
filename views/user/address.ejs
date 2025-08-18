@@ -328,12 +328,12 @@
 <body>
     <!-- Navbar -->
 <%-include('../partials/user/header.ejs')  %>
-<%-include('../partials/user/breadcrumps.ejs')  %>
 
 
     <% if (locals.user) { %>
         <div class="main-container">
 <%-include('../partials/user/sidebar.ejs',{currentPage:'address'})  %>
+<%-include('../partials/user/breadcrumps.ejs')  %>
 
             <!-- Address Content Area -->
             <div class="content-area">

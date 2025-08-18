@@ -1009,6 +1009,7 @@ const newArrivals = async (req, res) => {
       category: categories,
       selectedCategory: null,
       selectedSort: null,
+      breadcrumbs
     });
   } catch (error) {
     console.log("Error in new arrivals:", error);
