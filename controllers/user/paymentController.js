@@ -350,6 +350,7 @@ const createOrder = async (req, res) => {
 
           const shipping = totalPrice >= 1500 ? 0 : 40;
       const finalAmount = Math.max(0, priceAfterOffer - totalCouponDiscount + shipping);
+      console.log('----method for payment',paymentMethod);
 
       if (paymentMethod === 'Wallet') {
         const wallet = await Wallet.findOne({ userId });
@@ -359,11 +360,12 @@ const createOrder = async (req, res) => {
             message: 'Insufficient wallet balance',
             required: finalAmount,
             available: wallet ? wallet.balance : 0,
+            redirect: '/checkout'
           });
         }
       }
 
-      const isImmediatePay = (paymentMethod === 'Razorpay' || paymentMethod === 'UPI');
+      const isImmediatePay = (paymentMethod === 'Razorpay');
 
      
 
