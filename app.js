@@ -55,12 +55,14 @@ app.use((req, res, next) => {
   const parts = req.path.split('/').filter(Boolean); 
   res.locals.breadcrumbs = parts.map((part, i) => {
     return {
-      label: part.charAt(0).toUpperCase() + part.slice(1), 
+      label: decodeURIComponent(part).replace(/-/g, " ")
+                   .replace(/\b\w/g, c => c.toUpperCase()), 
       url: '/' + parts.slice(0, i + 1).join('/')
     };
   });
   next();
 });
+
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {

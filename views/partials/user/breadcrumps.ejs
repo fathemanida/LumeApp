@@ -1,6 +1,27 @@
 <div class="breadcrumbs">
   <a href="/">Home</a>
   <% breadcrumbs.forEach((crumb, i) => { %>
-    › <a href="<%= crumb.url %>"><%= crumb.label %></a>
+    › 
+    <% if (i === breadcrumbs.length - 1) { %>
+      <span><%= crumb.label %></span> 
+    <% } else { %>
+      <a href="<%= crumb.url %>"><%= crumb.label %></a>
+    <% } %>
   <% }) %>
 </div>
+
+<style>
+  .breadcrumbs {
+  font-size: 14px;
+  margin: 10px 0;
+}
+.breadcrumbs a {
+  text-decoration: none;
+  color: #355018;
+}
+.breadcrumbs span {
+  color: #333;
+  font-weight: bold;
+}
+
+</style>
