@@ -196,7 +196,7 @@ console.log('====cart data',cartData);
 const createOrder = async (req, res) => {
   try {
     console.log("=== Starting createAndProcessOrder ===");
-    const { addressId, paymentMethod: rawMethod, orderId, upiId, walletId } = req.body;
+    const { addressId, paymentMethod: rawMethod, orderId, } = req.body;
 
     if (!req.session.user) {
       return res.status(401).json({ success: false, message: "User not logged in" });
@@ -303,18 +303,22 @@ const createOrder = async (req, res) => {
       const shipping = totalPrice >= 1500 ? 0 : 40;
       const finalAmount = Math.max(0, priceAfterOffer - totalCouponDiscount + shipping);
 
-      // ⚡ Check wallet balance BEFORE creating order
       if (method === "Wallet") {
-        if (!walletId) {
-          return res.status(400).json({ success: false, message: "Wallet ID required" });
-        }
+       
         const wallet = await Wallet.findOne({ userId });
+        
+          if (!wallet) {
+  wallet = new Wallet({
+    userId,
+    balance: 0,
+    transactions: []
+  });
+        }
         if (!wallet || wallet.balance < finalAmount) {
           return res.status(400).json({ success: false, message: "Insufficient wallet balance" });
         }
       }
 
-      // ✅ Create Order (only if valid method)
       order = new Order({
         userId,
         items: processedItems,
@@ -331,7 +335,6 @@ const createOrder = async (req, res) => {
 
       await order.save();
 
-      // ⚡ Reduce stock
       const bulkOps = cart.items.map((item) => ({
         updateOne: { filter: { _id: item.productId._id }, update: { $inc: { quantity: -item.quantity } } },
       }));
@@ -343,7 +346,6 @@ const createOrder = async (req, res) => {
         }
       }
 
-      // ⚡ Coupon tracking
       if (cart.couponApplied) {
         await Coupon.findByIdAndUpdate(cart.couponApplied._id, {
           $push: { usedBy: { userId, orderId: order._id, usedAt: new Date() } },
@@ -353,14 +355,12 @@ const createOrder = async (req, res) => {
         });
       }
 
-      // ⚡ Clear cart
       await Cart.findOneAndUpdate(
         { userId },
         { $set: { items: [], couponApplied: null, updatedAt: new Date() } }
       );
     }
 
-    // ⚡ Handle Razorpay (after order creation)
     if (method === "Razorpay") {
       try {
         const amountInPaise = Math.round(order.totalAmount * 100);
@@ -387,8 +387,6 @@ const createOrder = async (req, res) => {
         return res.status(500).json({ success: false, message: "Failed to create Razorpay order" });
       }
     }
-
-    // ⚡ Handle Wallet deduction (after order creation)
     if (method === "Wallet") {
       const wallet = await Wallet.findOne({ userId });
       wallet.balance -= order.totalAmount;
@@ -403,7 +401,6 @@ const createOrder = async (req, res) => {
 
       order.paymentStatus = "Paid";
       order.paymentDetails = {
-        walletId,
         transactionId: `WALLET-${Date.now()}`,
         amount: order.totalAmount,
       };
@@ -411,7 +408,6 @@ const createOrder = async (req, res) => {
       await order.save();
     }
 
-    // ⚡ COD flow
     if (method === "COD") {
       order.paymentStatus = "Pending";
       order.paymentDetails = { method: "Cash on Delivery" };
