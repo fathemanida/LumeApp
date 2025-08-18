@@ -221,21 +221,8 @@ const createOrder = async (req, res) => {
     }
 
     paymentMethod = validPaymentMethods[paymentMethod];
-
-    if(paymentMethod==='Razorpay'){
-      const wallet = await Wallet.findOne(userId);
-      if(!wallet){
-        wallet=new Wallet({
-           userId,
-           balance: 0,
-          transactions: []
-        })
-      }
-
-      if(!wallet||wallet.balance<1){
-
-      }
-    }
+    
+  
 
     if (!addressId || !paymentMethod) {
       return res.status(400).json({ success: false, message: 'Address and payment method are required' });
