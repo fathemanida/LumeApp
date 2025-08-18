@@ -942,7 +942,7 @@ const applyCoupon = async (req, res) => {
     const shipping = totalPrice >= 1500 ? 0 : 40;
     const finalPrice = totalPrice - totalOfferDiscount - couponDiscount + shipping;
 
-    console.log('=================coupon,details,discount',cart.appliedCoupon,cart.appliedCouponDetails,cart.discount);
+    console.log('=================coupon,details,discount',cart.couponApplied,cart.appliedCouponDetails,cart.discount);
 
     return res.json({
       success: true,
