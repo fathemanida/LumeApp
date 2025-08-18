@@ -235,6 +235,15 @@ const createOrder = async (req, res) => {
         return res.status(404).json({ success: false, message: 'Order not found for retry' });
       }
       order.paymentMethod = paymentMethod;
+      if(paymentMethod==='Wallet'){
+        const wallet=await Wallet.findOne({userId});
+        if(!wallet||wallet.balance<order.totalAmount){
+          return res.status(400).json({
+            success:false,
+            message:'Insufficient wallet balance',
+          })
+        }
+      }
       order.status = 'Pending';
       order.paymentStatus = paymentMethod === 'COD' ? 'Pending' : 'Paid';
       order.updatedAt = new Date();
@@ -339,8 +348,24 @@ const createOrder = async (req, res) => {
         }
       }
 
-      const shipping = totalPrice >= 1500 ? 0 : 40;
+          const shipping = totalPrice >= 1500 ? 0 : 40;
       const finalAmount = Math.max(0, priceAfterOffer - totalCouponDiscount + shipping);
+
+      if (paymentMethod === 'Wallet') {
+        const wallet = await Wallet.findOne({ userId });
+        if (!wallet || wallet.balance < finalAmount) {
+          return res.status(400).json({
+            success: false,
+            message: 'Insufficient wallet balance',
+            required: finalAmount,
+            available: wallet ? wallet.balance : 0,
+          });
+        }
+      }
+
+      const isImmediatePay = (paymentMethod === 'Razorpay' || paymentMethod === 'UPI');
+
+     
 
       order = new Order({
         userId,
