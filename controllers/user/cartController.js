@@ -366,7 +366,7 @@ const cart = async (req, res) => {
 
 
      const breadcrumbs = [
-\      { label: "Collections", url: "/shopAll" },
+      { label: "Collections", url: "/shopAll" },
       {label:"Cart",url:'/cart'}
     ];
     res.render("cart", {

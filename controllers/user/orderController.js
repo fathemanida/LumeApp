@@ -232,7 +232,7 @@ const orders = async (req, res) => {
       };
     });
      const breadcrumbs = [
-\      { label: "My Orders", url: "/orders" },
+      { label: "My Orders", url: "/orders" },
     ];
 
     res.render('orders', {
