@@ -510,7 +510,6 @@
 </head>
 <body>
 <%- include('../partials/user/header.ejs') %>
-<%-include('../partials/user/breadcrumps.ejs')  %>
 
 <div class="wishlist-container">
 
@@ -523,6 +522,8 @@
       
       <!-- Main Content -->
       <div class="col-lg-9">
+        <%-include('../partials/user/breadcrumps.ejs')  %>
+
         <div class="wishlist-header">
           <h2 class="wishlist-title">
             <i class="fas fa-heart me-2" style="color: var(--offer-red);"></i> My Wishlist

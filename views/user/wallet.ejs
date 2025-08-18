@@ -331,7 +331,6 @@
 <body>
     <!-- Navbar -->
 <%-include('../partials/user/header.ejs')  %>
-<%-include('../partials/user/breadcrumps.ejs')  %>
 
 
     <% if (locals.user) { %>
@@ -340,6 +339,8 @@
 
             <!-- Wallet Content Area -->
             <div class="content-area">
+              <%-include('../partials/user/breadcrumps.ejs')  %>
+
                 <div class="page-header">
                     <h1 class="page-title">My Wallet</h1>
                     

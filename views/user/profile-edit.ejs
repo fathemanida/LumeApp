@@ -289,7 +289,6 @@
 <body>
     <!-- Navbar -->
 <%-include('../partials/user/header.ejs')  %>
-<%-include('../partials/user/breadcrumps.ejs')  %>
 
 
     <div class="container">
@@ -297,6 +296,8 @@
   <%-include('../partials/user/sidebar.ejs',{currentPage:'profile'})  %>
         <!-- Main Content -->
         <div class="main-content">
+            <%-include('../partials/user/breadcrumps.ejs')  %>
+
             <div class="flex justify-between items-center mb-10">
                 <h1 class="text-3xl font-semibold">Edit Account</h1>
             </div>
