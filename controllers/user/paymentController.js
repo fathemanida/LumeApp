@@ -232,7 +232,7 @@ const createOrder = async (req, res) => {
         })
       }
 
-      if(!wallet||wallet.balance<){
+      if(!wallet||wallet.balance<1){
 
       }
     }
