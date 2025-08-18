@@ -32,7 +32,6 @@
             color: var(--dark-brown);
             display: flex;
             flex-direction: column;
-            padding-top: 39px;
         }
 
       
@@ -329,6 +328,8 @@
 <body>
     <!-- Navbar -->
 <%-include('../partials/user/header.ejs')  %>
+<%-include('../partials/user/breadcrumps.ejs')  %>
+
 
     <% if (locals.user) { %>
         <div class="main-container">
