@@ -763,7 +763,7 @@ html, body {
                         payload.walletId = walletId;
                     }
                     
-                    const res = await fetch('/create-order', {
+                    const res = await fetch('/payment/process', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload)
@@ -800,7 +800,7 @@ html, body {
 
                 console.log('Processing payment for order:', orderId, 'with payload:', payload);
 
-                const res = await fetch('/create-order', {
+                const res = await fetch('/payment/process', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
