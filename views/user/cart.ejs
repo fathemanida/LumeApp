@@ -835,13 +835,13 @@
                     <div class="applied-coupon bg-light p-3 mb-3 rounded">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <span class="fw-bold"><%= appliedCouponDetails.code %></span>
+                                <span class="fw-bold"><%= couponApplied.code %></span>
                                 <span class="text-success ms-2">
-                                    -<%= appliedCouponDetails.discountType === 'PERCENTAGE' ? 
-                                        appliedCouponDetails.discountValue + '%' : 
-                                        '₹' + appliedCouponDetails.discountValue.toLocaleString() %>
-                                    <% if (aappliedCouponDetails.maxDiscount) { %>
-                                        (Max ₹<%= appliedCouponDetails.maxDiscount.toLocaleString() %>)
+                                    -<%= couponApplied.discountType === 'PERCENTAGE' ? 
+                                        couponApplied.discountValue + '%' : 
+                                        '₹' + couponApplied.discountValue.toLocaleString() %>
+                                    <% if (couponApplied.maxDiscount) { %>
+                                        (Max ₹<%= couponApplied.maxDiscount.toLocaleString() %>)
                                     <% } %>
                                 </span>
                             </div>
