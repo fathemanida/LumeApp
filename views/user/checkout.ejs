@@ -418,6 +418,49 @@
     .stock-info small.text-warning {
       color: var(--offer-red);
     }
+    .empty-cart {
+      text-align: center;
+      padding: clamp(3rem, 8vw, 4rem);
+      background: transparent;
+      border-radius: 0;
+    }
+    .empty-cart-icon {
+      font-size: clamp(4rem, 10vw, 5rem);
+      color: var(--soft-beige);
+      margin-bottom: 1.5rem;
+    }
+    .empty-cart-text {
+      font-family: 'Aboreto', cursive;
+      color: var(--darker-text);
+      font-size: clamp(1.5rem, 4vw, 1.8rem);
+      margin-bottom: 1rem;
+    }
+    .empty-cart-subtext {
+      color: var(--dark-text);
+      margin-bottom: 2rem;
+      font-size: clamp(1rem, 3vw, 1.2rem);
+    }
+    .continue-shopping-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: clamp(1rem, 3vw, 1.2rem) clamp(2rem, 5vw, 2.5rem);
+      background: var(--darker-text);
+      color: white;
+      border: none;
+      border-radius: 0;
+      font-family: 'Jost', sans-serif;
+      font-size: clamp(1rem, 3vw, 1.2rem);
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .continue-shopping-btn:hover {
+      background: var(--muted-green);
+      transform: translateY(-2px);
+    }
         /* --- Order Summary Sidebar --- */
         .order-summary {
             position: sticky;

@@ -831,29 +831,13 @@
                         <span class="text-success">-₹<%= totalOfferDiscount.toLocaleString() %></span>
                     </div>
                     <% } %>
-                    <% if (couponApplied) { %>
-                    <div class="applied-coupon bg-light p-3 mb-3 rounded">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <span class="fw-bold"><%= couponApplied.code %></span>
-                                <span class="text-success ms-2">
-                                    -<%= couponApplied.discountType === 'PERCENTAGE' ? 
-                                        couponApplied.discountValue + '%' : 
-                                        '₹' + couponApplied.discountValue.toLocaleString() %>
-                                    <% if (couponApplied.maxDiscount) { %>
-                                        (Max ₹<%= couponApplied.maxDiscount.toLocaleString() %>)
-                                    <% } %>
-                                </span>
-                            </div>
-                            <button class="btn btn-sm btn-outline-danger" onclick="removeCoupon()">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                        <div class="coupon-savings text-success small mt-1">
-                            Saved ₹<%= totalCouponDiscount.toLocaleString() %>
-                        </div>
+                     <% if (totalCouponDiscount > 0) { %>
+                    <div class="summary-row">
+                        <span>Offer Discount</span>
+                        <span class="text-success">-₹<%= totalCouponDiscount.toLocaleString() %></span>
                     </div>
                     <% } %>
+                    
                     <div class="summary-row">
                         <span>Shipping</span>
                         <span id="shipping"><%= shipping === 0 ? 'Free' : `₹${shipping.toLocaleString()}` %></span>
@@ -1010,7 +994,6 @@
             return;
         }
         
-        // Instead of updating the DOM elements, just reload the page
         window.location.reload();
         
     } catch (error) {
@@ -1040,17 +1023,14 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    // Remove the item from the UI
                     const cartItem = document.querySelector(`.cart-item[data-id="${itemId}"]`);
                     if (cartItem) cartItem.remove();
                     
-                    // Update the cart summary
                     if (data.totals) {
                         document.getElementById('subtotal').textContent = `₹${data.totals.subtotal?.toLocaleString() || '0'}`;
                         document.getElementById('shipping').textContent = data.totals.shipping === 0 ? 'Free' : `₹${data.totals.shipping?.toLocaleString() || '0'}`;
                         document.getElementById('finalPrice').textContent = `₹${data.totals.finalPrice?.toLocaleString() || '0'}`;
                         
-                        // Update discounts if they exist
                         if (data.totals.offerDiscount !== undefined || data.totals.couponDiscount !== undefined) {
                             updateSummaryDiscounts(
                                 data.totals.offerDiscount || 0, 
@@ -1059,7 +1039,6 @@
                         }
                     }
                     
-                    // Check if cart is empty
                     const remainingItems = document.querySelectorAll('.cart-item');
                     if (remainingItems.length === 0) {
                         document.querySelector('.col-lg-8').innerHTML = `
@@ -1224,7 +1203,7 @@
             }
         }
 
-        async function removeCoupon() {
+                async function removeCoupon() {
             try {
                 const result = await Swal.fire({
                     title: 'Remove Coupon',
@@ -1232,15 +1211,54 @@
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#3e4c22',
-                    cancelButtonColor: '#c82333',
+                    cancelButtonColor: '#d33',
                     confirmButtonText: 'Yes, remove it!'
                 });
                 if (!result.isConfirmed) return;
+
                 const response = await fetch('/remove-coupon', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
                 });
-                const data = await response.json();
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error(`Remove Coupon Failed - Status: ${response.status}, Response: ${errorText}`);
+                    let errorMessage = `Failed to remove coupon (Status: ${response.status})`;
+                    if (response.status === 401) {
+                        errorMessage = 'Please log in to remove coupon';
+                    } else if (response.status === 400) {
+                        try {
+                            const errorData = JSON.parse(errorText);
+                            errorMessage = errorData.message || 'Invalid request';
+                        } catch (e) {
+                            errorMessage = 'Invalid request';
+                        }
+                    } else if (response.status === 500) {
+                        errorMessage = 'Server error occurred';
+                    }
+                    showNotification(errorMessage, 'error');
+                    return;
+                }
+
+                let data;
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    console.error('Error parsing JSON response:', e);
+                    showNotification('Invalid server response format', 'error');
+                    return;
+                }
+
+                if (!data || typeof data !== 'object') {
+                    console.error('Invalid response structure:', data);
+                    showNotification('Unexpected server response', 'error');
+                    return;
+                }
+
                 if (data.success) {
                     const couponSection = document.querySelector('.applied-coupon');
                     if (couponSection) couponSection.remove();
@@ -1258,38 +1276,42 @@
                             item.onclick = () => selectCoupon(code);
                         }
                     });
-                    data.items.forEach(item => {
-                        const cartItem = document.querySelector(`.cart-item[data-id="${item._id}"]`);
-                        if (cartItem) {
-                            const priceElement = cartItem.querySelector('.product-price');
+                    if (Array.isArray(data.items)) {
+                        data.items.forEach(item => {
+                            const orderItem = document.querySelector(`.order-item[data-id="${item._id}"]`) || document.createElement('div');
+                            orderItem.setAttribute('data-id', item._id);
+                            const priceElement = orderItem.querySelector('.order-item-price');
                             if (priceElement) {
                                 priceElement.innerHTML = item.offerDiscount || item.couponDiscount
                                     ? `<span class="text-decoration-line-through text-muted">₹${(item.originalPrice * item.quantity).toLocaleString()}</span> <span class="text-success ms-2">₹${item.totalPrice.toLocaleString()}</span>`
                                     : `₹${item.totalPrice.toLocaleString()}`;
                             }
-                            const discountBadge = cartItem.querySelector('.discount-badge');
+                            const discountBadge = orderItem.querySelector('.discount-badge');
                             if (discountBadge) {
                                 let badgeHTML = '';
                                 if (item.offerDiscount > 0) {
-                                    badgeHTML += `<span class="badge bg-success me-2">${item.appliedOffer === 'product' ? 'Product Offer' : 'Category Offer'}: -₹${item.offerDiscount.toLocaleString()}</span>`;
+                                    badgeHTML += `<span class="badge bg-success me-2">Offer: -₹${item.offerDiscount.toLocaleString()}</span>`;
                                 }
                                 if (item.couponDiscount > 0) {
                                     badgeHTML += `<span class="badge bg-primary">Coupon: -₹${item.couponDiscount.toLocaleString()}</span>`;
                                 }
                                 discountBadge.innerHTML = badgeHTML;
                             }
-                        }
-                    });
-                    showNotification(data.message, 'success');
+                        });
+                    } else {
+                        console.warn('No items array in response:', data);
+                    }
+                    showNotification(data.message || 'Coupon removed successfully', 'success');
                     location.reload();
                 } else {
+                    console.warn('Coupon removal failed:', data.message);
                     showNotification(data.message || 'Failed to remove coupon', 'error');
                 }
             } catch (error) {
-                console.log('An error occurred while removing coupon', error);
+                console.error('Error in removeCoupon:', error);
+                showNotification(`Error removing coupon: ${error.message || 'Unknown error'}`, 'error');
             }
         }
-
         function proceedToCheckout() {
             window.location.href = '/checkout';
         }

@@ -567,10 +567,7 @@ html, body {
                         <input type="radio" name="paymentMethod" value="razorpay" onclick="showPaymentForm('razorpay')">
                         Razorpay
                     </label>
-                    <label>
-                        <input type="radio" name="paymentMethod" value="upi" onclick="showPaymentForm('upi')">
-                        UPI
-                    </label>
+                  
                     <label>
                         <input type="radio" name="paymentMethod" value="wallet" onclick="showPaymentForm('wallet')">
                         Wallet
@@ -589,12 +586,7 @@ html, body {
                             </div>
                         </div>
                     </div>
-                    <div class="payment-form" id="upiForm">
-                        <div class="form-group">
-                            <label for="upiId">UPI ID</label>
-                            <input type="text" id="upiId" placeholder="yourname@upi" required>
-                        </div>
-                    </div>
+                   
                     <div class="payment-form" id="walletForm">
                         <div class="form-group">
                             <label for="walletId">Wallet ID/Phone Number</label>
@@ -680,9 +672,6 @@ html, body {
             const payNowBtn = document.getElementById('payNowBtn');
             if (method === 'razorpay') {
                 payNowBtn.disabled = false;
-            } else if (method === 'upi') {
-                const upiId = document.getElementById('upiId').value;
-                payNowBtn.disabled = !upiId;
             } else if (method === 'wallet') {
                 const walletId = document.getElementById('walletId').value;
                 payNowBtn.disabled = !walletId;
@@ -774,7 +763,7 @@ html, body {
                         payload.walletId = walletId;
                     }
                     
-                    const res = await fetch('/payment/process', {
+                    const res = await fetch('/create-order', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload)
@@ -803,11 +792,7 @@ html, body {
                     payload.orderId = orderId;
                 }
 
-                if (method === 'upi') {
-                    const upiId = document.getElementById('upiId').value;
-                    if (!upiId) throw new Error('Please enter UPI ID');
-                    payload.upiId = upiId;
-                } else if (method === 'wallet') {
+                if (method === 'wallet') {
                     const walletId = document.getElementById('walletId').value;
                     if (!walletId) throw new Error('Please select a wallet');
                     payload.walletId = walletId;
@@ -815,7 +800,7 @@ html, body {
 
                 console.log('Processing payment for order:', orderId, 'with payload:', payload);
 
-                const res = await fetch('/payment/process', {
+                const res = await fetch('/create-order', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
@@ -953,7 +938,6 @@ html, body {
     }
 }
 
-        document.getElementById('upiId')?.addEventListener('input', () => validateForm('upi'));
         document.getElementById('walletId')?.addEventListener('input', () => validateForm('wallet'));
         document.getElementById('payNowBtn')?.addEventListener('click', processPayment);
 
