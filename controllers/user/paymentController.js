@@ -78,7 +78,7 @@ console.log('===order',items);
       { label: "Home", url: "/" },
       { label: "Collections", url: "/shopAll" },
       { label: "Cart", url: "/cart" },
-      { label: 'Checkout' ,url: "/checkout"}
+      { label: 'Checkout' ,url: "/checkout"},
       { label: `Payment`, url: `/checkout/payment` }
     ];
 console.log('====cart data',cartData);
