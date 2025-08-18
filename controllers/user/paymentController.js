@@ -323,6 +323,8 @@ const createOrder = async (req, res) => {
         const offerDiscount = Math.max(productOfferDiscount, categoryOfferDiscount);
         const finalPrice = originalPrice - offerDiscount;
 
+        console.log('--offerdis-----finalPrice',offerDiscount,finalAmount);
+
         totalPrice += originalPrice;
         totalOfferDiscount += offerDiscount;
 
@@ -350,7 +352,7 @@ const createOrder = async (req, res) => {
 
           const shipping = totalPrice >= 1500 ? 0 : 40;
       const finalAmount = Math.max(0, priceAfterOffer - totalCouponDiscount + shipping);
-      console.log('price after off,coupon offf,offer dis',priceAfterOffer,totalCouponDiscount,offerDiscount);
+      console.log('price after off,coupon offf,offer dis-----totalofferdis',priceAfterOffer,totalCouponDiscount,offerDiscount,tot);
       console.log('------finalamount',finalAmount);
       console.log('----method for payment',paymentMethod);
 
