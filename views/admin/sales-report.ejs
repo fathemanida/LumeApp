@@ -345,6 +345,16 @@ function formatPercentage(value) {
     }
     return `${value.toFixed(2)}%`;
 }
+function formatCurrency(value) {
+    if (value === null || value === undefined || isNaN(value)) {
+        return '₹0.00';  // or '$0.00'
+    }
+    return `₹${Number(value).toLocaleString("en-IN", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    })}`;
+}
+
 function updateSummaryCards(data) {
   // Total Orders
   document.getElementById('total-orders-value').textContent = data.totalOrders.value.toLocaleString();
