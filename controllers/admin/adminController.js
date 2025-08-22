@@ -738,7 +738,10 @@ const loadDashboard = async (req, res) => {
             productSales[productId] = { name: item.productId.productName, count: 0, revenue: 0 };
           }
           productSales[productId].count += item.quantity;
-          productSales[productId].revenue += (item.price || 0) * item.quantity;
+          productSales[productId].revenue += item.finalPrice 
+  ? item.finalPrice 
+  : (item.price || 0) * item.quantity;
+
         }
       });
     });
