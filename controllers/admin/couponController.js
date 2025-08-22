@@ -60,7 +60,7 @@ const createCoupon = async (req, res) => {
       });
     }
     if(discountValue>=65){
-      return res.status(204).json({
+      return res.status(400).json({
         success:false,
         message:"maximium 65% can give"
       })
