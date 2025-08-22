@@ -117,32 +117,34 @@
                 <% } %>   
                 </td>
 
-                <td>
-                  <% if (data[i] && data[i].productOffer && data[i].productOffer.active) { %>
-                    <% if (data[i].productOffer.discountType === 'percentage') { %>
-                      <%= data[i].productOffer.discountValue %>%
-                    <% } else { %>
-                      ₹<%= data[i].productOffer.discountValue.toFixed(2) %>
-                    <% } %>
-                  <% } else if (data[i] && data[i].offer && data[i].offer.isActive) { %>
-                    <% if (data[i].offer.discountType === 'percentage') { %>
-                      <%= data[i].offer.discountValue %>%
-                    <% } else { %>
-                      ₹<%= data[i].offer.discountValue.toFixed(2) %>
-                    <% } %>
-                  <% } else { %>
-                    -
-                  <% } %>
-                </td>
-                <td>
-                  <% if (data[i] && data[i].productOffer && data[i].productOffer.active) { %>
-                    <%= new Date(data[i].productOffer.endDate).toLocaleDateString() %>
-                  <% } else if (data[i] && data[i].offer && data[i].offer.isActive) { %>
-                    <%= new Date(data[i].offer.endDate).toLocaleDateString() %>
-                  <% } else { %>
-                    -
-                  <% } %>
-                </td>
+<td>
+  <% if (data[i] && data[i].offer) { %> 
+    <% if (data[i].offer.discountType === 'percentage') { %>
+      <%= data[i].offer.discountValue %>%
+    <% } else { %>
+      ₹<%= data[i].offer.discountValue.toFixed(2) %>
+    <% } %>
+  <% } else if (data[i] && data[i].category && data[i].category.offer) { %> 
+    <% if (data[i].category.offer.discountType === 'percentage') { %>
+      <%= data[i].category.offer.discountValue %>%
+    <% } else { %>
+      ₹<%= data[i].category.offer.discountValue.toFixed(2) %>
+    <% } %>
+  <% } else { %>
+    -
+  <% } %>
+</td>
+
+<td>
+  <% if (data[i] && data[i].offer) { %> 
+    <%= new Date(data[i].offer.endDate).toLocaleDateString() %>
+  <% } else if (data[i] && data[i].category && data[i].category.offer) { %> 
+    <%= new Date(data[i].category.offer.endDate).toLocaleDateString() %>
+  <% } else { %>
+    -
+  <% } %>
+</td>
+
                 <td>
                   <%= data[i].quantity || data[i].productStock || 0 %>
                 </td>
