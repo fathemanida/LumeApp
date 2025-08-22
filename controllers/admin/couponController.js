@@ -59,10 +59,10 @@ const createCoupon = async (req, res) => {
         message: 'Please provide all required fields'
       });
     }
-    if(discountValue>=65){
+    if(discountValue>=4000){
       return res.status(400).json({
         success:false,
-        message:"maximium 65% can give"
+        message:"maximium 4000 can give"
       })
     }
     const existingCoupon = await Coupon.findOne({ code: code.toUpperCase() });
