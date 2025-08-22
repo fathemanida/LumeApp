@@ -392,36 +392,36 @@ const downloadReport = async (req, res) => {
     const orders = await Order.find(dateQuery)
       .populate('userId', 'name')
       .sort({ createdOn: 1 });
-      if (!orders || orders.length === 0) {
-  if (format === 'excel') {
-    const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet('Sales Report');
+//       if (!orders || orders.length === 0) {
+//   if (format === 'excel') {
+//     const workbook = new ExcelJS.Workbook();
+//     const worksheet = workbook.addWorksheet('Sales Report');
 
-    worksheet.addRow(['No data available for the selected period.']);
+//     worksheet.addRow(['No data available for the selected period.']);
 
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', 'attachment; filename=sales-report.xlsx');
-    await workbook.xlsx.write(res);
-    return res.end();
-  }
+//     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+//     res.setHeader('Content-Disposition', 'attachment; filename=sales-report.xlsx');
+//     await workbook.xlsx.write(res);
+//     return res.end();
+//   }
 
-  if (format === 'pdf') {
-    const doc = new PDFDocument({
-      size: [900, 600],
-      margin: 30
-    });
+//   if (format === 'pdf') {
+//     const doc = new PDFDocument({
+//       size: [900, 600],
+//       margin: 30
+//     });
 
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 'attachment; filename=sales-report.pdf');
+//     res.setHeader('Content-Type', 'application/pdf');
+//     res.setHeader('Content-Disposition', 'attachment; filename=sales-report.pdf');
 
-    doc.pipe(res);
-    doc.fontSize(20).fillColor('#e74c3c').text('No data available for the selected period', { align: 'center' });
-    doc.end();
-    return;
-  }
+//     doc.pipe(res);
+//     doc.fontSize(20).fillColor('#e74c3c').text('No data available for the selected period', { align: 'center' });
+//     doc.end();
+//     return;
+//   }
 
-  return res.status(200).send('No data available for the selected period');
-}
+//   return res.status(200).send('No data available for the selected period');
+// }
 
     console.log('Found orders for report:', orders.length);
     if (orders.length > 0) {
