@@ -949,6 +949,10 @@ const applyCoupon = async (req, res) => {
       couponDiscount = coupon.discountValue;
     }
 
+    if(couponDiscount>coupon.maxDiscount){
+      couponDiscount=coupon.maxDiscount
+    }
+
     const couponPerUnit = totalQuantity > 0 ? couponDiscount / totalQuantity : 0;
 
     cart.couponApplied = coupon._id;
