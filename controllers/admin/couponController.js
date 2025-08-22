@@ -59,12 +59,7 @@ const createCoupon = async (req, res) => {
         message: 'Please provide all required fields'
       });
     }
-    if(discountValue>=4000){
-      return res.status(400).json({
-        success:false,
-        message:"maximium 4000 can give"
-      })
-    }
+  
     const existingCoupon = await Coupon.findOne({ code: code.toUpperCase() });
     if (existingCoupon) {
       return res.status(400).json({

@@ -217,7 +217,7 @@
 
             if (formData.get('discountType') === 'PERCENTAGE') {
                 if (discountValue > 65) {
-                    showError('discountValue', 'Percentage discount cannot be more than 5%');
+                    showError('discountValue', 'Percentage discount cannot be more than 65%');
                     hasErrors = true;
                 }
                 if (!maxDiscountValue || maxDiscountValue <= 0) {
