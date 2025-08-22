@@ -169,6 +169,27 @@ const loadSalesreport = async (req, res) => {
     const orders = await Order.find(dateQuery)
       .populate('userId', 'name')
       .sort({ createdOn: 1 });
+      if (!orders || orders.length === 0) {
+  return res.render('admin/sales-report', {
+    totalCustomers: await User.countDocuments({ isAdmin: false }),
+    totalProducts: await Product.countDocuments(),
+    totalOrders: 0,
+    totalRevenue: 0,
+    recentOrders: [],
+    noData: true, 
+    salesData: {
+      summary: {
+        totalOrders: { value: 0, change: 0 },
+        totalSales: { value: 0, change: 0 },
+        totalDiscounts: { value: 0, change: 0 },
+        totalCoupons: { value: 0, change: 0 },
+        tableData: []
+      },
+      chartData: { labels: [], datasets: [] },
+      tableData: []
+    }
+  });
+}
 
     console.log('Found orders:', orders.length);
     if (orders.length > 0) {
@@ -371,6 +392,36 @@ const downloadReport = async (req, res) => {
     const orders = await Order.find(dateQuery)
       .populate('userId', 'name')
       .sort({ createdOn: 1 });
+      if (!orders || orders.length === 0) {
+  if (format === 'excel') {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Sales Report');
+
+    worksheet.addRow(['No data available for the selected period.']);
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=sales-report.xlsx');
+    await workbook.xlsx.write(res);
+    return res.end();
+  }
+
+  if (format === 'pdf') {
+    const doc = new PDFDocument({
+      size: [900, 600],
+      margin: 30
+    });
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename=sales-report.pdf');
+
+    doc.pipe(res);
+    doc.fontSize(20).fillColor('#e74c3c').text('No data available for the selected period', { align: 'center' });
+    doc.end();
+    return;
+  }
+
+  return res.status(200).send('No data available for the selected period');
+}
 
     console.log('Found orders for report:', orders.length);
     if (orders.length > 0) {
