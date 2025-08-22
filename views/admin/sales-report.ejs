@@ -61,7 +61,7 @@
                         <label class="filter-label">To:</label>
                         <input type="date" class="filter-date" id="end-date">
                     </div>
-                    <button class="generate-btn" id="generate-report">
+                    <button class="generate-btn" id="generate-report" >
                         <i class="fas fa-chart-line"></i> Generate Report
                     </button>
                     <div class="download-buttons">
@@ -82,10 +82,14 @@
         <div class="summary-title">
             <i class="fas fa-shopping-cart"></i> Total Orders
         </div>
-        <div class="summary-value" id="total-orders">
-            <%= salesData.summary.totalOrders.value %>
-        </div>
-        <div class="summary-change <%= salesData.summary.totalOrders.change >= 0 ? 'change-up' : 'change-down' %>">
+<div class="summary-value" id="total-orders-value">
+  <% if (salesData && salesData.summary && salesData.summary.totalOrders && salesData.summary.totalOrders.value > 0) { %>
+    <%= salesData.summary.totalOrders.value %>
+  <% } else { %>
+    No Data
+  <% } %>
+</div>
+        <div class="summary-change<%= salesData.summary.totalOrders.change >= 0 ? 'change-up' : 'change-down' %>" id="total-orders-change">
             <i class="fas fa-arrow-<%= salesData.summary.totalOrders.change >= 0 ? 'up' : 'down' %>"></i>
             <%= Math.abs(salesData.summary.totalOrders.change).toFixed(1) %>% from last period
         </div>
@@ -97,10 +101,15 @@
         <div class="summary-title">
             <i class="fas fa-rupee-sign"></i> Total Sales
         </div>
-        <div class="summary-value" id="total-sales">
-₹<%= Number(salesData.summary.totalSales.value).toLocaleString('en-IN') %>
-        </div>
-        <div class="summary-change <%= salesData.summary.totalSales.change >= 0 ? 'change-up' : 'change-down' %>">
+<div class="summary-value" id="total-sales-value">
+  <% if (salesData && salesData.summary && salesData.summary.totalSales && salesData.summary.totalSales.value > 0) { %>
+    ₹<%= Number(salesData.summary.totalSales.value).toLocaleString('en-IN') %>
+  <% } else { %>
+    No Data
+  <% } %>
+</div>
+
+        <div class="summary-change <%= salesData.summary.totalSales.change >= 0 ? 'change-up' : 'change-down' %>" id="total-sales-change">
             <i class="fas fa-arrow-<%= salesData.summary.totalSales.change >= 0 ? 'up' : 'down' %>"></i>
             <%= Math.abs(salesData.summary.totalSales.change).toFixed(1) %>% from last period
         </div>
@@ -112,10 +121,15 @@
         <div class="summary-title">
             <i class="fas fa-tag"></i> Discounts Applied
         </div>
-        <div class="summary-value" id="total-discounts">
-₹<%= Number(salesData.summary.totalDiscounts.value).toLocaleString('en-IN') %>
-        </div>
-        <div class="summary-change <%= salesData.summary.totalDiscounts.change >= 0 ? 'change-up' : 'change-down' %>">
+<div class="summary-value" id="total-discounts-value">
+  <% if (salesData && salesData.summary && salesData.summary.totalDiscounts && salesData.summary.totalDiscounts.value > 0) { %>
+    ₹<%= Number(salesData.summary.totalDiscounts.value).toLocaleString('en-IN') %>
+  <% } else { %>
+    No Data
+  <% } %>
+</div>
+
+        <div class="summary-change <%= salesData.summary.totalDiscounts.change >= 0 ? 'change-up' : 'change-down' %>" id="total-discount-change">
             <i class="fas fa-arrow-<%= salesData.summary.totalDiscounts.change >= 0 ? 'up' : 'down' %>"></i>
             <%= Math.abs(salesData.summary.totalDiscounts.change).toFixed(1) %>% from last period
         </div>
@@ -127,10 +141,15 @@
         <div class="summary-title">
             <i class="fas fa-ticket-alt"></i> Coupons Used
         </div>
-        <div class="summary-value" id="total-coupons">
-            <%= salesData.summary.totalCoupons.value %>
-        </div>
-        <div class="summary-change <%= salesData.summary.totalCoupons.change >= 0 ? 'change-up' : 'change-down' %>">
+<div class="summary-value" id="total-coupon-value">
+  <% if (salesData && salesData.summary && salesData.summary.totalCoupons && salesData.summary.totalCoupons.value > 0) { %>
+    <%= salesData.summary.totalCoupons.value %>
+  <% } else { %>
+    No Data
+  <% } %>
+</div>
+
+        <div class="summary-change <%= salesData.summary.totalCoupons.change >= 0 ? 'change-up' : 'change-down' %>" id="total-coupon-change">
             <i class="fas fa-arrow-<%= salesData.summary.totalCoupons.change >= 0 ? 'up' : 'down' %>"></i>
             <%= Math.abs(salesData.summary.totalCoupons.change).toFixed(1) %>% from last period
         </div>
@@ -206,19 +225,16 @@
             document.body.classList.toggle('sidebar-open');
         });
 
-        // Close sidebar when clicking outside (on body)
         document.body.addEventListener('click', function(e) {
             const sidebar = document.querySelector('.sidebar');
             const menuBtn = document.getElementById('mobileMenuBtn');
             if (window.innerWidth <= 991 && sidebar.classList.contains('active')) {
-                // If click is outside sidebar and not on menu button
                 if (!sidebar.contains(e.target) && e.target !== menuBtn && !menuBtn.contains(e.target)) {
                     sidebar.classList.remove('active');
                     document.body.classList.remove('sidebar-open');
                 }
             }
         });
-        // Prevent sidebar click from closing itself
         document.querySelector('.sidebar').addEventListener('click', function(e) {
             e.stopPropagation();
         });
@@ -324,30 +340,32 @@
             });
         }
 
-        function updateSummaryCards(data) {
-            const formatCurrency = (value) => '₹' + value.toLocaleString();
-            const formatPercentage = (value) => value.toFixed(1) + '%';
+function updateSummaryCards(data) {
+  // Total Orders
+  document.getElementById('total-orders-value').textContent = data.totalOrders.value.toLocaleString();
+  const ordersChange = document.getElementById('total-orders-change');
+  ordersChange.innerHTML = `<i class="fas fa-arrow-${data.totalOrders.change >= 0 ? 'up' : 'down'}"></i> ${formatPercentage(Math.abs(data.totalOrders.change))} from last period`;
+  ordersChange.className = `summary-change ${data.totalOrders.change >= 0 ? 'change-up' : 'change-down'}`;
 
-            document.getElementById('total-orders').textContent = data.totalOrders.value.toLocaleString();
-            const ordersChange = document.querySelector('#total-orders').nextElementSibling;
-            ordersChange.innerHTML = `<i class="fas fa-arrow-${data.totalOrders.change >= 0 ? 'up' : 'down'}"></i> ${formatPercentage(Math.abs(data.totalOrders.change))} from last period`;
-            ordersChange.className = `summary-change ${data.totalOrders.change >= 0 ? 'change-up' : 'change-down'}`;
+  // Total Sales
+  document.getElementById('total-sales-value').textContent = formatCurrency(data.totalSales.value);
+  const salesChange = document.getElementById('total-sales-change');
+  salesChange.innerHTML = `<i class="fas fa-arrow-${data.totalSales.change >= 0 ? 'up' : 'down'}"></i> ${formatPercentage(Math.abs(data.totalSales.change))} from last period`;
+  salesChange.className = `summary-change ${data.totalSales.change >= 0 ? 'change-up' : 'change-down'}`;
 
-            document.getElementById('total-sales').textContent = formatCurrency(data.totalSales.value);
-            const salesChange = document.querySelector('#total-sales').nextElementSibling;
-            salesChange.innerHTML = `<i class="fas fa-arrow-${data.totalSales.change >= 0 ? 'up' : 'down'}"></i> ${formatPercentage(Math.abs(data.totalSales.change))} from last period`;
-            salesChange.className = `summary-change ${data.totalSales.change >= 0 ? 'change-up' : 'change-down'}`;
+  // Total Discount
+  document.getElementById('total-discount-value').textContent = formatCurrency(data.totalDiscount.value);
+  const discountChange = document.getElementById('total-discount-change');
+  discountChange.innerHTML = `<i class="fas fa-arrow-${data.totalDiscount.change >= 0 ? 'up' : 'down'}"></i> ${formatPercentage(Math.abs(data.totalDiscount.change))} from last period`;
+  discountChange.className = `summary-change ${data.totalDiscount.change >= 0 ? 'change-up' : 'change-down'}`;
 
-            document.getElementById('total-discounts').textContent = formatCurrency(data.totalDiscounts.value);
-            const discountsChange = document.querySelector('#total-discounts').nextElementSibling;
-            discountsChange.innerHTML = `<i class="fas fa-arrow-${data.totalDiscounts.change >= 0 ? 'up' : 'down'}"></i> ${formatPercentage(Math.abs(data.totalDiscounts.change))} from last period`;
-            discountsChange.className = `summary-change ${data.totalDiscounts.change >= 0 ? 'change-up' : 'change-down'}`;
+  // Coupon Discount
+  document.getElementById('total-coupon-value').textContent = formatCurrency(data.totalCoupon.value);
+  const couponChange = document.getElementById('total-coupon-change');
+  couponChange.innerHTML = `<i class="fas fa-arrow-${data.totalCoupon.change >= 0 ? 'up' : 'down'}"></i> ${formatPercentage(Math.abs(data.totalCoupon.change))} from last period`;
+  couponChange.className = `summary-change ${data.totalCoupon.change >= 0 ? 'change-up' : 'change-down'}`;
+}
 
-            document.getElementById('total-coupons').textContent = data.totalCoupons.value.toLocaleString();
-            const couponsChange = document.querySelector('#total-coupons').nextElementSibling;
-            couponsChange.innerHTML = `<i class="fas fa-arrow-${data.totalCoupons.change >= 0 ? 'up' : 'down'}"></i> ${formatPercentage(Math.abs(data.totalCoupons.change))} from last period`;
-            couponsChange.className = `summary-change ${data.totalCoupons.change >= 0 ? 'change-up' : 'change-down'}`;
-        }
 
         function updateSalesTable(data) {
             const tbody = document.querySelector('.sales-table tbody');
