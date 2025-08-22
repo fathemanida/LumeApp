@@ -177,57 +177,10 @@
             <% } %>
         </div>
 
-        <!-- Add/Edit Offer Form (Hidden by default) -->
-        <div class="form-container" style="display: none;">
-            <form id="offer-form">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="offer-name" class="form-label">Offer Name</label>
-                        <input type="text" id="offer-name" class="form-input" placeholder="Enter offer name">
-                    </div>
-                    <div class="form-group">
-                        <label for="discount" class="form-label">Discount (%)</label>
-                        <input type="number" id="discount" class="form-input" placeholder="Enter discount percentage">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="applicable-on" class="form-label">Applicable On</label>
-                        <select id="applicable-on" class="form-input">
-                            <option value="">Select option</option>
-                            <option value="all">All Products</option>
-                            <option value="categories">Selected Categories</option>
-                            <option value="products">Selected Products</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="status" class="form-label">Status</label>
-                        <select id="status" class="form-input">
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="start-date" class="form-label">Start Date</label>
-                        <input type="date" id="start-date" class="form-input">
-                    </div>
-                    <div class="form-group">
-                        <label for="end-date" class="form-label">End Date</label>
-                        <input type="date" id="end-date" class="form-input">
-                    </div>
-                </div>
-                <div class="form-footer">
-                    <button type="button" class="btn btn-secondary">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Offer</button>
-                </div>
-            </form>
-        </div>
+
     </main>
 
     <script>
-        // Simple script to toggle the form visibility
         document.querySelector('.btn-primary').addEventListener('click', function() {
             const formContainer = document.querySelector('.form-container');
             formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
@@ -237,7 +190,6 @@
             document.querySelector('.form-container').style.display = 'none';
         });
 
-        // Filter functionality
         document.getElementById('status-filter').addEventListener('change', filterOffers);
         document.getElementById('type-filter').addEventListener('change', filterOffers);
         document.querySelector('.search-input').addEventListener('input', filterOffers);
@@ -267,27 +219,22 @@
             window.location.href = `/admin/edit-offer/${id}`;
         }
 
-        // Function to update URL with filter parameters
         function updateFilters() {
             const statusFilter = document.getElementById('status-filter').value;
             const typeFilter = document.getElementById('type-filter').value;
             const searchQuery = document.querySelector('.search-input').value.toLowerCase();
             
-            // Update URL with new filters
             const params = new URLSearchParams();
             if (statusFilter) params.append('status', statusFilter);
             if (typeFilter) params.append('type', typeFilter);
             if (searchQuery) params.append('search', searchQuery);
             
-            // Redirect to the new URL with filters
             window.location.href = `/admin/offers?${params.toString()}`;
         }
 
-        // Initialize filters from URL on page load
         document.addEventListener('DOMContentLoaded', function() {
             const params = new URLSearchParams(window.location.search);
             
-            // Set filter dropdowns from URL parameters
             if (params.has('status')) {
                 document.getElementById('status-filter').value = params.get('status');
             }
@@ -298,11 +245,9 @@
                 document.querySelector('.search-input').value = params.get('search');
             }
             
-            // Add event listeners for filter changes
             document.getElementById('status-filter').addEventListener('change', updateFilters);
             document.getElementById('type-filter').addEventListener('change', updateFilters);
             
-            // Add debounced search
             let searchTimeout;
             document.querySelector('.search-input').addEventListener('input', function() {
                 clearTimeout(searchTimeout);
@@ -310,7 +255,6 @@
             });
         });
 
-        // Delete offer function
         function deleteOffer(offerId) {
             Swal.fire({
                 title: 'Are you sure?',

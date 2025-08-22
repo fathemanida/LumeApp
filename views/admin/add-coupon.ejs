@@ -273,18 +273,23 @@
                 const result = await response.json();
                 
                 if (response.ok) {
-                    showError('code', '<%= coupon ? "Coupon updated" : "Coupon created" %> successfully!');
-                    document.getElementById('codeError').style.color = '#2e7d32';
-                    
-                    setTimeout(() => {
-                        window.location.href = '/admin/coupons';
-                    }, 1000);
-                } else {
-                    showError('code', result.message || "Error <%= coupon ? 'updating' : 'creating' %> coupon");
-                }
+    await Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: result.message || "<%= coupon ? 'Coupon updated successfully' : 'Coupon created successfully' %>",
+        timer: 2000,
+        showConfirmButton: false
+    });
+
+    setTimeout(() => {
+        window.location.href = '/admin/coupons';
+    }, 1500);
+} else {
+    showError('code', result.message || "Error <%= coupon ? 'updating' : 'creating' %> coupon");
+}
+
             } catch (error) {
                 console.error('Error:', error);
-                showError('code', 'Error <%= coupon ? 'updating' : 'creating' %> coupon');
             }
         });
     </script>

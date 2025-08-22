@@ -50,13 +50,8 @@
             <i class="fas fa-rupee-sign"></i> Total Revenue
           </div>
           <div class="summary-value">
-  <% if (!totalRevenue || totalRevenue === 0) { %>
-    No Data
-  <% } else { %>
-    ₹<%= totalRevenue.toLocaleString('en-IN') %>
-  <% } %>
-</div>
-
+            ₹<%= totalRevenue.toLocaleString('en-IN') %>
+          </div>
           <div class="summary-change <%= revenueChange >= 0 ? 'change-up' : 'change-down' %>">
             <i class="fas fa-arrow-<%= revenueChange >= 0 ? 'up' : 'down' %>"></i>
             <%= Math.abs(revenueChange).toFixed(1) %>% from last period
@@ -68,14 +63,9 @@
           <div class="summary-title">
             <i class="fas fa-shopping-cart"></i> Total Orders
           </div>
-         <div class="summary-value">
-  <% if (!totalOrders || totalOrders === 0) { %>
-    No Data
-  <% } else { %>
-    <%= totalOrders.toLocaleString('en-IN') %>
-  <% } %>
-</div>
-
+          <div class="summary-value">
+            <%= totalOrders.toLocaleString('en-IN') %>
+          </div>
           <div class="summary-change <%= ordersChange >= 0 ? 'change-up' : 'change-down' %>">
             <i class="fas fa-arrow-<%= ordersChange >= 0 ? 'up' : 'down' %>"></i>
             <%= Math.abs(ordersChange).toFixed(1) %>% from last period
@@ -102,13 +92,8 @@
             <i class="fas fa-percentage"></i> Conversion Rate
           </div>
           <div class="summary-value">
-  <% if (!conversionRate || conversionRate === 0) { %>
-    No Data
-  <% } else { %>
-    <%= conversionRate.toFixed(1) %>%
-  <% } %>
-</div>
-
+            <%= conversionRate.toFixed(1) %>%
+          </div>
           <div class="summary-change <%= conversionChange >= 0 ? 'change-up' : 'change-down' %>">
             <i class="fas fa-arrow-<%= conversionChange >= 0 ? 'up' : 'down' %>"></i>
             <%= Math.abs(conversionChange).toFixed(1) %>% from last period
@@ -170,22 +155,15 @@
                 </tr>
               </thead>
               <tbody>
-  <% if (!bestSellingProducts || bestSellingProducts.length === 0) { %>
-    <tr>
-      <td colspan="4" class="text-center text-gray-500">No Data Available</td>
-    </tr>
-  <% } else { %>
-    <% bestSellingProducts.forEach(function(product, index) { %>
-      <tr>
-        <td><%= index + 1 %></td>
-        <td><%= product.name %></td>
-        <td><%= product.count %></td>
-        <td>₹<%= product.revenue.toLocaleString('en-IN') %></td>
-      </tr>
-    <% }); %>
-  <% } %>
-</tbody>
-
+                <% bestSellingProducts.forEach(function(product, index) { %>
+                  <tr>
+                    <td><%= index + 1 %></td>
+                    <td><%= product.name %></td>
+                    <td><%= product.count %></td>
+                    <td>₹<%= product.revenue.toLocaleString('en-IN') %></td>
+                  </tr>
+                <% }); %>
+              </tbody>
             </table>
           </div>
           <div class="top-list animate-fadeIn delay-3" style="flex: 1 1 300px; min-width: 300px;">
@@ -200,23 +178,15 @@
                 </tr>
               </thead>
               <tbody>
-  <% if (! bestSellingCategories ||  bestSellingCategories.length === 0) { %>
-    <tr>
-      <td colspan="4" class="text-center text-gray-500">No Data Available</td>
-    </tr>
-  <% } else { %>
-    <%  bestSellingCategories.forEach(function(category, index) { %>
-      <tr>
-        <td><%= index + 1 %></td>
-        <td><%= category.name %></td>
-        <td><%= category.count %></td>
-        <td>₹<%= category.revenue.toLocaleString('en-IN') %></td>
-      </tr>
-    <% }); %>
-  <% } %>
-</tbody>
-
-              
+                <% bestSellingCategories.forEach(function(category, index) { %>
+                  <tr>
+                    <td><%= index + 1 %></td>
+                    <td><%= category.name %></td>
+                    <td><%= category.count %></td>
+                    <td>₹<%= category.revenue.toLocaleString('en-IN') %></td>
+                  </tr>
+                <% }); %>
+              </tbody>
             </table>
           </div>
         </div>
@@ -311,15 +281,18 @@
   </style>
 
   <script>
+    // Mobile menu toggle
     document.getElementById('mobileMenuBtn').addEventListener('click', function() {
       document.querySelector('.sidebar').classList.toggle('active');
       document.body.classList.toggle('sidebar-open');
     });
 
+    // Close sidebar when clicking outside (on body)
     document.body.addEventListener('click', function(e) {
       const sidebar = document.querySelector('.sidebar');
       const menuBtn = document.getElementById('mobileMenuBtn');
       if (window.innerWidth <= 991 && sidebar.classList.contains('active')) {
+        // If click is outside sidebar and not on menu button
         if (!sidebar.contains(e.target) && e.target !== menuBtn && !menuBtn.contains(e.target)) {
           sidebar.classList.remove('active');
           document.body.classList.remove('sidebar-open');

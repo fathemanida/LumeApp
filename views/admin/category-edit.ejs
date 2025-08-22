@@ -304,7 +304,7 @@ input[type="datetime-local"] {
     isValid = false;
   }
 
-  return isValid; // ✅ THIS WAS MISSING
+  return isValid; 
 }
 
 
@@ -361,7 +361,6 @@ input[type="datetime-local"] {
           minCropBoxWidth: 200,
           minCropBoxHeight: 200,
           ready: function () {
-            // Ensure the cropper is properly initialized
             this.cropper.setCanvasData({
               width: Math.min(window.innerWidth * 0.8, 800),
               height: Math.min(window.innerHeight * 0.8, 800)
