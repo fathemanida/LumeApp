@@ -61,7 +61,7 @@
                         <label class="filter-label">To:</label>
                         <input type="date" class="filter-date" id="end-date">
                     </div>
-                    <button class="generate-btn" id="generate-report">
+                    <button class="generate-btn" id="generate-report" >
                         <i class="fas fa-chart-line"></i> Generate Report
                     </button>
                     <div class="download-buttons">
@@ -82,15 +82,17 @@
         <div class="summary-title">
             <i class="fas fa-shopping-cart"></i> Total Orders
         </div>
-        
-        <div class="summary-change">
+<div class="summary-value" id="total-orders">
   <% if (salesData && salesData.summary && salesData.summary.totalOrders && salesData.summary.totalOrders.value > 0) { %>
-    <i class="fas fa-arrow-<%= salesData.summary.totalOrders.change >= 0 ? 'up' : 'down' %>"></i>
-    <%= Math.abs(salesData.summary.totalOrders.change).toFixed(1) %>% from last period
+    <%= salesData.summary.totalOrders.value %>
   <% } else { %>
-    <span>No Data</span>
+    No Data
   <% } %>
 </div>
+        <div class="summary-change <%= salesData.summary.totalOrders.change >= 0 ? 'change-up' : 'change-down' %>">
+            <i class="fas fa-arrow-<%= salesData.summary.totalOrders.change >= 0 ? 'up' : 'down' %>"></i>
+            <%= Math.abs(salesData.summary.totalOrders.change).toFixed(1) %>% from last period
+        </div>
         <i class="fas fa-shopping-bag summary-icon"></i>
     </div>
 
@@ -99,13 +101,14 @@
         <div class="summary-title">
             <i class="fas fa-rupee-sign"></i> Total Sales
         </div>
-        <div class="summary-value" id="total-sales">
+<div class="summary-value" id="total-sales">
   <% if (salesData && salesData.summary && salesData.summary.totalSales && salesData.summary.totalSales.value > 0) { %>
     ₹<%= Number(salesData.summary.totalSales.value).toLocaleString('en-IN') %>
   <% } else { %>
     No Data
   <% } %>
 </div>
+
         <div class="summary-change <%= salesData.summary.totalSales.change >= 0 ? 'change-up' : 'change-down' %>">
             <i class="fas fa-arrow-<%= salesData.summary.totalSales.change >= 0 ? 'up' : 'down' %>"></i>
             <%= Math.abs(salesData.summary.totalSales.change).toFixed(1) %>% from last period
@@ -118,7 +121,7 @@
         <div class="summary-title">
             <i class="fas fa-tag"></i> Discounts Applied
         </div>
-        <div class="summary-value" id="total-discounts">
+<div class="summary-value" id="total-discounts">
   <% if (salesData && salesData.summary && salesData.summary.totalDiscounts && salesData.summary.totalDiscounts.value > 0) { %>
     ₹<%= Number(salesData.summary.totalDiscounts.value).toLocaleString('en-IN') %>
   <% } else { %>
@@ -138,7 +141,7 @@
         <div class="summary-title">
             <i class="fas fa-ticket-alt"></i> Coupons Used
         </div>
-        <div class="summary-value" id="total-coupons">
+<div class="summary-value" id="total-coupons">
   <% if (salesData && salesData.summary && salesData.summary.totalCoupons && salesData.summary.totalCoupons.value > 0) { %>
     <%= salesData.summary.totalCoupons.value %>
   <% } else { %>
