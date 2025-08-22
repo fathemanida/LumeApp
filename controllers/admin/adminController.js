@@ -392,13 +392,12 @@ const downloadReport = async (req, res) => {
     const orders = await Order.find(dateQuery)
       .populate('userId', 'name')
       .sort({ createdOn: 1 });
-      if (!orders || orders.length === 0) {
  if (!orders || orders.length === 0) {
   if (format === 'excel') {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Sales Report');
 
-    worksheet.addRow(['LUME Sales Report']);
+    worksheet.addRow(['LEMO Sales Report']);
     worksheet.addRow([]);
     worksheet.addRow(['⚠️ No data available for the selected period.']);
 
@@ -430,7 +429,7 @@ const downloadReport = async (req, res) => {
     doc.fontSize(12).fillColor('#dac6a4').text(`Period: ${period}`, { align: 'center', y: 70 });
 
     doc.moveDown(4);
-    doc.fontSize(22).fillColor('#e74c3c').text(' No data available for the selected period', {
+    doc.fontSize(22).fillColor('#e74c3c').text('⚠️ No data available for the selected period', {
       align: 'center'
     });
 
