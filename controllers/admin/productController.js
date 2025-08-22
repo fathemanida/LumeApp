@@ -80,7 +80,19 @@ const productInfo = async (req, res) => {
           startDate: { $lte: new Date() },
           endDate: { $gte: new Date() }
         }
-      });
+      })
+        .populate({
+    path: "category",
+    select: "name",
+    populate: {
+      path: "offer",
+      match: {
+        isActive: true,
+        startDate: { $lte: new Date() },
+        endDate: { $gte: new Date() }
+      }
+    }
+  });
 
     const totalProducts = await Product.countDocuments(searchQuery);
     const totalPages = Math.ceil(totalProducts / limit);
@@ -98,6 +110,7 @@ const productInfo = async (req, res) => {
         offset
       });
     }
+    console.log('-----product data',productData,'-----');
 
     res.render("product", {
       cat: categories || [],

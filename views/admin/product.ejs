@@ -102,14 +102,21 @@
                   <% } %>
                 </td>
                 <td>
-                  <% if (data[i] && data[i].productOffer && data[i].productOffer.active) { %>
-                    <span class="badge badge-success">Active</span>
-                  <% } else if (data[i] && data[i].offer && data[i].offer.isActive) { %>
-                    <span class="badge badge-success">Active</span>
-                  <% } else { %>
-                    <span class="badge badge-secondary">Inactive</span>
-                  <% } %>
+                <% if (product.offer) { %>
+                  <span class="badge badge-success">
+                     Product Offer: <%= product.offer.discountValue %>
+                     <%= product.offer.discountType === "percentage" ? "%" : "₹" %> OFF
+                  </span>
+               <% } else if (product.category && product.category.offer) { %>
+                 <span class="badge badge-info">
+                     Category Offer: <%= product.category.offer.discountValue %>
+                     <%= product.category.offer.discountType === "percentage" ? "%" : "₹" %> OFF
+                 </span>
+                <% } else { %>
+                <span class="badge badge-secondary">No Offer</span>
+                <% } %>   
                 </td>
+
                 <td>
                   <% if (data[i] && data[i].productOffer && data[i].productOffer.active) { %>
                     <% if (data[i].productOffer.discountType === 'percentage') { %>
