@@ -466,6 +466,7 @@ const updateQuantity = async (req, res) => {
         message: "Invalid action",
       });
     }
+    let totalOfferDiscount=0
 
     const basePrice =
       product.salePrice && product.salePrice < product.regularPrice
@@ -508,6 +509,8 @@ const updateQuantity = async (req, res) => {
         }
       }
     }
+
+
 
     const effectivePrice = Math.max(basePrice - offerDiscount, 0);
     cartItem.quantity = newQuantity;
@@ -572,10 +575,13 @@ const updateQuantity = async (req, res) => {
 
       const itemEffectivePrice = Math.max(itemBasePrice - itemOfferDiscount, 0);
       return total + itemEffectivePrice * item.quantity;
+        totalOfferDiscount += itemOfferDiscount * item.quantity;
+
     }, 0);
     let totalCouponDiscount=0
     let couponApplied = cart.couponApplied;
     let appliedCouponDetails = null;
+    
 
     if (couponApplied) {
       const coupon = await Coupon.findOne({
@@ -952,6 +958,8 @@ const applyCoupon = async (req, res) => {
     if(couponDiscount>coupon.maxDiscount){
       couponDiscount=coupon.maxDiscount
     }
+
+    console.log('coupondiscc-----------maxdiscount',couponDiscount,coupon.maxDiscount);
 
     const couponPerUnit = totalQuantity > 0 ? couponDiscount / totalQuantity : 0;
 
