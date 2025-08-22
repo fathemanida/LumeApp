@@ -393,11 +393,18 @@ const downloadReport = async (req, res) => {
       .populate('userId', 'name')
       .sort({ createdOn: 1 });
       if (!orders || orders.length === 0) {
+ if (!orders || orders.length === 0) {
   if (format === 'excel') {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Sales Report');
 
-    worksheet.addRow(['No data available for the selected period.']);
+    worksheet.addRow(['LUME Sales Report']);
+    worksheet.addRow([]);
+    worksheet.addRow(['⚠️ No data available for the selected period.']);
+
+    worksheet.getRow(1).font = { bold: true, size: 16 };
+    worksheet.getRow(1).alignment = { horizontal: 'center' };
+    worksheet.mergeCells('A1:C1');
 
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Disposition', 'attachment; filename=sales-report.xlsx');
@@ -415,7 +422,21 @@ const downloadReport = async (req, res) => {
     res.setHeader('Content-Disposition', 'attachment; filename=sales-report.pdf');
 
     doc.pipe(res);
-    doc.fontSize(20).fillColor('#e74c3c').text('No data available for the selected period', { align: 'center' });
+
+    doc.rect(0, 0, doc.page.width, 100).fill('#2d2d2d');
+
+    doc.fontSize(28).fillColor('#c5a267').text('LEMO', { align: 'left', x: 40, y: 40 });
+    doc.fontSize(24).fillColor('#ffffff').text('Sales Report', { align: 'center', y: 40 });
+    doc.fontSize(12).fillColor('#dac6a4').text(`Period: ${period}`, { align: 'center', y: 70 });
+
+    doc.moveDown(4);
+    doc.fontSize(22).fillColor('#e74c3c').text(' No data available for the selected period', {
+      align: 'center'
+    });
+
+    const footerText = `Generated on ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`;
+    doc.fontSize(10).fillColor('#b3b3b3').text(footerText, { align: 'center', y: doc.page.height - 50 });
+
     doc.end();
     return;
   }
