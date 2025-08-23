@@ -327,7 +327,7 @@ const createOrder = async (req, res) => {
         if (
           product.offer?.isActive &&
           (!product.offer.startDate || new Date(product.offer.startDate) <= now) &&
-          (!product.offer.expiryDate || new Date(product.offer.expiryDate) >= now)
+          (!product.offer.endDate || new Date(product.offer.endDate) >= now)
         ) {
           productOfferDiscount = product.offer.discountType === 'percentage'
             ? (originalPrice * product.offer.discountValue) / 100
