@@ -340,7 +340,7 @@ const createOrder = async (req, res) => {
         if (
           product.category?.categoryOffer?.active &&
           (!product.category.categoryOffer.startDate || new Date(product.category.categoryOffer.startDate) <= now) &&
-          (!product.category.categoryOffer.expiryDate || new Date(product.category.categoryOffer.expiryDate) >= now)
+          (!product.category.categoryOffer.endDate || new Date(product.category.categoryOffer.endDate) >= now)
         ) {
           categoryOfferDiscount = product.category.categoryOffer.discountType === 'percentage'
             ? (originalPrice * product.category.categoryOffer.discountValue) / 100

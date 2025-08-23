@@ -237,6 +237,10 @@ const cart = async (req, res) => {
         }
       })
       .populate('couponApplied');
+       const breadcrumbs = [
+      { label: "Collections", url: "/shopAll" },
+      {label:"Cart",url:'/cart'}
+    ];
 
     if (!cart || cart.items.length === 0) {
       return res.render("cart", {
@@ -250,6 +254,7 @@ const cart = async (req, res) => {
         coupons: [],
         couponApplied: null,
         discount: 0,
+        breadcrumbs
       });
     }
 
@@ -347,10 +352,7 @@ const cart = async (req, res) => {
     console.log('==couponApplied at cart',couponApplied);
 
 
-     const breadcrumbs = [
-      { label: "Collections", url: "/shopAll" },
-      {label:"Cart",url:'/cart'}
-    ];
+   
     res.render("cart", {
       user,
       items: cart.items,
@@ -645,6 +647,11 @@ const getCheckout = async (req, res) => {
     }).select(
       "code discountType discountValue maxDiscount minOrderAmount expiryDate usedBy"
     );
+     const breadcrumbs = [
+      { label: "Collections", url: "/shopAll" },
+      {label:"Cart",url:'/cart'},
+      {label:"Checkout" , url:'/checkout'}
+    ];
 
     const offers = await Offer.find({
       isActive: true,
@@ -666,6 +673,7 @@ const getCheckout = async (req, res) => {
         couponApplied: null,
         coupons: [],
         offerExpiryTime: null,
+        breadcrumbs
       });
     }
 
@@ -751,11 +759,7 @@ const getCheckout = async (req, res) => {
       console.log('===couponapplied at checkout',cart.couponApplied);
   
 
-      const breadcrumbs = [
-      { label: "Collections", url: "/shopAll" },
-      {label:"Cart",url:'/cart'},
-      {label:"Checkout",url:"/checkout"}
-    ];
+    
     res.render("checkout", {
       user: req.session.user,
       items: cart.items,
