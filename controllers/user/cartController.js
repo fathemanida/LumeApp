@@ -309,7 +309,7 @@ const cart = async (req, res) => {
         } else {
           totalCouponDiscount = coupon.discountValue;
         }
-
+  console.log('maxdis,totalcoupo-------',couponApplied.maxDiscount,totalCouponDiscount);
 
         appliedCouponDetails = coupon;
         couponApplied=coupon
@@ -317,7 +317,6 @@ const cart = async (req, res) => {
         cart.couponApplied = null;
       }
     }
-    console.log('totalcoupondiss,maxdis----',totalCouponDiscount,couponApplied.maxDiscount);
     if(totalCouponDiscount>couponApplied.maxDiscount){
       totalCouponDiscount=couponApplied.maxDiscount
     }
@@ -497,7 +496,7 @@ const updateQuantity = async (req, res) => {
         isActive: true,
         createdAt: { $lte: new Date() },
       expiryDate: { $gte: new Date() },
-        minPurchase: { $lte: totalPrice - totalOfferDiscount },
+        minPurchase: { $lte: totalPrice - totalPrice },
       }).lean();
 
       if (coupon) {
