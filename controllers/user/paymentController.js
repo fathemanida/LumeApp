@@ -73,7 +73,7 @@ const paymentMethod = async (req, res) => {
         couponApplied: order.couponApplied,
         
       };
-      console.log('offerdis////////////////////////////////////////////',cart.offerDiscount);
+      console.log('offerdis////////////////////////////////////////////',cartData.offerDiscount);
 
        const breadcrumbs = [
      
