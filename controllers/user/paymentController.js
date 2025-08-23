@@ -61,7 +61,7 @@ const paymentMethod = async (req, res) => {
         finalPrice: item.finalPrice,
         offerDiscount: item.offerDiscount || 0
       }));
-console.log('===order',items);
+      console.log('===order',items);
       const cartData = {
         items,
         subtotal: order.subtotal,
@@ -132,8 +132,8 @@ console.log('====cart data',cartData);
       const originalPrice = basePrice * quantity;
       subtotal += originalPrice;
 
-      const { maxDiscount: offerDiscount } = getBestOffer(product, activeOffers, quantity);
-      totalOfferDiscount += offerDiscount;
+      const { maxDiscount, bestOffer } = getBestOffer(product, activeOffers, quantity);
+      totalOfferDiscount += maxDiscount;
 
       items.push({
         productId: product._id,
