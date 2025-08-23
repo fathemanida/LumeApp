@@ -317,7 +317,7 @@ const cart = async (req, res) => {
         cart.couponApplied = null;
       }
     }
-    console.log('totalcoupondiss,maxdis----',totalCouponDiscount.coupon.maxDiscount);
+    console.log('totalcoupondiss,maxdis----',totalCouponDiscount,coupon.maxDiscount);
     if(totalCouponDiscount>couponApplied.maxDiscount){
       totalCouponDiscount=couponApplied.maxDiscount
     }
