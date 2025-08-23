@@ -299,13 +299,13 @@ const cart = async (req, res) => {
         createdAt: { $lte: new Date() },
         expiryDate: { $gte: new Date()},
       }).lean();
-
+     const total=totalPrice-totalOfferDiscount;
       console.log('------------coupon,cpuponApplied,totaloffer',coupon,couponApplied,totalOfferDiscount);
 
       if (coupon) {
         if (coupon.discountType === "PERCENTAGE") {
           totalCouponDiscount =
-            (totalOfferDiscount * coupon.discountValue) / 100;
+            (total * coupon.discountValue) / 100;
         } else {
           totalCouponDiscount = coupon.discountValue;
         }
