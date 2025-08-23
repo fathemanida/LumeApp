@@ -473,6 +473,7 @@ const handleOrderItemReturn = async (req, res) => {
                         product.quantity = (parseInt(product.quantity) || 0) + parseInt(item.quantity);
                         if (product.quantity > 0 && product.status === 'Out of Stock') {
                             product.status = 'Available';
+                            console.log('status changed');
                         }
                         await product.save();
                     }
