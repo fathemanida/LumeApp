@@ -153,9 +153,10 @@ const paymentMethod = async (req, res) => {
 
     let couponDiscount = 0;
     if (cart.couponApplied) {
+      console.log('coupon applied==================+++++++++');
       const coupon = await Coupon.findById(cart.couponApplied._id);
       const isUsed = user.usedCoupons?.some(c => c.code === coupon.code);
-      if (coupon && coupon.isActive && coupon.expiry > now && !isUsed) {
+      if (coupon && coupon.isActive && coupon.expiryDate > now && !isUsed) {
         const discountableAmount = subtotal - totalOfferDiscount;
         if (coupon.discountType === 'PERCENTAGE') {
           couponDiscount = (discountableAmount * coupon.discountValue) / 100;
