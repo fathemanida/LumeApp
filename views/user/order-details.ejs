@@ -542,7 +542,7 @@
                     <div class="summary-totals mt-4">
                         <div class="total-row">
                             <span>Subtotal:</span>
-                            <span>₹<%= order.totalAmount ? order.totalAmount.toFixed(2) : '0.00' %></span>
+                            <span>₹<%= order.subtotal ? order.subtotal.toFixed(2) : '0.00' %></span>
                         </div>
                             <% if (order.offerDiscount && order.offerDiscount> 0) { %>
                             <div class="total-row">
