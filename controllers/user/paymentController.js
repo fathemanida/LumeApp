@@ -146,7 +146,7 @@ console.log('====cart data',cartData);
         quantity,
         total: basePrice * quantity,
         image: product.images?.[0] || '/images/default-product.png',
-        offerDiscount
+        totalOfferDiscount
       });
     }
 
