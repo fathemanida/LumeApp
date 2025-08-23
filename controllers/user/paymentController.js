@@ -309,8 +309,8 @@ const createOrder = async (req, res) => {
       }
   const offers = await Offer.find({
       isActive: true,
-      startDate: { $lte: now },
-      endDate: { $gte: now },
+      startDate: { $lte: new Date() },
+      endDate: { $gte: new Date()},
       applicableOn: { $in: ["all", "categories", "products"] },
     });
       const now = new Date();
