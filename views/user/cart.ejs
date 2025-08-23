@@ -1244,30 +1244,69 @@
           }
         }
 
-        async function applyCouponCode(code) {
-          try {
-            const response = await fetch('/apply-coupon', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ code })
-            });
-            const data = await response.json();
-            if (data.success) {
-              showNotification(data.message, 'success');
-              document.getElementById('subtotal').textContent = `₹${data.totals.subtotal.toLocaleString()}`;
-              document.getElementById('shipping').textContent = data.totals.shipping === 0 ? 'Free' : `₹${data.totals.shipping.toLocaleString()}`;
-              document.getElementById('finalPrice').textContent = `₹${data.totals.finalPrice.toLocaleString()}`;
-              updateSummaryDiscounts(data.totals.offerDiscount, data.totals.couponDiscount);
-              let couponSection = document.querySelector('.applied-coupon');
-              if (!couponSection) {
-                couponSection = document.createElement('div');
-                couponSection.className = 'applied-coupon';
-                document.querySelector('.coupon-input-group').after(couponSection);
-              }
-              const discountText = data.coupon.discountType === 'percentage'
-                ? `${data.coupon.discountValue}% off`
-                : `₹${data.coupon.discountValue} off`;
-              couponSection.innerHTML = `
+            async function applyCouponCode(code) {
+            try {
+                const response = await fetch('/apply-coupon', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ code })
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error(`Apply Coupon Failed - Status: ${response.status}, Response: ${errorText}`);
+                    let errorMessage = `Failed to apply coupon (Status: ${response.status})`;
+                    if (response.status === 401) {
+                        errorMessage = 'Please log in to apply coupon';
+                    } else if (response.status === 400) {
+                        try {
+                            const errorData = JSON.parse(errorText);
+                            errorMessage = errorData.message || 'Invalid coupon code';
+                        } catch (e) {
+                            errorMessage = 'Invalid request';
+                        }
+                    } else if (response.status === 500) {
+                        errorMessage = 'Server error occurred';
+                    }
+                    showNotification(errorMessage, 'error');
+                    return;
+                }
+
+                let data;
+                console.log(data,'daaaaaaata');
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    console.error('Error parsing JSON response:', e);
+                    showNotification('Invalid server response format', 'error');
+                    return;
+                }
+
+                if (!data || typeof data !== 'object') {
+                    console.error('Invalid response structure:', data);
+                    showNotification('Unexpected server response', 'error');
+                    return;
+                }
+
+                if (data.success) {
+                    showNotification(data.message || 'Successfully applied', 'success');
+                    document.getElementById('subtotal').textContent = `₹${data.totals.subtotal.toLocaleString()}`;
+                    document.getElementById('shipping').textContent = data.totals.shipping === 0 ? 'Free' : `₹${data.totals.shipping.toLocaleString()}`;
+                    document.getElementById('finalPrice').textContent = `₹${data.totals.finalPrice.toLocaleString()}`;
+                    updateSummaryDiscounts(data.totals.offerDiscount, data.totals.couponDiscount);
+                    let couponSection = document.querySelector('.applied-coupon');
+                    if (!couponSection) {
+                        couponSection = document.createElement('div');
+                        couponSection.className = 'applied-coupon';
+                        document.querySelector('.coupon-input-group').after(couponSection);
+                    }
+                    const discountText = data.coupon.discountType === 'percentage' 
+                        ? `${data.coupon.discountValue}% off` 
+                        : `₹${data.coupon.discountValue.toLocaleString()} off`;
+                    couponSection.innerHTML = `
                         <div class="d-flex align-items-center justify-content-between">
                             <div class="d-flex align-items-center gap-2">
                                 <span class="text-success">Coupon Applied:</span>
@@ -1282,46 +1321,51 @@
                             You saved: ₹${data.totals.couponDiscount.toLocaleString()}
                         </div>
                     `;
-              document.getElementById('couponCode').value = '';
-              document.getElementById('couponCode').disabled = true;
-              document.querySelector('.apply-coupon-btn').disabled = true;
-              const couponItems = document.querySelectorAll('.coupon-item');
-              couponItems.forEach(item => {
-                const codeText = item.querySelector('.coupon-code').textContent.trim().split(' ')[0];
-                if (codeText === data.coupon.code) {
-                  item.classList.add('applied');
-                  item.onclick = null;
-                }
-              });
-              data.items.forEach(item => {
-                const cartItem = document.querySelector(`.cart-item[data-id="${item._id}"]`);
-                if (cartItem) {
-                  const priceElement = cartItem.querySelector('.product-price');
-                  if (priceElement) {
-                    priceElement.innerHTML = item.offerDiscount || item.couponDiscount
-                      ? `<span class="text-decoration-line-through text-muted">₹${(item.originalPrice * item.quantity).toLocaleString()}</span> <span class="text-success ms-2">₹${item.totalPrice.toLocaleString()}</span>`
-                      : `₹${item.totalPrice.toLocaleString()}`;
-                  }
-                  const discountBadge = cartItem.querySelector('.discount-badge');
-                  if (discountBadge) {
-                    let badgeHTML = '';
-                    if (item.offerDiscount > 0) {
-                      badgeHTML += `<span class="badge bg-success me-2">${item.appliedOffer === 'product' ? 'Product Offer' : 'Category Offer'}: -₹${item.offerDiscount.toLocaleString()}</span>`;
+                    document.getElementById('couponCode').value = '';
+                    document.getElementById('couponCode').disabled = true;
+                    document.querySelector('.apply-coupon-btn').disabled = true;
+                    const couponItems = document.querySelectorAll('.coupon-item');
+                    couponItems.forEach(item => {
+                        const codeText = item.querySelector('.coupon-code').textContent.trim().split(' ')[0];
+                        if (codeText === data.coupon.code) {
+                            item.classList.add('applied');
+                            item.onclick = null;
+                        }
+                    });
+                    if (Array.isArray(data.items)) {
+                        data.items.forEach(item => {
+                            const orderItem = document.querySelector(`.order-item[data-id="${item._id}"]`) || document.createElement('div');
+                            orderItem.setAttribute('data-id', item._id);
+                            const priceElement = orderItem.querySelector('.order-item-price');
+                            if (priceElement) {
+                                priceElement.innerHTML = item.offerDiscount || item.couponDiscount
+                                    ? `<span class="text-decoration-line-through text-muted">₹${(item.originalPrice * item.quantity).toLocaleString()}</span> <span class="text-success ms-2">₹${item.totalPrice.toLocaleString()}</span>`
+                                    : `₹${item.totalPrice.toLocaleString()}`;
+                            }
+                            const discountBadge = orderItem.querySelector('.discount-badge');
+                            if (discountBadge) {
+                                let badgeHTML = '';
+                                if (item.offerDiscount > 0) {
+                                    badgeHTML += `<span class="badge bg-success me-2">Offer: -₹${item.offerDiscount.toLocaleString()}</span>`;
+                                }
+                                if (item.couponDiscount > 0) {
+                                    badgeHTML += `<span class="badge bg-primary">Coupon: -₹${item.couponDiscount.toLocaleString()}</span>`;
+                                }
+                                discountBadge.innerHTML = badgeHTML;
+                            }
+                        });
+                    } else {
+                        console.warn('No items array in response:', data);
                     }
-                    if (item.couponDiscount > 0) {
-                      badgeHTML += `<span class="badge bg-primary">Coupon: -₹${item.couponDiscount.toLocaleString()}</span>`;
-                    }
-                    discountBadge.innerHTML = badgeHTML;
-                  }
+                    location.reload();
+                } else {
+                    console.warn('Coupon application failed:', data.message);
+                    showNotification(data.message || 'Failed to apply coupon', 'error');
                 }
-              });
-              location.reload();
-            } else {
-              showNotification(data.message, 'error');
+            } catch (error) {
+                console.error('Error in applyCouponCode:', error);
+                showNotification(`Error applying coupon: ${error.message || 'Unknown error'}`, 'error');
             }
-          } catch (error) {
-            console.log('Error occurred while applying coupon', error);
-          }
         }
 
 
