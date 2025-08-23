@@ -269,33 +269,11 @@ const cart = async (req, res) => {
       const quantity = item.quantity;
       const unitPrice = product.salePrice;
 
-      const matchedOffers = offers.filter((offer) => {
-        if (offer.applicableOn === "all") return true;
-        if (
-          offer.applicableOn === "categories" &&
-          offer.categories.some(
-            (cat) => cat.toString() === product.category._id.toString()
-          )
-        ) return true;
-        if (
-          offer.applicableOn === "products" &&
-          offer.products.some(
-            (prod) => prod.toString() === product._id.toString()
-          )
-        ) return true;
-        return false;
-      });
+      const {maxDiscount,bestoffer}=getBestOffer(offers,product,quantity)
+      console.log('----maxdis,bestOfffer',bestoffer);
 
-      let bestDiscountPerItem = 0;
-      matchedOffers.forEach((offer) => {
-        let discount = 0;
-        if (offer.discountType === "percentage") {
-          discount = (unitPrice * offer.discountValue) / 100;
-        } else {
-          discount = offer.discountValue;
-        }
-        if (discount > bestDiscountPerItem) bestDiscountPerItem = discount;
-      });
+      let bestDiscountPerItem = maxDiscount
+      
 
       const discountedPrice = unitPrice - bestDiscountPerItem;
       const itemTotal = discountedPrice * quantity;
@@ -466,7 +444,6 @@ const updateQuantity = async (req, res) => {
         message: "Invalid action",
       });
     }
-    let totalOfferDiscount=0
 
     const basePrice =
       product.salePrice && product.salePrice < product.regularPrice
@@ -509,8 +486,6 @@ const updateQuantity = async (req, res) => {
         }
       }
     }
-
-
 
     const effectivePrice = Math.max(basePrice - offerDiscount, 0);
     cartItem.quantity = newQuantity;
@@ -575,13 +550,10 @@ const updateQuantity = async (req, res) => {
 
       const itemEffectivePrice = Math.max(itemBasePrice - itemOfferDiscount, 0);
       return total + itemEffectivePrice * item.quantity;
-        totalOfferDiscount += itemOfferDiscount * item.quantity;
-
     }, 0);
     let totalCouponDiscount=0
     let couponApplied = cart.couponApplied;
     let appliedCouponDetails = null;
-    
 
     if (couponApplied) {
       const coupon = await Coupon.findOne({
