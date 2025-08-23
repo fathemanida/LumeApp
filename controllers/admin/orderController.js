@@ -471,7 +471,7 @@ const handleOrderItemReturn = async (req, res) => {
                         console.log('product stock count updating');
                         console.log('producy.quantity--------',product.quantity,'items.quantiy',item.quantity);
                         product.quantity = (parseInt(product.quantity) || 0) + parseInt(item.quantity);
-                        if (product.quantity > 0 && product.status === 'Out of Stock') {
+                        if (product.quantity > 0 ) {
                             product.status = 'Available';
                             console.log('status changed');
                         }
