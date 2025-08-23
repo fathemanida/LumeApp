@@ -1026,9 +1026,10 @@
                                 </div>
                                 <div class="coupon-details">
                                   <span class="coupon-discount">
-                                    <%= coupon.discountType==='PERCENTAGE' ? `${coupon.discountValue}% OFF` :
-                                      `₹${coupon.discountValue} OFF` %>
-                                  </span>
+                                                <%= coupon.discountType === 'percentage' ? 
+                                                    `${coupon.discountValue}% OFF` : 
+                                                    `₹${coupon.discountValue} OFF` %>
+                                            </span>
                                   <% if (coupon.maxDiscount) { %>
                                     <span class="coupon-min-order">
                                       (Max discount: ₹<%= coupon.maxDiscount.toLocaleString() %>)
