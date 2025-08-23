@@ -59,7 +59,8 @@ const paymentMethod = async (req, res) => {
         originalPrice: item.originalPrice,
         quantity: item.quantity,
         finalPrice: item.finalPrice,
-        offerDiscount: item.offerDiscount || 0
+        offerDiscount: item.offerDiscount || 0,
+        couponDiscount:item.couponDiscount || 0
       }));
       console.log('===order',items);
       const cartData = {
@@ -81,7 +82,7 @@ const paymentMethod = async (req, res) => {
       { label: 'Checkout' ,url: "/checkout"},
       { label: `Payment`, url: `/checkout/payment` }
     ];
-console.log('====cart data',cartData);
+    console.log('====cart data',cartData);
       return res.render('payment', {
         user,
         cart: cartData,
@@ -171,6 +172,8 @@ console.log('====cart data',cartData);
         couponDiscount=cart.couponApplied.maxDiscount;
       }
     }
+
+    console.log('coupon dis]]]]]]]]]]]]]]]]]]]]]]]]]]]]]',couponDiscount);
 
     const shipping = subtotal >= 1500 ? 0 : 40;
     const totalDiscount = totalOfferDiscount + couponDiscount;
