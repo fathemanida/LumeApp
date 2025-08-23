@@ -938,13 +938,13 @@
                 <span id="subtotal">₹<%= totalPrice.toLocaleString() %></span>
               </div>
               <% if (totalOfferDiscount> 0) { %>
-                <div class="summary-row">
+                <div  class="summary-row text-success" id="offer-discount-row" style="display: <%= totalOfferDiscount > 0 ? 'flex' : 'none' %>;">
                   <span>Offer Discount</span>
                   <span class="text-success">-₹<%= totalOfferDiscount.toLocaleString() %></span>
                 </div>
                 <% } %>
                   <% if (totalCouponDiscount> 0) { %>
-                    <div class="summary-row">
+                        <div class="summary-row text-success" id="coupon-discount-row" style="display: <%= totalCouponDiscount > 0 ? 'flex' : 'none' %>;">
                       <span>Coupon Discount</span>
                       <span class="text-success">-₹<%= totalCouponDiscount.toLocaleString() %></span>
                     </div>
@@ -1227,7 +1227,7 @@
           }
         }
 
-        function updateSummaryDiscounts(offerDiscount, couponDiscount) {
+      function updateSummaryDiscounts(offerDiscount, couponDiscount) {
           const offerDiscountRow = document.getElementById('offer-discount-row');
           const couponDiscountRow = document.getElementById('coupon-discount-row');
           if (offerDiscount > 0) {
