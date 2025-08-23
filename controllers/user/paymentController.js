@@ -307,11 +307,12 @@ const createOrder = async (req, res) => {
       if (!cart || !cart.items?.length) {
         return res.status(400).json({ success: false, message: 'Your cart is empty' });
       }
-   const offer=await Offer({
-    isActive:true,
-    startDate:{$lte:new Date()},
-    endDate:{$gte:new Date()}
-   })
+  const offers = await Offer.find({
+      isActive: true,
+      startDate: { $lte: now },
+      endDate: { $gte: now },
+      applicableOn: { $in: ["all", "categories", "products"] },
+    });
       const now = new Date();
       let totalPrice = 0;
       let totalOfferDiscount = 0;
@@ -326,7 +327,7 @@ const createOrder = async (req, res) => {
           : product.regularPrice;
 
         const originalPrice = basePrice * quantity;
-        const {maxDiscount,bestOffer}=getBestOffer(product,offer,quantity)
+        const {maxDiscount,bestOffer}=getBestOffer(product,offers,quantity)
         console.log('maxdiscount,bestoffer',bestOffer,maxDiscount);
         const offerDiscount =maxDiscount;
         const finalPrice = originalPrice - offerDiscount;
