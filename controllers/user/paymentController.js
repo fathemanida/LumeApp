@@ -307,7 +307,11 @@ const createOrder = async (req, res) => {
       if (!cart || !cart.items?.length) {
         return res.status(400).json({ success: false, message: 'Your cart is empty' });
       }
-
+   const offer=await Offer({
+    isActive:true,
+    startDate:{$lte:new Date()},
+    endDate:{$gte:new Date()}
+   })
       const now = new Date();
       let totalPrice = 0;
       let totalOfferDiscount = 0;
@@ -322,32 +326,9 @@ const createOrder = async (req, res) => {
           : product.regularPrice;
 
         const originalPrice = basePrice * quantity;
-
-        let productOfferDiscount = 0;
-        if (
-          product.offer?.isActive &&
-          (!product.offer.startDate || new Date(product.offer.startDate) <= now) &&
-          (!product.offer.endDate || new Date(product.offer.endDate) >= now)
-        ) {
-          productOfferDiscount = product.offer.discountType === 'percentage'
-            ? (originalPrice * product.offer.discountValue) / 100
-            : product.offer.discountValue * quantity;
-        }
-
-        console.log('===create order offer',productOfferDiscount);
-
-        let categoryOfferDiscount = 0;
-        if (
-          product.category?.categoryOffer?.active &&
-          (!product.category.categoryOffer.startDate || new Date(product.category.categoryOffer.startDate) <= now) &&
-          (!product.category.categoryOffer.endDate || new Date(product.category.categoryOffer.endDate) >= now)
-        ) {
-          categoryOfferDiscount = product.category.categoryOffer.discountType === 'percentage'
-            ? (originalPrice * product.category.categoryOffer.discountValue) / 100
-            : product.category.categoryOffer.discountValue * quantity;
-        }
-
-        const offerDiscount = Math.max(productOfferDiscount, categoryOfferDiscount);
+        const {maxDiscount,bestOffer}=getBestOffer(product,offer,quantity)
+        console.log('maxdiscount,bestoffer',bestOffer,maxDiscount);
+        const offerDiscount =maxDiscount;
         const finalPrice = originalPrice - offerDiscount;
 
         console.log('--offerdis-----finalPrice',offerDiscount,finalPrice);
