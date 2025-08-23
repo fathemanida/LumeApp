@@ -303,21 +303,22 @@ const cart = async (req, res) => {
       console.log('------------coupon,cpuponApplied',coupon,couponApplied);
 
       if (coupon) {
-        console.log('ifone----------------------');
         if (coupon.discountType === "PERCENTAGE") {
-          console.log('iftwo worked------');
           totalCouponDiscount =
             ((totalPrice - totalOfferDiscount) * coupon.discountValue) / 100;
         } else {
           totalCouponDiscount = coupon.discountValue;
         }
 
+
         appliedCouponDetails = coupon;
         couponApplied=coupon
       } else {
         cart.couponApplied = null;
-        console.log('else worked----------');
       }
+    }
+    if(totalCouponDiscount>couponApplied.maxDiscount){
+      totalCouponDiscount=couponApplied.maxDiscount
     }
 
     const shipping = totalPrice - totalOfferDiscount - totalCouponDiscount >= 1000 ? 0 : 40;
@@ -394,6 +395,14 @@ const updateQuantity = async (req, res) => {
       });
     }
 
+    const offer=await Offer.find({
+      isActive: true,
+      startDate: { $lte: now },
+      endDate: { $gte: now },
+      applicableOn: { $in: ["all", "categories", "products"] },
+    }).lean();
+    
+
     const cartItem = cart.items.find((item) => item._id.toString() === itemId);
     if (!cartItem) {
       return res.status(404).json({
@@ -449,45 +458,11 @@ const updateQuantity = async (req, res) => {
       product.salePrice && product.salePrice < product.regularPrice
         ? product.salePrice
         : product.regularPrice;
-    let offerDiscount = 0;
-    let largestDiscount = 0;
+    
 
-    if (product.offer && product.offer.isActive) {
-      if (product.offer.discountType === "percentage") {
-        const discount = (basePrice * product.offer.discountValue) / 100;
-        if (discount > largestDiscount) {
-          largestDiscount = discount;
-          offerDiscount = discount;
-        }
-      } else {
-        if (product.offer.discountValue > largestDiscount) {
-          largestDiscount = product.offer.discountValue;
-          offerDiscount = product.offer.discountValue;
-        }
-      }
-    }
+    const {maxDiscount,bestoffer}=getBestOffer(product,offer,newQuantity)
 
-    if (
-      product.category &&
-      product.category.categoryOffer &&
-      product.category.categoryOffer.isActive
-    ) {
-      if (product.category.categoryOffer.discountType === "percentage") {
-        const discount =
-          (basePrice * product.category.categoryOffer.discountValue) / 100;
-        if (discount > largestDiscount) {
-          largestDiscount = discount;
-          offerDiscount = discount;
-        }
-      } else {
-        if (product.category.categoryOffer.discountValue > largestDiscount) {
-          largestDiscount = product.category.categoryOffer.discountValue;
-          offerDiscount = product.category.categoryOffer.discountValue;
-        }
-      }
-    }
-
-    const effectivePrice = Math.max(basePrice - offerDiscount, 0);
+    const effectivePrice = Math.max(basePrice - maxDiscount, 0);
     cartItem.quantity = newQuantity;
     cartItem.price = effectivePrice;
     cartItem.totalPrice = newQuantity * effectivePrice;
@@ -503,52 +478,12 @@ const updateQuantity = async (req, res) => {
       let itemOfferDiscount = 0;
       let itemLargestDiscount = 0;
 
-      if (item.productId.offer && item.productId.offer.isActive) {
-        if (item.productId.offer.discountType === "percentage") {
-          const discount =
-            (itemBasePrice * item.productId.offer.discountValue) / 100;
-          if (discount > itemLargestDiscount) {
-            itemLargestDiscount = discount;
-            itemOfferDiscount = discount;
-          }
-        } else {
-          if (item.productId.offer.discountValue > itemLargestDiscount) {
-            itemLargestDiscount = item.productId.offer.discountValue;
-            itemOfferDiscount = item.productId.offer.discountValue;
-          }
-        }
-      }
+      
 
-      if (
-        item.productId.category &&
-        item.productId.category.categoryOffer &&
-        item.productId.category.categoryOffer.isActive
-      ) {
-        if (
-          item.productId.category.categoryOffer.discountType === "percentage"
-        ) {
-          const discount =
-            (itemBasePrice *
-              item.productId.category.categoryOffer.discountValue) /
-            100;
-          if (discount > itemLargestDiscount) {
-            itemLargestDiscount = discount;
-            itemOfferDiscount = discount;
-          }
-        } else {
-          if (
-            item.productId.category.categoryOffer.discountValue >
-            itemLargestDiscount
-          ) {
-            itemLargestDiscount =
-              item.productId.category.categoryOffer.discountValue;
-            itemOfferDiscount =
-              item.productId.category.categoryOffer.discountValue;
-          }
-        }
-      }
+      const {maxDiscount,bestOffer}=getBestOffer(item,offer,item.quantity)
+      
 
-      const itemEffectivePrice = Math.max(itemBasePrice - itemOfferDiscount, 0);
+      const itemEffectivePrice = Math.max(itemBasePrice - maxDiscount, 0);
       return total + itemEffectivePrice * item.quantity;
     }, 0);
     let totalCouponDiscount=0
