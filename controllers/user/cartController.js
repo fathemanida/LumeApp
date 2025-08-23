@@ -300,7 +300,7 @@ const cart = async (req, res) => {
         expiryDate: { $gte: new Date()},
       }).lean();
 
-      console.log('------------coupon,cpuponApplied',coupon,couponApplied);
+      console.log('------------coupon,cpuponApplied,totaloffer',coupon,couponApplied,totalOfferDiscount);
 
       if (coupon) {
         if (coupon.discountType === "PERCENTAGE") {
@@ -399,7 +399,7 @@ const updateQuantity = async (req, res) => {
     const offer=await Offer.find({
       isActive: true,
       startDate: { $lte: new Date() },
-      endDate: { $gte: new date() },
+      endDate: { $gte: new Date() },
       applicableOn: { $in: ["all", "categories", "products"] },
     }).lean();
     
