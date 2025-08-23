@@ -316,6 +316,9 @@ const cart = async (req, res) => {
         cart.couponApplied = null;
       }
     }
+    if(totalCouponDiscount>couponApplied.maxDiscount){
+      totalCouponDiscount=couponApplied.maxDiscount
+    }
  
 
     const shipping = totalPrice - totalOfferDiscount - totalCouponDiscount >= 1000 ? 0 : 40;

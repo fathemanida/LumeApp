@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LUME - Cart</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Jost&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-    <link rel="icon" href="/images/image.png" type="image/png">
 
-    <style>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LUME - Cart</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Aboreto&family=Jost&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <link rel="icon" href="/images/image.png" type="image/png">
+
+  <style>
     :root {
       --soft-beige: #D4B996;
       --muted-green: #657858;
@@ -26,7 +27,8 @@
       --darker-text: #1a0f0a;
     }
 
-    html, body {
+    html,
+    body {
       height: 100%;
       margin: 0;
       padding: 0;
@@ -39,6 +41,7 @@
     .main-content-container {
       padding: clamp(2rem, 5vw, 3rem);
     }
+
     .cart-title {
       font-family: 'Aboreto', cursive;
       color: var(--darker-text);
@@ -48,6 +51,7 @@
       margin-bottom: 2rem;
       font-size: clamp(2rem, 5vw, 2.5rem);
     }
+
     .cart-item {
       background: transparent;
       border: none;
@@ -58,15 +62,18 @@
       padding: 1.5rem;
       border-bottom: 1px solid var(--border-color);
     }
+
     .product-image {
       width: clamp(120px, 20vw, 150px);
       height: clamp(120px, 20vw, 150px);
       object-fit: cover;
       border-radius: 0;
     }
+
     .product-details {
       padding: 0 clamp(1rem, 2vw, 1.5rem);
     }
+
     .product-name {
       font-family: 'Aboreto', cursive;
       color: var(--darker-text);
@@ -74,24 +81,29 @@
       margin-bottom: 0.75rem;
       letter-spacing: 0.5px;
     }
+
     .product-price {
       color: var(--dark-text);
       font-weight: 500;
       margin-bottom: 0.75rem;
       font-size: clamp(1.1rem, 2.5vw, 1.2rem);
     }
+
     .text-decoration-line-through {
       text-decoration: line-through;
       opacity: 0.7;
     }
+
     .text-success {
       color: var(--muted-green) !important;
     }
+
     .quantity-control {
       display: flex;
       align-items: center;
       gap: 0.75rem;
     }
+
     .quantity-btn {
       background: var(--darker-text);
       border: none;
@@ -105,16 +117,19 @@
       transition: all 0.3s ease;
       cursor: pointer;
     }
+
     .quantity-btn:hover:not(:disabled) {
       background: var(--muted-green);
       transform: translateY(-1px);
     }
+
     .quantity-btn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
       background: #ccc;
       transform: none;
     }
+
     .quantity-input {
       width: clamp(50px, 12vw, 60px);
       text-align: center;
@@ -125,11 +140,12 @@
       background-color: var(--light-bg);
       font-size: clamp(0.9rem, 2.5vw, 1rem);
     }
+
     .quantity-input:disabled {
       background-color: #f8f5f2;
       cursor: not-allowed;
     }
-    
+
     /* Offer Badge Styles */
     .offer-badge {
       background-color: #e8f5e9;
@@ -141,22 +157,26 @@
       display: inline-flex;
       align-items: center;
     }
+
     .offer-text {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
       gap: 4px;
     }
+
     .savings {
       font-size: 0.9em;
       color: #43a047;
       font-weight: 500;
     }
+
     .offer-savings {
       display: flex;
       align-items: center;
       gap: 4px;
     }
+
     .remove-btn {
       background: none;
       border: none;
@@ -165,9 +185,11 @@
       transition: all 0.3s ease;
       padding: 0.75rem;
     }
+
     .remove-btn:hover {
       transform: scale(1.1);
     }
+
     .cart-summary {
       background: transparent;
       border: none;
@@ -177,6 +199,7 @@
       position: sticky;
       top: 1.5rem;
     }
+
     .summary-title {
       font-family: 'Aboreto', cursive;
       color: var(--darker-text);
@@ -188,6 +211,7 @@
       border-bottom: 1px solid var(--border-color);
       font-size: clamp(1.2rem, 3vw, 1.4rem);
     }
+
     .summary-row {
       display: flex;
       justify-content: space-between;
@@ -195,6 +219,7 @@
       color: var(--dark-text);
       font-size: clamp(0.9rem, 2.5vw, 1rem);
     }
+
     .summary-total {
       font-weight: 600;
       font-size: clamp(1.2rem, 3vw, 1.4rem);
@@ -203,6 +228,7 @@
       padding-top: 1rem;
       border-top: 1px solid var(--border-color);
     }
+
     .checkout-btn {
       background: var(--darker-text);
       border: none;
@@ -217,20 +243,24 @@
       text-transform: uppercase;
       letter-spacing: 1px;
     }
+
     .checkout-btn:hover:not(:disabled) {
       background: var(--muted-green);
       transform: translateY(-2px);
     }
+
     .checkout-btn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
       background: #ccc;
     }
+
     .coupon-section {
       margin-top: 2rem;
       padding-top: 2rem;
       border-top: 1px solid var(--border-color);
     }
+
     .coupon-title {
       font-family: 'Aboreto', cursive;
       color: var(--darker-text);
@@ -240,11 +270,13 @@
       margin-bottom: 1rem;
       font-size: clamp(1rem, 3vw, 1.2rem);
     }
+
     .coupon-list {
       display: flex;
       flex-direction: column;
       gap: 1rem;
     }
+
     .coupon-item {
       background: var(--light-bg);
       border: 2px dashed var(--soft-beige);
@@ -255,10 +287,12 @@
       position: relative;
       overflow: hidden;
     }
+
     .coupon-item:hover:not(.applied):not(.used) {
       transform: translateY(-2px);
       border-color: var(--muted-green);
     }
+
     .coupon-code {
       font-family: 'Aboreto', cursive;
       color: var(--darker-text);
@@ -268,27 +302,33 @@
       align-items: center;
       gap: 0.75rem;
     }
+
     .coupon-code i {
       color: var(--soft-beige);
     }
+
     .coupon-details {
       color: var(--dark-text);
       font-size: clamp(0.9rem, 2.5vw, 1rem);
     }
+
     .coupon-discount {
       color: var(--offer-red);
       font-weight: 600;
     }
+
     .coupon-min-order {
       color: var(--soft-beige);
       font-size: clamp(0.8rem, 2vw, 0.9rem);
       margin-top: 0.5rem;
     }
+
     .coupon-expiry {
       color: #666;
       font-size: clamp(0.8rem, 2vw, 0.9rem);
       margin-top: 0.5rem;
     }
+
     .copy-coupon-btn {
       background: var(--darker-text);
       border: none;
@@ -302,10 +342,12 @@
       transition: all 0.3s ease;
       cursor: pointer;
     }
+
     .copy-coupon-btn:hover {
       background: var(--muted-green);
       transform: translateY(-1px);
     }
+
     .apply-coupon-btn {
       background: var(--darker-text);
       border: none;
@@ -319,37 +361,44 @@
       transition: all 0.3s ease;
       cursor: pointer;
     }
+
     .apply-coupon-btn:hover:not(:disabled) {
       background: var(--muted-green);
       transform: translateY(-1px);
     }
+
     .apply-coupon-btn:disabled {
       opacity: 0.7;
       cursor: not-allowed;
       background: #ccc;
     }
+
     .empty-cart {
       text-align: center;
       padding: clamp(3rem, 8vw, 4rem);
       background: transparent;
       border-radius: 0;
     }
+
     .empty-cart-icon {
       font-size: clamp(4rem, 10vw, 5rem);
       color: var(--soft-beige);
       margin-bottom: 1.5rem;
     }
+
     .empty-cart-text {
       font-family: 'Aboreto', cursive;
       color: var(--darker-text);
       font-size: clamp(1.5rem, 4vw, 1.8rem);
       margin-bottom: 1rem;
     }
+
     .empty-cart-subtext {
       color: var(--dark-text);
       margin-bottom: 2rem;
       font-size: clamp(1rem, 3vw, 1.2rem);
     }
+
     .continue-shopping-btn {
       display: inline-flex;
       align-items: center;
@@ -367,15 +416,18 @@
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
+
     .continue-shopping-btn:hover {
       background: var(--muted-green);
       transform: translateY(-2px);
     }
+
     .coupon-input-group {
       display: flex;
       gap: 0.75rem;
       margin-bottom: 1.5rem;
     }
+
     .coupon-input {
       flex: 1;
       border: 1px solid var(--border-color);
@@ -386,10 +438,12 @@
       transition: all 0.3s ease;
       background: var(--light-bg);
     }
+
     .coupon-input:focus {
       outline: none;
       border-color: var(--soft-beige);
     }
+
     .delivery-info {
       margin: 1.5rem 0;
       padding: 1rem;
@@ -397,6 +451,7 @@
       border-radius: 0;
       border: 1px solid var(--border-color);
     }
+
     .delivery-title {
       font-family: 'Aboreto', cursive;
       color: var(--darker-text);
@@ -406,6 +461,7 @@
       font-size: clamp(1rem, 3vw, 1.2rem);
       margin-bottom: 0.75rem;
     }
+
     .delivery-date {
       display: flex;
       align-items: center;
@@ -413,15 +469,18 @@
       color: var(--dark-text);
       font-size: clamp(0.9rem, 2.5vw, 1rem);
     }
+
     .delivery-date i {
       color: var(--soft-beige);
       font-size: clamp(1.2rem, 3vw, 1.3rem);
     }
+
     .available-coupons {
       margin-top: 1.5rem;
       padding-top: 1.5rem;
       border-top: 1px solid var(--border-color);
     }
+
     .show-coupons-btn {
       display: flex;
       align-items: center;
@@ -436,22 +495,27 @@
       font-weight: 500;
       transition: all 0.3s ease;
     }
+
     .show-coupons-btn:hover {
       background: var(--soft-beige);
       color: white;
       transform: translateY(-1px);
     }
+
     .show-coupons-btn i {
       transition: transform 0.3s ease;
       font-size: clamp(0.9rem, 2.5vw, 1rem);
     }
+
     .show-coupons-btn.active {
       background: var(--soft-beige);
       color: white;
     }
+
     .show-coupons-btn.active i {
       transform: rotate(180deg);
     }
+
     .applied-coupon {
       background: rgba(212, 185, 150, 0.1);
       border: 1px solid rgba(212, 185, 150, 0.2);
@@ -459,6 +523,7 @@
       padding: 0.75rem 1rem;
       margin: 0.75rem 0;
     }
+
     .applied-coupon .coupon-code {
       background: rgba(212, 185, 150, 0.2);
       color: var(--soft-beige);
@@ -467,9 +532,11 @@
       font-weight: 500;
       font-size: clamp(0.9rem, 2.5vw, 1rem);
     }
+
     .applied-coupon .coupon-code i {
       color: var(--soft-beige);
     }
+
     .remove-coupon-btn {
       background: none;
       border: none;
@@ -484,566 +551,619 @@
       justify-content: center;
       border-radius: 0;
     }
+
     .remove-coupon-btn:hover {
       color: var(--offer-red);
       background: rgba(220, 53, 69, 0.1);
       transform: scale(1.1);
     }
+
     .discount-amount {
       color: var(--muted-green);
       font-weight: 600;
       font-size: clamp(1rem, 3vw, 1.2rem);
     }
+
     .coupon-item.applied {
       background: rgba(212, 185, 150, 0.15);
       border: 2px solid var(--soft-beige);
       cursor: default;
     }
+
     .coupon-item.applied:hover {
       transform: none;
     }
+
     .coupon-item.used {
       opacity: 0.7;
       cursor: not-allowed;
       background: #f8f8f8;
       border: 2px dashed #ccc;
     }
+
     .coupon-item.used:hover {
       transform: none;
     }
+
     .coupon-item.used .coupon-code {
       color: #666;
     }
+
     .coupon-item.used .coupon-details {
       color: #666;
     }
+
     .coupon-item.used .coupon-min-order,
     .coupon-item.used .coupon-expiry {
       color: #999;
     }
+
     .coupon-input:disabled,
     .apply-coupon-btn:disabled {
       opacity: 0.7;
       cursor: not-allowed;
     }
+
     .stock-info {
       margin-top: 0.75rem;
       font-size: clamp(0.8rem, 2vw, 0.9rem);
     }
+
     .stock-info small {
       color: var(--soft-beige);
       font-style: italic;
     }
+
     .stock-info small.text-warning {
       color: var(--offer-red);
     }
+
     @media (max-width: 992px) {
       .main-content-container {
         padding: clamp(1rem, 4vw, 1.5rem);
       }
+
       .cart-item {
         flex-direction: column;
         align-items: flex-start;
         padding: 1rem;
       }
+
       .product-image {
         width: 100%;
         height: auto;
         max-height: 120px;
       }
+
       .product-details {
         width: 100%;
         padding: 0.5rem 0;
       }
+
       .quantity-control {
         justify-content: center;
         width: 100%;
         margin-top: 0.5rem;
       }
+
       .cart-summary {
         position: static;
         margin-top: 1.5rem;
         padding: 1.5rem;
       }
-      .col-lg-8, .col-lg-4 {
+
+      .col-lg-8,
+      .col-lg-4 {
         flex: 0 0 100%;
         max-width: 100%;
       }
     }
+
     @media (max-width: 768px) {
       .cart-title {
         font-size: clamp(1.5rem, 4vw, 1.8rem);
       }
+
       .cart-item {
         padding: 0.75rem;
       }
+
       .product-name {
         font-size: clamp(0.9rem, 2.5vw, 1rem);
       }
+
       .quantity-control {
         gap: 0.25rem;
       }
+
       .quantity-btn {
         width: clamp(24px, 6vw, 28px);
         height: clamp(24px, 6vw, 28px);
       }
+
       .quantity-input {
         width: clamp(36px, 10vw, 40px);
       }
+
       .coupon-input-group {
         flex-direction: column;
       }
+
       .coupon-input {
         width: 100%;
       }
+
       .apply-coupon-btn {
         width: 100%;
         height: clamp(36px, 10vw, 42px);
       }
+
       .delivery-info {
         padding: 0.5rem;
       }
+
       .continue-shopping-btn {
         padding: clamp(0.5rem, 2vw, 0.75rem) clamp(1rem, 4vw, 1.5rem);
       }
     }
+
     @media (max-width: 576px) {
       .product-image {
         max-height: 100px;
       }
+
       .product-price {
         font-size: clamp(0.8rem, 2vw, 0.9rem);
       }
+
       .stock-info {
         font-size: clamp(0.7rem, 1.8vw, 0.75rem);
       }
+
       .coupon-item {
         padding: 0.5rem;
       }
+
       .coupon-code {
         font-size: clamp(0.8rem, 2.5vw, 0.9rem);
       }
+
       .coupon-details {
         font-size: clamp(0.7rem, 2vw, 0.8rem);
       }
+
       .empty-cart {
         padding: clamp(1.5rem, 6vw, 2rem);
       }
+
       .empty-cart-icon {
         font-size: clamp(2.5rem, 8vw, 3rem);
       }
+
       .empty-cart-text {
         font-size: clamp(1rem, 3.5vw, 1.2rem);
       }
+
       .continue-shopping-btn {
         font-size: clamp(0.8rem, 2.5vw, 0.9rem);
       }
     }
+
     @media (max-width: 400px) {
       .cart-item {
         padding: 0.5rem;
       }
+
       .product-name {
         font-size: clamp(0.8rem, 2vw, 0.9rem);
       }
+
       .product-price {
         font-size: clamp(0.7rem, 1.8vw, 0.8rem);
       }
+
       .quantity-btn {
         width: clamp(20px, 5vw, 24px);
         height: clamp(20px, 5vw, 24px);
       }
+
       .quantity-input {
         width: clamp(32px, 8vw, 36px);
       }
+
       .coupon-title {
         font-size: clamp(0.8rem, 2.5vw, 0.9rem);
       }
+
       .checkout-btn {
         font-size: clamp(0.8rem, 2.5vw, 0.9rem);
       }
     }
-    </style>
+  </style>
 </head>
+
 <body>
-<%- include('../partials/user/header.ejs') %>
+  <%- include('../partials/user/header.ejs') %>
     <div class="container-fluid py-3 main-content-container">
-      <%-include('../partials/user/breadcrumps.ejs')  %>
+      <%-include('.. /partials/user/breadcrumps.ejs') %>
 
         <h2 class="cart-title">Shopping Cart</h2>
         <div class="row">
-            <div class="col-lg-8">
-                <% if (items && items.length > 0) { %>
-                    <% items.forEach(item => { %>
-                        <div class="cart-item" data-id="<%= item._id %>">
-                            <div class="row align-items-center">
-                                <div class="col-auto">
-                                    <img src="/uploads/product/<%= item.productId.productImage[0] %>" alt="<%= item.productId.productName %>" class="product-image">
-                                </div>
-                                <div class="col">
-                                    <div class="product-details">
-                                        <h5 class="product-name"><%= item.productId.productName %></h5>
-                                        <div class="product-price">
-                                            <% 
-                                                const product = item.productId;
-                                                const basePrice = product.salePrice && product.salePrice < product.regularPrice ? 
-                                                    product.salePrice : product.regularPrice;
-                                                
-                                                console.log('Product:', product.productName);
-                                                console.log('Category:', product.category);
-                                                if (product.category) {
-                                                    console.log('Category Offer:', product.category.categoryOffer);
-                                                }
-                                                
-                                                let offerDiscount = 0;
-                                                let bestOffer = null;
-                                                
-                                                if (product.productOffer && product.productOffer.active) {
-                                                    if (product.productOffer.discountType === 'percentage') {
-                                                        offerDiscount = (basePrice * product.productOffer.discountValue) / 100;
-                                                    } else {
-                                                        offerDiscount = product.productOffer.discountValue;
-                                                    }
-                                                    bestOffer = {
-                                                        name: 'Product Offer',
-                                                        discountType: product.productOffer.discountType,
-                                                        discountValue: product.productOffer.discountValue
-                                                    };
-                                                }
-                                                
-                                                if (product.category && product.category.categoryOffer && 
-                                                    product.category.categoryOffer.active) {
-                                                    let categoryDiscount = 0;
-                                                    if (product.category.categoryOffer.discountType === 'percentage') {
-                                                        categoryDiscount = (basePrice * product.category.categoryOffer.discountValue) / 100;
-                                                    } else {
-                                                        categoryDiscount = product.category.categoryOffer.discountValue;
-                                                    }
-                                                    
-                                                    if (categoryDiscount > offerDiscount) {
-                                                        offerDiscount = categoryDiscount;
-                                                        bestOffer = {
-                                                            name: 'Category Offer',
-                                                            discountType: product.category.categoryOffer.discountType,
-                                                            discountValue: product.category.categoryOffer.discountValue
-                                                        };
-                                                    }
-                                                }
-                                                
-                                                const finalPricePerUnit = Math.max(basePrice - offerDiscount, 0);
-                                                const hasOffer = offerDiscount > 0;
-                                            %>
-                                            
-                                            <div class="price-display">
-                                                <% if (hasOffer) { %>
-                                                    <span class="text-decoration-line-through text-muted">₹<%= Math.round(basePrice).toLocaleString() %></span>
-                                                    <span class="text-success ms-2 fw-bold">₹<%= Math.round(finalPricePerUnit).toLocaleString() %></span>
-                                                <% } else { %>
-                                                    <span class="fw-bold">₹<%= Math.round(basePrice).toLocaleString() %></span>
-                                                <% } %>
-                                                <span class="text-muted ms-2 small">per unit</span>
-                                            </div>
-                                            
-                                            <% if (hasOffer) { %>
-                                                <div class="offer-savings small text-success mt-1">
-                                                    <i class="fas fa-tag me-1"></i>
-                                                    You save ₹<%= Math.round(offerDiscount).toLocaleString() %> per unit
-                                                    <% if (bestOffer) { %>
-                                                        <span class="ms-1">
-                                                            (<%= bestOffer.name || 'Special Offer' %>: 
-                                                            <% if (bestOffer.discountType === 'percentage') { %>
-                                                                <%= bestOffer.discountValue %>% off
-                                                            <% } else { %>
-                                                                ₹<%= bestOffer.discountValue %> off
-                                                            <% } %>)
-                                                        </span>
-                                                    <% } %>
-                                                </div>
-                                            <% } %>
-                                            
-                                            <div class="item-total small text-muted mt-1">
-                                                Total: ₹<%= Math.round((finalPricePerUnit * item.quantity)).toLocaleString() %>
-                                                <% if (hasOffer) { %>
-                                                    <span class="text-decoration-line-through text-muted ms-2">
-                                                        (₹<%= Math.round(basePrice * item.quantity).toLocaleString() %>)
-                                                    </span>
-                                                <% } %>
-                                            </div>
-                                        </div>
+          <div class="col-lg-8">
+            <% if (items && items.length> 0) { %>
+              <% items.forEach(item=> { %>
+                <div class="cart-item" data-id="<%= item._id %>">
+                  <div class="row align-items-center">
+                    <div class="col-auto">
+                      <img src="/uploads/product/<%= item.productId.productImage[0] %>"
+                        alt="<%= item.productId.productName %>" class="product-image">
+                    </div>
+                    <div class="col">
+                      <div class="product-details">
+                        <h5 class="product-name">
+                          <%= item.productId.productName %>
+                        </h5>
+                        <div class="product-price">
+                          <% const product=item.productId; const basePrice=product.salePrice && product.salePrice <
+                            product.regularPrice ? product.salePrice : product.regularPrice; console.log('Product:',
+                            product.productName); console.log('Category:', product.category); if (product.category) {
+                            console.log('Category Offer:', product.category.categoryOffer); } let offerDiscount=0; let
+                            bestOffer=null; if (product.productOffer && product.productOffer.active) { if
+                            (product.productOffer.discountType==='percentage' ) { offerDiscount=(basePrice *
+                            product.productOffer.discountValue) / 100; } else {
+                            offerDiscount=product.productOffer.discountValue; } bestOffer={ name: 'Product Offer' ,
+                            discountType: product.productOffer.discountType, discountValue:
+                            product.productOffer.discountValue }; } if (product.category &&
+                            product.category.categoryOffer && product.category.categoryOffer.active) { let
+                            categoryDiscount=0; if (product.category.categoryOffer.discountType==='percentage' ) {
+                            categoryDiscount=(basePrice * product.category.categoryOffer.discountValue) / 100; } else {
+                            categoryDiscount=product.category.categoryOffer.discountValue; } if (categoryDiscount>
+                            offerDiscount) {
+                            offerDiscount = categoryDiscount;
+                            bestOffer = {
+                            name: 'Category Offer',
+                            discountType: product.category.categoryOffer.discountType,
+                            discountValue: product.category.categoryOffer.discountValue
+                            };
+                            }
+                            }
 
-                                        <div class="quantity-control">
-                                            <button class="quantity-btn" onclick="updateQuantity('<%= item._id %>', 'decrease')" <%= item.quantity <= 1 ? 'disabled' : '' %>>
-                                                <i class="fas fa-minus"></i>
-                                            </button>
-                                            <input type="number" class="quantity-input" value="<%= item.quantity %>" min="1" max="<%= Math.min(item.productId.quantity || item.productId.productStock || 6, 6) %>" readonly>
-                                            <button class="quantity-btn" onclick="updateQuantity('<%= item._id %>', 'increase')" <%= item.quantity >= Math.min(item.productId.quantity || item.productId.productStock || 6, 6) ? 'disabled' : '' %>>
-                                                <i class="fas fa-plus"></i>
-                                            </button>
-                                        </div>
-                                        <p class="stock-info">
-                                            <small class="<%= (item.productId.quantity || item.productId.productStock || 0) <= 6 ? 'text-warning' : 'text-muted' %>">
-                                                <% if ((item.productId.quantity || item.productId.productStock || 0) <= 6) { %>
-                                                    Only <%= item.productId.quantity || item.productId.productStock || 0 %> items available
-                                                <% } else { %>
-                                                    Maximum 6 items allowed per product
-                                                <% } %>
-                                            </small>
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="col-auto">
-                                    <button class="remove-btn" onclick="removeItem('<%= item._id %>')">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </div>
+                            const finalPricePerUnit = Math.max(basePrice - offerDiscount, 0);
+                            const hasOffer = offerDiscount > 0;
+                            %>
+
+                            <div class="price-display">
+                              <% if (hasOffer) { %>
+                                <span class="text-decoration-line-through text-muted">₹<%=
+                                    Math.round(basePrice).toLocaleString() %></span>
+                                <span class="text-success ms-2 fw-bold">₹<%=
+                                    Math.round(finalPricePerUnit).toLocaleString() %></span>
+                                <% } else { %>
+                                  <span class="fw-bold">₹<%= Math.round(basePrice).toLocaleString() %></span>
+                                  <% } %>
+                                    <span class="text-muted ms-2 small">per unit</span>
                             </div>
+
+                            <% if (hasOffer) { %>
+                              <div class="offer-savings small text-success mt-1">
+                                <i class="fas fa-tag me-1"></i>
+                                You save ₹<%= Math.round(offerDiscount).toLocaleString() %> per unit
+                                  <% if (bestOffer) { %>
+                                    <span class="ms-1">
+                                      (<%= bestOffer.name || 'Special Offer' %>:
+                                        <% if (bestOffer.discountType==='percentage' ) { %>
+                                          <%= bestOffer.discountValue %>% off
+                                            <% } else { %>
+                                              ₹<%= bestOffer.discountValue %> off
+                                                <% } %>)
+                                    </span>
+                                    <% } %>
+                              </div>
+                              <% } %>
+
+                                <div class="item-total small text-muted mt-1">
+                                  Total: ₹<%= Math.round((finalPricePerUnit * item.quantity)).toLocaleString() %>
+                                    <% if (hasOffer) { %>
+                                      <span class="text-decoration-line-through text-muted ms-2">
+                                        (₹<%= Math.round(basePrice * item.quantity).toLocaleString() %>)
+                                      </span>
+                                      <% } %>
+                                </div>
                         </div>
-                    <% }) %>
-                    <div class="delivery-info mt-3">
-                        <h4 class="delivery-title">Estimated Delivery</h4>
-                        <div class="delivery-date">
-                            <i class="fas fa-truck"></i>
-                            <span><%= new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }) %> - <%= new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }) %></span>
+
+                        <div class="quantity-control">
+                          <button class="quantity-btn" onclick="updateQuantity('<%= item._id %>', 'decrease')"
+                            <%=item.quantity <=1 ? 'disabled' : '' %>>
+                            <i class="fas fa-minus"></i>
+                          </button>
+                          <input type="number" class="quantity-input" value="<%= item.quantity %>" min="1"
+                            max="<%= Math.min(item.productId.quantity || item.productId.productStock || 6, 6) %>"
+                            readonly>
+                          <button class="quantity-btn" onclick="updateQuantity('<%= item._id %>', 'increase')"
+                            <%=item.quantity>= Math.min(item.productId.quantity || item.productId.productStock || 6, 6)
+                            ? 'disabled' : '' %>>
+                            <i class="fas fa-plus"></i>
+                          </button>
                         </div>
+                        <p class="stock-info">
+                          <small
+                            class="<%= (item.productId.quantity || item.productId.productStock || 0) <= 6 ? 'text-warning' : 'text-muted' %>">
+                            <% if ((item.productId.quantity || item.productId.productStock || 0) <=6) { %>
+                              Only <%= item.productId.quantity || item.productId.productStock || 0 %> items available
+                                <% } else { %>
+                                  Maximum 6 items allowed per product
+                                  <% } %>
+                          </small>
+                        </p>
+                      </div>
                     </div>
-                    <div class="text-center mt-3 mb-3">
-                        <a href="/shopAll" class="continue-shopping-btn">
-                            <i class="fas fa-shopping-cart"></i> Continue Shopping
-                        </a>
+                    <div class="col-auto">
+                      <button class="remove-btn" onclick="removeItem('<%= item._id %>')">
+                        <i class="fas fa-trash-alt"></i>
+                      </button>
                     </div>
-                <% } else { %>
+                  </div>
+                </div>
+                <% }) %>
+                  <div class="delivery-info mt-3">
+                    <h4 class="delivery-title">Estimated Delivery</h4>
+                    <div class="delivery-date">
+                      <i class="fas fa-truck"></i>
+                      <span>
+                        <%= new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { weekday: 'long'
+                          , month: 'long' , day: 'numeric' }) %> - <%= new Date(Date.now() + 6 * 24 * 60 * 60 *
+                            1000).toLocaleDateString('en-US', { weekday: 'long' , month: 'long' , day: 'numeric' }) %>
+                      </span>
+                    </div>
+                  </div>
+                  <div class="text-center mt-3 mb-3">
+                    <a href="/shopAll" class="continue-shopping-btn">
+                      <i class="fas fa-shopping-cart"></i> Continue Shopping
+                    </a>
+                  </div>
+                  <% } else { %>
                     <div class="empty-cart">
-                        <i class="fas fa-shopping-cart empty-cart-icon"></i>
-                        <h3 class="empty-cart-text">Your cart is empty</h3>
-                        <p class="empty-cart-subtext">Looks like you haven't added any items to your cart yet.</p>
-                        <a href="/shopAll" class="continue-shopping-btn">Continue Shopping</a>
+                      <i class="fas fa-shopping-cart empty-cart-icon"></i>
+                      <h3 class="empty-cart-text">Your cart is empty</h3>
+                      <p class="empty-cart-subtext">Looks like you haven't added any items to your cart yet.</p>
+                      <a href="/shopAll" class="continue-shopping-btn">Continue Shopping</a>
                     </div>
+                    <% } %>
+          </div>
+          <div class="col-lg-4">
+            <div class="cart-summary">
+              <h3 class="summary-title">Order Summary</h3>
+              <div class="summary-row">
+                <span>Subtotal</span>
+                <span id="subtotal">₹<%= totalPrice.toLocaleString() %></span>
+              </div>
+              <% if (totalOfferDiscount> 0) { %>
+                <div class="summary-row">
+                  <span>Offer Discount</span>
+                  <span class="text-success">-₹<%= totalOfferDiscount.toLocaleString() %></span>
+                </div>
                 <% } %>
-            </div>
-            <div class="col-lg-4">
-                <div class="cart-summary">
-                    <h3 class="summary-title">Order Summary</h3>
+                  <% if (totalCouponDiscount> 0) { %>
                     <div class="summary-row">
-                        <span>Subtotal</span>
-                        <span id="subtotal">₹<%= totalPrice.toLocaleString() %></span>
-                    </div>
-                    <% if (totalOfferDiscount > 0) { %>
-                    <div class="summary-row">
-                        <span>Offer Discount</span>
-                        <span class="text-success">-₹<%= totalOfferDiscount.toLocaleString() %></span>
+                      <span>Coupon Discount</span>
+                      <span class="text-success">-₹<%= totalCouponDiscount.toLocaleString() %></span>
                     </div>
                     <% } %>
-                     <% if (totalCouponDiscount > 0) { %>
-                    <div class="summary-row">
-                        <span>Coupon Discount</span>
-                        <span class="text-success">-₹<%= totalCouponDiscount.toLocaleString() %></span>
-                    </div>
-                    <% } %>
-                    
-                    <div class="summary-row">
+
+                      <div class="summary-row">
                         <span>Shipping</span>
-                        <span id="shipping"><%= shipping === 0 ? 'Free' : `₹${shipping.toLocaleString()}` %></span>
-                    </div>
-                    <div class="summary-row summary-total">
+                        <span id="shipping">
+                          <%= shipping===0 ? 'Free' : `₹${shipping.toLocaleString()}` %>
+                        </span>
+                      </div>
+                      <div class="summary-row summary-total">
                         <span>Total</span>
                         <span id="finalPrice">₹<%= finalPrice.toLocaleString() %></span>
-                    </div>
-                    <div class="coupon-section">
+                      </div>
+                      <div class="coupon-section">
                         <h4 class="coupon-title">Apply Coupon</h4>
                         <div class="coupon-input-group">
-                            <input type="text" class="coupon-input" id="couponCode" placeholder="Enter coupon code" <%= couponApplied ? 'disabled' : '' %>>
-                            <button class="apply-coupon-btn" onclick="applyCoupon()" <%= couponApplied ? 'disabled' : '' %>>
-                                <i class="fas fa-check"></i>
-                            </button>
+                          <input type="text" class="coupon-input" id="couponCode" placeholder="Enter coupon code"
+                            <%=couponApplied ? 'disabled' : '' %>>
+                          <button class="apply-coupon-btn" onclick="applyCoupon()" <%=couponApplied ? 'disabled' : ''
+                            %>>
+                            <i class="fas fa-check"></i>
+                          </button>
                         </div>
                         <% if (couponApplied) { %>
-                            <div class="applied-coupon">
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <span class="text-success">Coupon Applied:</span>
-                                        <span class="coupon-code"><i class="fas fa-tag"></i> <%= couponApplied.code %></span>
-                                        <span class="text-success">(<%= couponApplied.discountType === 'percentage' ? 
-                                            `${couponApplied.discountValue}% off` : 
-                                            `₹${couponApplied.discountValue} off` %>)</span>
-                                    </div>
-                                    <button class="remove-coupon-btn" onclick="removeCoupon()" title="Remove coupon">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
-                                <div class="text-success mt-1">
-                                    You saved: ₹<%= totalCouponDiscount.toLocaleString() %>
-                                </div>
+                          <div class="applied-coupon">
+                            <div class="d-flex align-items-center justify-content-between">
+                              <div class="d-flex align-items-center gap-2">
+                                <span class="text-success">Coupon Applied:</span>
+                                <span class="coupon-code"><i class="fas fa-tag"></i>
+                                  <%= couponApplied.code %>
+                                </span>
+                                <span class="text-success">(<%= couponApplied.discountType==='percentage' ?
+                                    `${couponApplied.discountValue}% off` : `₹${couponApplied.discountValue} off` %>
+                                    )</span>
+                              </div>
+                              <button class="remove-coupon-btn" onclick="removeCoupon()" title="Remove coupon">
+                                <i class="fas fa-times"></i>
+                              </button>
                             </div>
-                        <% } %>
-                    </div>
-                    <div class="available-coupons mt-4">
+                            <div class="text-success mt-1">
+                              You saved: ₹<%= totalCouponDiscount.toLocaleString() %>
+                            </div>
+                          </div>
+                          <% } %>
+                      </div>
+                      <div class="available-coupons mt-4">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h4 class="coupon-title mb-0">Available Coupons</h4>
-                            <button class="show-coupons-btn" onclick="toggleCoupons()">
-                                <span class="show-text">Show All</span>
-                                <i class="fas fa-chevron-down"></i>
-                            </button>
+                          <h4 class="coupon-title mb-0">Available Coupons</h4>
+                          <button class="show-coupons-btn" onclick="toggleCoupons()">
+                            <span class="show-text">Show All</span>
+                            <i class="fas fa-chevron-down"></i>
+                          </button>
                         </div>
                         <div class="coupon-list" id="couponList" style="display: none;">
-                            <% if (coupons && coupons.length > 0) { %>
-                                <% coupons.forEach(coupon => { 
-                                    const isUsed = user && coupon.usedBy && coupon.usedBy.some(id => id.toString() === user.id.toString());
-                                    const isApplied = couponApplied && couponApplied._id && couponApplied._id.toString() === coupon._id.toString();
-                                %>
-                                    <div class="coupon-item <%= isApplied ? 'applied' : '' %> <%= isUsed ? 'used' : '' %>"
-                                        style="<%= isUsed ? 'pointer-events: none; opacity: 0.7; cursor: not-allowed;' : '' %>"
-                                        onclick="<%= (!isUsed && !isApplied) ? `applyCouponCode('${coupon.code}')` : '' %>">
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            <div class="coupon-code">
-                                                <i class="fas fa-tag"></i>
-                                                <%= coupon.code %>
-                                                <% if (isUsed) { %>
-                                                    <span class="badge bg-secondary ms-2">Already Used</span>
-                                                <% } %>
-                                            </div>
-                                            <button class="copy-coupon-btn" onclick="copyCouponCode('<%= coupon.code %>', event)" title="Copy coupon code">
-                                                <i class="fas fa-copy"></i>
-                                            </button>
-                                        </div>
-                                        <div class="coupon-details">
-                                            <span class="coupon-discount">
-                                                <%= coupon.discountType === 'PERCENTAGE' ? 
-                                                    `${coupon.discountValue}% OFF` : 
-                                                    `₹${coupon.discountValue} OFF` %>
-                                            </span>
-                                            <% if (coupon.maxDiscount) { %>
-                                                <span class="coupon-min-order">
-                                                    (Max discount: ₹<%= coupon.maxDiscount.toLocaleString() %>)
-                                                </span>
-                                            <% } %>
-                                        </div>
-                                        <% if (coupon.minOrderAmount) { %>
-                                            <div class="coupon-min-order">
-                                                Min. order: ₹<%= coupon.minOrderAmount.toLocaleString() %>
-                                            </div>
+                          <% if (coupons && coupons.length> 0) { %>
+                            <% coupons.forEach(coupon=> {
+                              const isUsed = user && coupon.usedBy && coupon.usedBy.some(id => id.toString() ===
+                              user.id.toString());
+                              const isApplied = couponApplied && couponApplied._id && couponApplied._id.toString() ===
+                              coupon._id.toString();
+                              %>
+                              <div class="coupon-item <%= isApplied ? 'applied' : '' %> <%= isUsed ? 'used' : '' %>"
+                                style="<%= isUsed ? 'pointer-events: none; opacity: 0.7; cursor: not-allowed;' : '' %>"
+                                onclick="<%= (!isUsed && !isApplied) ? `applyCouponCode('${coupon.code}')` : '' %>">
+                                <div class="d-flex align-items-center justify-content-between">
+                                  <div class="coupon-code">
+                                    <i class="fas fa-tag"></i>
+                                    <%= coupon.code %>
+                                      <% if (isUsed) { %>
+                                        <span class="badge bg-secondary ms-2">Already Used</span>
                                         <% } %>
-                                        <% if (coupon.expiryDate) { %>
-                                            <div class="coupon-expiry">
-                                                Expires: <%= new Date(coupon.expiryDate).toLocaleDateString() %>
-                                            </div>
-                                        <% } %>
+                                  </div>
+                                  <button class="copy-coupon-btn" onclick="copyCouponCode('<%= coupon.code %>', event)"
+                                    title="Copy coupon code">
+                                    <i class="fas fa-copy"></i>
+                                  </button>
+                                </div>
+                                <div class="coupon-details">
+                                  <span class="coupon-discount">
+                                    <%= coupon.discountType==='PERCENTAGE' ? `${coupon.discountValue}% OFF` :
+                                      `₹${coupon.discountValue} OFF` %>
+                                  </span>
+                                  <% if (coupon.maxDiscount) { %>
+                                    <span class="coupon-min-order">
+                                      (Max discount: ₹<%= coupon.maxDiscount.toLocaleString() %>)
+                                    </span>
+                                    <% } %>
+                                </div>
+                                <% if (coupon.minOrderAmount) { %>
+                                  <div class="coupon-min-order">
+                                    Min. order: ₹<%= coupon.minOrderAmount.toLocaleString() %>
+                                  </div>
+                                  <% } %>
+                                    <% if (coupon.expiryDate) { %>
+                                      <div class="coupon-expiry">
+                                        Expires: <%= new Date(coupon.expiryDate).toLocaleDateString() %>
+                                      </div>
+                                      <% } %>
                                         <% if (isUsed) { %>
-                                            <div class="text-muted mt-2">
-                                                <small><i class="fas fa-info-circle"></i> You have already used this coupon in a previous order</small>
-                                            </div>
-                                        <% } %>
-                                    </div>
-                                <% }); %>
-                            <% } else { %>
-                                <p class="text-muted">No coupons available</p>
-                            <% } %>
+                                          <div class="text-muted mt-2">
+                                            <small><i class="fas fa-info-circle"></i> You have already used this coupon
+                                              in a previous order</small>
+                                          </div>
+                                          <% } %>
+                              </div>
+                              <% }); %>
+                                <% } else { %>
+                                  <p class="text-muted">No coupons available</p>
+                                  <% } %>
                         </div>
-                    </div>
-                    <button class="checkout-btn" onclick="proceedToCheckout()" <%= items.length === 0 ? 'disabled' : '' %>>
+                      </div>
+                      <button class="checkout-btn" onclick="proceedToCheckout()" <%=items.length===0 ? 'disabled' : ''
+                        %>>
                         Proceed to Checkout
-                    </button>
-                </div>
+                      </button>
             </div>
+          </div>
         </div>
     </div>
 
     <%- include("../../views/partials/user/fooret.ejs") %>
 
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-    <script>
+      <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+      <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+      <script>
         async function updateQuantity(itemId, action) {
-    try {
-        if (!itemId || !['increase', 'decrease'].includes(action)) {
-            showNotification('Invalid item or action', 'error');
-            return;
-        }
-        const cartItem = document.querySelector(`.cart-item[data-id="${itemId}"]`);
-        if (!cartItem) {
-            showNotification('Cart item not found', 'error');
-            return;
-        }
-        const quantityInput = cartItem.querySelector('.quantity-input');
-        if (!quantityInput) {
-            showNotification('Quantity input not found', 'error');
-            return;
-        }
-        const currentQuantity = parseInt(quantityInput.value, 10);
-        const maxAllowed = parseInt(quantityInput.max, 10) || 6;
-        if (action === 'decrease' && currentQuantity <= 1) {
-            showNotification('Minimum quantity reached', 'error');
-            return;
-        }
-        if (action === 'increase' && currentQuantity >= maxAllowed) {
-            if (maxAllowed <= 6) {
-                showNotification(`Only ${maxAllowed} items available in stock`, 'error');
-            } else {
-                showNotification('Maximum quantity limit reached (6 items per product)', 'error');
+          try {
+            if (!itemId || !['increase', 'decrease'].includes(action)) {
+              showNotification('Invalid item or action', 'error');
+              return;
             }
-            return;
+            const cartItem = document.querySelector(`.cart-item[data-id="${itemId}"]`);
+            if (!cartItem) {
+              showNotification('Cart item not found', 'error');
+              return;
+            }
+            const quantityInput = cartItem.querySelector('.quantity-input');
+            if (!quantityInput) {
+              showNotification('Quantity input not found', 'error');
+              return;
+            }
+            const currentQuantity = parseInt(quantityInput.value, 10);
+            const maxAllowed = parseInt(quantityInput.max, 10) || 6;
+            if (action === 'decrease' && currentQuantity <= 1) {
+              showNotification('Minimum quantity reached', 'error');
+              return;
+            }
+            if (action === 'increase' && currentQuantity >= maxAllowed) {
+              if (maxAllowed <= 6) {
+                showNotification(`Only ${maxAllowed} items available in stock`, 'error');
+              } else {
+                showNotification('Maximum quantity limit reached (6 items per product)', 'error');
+              }
+              return;
+            }
+
+            const response = await fetch('/cart/update-quantity', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ itemId, action })
+            });
+            const data = await response.json();
+            if (!data.success) {
+              showNotification(data.message || 'Failed to update quantity', 'error');
+              return;
+            }
+
+            window.location.reload();
+
+          } catch (error) {
+            console.log('An error occurred while updating quantity', error);
+            showNotification('An error occurred while updating quantity', 'error');
+          }
         }
-        
-        const response = await fetch('/cart/update-quantity', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ itemId, action })
-        });
-        const data = await response.json();
-        if (!data.success) {
-            showNotification(data.message || 'Failed to update quantity', 'error');
-            return;
-        }
-        
-        window.location.reload();
-        
-    } catch (error) {
-        console.log('An error occurred while updating quantity', error);
-        showNotification('An error occurred while updating quantity', 'error');
-    }
-}
         async function removeItem(itemId) {
-            try {
-                const result = await Swal.fire({
-                    title: 'Remove Item',
-                    text: 'Are you sure you want to remove this item from your cart?',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3e4c22',
-                    cancelButtonColor: '#c82333',
-                    confirmButtonText: 'Yes, remove it!'
-                });
-                if (!result.isConfirmed) return;
-                
-                const response = await fetch('/remove-item', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ itemId })
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    const cartItem = document.querySelector(`.cart-item[data-id="${itemId}"]`);
-                    if (cartItem) cartItem.remove();
-                    
-                    if (data.totals) {
-                        document.getElementById('subtotal').textContent = `₹${data.totals.subtotal?.toLocaleString() || '0'}`;
-                        document.getElementById('shipping').textContent = data.totals.shipping === 0 ? 'Free' : `₹${data.totals.shipping?.toLocaleString() || '0'}`;
-                        document.getElementById('finalPrice').textContent = `₹${data.totals.finalPrice?.toLocaleString() || '0'}`;
-                        
-                        if (data.totals.offerDiscount !== undefined || data.totals.couponDiscount !== undefined) {
-                            updateSummaryDiscounts(
-                                data.totals.offerDiscount || 0, 
-                                data.totals.couponDiscount || 0
-                            );
-                        }
-                    }
-                    
-                    const remainingItems = document.querySelectorAll('.cart-item');
-                    if (remainingItems.length === 0) {
-                        document.querySelector('.col-lg-8').innerHTML = `
+          try {
+            const result = await Swal.fire({
+              title: 'Remove Item',
+              text: 'Are you sure you want to remove this item from your cart?',
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#3e4c22',
+              cancelButtonColor: '#c82333',
+              confirmButtonText: 'Yes, remove it!'
+            });
+            if (!result.isConfirmed) return;
+
+            const response = await fetch('/remove-item', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ itemId })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+              const cartItem = document.querySelector(`.cart-item[data-id="${itemId}"]`);
+              if (cartItem) cartItem.remove();
+
+              if (data.totals) {
+                document.getElementById('subtotal').textContent = `₹${data.totals.subtotal?.toLocaleString() || '0'}`;
+                document.getElementById('shipping').textContent = data.totals.shipping === 0 ? 'Free' : `₹${data.totals.shipping?.toLocaleString() || '0'}`;
+                document.getElementById('finalPrice').textContent = `₹${data.totals.finalPrice?.toLocaleString() || '0'}`;
+
+                if (data.totals.offerDiscount !== undefined || data.totals.couponDiscount !== undefined) {
+                  updateSummaryDiscounts(
+                    data.totals.offerDiscount || 0,
+                    data.totals.couponDiscount || 0
+                  );
+                }
+              }
+
+              const remainingItems = document.querySelectorAll('.cart-item');
+              if (remainingItems.length === 0) {
+                document.querySelector('.col-lg-8').innerHTML = `
                             <div class="empty-cart">
                                 <i class="fas fa-shopping-cart empty-cart-icon"></i>
                                 <h3 class="empty-cart-text">Your cart is empty</h3>
@@ -1051,104 +1171,103 @@
                                 <a href="/shopAll" class="continue-shopping-btn">Continue Shopping</a>
                             </div>
                         `;
-                        const checkoutBtn = document.querySelector('.checkout-btn');
-                        if (checkoutBtn) {
-                            checkoutBtn.disabled = true;
-                        }
-                    }
-                    
-                    // Update cart count in header
-                    const cartCount = document.querySelector('.cart-count');
-                    if (cartCount) {
-                        const currentCount = parseInt(cartCount.textContent) || 0;
-                        const newCount = Math.max(0, currentCount - 1);
-                        cartCount.textContent = newCount;
-                        if (newCount === 0) {
-                            cartCount.style.display = 'none';
-                        }
-                    }
-                    
-                    showNotification(data.message || 'Item removed from cart', 'success');
-                } else {
-                    showNotification(data.message || 'Failed to remove item', 'error');
+                const checkoutBtn = document.querySelector('.checkout-btn');
+                if (checkoutBtn) {
+                  checkoutBtn.disabled = true;
                 }
-            } catch (error) {
-                console.error('Error removing item:', error);
+              }
+
+              const cartCount = document.querySelector('.cart-count');
+              if (cartCount) {
+                const currentCount = parseInt(cartCount.textContent) || 0;
+                const newCount = Math.max(0, currentCount - 1);
+                cartCount.textContent = newCount;
+                if (newCount === 0) {
+                  cartCount.style.display = 'none';
+                }
+              }
+
+              showNotification(data.message || 'Item removed from cart', 'success');
+            } else {
+              showNotification(data.message || 'Failed to remove item', 'error');
             }
+          } catch (error) {
+            console.error('Error removing item:', error);
+          }
         }
 
         async function applyCoupon() {
-            const code = document.getElementById('couponCode').value.trim();
-            if (!code) {
-                showNotification('Please enter a coupon code', 'error');
-                return;
-            }
-            await applyCouponCode(code);
+          const code = document.getElementById('couponCode').value.trim();
+          if (!code) {
+            showNotification('Please enter a coupon code', 'error');
+            return;
+          }
+          await applyCouponCode(code);
         }
 
         async function selectCoupon(code) {
-            if (!code) {
-                showNotification('Invalid coupon code', 'error');
-                return;
-            }
-            const couponInput = document.getElementById('couponCode');
-            const applyButton = document.querySelector('.apply-coupon-btn');
-            couponInput.value = code;
-            applyButton.disabled = false;
-            await applyCouponCode(code);
+          if (!code) {
+            showNotification('Invalid coupon code', 'error');
+            return;
+          }
+          const couponInput = document.getElementById('couponCode');
+          const applyButton = document.querySelector('.apply-coupon-btn');
+          couponInput.value = code;
+          applyButton.disabled = false;
+          await applyCouponCode(code);
         }
 
         async function copyCouponCode(code, event) {
-            event.stopPropagation();
-            try {
-                await navigator.clipboard.writeText(code);
-                showNotification('Coupon code copied to clipboard!', 'success');
-            } catch (error) {
-                showNotification('Failed to copy coupon code', 'error');
-            }
+          event.stopPropagation();
+          try {
+            await navigator.clipboard.writeText(code);
+            showNotification('Coupon code copied to clipboard!', 'success');
+          } catch (error) {
+            showNotification('Failed to copy coupon code', 'error');
+          }
         }
 
         function updateSummaryDiscounts(offerDiscount, couponDiscount) {
-            const offerDiscountRow = document.getElementById('offer-discount-row');
-            const couponDiscountRow = document.getElementById('coupon-discount-row');
-            if (offerDiscount > 0) {
-                offerDiscountRow.style.display = 'flex';
-                document.getElementById('offer-discount').textContent = `-₹${offerDiscount.toLocaleString()}`;
-            } else {
-                offerDiscountRow.style.display = 'none';
-            }
-            if (couponDiscount > 0) {
-                couponDiscountRow.style.display = 'flex';
-                document.getElementById('coupon-discount').textContent = `-₹${couponDiscount.toLocaleString()}`;
-            } else {
-                couponDiscountRow.style.display = 'none';
-            }
+          const offerDiscountRow = document.getElementById('offer-discount-row');
+          const couponDiscountRow = document.getElementById('coupon-discount-row');
+          if (offerDiscount > 0) {
+            offerDiscountRow.style.display = 'flex';
+            document.getElementById('offer-discount').textContent = `-₹${offerDiscount.toLocaleString()}`;
+          } else {
+            offerDiscountRow.style.display = 'none';
+          }
+          if (couponDiscount > 0) {
+            couponDiscountRow.style.display = 'flex';
+            document.getElementById('coupon-discount').textContent = `-₹${couponDiscount.toLocaleString()}`;
+          } else {
+            couponDiscountRow.style.display = 'none';
+          }
         }
 
         async function applyCouponCode(code) {
-            try {
-                const response = await fetch('/apply-coupon', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ code })
-                });
-                const data = await response.json();
-                if (data.success) {
-                    showNotification(data.message, 'success');
-                    document.getElementById('subtotal').textContent = `₹${data.totals.subtotal.toLocaleString()}`;
-                    document.getElementById('shipping').textContent = data.totals.shipping === 0 ? 'Free' : `₹${data.totals.shipping.toLocaleString()}`;
-                    document.getElementById('finalPrice').textContent = `₹${data.totals.finalPrice.toLocaleString()}`;
-                    updateSummaryDiscounts(data.totals.offerDiscount, data.totals.couponDiscount);
-                    let couponSection = document.querySelector('.applied-coupon');
-                    if (!couponSection) {
-                        couponSection = document.createElement('div');
-                        couponSection.className = 'applied-coupon';
-                        document.querySelector('.coupon-input-group').after(couponSection);
-                    }
-                    const discountText = data.coupon.discountType === 'percentage' 
-                        ? `${data.coupon.discountValue}% off` 
-                        : `₹${data.coupon.discountValue} off`;
-                    couponSection.innerHTML = `
+          try {
+            const response = await fetch('/apply-coupon', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ code })
+            });
+            const data = await response.json();
+            if (data.success) {
+              showNotification(data.message, 'success');
+              document.getElementById('subtotal').textContent = `₹${data.totals.subtotal.toLocaleString()}`;
+              document.getElementById('shipping').textContent = data.totals.shipping === 0 ? 'Free' : `₹${data.totals.shipping.toLocaleString()}`;
+              document.getElementById('finalPrice').textContent = `₹${data.totals.finalPrice.toLocaleString()}`;
+              updateSummaryDiscounts(data.totals.offerDiscount, data.totals.couponDiscount);
+              let couponSection = document.querySelector('.applied-coupon');
+              if (!couponSection) {
+                couponSection = document.createElement('div');
+                couponSection.className = 'applied-coupon';
+                document.querySelector('.coupon-input-group').after(couponSection);
+              }
+              const discountText = data.coupon.discountType === 'percentage'
+                ? `${data.coupon.discountValue}% off`
+                : `₹${data.coupon.discountValue} off`;
+              couponSection.innerHTML = `
                         <div class="d-flex align-items-center justify-content-between">
                             <div class="d-flex align-items-center gap-2">
                                 <span class="text-success">Coupon Applied:</span>
@@ -1163,49 +1282,86 @@
                             You saved: ₹${data.totals.couponDiscount.toLocaleString()}
                         </div>
                     `;
-                    document.getElementById('couponCode').value = '';
-                    document.getElementById('couponCode').disabled = true;
-                    document.querySelector('.apply-coupon-btn').disabled = true;
-                    const couponItems = document.querySelectorAll('.coupon-item');
-                    couponItems.forEach(item => {
-                        const codeText = item.querySelector('.coupon-code').textContent.trim().split(' ')[0];
-                        if (codeText === data.coupon.code) {
-                            item.classList.add('applied');
-                            item.onclick = null;
-                        }
-                    });
-                    data.items.forEach(item => {
-                        const cartItem = document.querySelector(`.cart-item[data-id="${item._id}"]`);
-                        if (cartItem) {
-                            const priceElement = cartItem.querySelector('.product-price');
-                            if (priceElement) {
-                                priceElement.innerHTML = item.offerDiscount || item.couponDiscount
-                                    ? `<span class="text-decoration-line-through text-muted">₹${(item.originalPrice * item.quantity).toLocaleString()}</span> <span class="text-success ms-2">₹${item.totalPrice.toLocaleString()}</span>`
-                                    : `₹${item.totalPrice.toLocaleString()}`;
-                            }
-                            const discountBadge = cartItem.querySelector('.discount-badge');
-                            if (discountBadge) {
-                                let badgeHTML = '';
-                                if (item.offerDiscount > 0) {
-                                    badgeHTML += `<span class="badge bg-success me-2">${item.appliedOffer === 'product' ? 'Product Offer' : 'Category Offer'}: -₹${item.offerDiscount.toLocaleString()}</span>`;
-                                }
-                                if (item.couponDiscount > 0) {
-                                    badgeHTML += `<span class="badge bg-primary">Coupon: -₹${item.couponDiscount.toLocaleString()}</span>`;
-                                }
-                                discountBadge.innerHTML = badgeHTML;
-                            }
-                        }
-                    });
-                    location.reload();
-                } else {
-                    showNotification(data.message, 'error');
+              document.getElementById('couponCode').value = '';
+              document.getElementById('couponCode').disabled = true;
+              document.querySelector('.apply-coupon-btn').disabled = true;
+              const couponItems = document.querySelectorAll('.coupon-item');
+              couponItems.forEach(item => {
+                const codeText = item.querySelector('.coupon-code').textContent.trim().split(' ')[0];
+                if (codeText === data.coupon.code) {
+                  item.classList.add('applied');
+                  item.onclick = null;
                 }
-            } catch (error) {
-                console.log('Error occurred while applying coupon', error);
+              });
+              data.items.forEach(item => {
+                const cartItem = document.querySelector(`.cart-item[data-id="${item._id}"]`);
+                if (cartItem) {
+                  const priceElement = cartItem.querySelector('.product-price');
+                  if (priceElement) {
+                    priceElement.innerHTML = item.offerDiscount || item.couponDiscount
+                      ? `<span class="text-decoration-line-through text-muted">₹${(item.originalPrice * item.quantity).toLocaleString()}</span> <span class="text-success ms-2">₹${item.totalPrice.toLocaleString()}</span>`
+                      : `₹${item.totalPrice.toLocaleString()}`;
+                  }
+                  const discountBadge = cartItem.querySelector('.discount-badge');
+                  if (discountBadge) {
+                    let badgeHTML = '';
+                    if (item.offerDiscount > 0) {
+                      badgeHTML += `<span class="badge bg-success me-2">${item.appliedOffer === 'product' ? 'Product Offer' : 'Category Offer'}: -₹${item.offerDiscount.toLocaleString()}</span>`;
+                    }
+                    if (item.couponDiscount > 0) {
+                      badgeHTML += `<span class="badge bg-primary">Coupon: -₹${item.couponDiscount.toLocaleString()}</span>`;
+                    }
+                    discountBadge.innerHTML = badgeHTML;
+                  }
+                }
+              });
+              location.reload();
+            } else {
+              showNotification(data.message, 'error');
             }
+          } catch (error) {
+            console.log('Error occurred while applying coupon', error);
+          }
         }
 
-                async function removeCoupon() {
+
+        function proceedToCheckout() {
+          window.location.href = '/checkout';
+        }
+
+        function showNotification(message, type) {
+          Toastify({
+            text: message,
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            backgroundColor: type === 'success' ? '#4a6741' : '#e63946',
+            stopOnFocus: true,
+            style: {
+              fontFamily: "'Jost', sans-serif",
+              fontSize: "14px",
+              padding: "12px 20px",
+              borderRadius: "8px",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
+            }
+          }).showToast();
+        }
+
+        function toggleCoupons() {
+          const couponList = document.getElementById('couponList');
+          const showBtn = document.querySelector('.show-coupons-btn');
+          const showText = showBtn.querySelector('.show-text');
+          if (couponList.style.display === 'none') {
+            couponList.style.display = 'block';
+            showText.textContent = 'Hide';
+            showBtn.classList.add('active');
+          } else {
+            couponList.style.display = 'none';
+            showText.textContent = 'Show All';
+            showBtn.classList.remove('active');
+          }
+        }
+      async function removeCoupon() {
             try {
                 const result = await Swal.fire({
                     title: 'Remove Coupon',
@@ -1314,42 +1470,8 @@
                 showNotification(`Error removing coupon: ${error.message || 'Unknown error'}`, 'error');
             }
         }
-        function proceedToCheckout() {
-            window.location.href = '/checkout';
-        }
 
-        function showNotification(message, type) {
-            Toastify({
-                text: message,
-                duration: 3000,
-                gravity: "top",
-                position: "right",
-                backgroundColor: type === 'success' ? '#4a6741' : '#e63946',
-                stopOnFocus: true,
-                style: {
-                    fontFamily: "'Jost', sans-serif",
-                    fontSize: "14px",
-                    padding: "12px 20px",
-                    borderRadius: "8px",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
-                }
-            }).showToast();
-        }
-
-        function toggleCoupons() {
-            const couponList = document.getElementById('couponList');
-            const showBtn = document.querySelector('.show-coupons-btn');
-            const showText = showBtn.querySelector('.show-text');
-            if (couponList.style.display === 'none') {
-                couponList.style.display = 'block';
-                showText.textContent = 'Hide';
-                showBtn.classList.add('active');
-            } else {
-                couponList.style.display = 'none';
-                showText.textContent = 'Show All';
-                showBtn.classList.remove('active');
-            }
-        }
-    </script>
+      </script>
 </body>
+
 </html>
