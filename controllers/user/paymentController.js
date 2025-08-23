@@ -105,6 +105,9 @@ console.log('====cart data',cartData);
       })
       .populate('couponApplied');
 
+      console.log('cart]]]]]]]]]]]]]]]]]]]]',cart);
+
+
     if (!cart || cart.items.length === 0) {
       req.flash('error', 'Your cart is empty');
       return res.redirect('/cart');
