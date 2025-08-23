@@ -309,7 +309,6 @@ const cart = async (req, res) => {
         } else {
           totalCouponDiscount = coupon.discountValue;
         }
-  console.log('maxdis,totalcoupo-------',couponApplied.maxDiscount,totalCouponDiscount);
 
         appliedCouponDetails = coupon;
         couponApplied=coupon
@@ -317,9 +316,7 @@ const cart = async (req, res) => {
         cart.couponApplied = null;
       }
     }
-    if(totalCouponDiscount>couponApplied.maxDiscount){
-      totalCouponDiscount=couponApplied.maxDiscount
-    }
+ 
 
     const shipping = totalPrice - totalOfferDiscount - totalCouponDiscount >= 1000 ? 0 : 40;
     const finalPrice = totalPrice - totalOfferDiscount - totalCouponDiscount + shipping;
