@@ -316,9 +316,12 @@ const cart = async (req, res) => {
         cart.couponApplied = null;
       }
     }
+    if(couponApplied){
     if(totalCouponDiscount>couponApplied.maxDiscount){
       totalCouponDiscount=couponApplied.maxDiscount
     }
+    }
+    
  
 
     const shipping = totalPrice - totalOfferDiscount - totalCouponDiscount >= 1000 ? 0 : 40;
@@ -975,6 +978,10 @@ const removeCoupon = async (req, res) => {
         shipping,
         finalPrice,
       },
+      shipping,
+      finalPrice,
+      subtotal:totalPrice
+
     });
   } catch (error) {
     console.error("Error removing coupon:", error);
