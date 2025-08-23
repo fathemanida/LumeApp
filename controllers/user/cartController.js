@@ -317,6 +317,7 @@ const cart = async (req, res) => {
         cart.couponApplied = null;
       }
     }
+    console.log('totalcoupondiss,maxdis----',totalCouponDiscount.couponApplied.maxDiscount);
     if(totalCouponDiscount>couponApplied.maxDiscount){
       totalCouponDiscount=couponApplied.maxDiscount
     }
@@ -397,8 +398,8 @@ const updateQuantity = async (req, res) => {
 
     const offer=await Offer.find({
       isActive: true,
-      startDate: { $lte: now },
-      endDate: { $gte: now },
+      startDate: { $lte: new Date() },
+      endDate: { $gte: new date() },
       applicableOn: { $in: ["all", "categories", "products"] },
     }).lean();
     
