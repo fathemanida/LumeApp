@@ -269,7 +269,7 @@ const cart = async (req, res) => {
       const quantity = item.quantity;
       const unitPrice = product.salePrice;
 
-      const {maxDiscount,bestoffer}=getBestOffer(offers,product,quantity)
+      const {maxDiscount,bestoffer}=getBestOffer(product,offers,quantity)
       console.log('----maxdis,bestOfffer',bestoffer);
 
       let bestDiscountPerItem = maxDiscount
