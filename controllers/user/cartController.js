@@ -305,7 +305,7 @@ const cart = async (req, res) => {
       if (coupon) {
         if (coupon.discountType === "PERCENTAGE") {
           totalCouponDiscount =
-            ((totalPrice - totalOfferDiscount) * coupon.discountValue) / 100;
+            (totalOfferDiscount * coupon.discountValue) / 100;
         } else {
           totalCouponDiscount = coupon.discountValue;
         }
