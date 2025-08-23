@@ -152,7 +152,7 @@ console.log('====cart data',cartData);
       const isUsed = user.usedCoupons?.some(c => c.code === coupon.code);
       if (coupon && coupon.isActive && coupon.expiry > now && !isUsed) {
         const discountableAmount = subtotal - totalOfferDiscount;
-        if (coupon.discountType === 'percentage') {
+        if (coupon.discountType === 'PERCENTAGE') {
           couponDiscount = (discountableAmount * coupon.discountValue) / 100;
           if (coupon.maxDiscount) {
             couponDiscount = Math.min(couponDiscount, coupon.maxDiscount);
@@ -160,6 +160,11 @@ console.log('====cart data',cartData);
         } else {
           couponDiscount = Math.min(coupon.discountValue, discountableAmount);
         }
+      }
+    }
+    if(cart.couponApplied){
+      if(couponDiscount>cart.couponApplied.maxDiscount){
+        couponDiscount=cart.couponApplied.maxDiscount;
       }
     }
 
@@ -362,6 +367,28 @@ const createOrder = async (req, res) => {
         if (cart.couponApplied.maxDiscount) {
           totalCouponDiscount = Math.min(totalCouponDiscount, cart.couponApplied.maxDiscount);
         }
+      }
+
+      if(cart.couponApplied){
+        if(totalCouponDiscount>cart.couponApplied.maxDiscount){
+          totalCouponDiscount=cart.couponApplied.maxDiscount
+        }
+      }
+      if(cart.couponApplied){
+      const couponId = cart.couponApplied?._id;
+      const couponCode = cart.appliedCouponDetails?.code?.toUpperCase();
+      if (couponId) {
+      await Coupon.findByIdAndUpdate(couponId, {
+        $push: { usedBy: userId },
+      });
+    }
+
+    if (couponCode) {
+      await User.findByIdAndUpdate(userId, {
+        $push: { usedCoupons: { code: couponCode } },
+      });
+    }
+    console.log('coupon doc saved');
       }
 
           const shipping = totalPrice >= 1500 ? 0 : 40;
