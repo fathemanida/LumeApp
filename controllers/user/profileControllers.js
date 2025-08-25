@@ -304,13 +304,19 @@ const verifyOtp = async (req, res) => {
       });
     }
 
+
     if (otp === req.session.otp) {
       req.session.emailVerified = true;
+       await User.findByIdAndUpdate(
+        req.session.user.id,
+        {email:req.session.pendingEmail},
+        {new:true})
       req.session.verifiedEmail = req.session.pendingEmail;
 
       req.session.otp = null;
       req.session.otpGeneratedAt = null;
       req.session.pendingEmail = null;
+     
 
       return res.json({
         success: true,
@@ -418,6 +424,8 @@ const getEditProfile = async (req, res) => {
       }
       updates.email = req.body.email;
     }
+
+    console.log('email------',req.body.email,'----sessionemail-------',req.session.user.email);
 
     try {
       const updatedUser = await User.findByIdAndUpdate(
@@ -858,7 +866,8 @@ const changePassword = async (req, res) => {
     if (!currentPassword || !newPassword || !confirmPassword) {
       return res.status(400).json({ 
         success: false, 
-        message: "All password fields are required" 
+        message: "All password fields are required" ,
+        
       });
     }
 
@@ -891,7 +900,8 @@ const changePassword = async (req, res) => {
 
     return res.status(200).json({ 
       success: true, 
-      message: "Password changed successfully" 
+      message: "Password changed successfully" ,
+      redirectUrl:"/profile/update"
     });
 
   } catch (error) {
