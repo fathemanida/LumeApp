@@ -365,7 +365,7 @@ const cart = async (req, res) => {
       couponApplied: couponApplied,
       discount: totalCouponDiscount,
       breadcrumbs,
-      bestOffer:bestOffer
+      
     });
   } catch (err) {
     console.error("Error loading cart:", err);
