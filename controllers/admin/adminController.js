@@ -293,6 +293,10 @@ const loadSalesreport = async (req, res) => {
       createdOn: order.createdOn
     }));
 
+    console.log('cutomers-----.',totalCustomers);
+    console.log('products-----.',totalProducts);
+    console.log('orders-------',totalOrders);
+
     res.render('admin/sales-report', {
       totalCustomers,
       totalProducts,

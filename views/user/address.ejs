@@ -351,15 +351,14 @@
                         <% addresses.forEach(address => { %>
                             <div class="address-card">
                                 <span class="address-type">
-                                    <%= address.type %>
+                                    <%= address.addressType %>
                                 </span>
                                 <h3 class="address-name">
                                     <%= address.name %>
                                 </h3>
                                 <div class="address-details">
                                     <p><%= address.street %>,
-                                    <%= address.city %>, <%= address.state %> <%= address.zipCode %></p>
-                                    <p><%= address.country %></p>
+                                    <%= address.city %>, <%= address.state %> <%= address.pincode %></p>
                                     <p>Phone: <%= address.phone %></p>
                                 </div>
                                 <div class="address-actions">
