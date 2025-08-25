@@ -260,19 +260,7 @@ const verifyOtp = async (req, res) => {
           });
           await newUserWallet.save();
 
-          const coupon = new Offer({
-            name: `Referral Reward - ${referrer.name}`,
-            code: `REF${referrer.referalCode}`,
-            discountType: 'flat',
-            discountValue: 100,
-            startDate: new Date(),
-            endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-            applicableOn: 'all',
-            isActive: true,
-            isReferral: true,
-            userId: referrer._id
-          });
-          await coupon.save();
+
         }
       }
        return res.json({
