@@ -152,7 +152,7 @@ const verifypassOTP = async (req, res) => {
       return res.json({
         success: true,
         message: "OTP Verified successfully!",
-        redirectUrl: "/reset-password",
+        redirectUrl: "/",
       });
     } else {
       return res.status(400).json({
