@@ -362,11 +362,11 @@
                     <label>Phone</label>
                     <input type="text" name="phone" value="<%= users.phone || '' %>" class="input-field">
                 </div>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" name="email" value="<%= users.email %>" class="input-field" id="emailInput">
-                    <button type="button" id="verifyEmailBtn" class="text-sm hidden">Verify New Email</button>
-                </div>
+<div class="form-group">
+  <label>Email</label>
+  <input type="email" name="email" value="<%= users.email %>" class="input-field" id="emailInput">
+  <button type="button" id="verifyEmailBtn" class="text-sm hidden">Verify New Email</button>
+</div>
 
                 <div>
                     <% if (users.googleId) { %>
@@ -375,18 +375,19 @@
                         <a href="/change-password" class="change-password-link">Change Password</a>
                     <% } %>
                 </div>
+                <br>
 
-                <div id="otpSection" class="hidden">
-                    <div class="form-group">
-                        <label>OTP Verification</label>
-                        <p class="text-sm">We've sent an OTP to your new email. Please check and enter it below.</p>
-                        <input type="text" name="otp" class="input-field" placeholder="Enter 6-digit OTP" maxlength="6">
-                        <div class="flex justify-between items-center mt-2">
-                            <button type="button" id="resendOtpBtn" class="text-sm">Resend OTP</button>
-                            <span id="otpTimer" class="text-sm"></span>
-                        </div>
-                    </div>
-                </div>
+<div id="otpSection" class="hidden">
+  <div class="form-group">
+    <label>OTP Verification</label>
+    <p class="text-sm">We've sent an OTP to your new email. Please check and enter it below.</p>
+    <input type="text" name="otp" class="input-field" placeholder="Enter 6-digit OTP" maxlength="6">
+    <div class="flex justify-between items-center mt-2">
+      <button type="button" id="resendOtpBtn" class="text-sm">Resend OTP</button>
+      <span id="otpTimer" class="text-sm"></span>
+    </div>
+  </div>
+</div>
 
                 <div class="flex justify-end">
                     <button type="submit" class="submit-btn">Save Changes</button>
@@ -415,6 +416,16 @@
             const otpTimer = document.getElementById('otpTimer');
             let timerInterval;
             const originalEmail = '<%= users.email %>';
+            emailInput.addEventListener('input', function () {
+  const newEmail = this.value.trim();
+
+  if (newEmail && newEmail !== originalEmail) {
+    verifyEmailBtn.classList.remove('hidden');
+    otpSection.classList.remove('hidden'); 
+  } else {
+    verifyEmailBtn.classList.add('hidden');
+    otpSection.classList.add('hidden'); 
+  }
 
             fileInput.addEventListener('change', function (e) {
                 if (this.files && this.files[0]) {
