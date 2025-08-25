@@ -274,8 +274,8 @@ const cart = async (req, res) => {
       const quantity = item.quantity;
       const unitPrice = product.salePrice;
 
-      const {maxDiscount,bestoffer}=getBestOffer(product,offers,quantity)
-      console.log('----maxdis,bestOfffer',bestoffer);
+      const {maxDiscount,bestOffer,offerType}=getBestOffer(product,offers,quantity)
+      console.log('----maxdis,bestOfffer',maxDiscount,bestOffer,offerType);
 
       let bestDiscountPerItem = maxDiscount
       
@@ -365,6 +365,7 @@ const cart = async (req, res) => {
       couponApplied: couponApplied,
       discount: totalCouponDiscount,
       breadcrumbs,
+      bestOffer:bestOffer
     });
   } catch (err) {
     console.error("Error loading cart:", err);
