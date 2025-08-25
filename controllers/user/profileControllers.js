@@ -109,6 +109,7 @@ const forgotEmailValid = async (req, res) => {
     if (emailSent) {
       req.session.userOtp = otp;
       req.session.email = email;
+      console.log('-----otp',otp);
       req.session.save(() => {
         return res.json({
           success: true,
