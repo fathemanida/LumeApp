@@ -216,7 +216,10 @@ const checkNewPassword = async (req, res) => {
 
     if (password === Cpassword) {
       const passwordHash = await securePassword(password);
-      await User.updateOne({ email }, { $set: { password: passwordHash } });
+      await User.findByIdAndUpdate(
+        { email }, 
+        { password: passwordHash } ,
+        {new:true});
 
       return res.redirect("/login");
     } else {
