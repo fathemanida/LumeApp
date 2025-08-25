@@ -124,7 +124,7 @@ router.get('/passForgot-otp',profileController.verifypassOTPpage);
 router.post('/verify-passForgot-otp',profileController.verifypassOTP);
 router.post("/resend-forgotPass-otp",profileController.forgotresendOtp)
 router.get("/reset-password",profileController.getResetPassword)
-router.post("/reset-password",profileController.checkNewPassword)
+router.post("/get-reset-password",profileController.checkNewPassword)
 
 
 
