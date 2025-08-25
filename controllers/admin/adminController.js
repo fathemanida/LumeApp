@@ -707,7 +707,12 @@ const loadDashboard = async (req, res) => {
     dateQuery = { createdOn: { $gte: start, $lte: end } };
     previousPeriodQuery = { createdOn: { $gte: prevStart, $lte: prevEnd } };
 
-    const orders = await Order.find(dateQuery).populate('items.productId').lean();
+const orders = await Order.find({
+  ...dateQuery,
+  status: { $nin: ["Cancelled", "Returned"] }
+})
+.populate('items.productId')
+.lean();
     const prevOrders = await Order.find(previousPeriodQuery).lean();
 
     const totalRevenue = orders.reduce((sum, o) => sum + (o.totalAmount || 0), 0);

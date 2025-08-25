@@ -68,10 +68,10 @@ const createCoupon = async (req, res) => {
       });
     }
     const couponCode = code.toUpperCase();
-if (couponCode.length < 5 || couponCode.length > 8) {
+if (couponCode.length < 5 || couponCode.length > 14) {
   return res.status(400).json({
     success: false,
-    message: 'Coupon code must be between 5 and 8 characters'
+    message: 'Coupon code must be between 5 and 14 characters'
   });
 }
     const coupon = new Coupon({
@@ -87,6 +87,7 @@ if (couponCode.length < 5 || couponCode.length > 8) {
     });
 
     await coupon.save();
+    console.log(';coupon added successfully');
 
     res.status(201).json({
       success: true,
