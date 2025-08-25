@@ -165,7 +165,7 @@ const verifypassOTP = async (req, res) => {
       .status(500)
       .json({
         success: false,
-        message: "error in verify otp for reser password",
+        message: "error in verify otp for reset password",
       });
   }
 };
