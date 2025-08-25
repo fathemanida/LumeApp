@@ -268,14 +268,13 @@ const cart = async (req, res) => {
 
     let totalPrice = 0;
     let totalOfferDiscount = 0;
+      let offerShare
 
     for (let item of cart.items) {
       const product = item.productId;
       const quantity = item.quantity;
       const unitPrice = product.salePrice;
-      let offerShare
 
-      const {maxDiscount,bestOffer,offerType}=getBestOffer(product,offers,quantity)
       console.log('----maxdis,bestOfffer',maxDiscount,bestOffer,offerType);
       if(bestOffer){
         offerShare=bestOffer
@@ -370,7 +369,7 @@ const cart = async (req, res) => {
       couponApplied: couponApplied,
       discount: totalCouponDiscount,
       breadcrumbs,
-      bestOffer:offerShare
+      bestOffer:offerShare || null
       
     });
   } catch (err) {
