@@ -274,33 +274,35 @@
                 });
                 
                 const result = await response.json();
+                console.log('daaaaata',result);
                 
-                if (response.ok) {
-                await Swal.fire({
-                icon: "success",
-                title: "Success!",
-                text: result.message || "<%= coupon ? 'Coupon updated successfully' : 'Coupon created successfully' %>",
-                timer: 2000,
-                showConfirmButton: false
-                });
-                if (response.ok) {
-                    setTimeout(() => {
-                        window.location.href = '/admin/coupons';
-                    }, 1000);
-                        } else {
-                    showToast(result.message || "Error updating coupon", 'error');
-                        }
-                  } else {
-Toastify({
-  text: result.message || "Error <%= coupon ? 'updating' : 'creating' %> coupon",
-  duration: 4000,
-  close: true,
-  gravity: "top", 
-  position: "right", 
-  backgroundColor: "#ef4444", 
-  stopOnFocus: true, 
-}).showToast();
+            if (result.success) {
+    Toastify({
+        text: result.message || "<%= coupon ? 'Coupon updated successfully' : 'Coupon created successfully' %>",
+        duration: 3000,
+        close: true,
+        gravity: "top",
+        position: "right",
+        backgroundColor: "#22c55e", 
+        stopOnFocus: true,
+    }).showToast();
+
+    setTimeout(() => {
+        window.location.href = '/admin/coupons';
+    }, 1000);
+
+} else {
+    Toastify({
+        text: result.message || "Error <%= coupon ? 'updating' : 'creating' %> coupon",
+        duration: 4000,
+        close: true,
+        gravity: "top",
+        position: "right",
+        backgroundColor: "#ef4444",
+        stopOnFocus: true,
+    }).showToast();
 }
+
 
             } catch (error) {
                 console.error('Error:', error);

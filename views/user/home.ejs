@@ -846,7 +846,6 @@
   <%- include('../partials/user/breadcrumps.ejs') %>
 
 
-  <!-- Ornament Banner Start -->
   <style>
     .ornament-banner-container {
       position: relative;
@@ -955,7 +954,6 @@
     <div class="ornament-nav-icon ornament-nav-left" id="ornamentPrevBtn"><i class="fas fa-chevron-left"></i></div>
     <div class="ornament-nav-icon ornament-nav-right" id="ornamentNextBtn"><i class="fas fa-chevron-right"></i></div>
     <div class="ornament-banner-slides" id="ornamentSlides">
-      <!-- Slide 1 -->
       <div class="ornament-banner-slide">
         <img src="/uploads/banner/banner-1.png" alt="Antique Vase">
         <div class="ornament-slide-content">
@@ -963,7 +961,6 @@
           <p>"The beauty of ornaments lies in their ability to tell stories across generations."</p>
     </div>
         </div>
-      <!-- Slide 2 -->
       <div class="ornament-banner-slide">
         <img src="/uploads/banner/banner-2.png" alt="Porcelain Figurine">
         <div class="ornament-slide-content">
@@ -971,7 +968,6 @@
           <p>"True ornaments are not just decorations, but fragments of history in our hands."</p>
         </div>
       </div>
-      <!-- Slide 3 -->
       <div class="ornament-banner-slide">
         <img src="/uploads/banner/banner-3.png" alt="Brass Sculpture">
         <div class="ornament-slide-content">
@@ -979,7 +975,6 @@
           <p>"In every delicate curve of an antique ornament, we find the patience of its maker."</p>
         </div>
         </div>
-      <!-- Clone of Slide 1 for seamless looping -->
       <div class="ornament-banner-slide">
         <img src="/uploads/banner/banner-4.webp" alt="Antique Vase">
         <div class="ornament-slide-content">
@@ -990,7 +985,6 @@
         </div>
       </div>
   <script>
-    // Function to toggle wishlist status
     async function toggleWishlist(iconElement, productId) {
       try {
         const response = await fetch('/wishlist/add', {
@@ -1004,12 +998,10 @@
         const result = await response.json();
         
         if (result.success) {
-          // Toggle the heart icon between outline and solid
           if (iconElement.classList.contains('far')) {
             iconElement.classList.remove('far');
             iconElement.classList.add('fas', 'text-danger');
             
-            // Show success toast
             Toastify({
               text: "Added to wishlist",
               duration: 3000,
@@ -1023,7 +1015,6 @@
             iconElement.classList.remove('fas', 'text-danger');
             iconElement.classList.add('far');
             
-            // Show removed toast
             Toastify({
               text: "Removed from wishlist",
               duration: 3000,
@@ -1135,7 +1126,6 @@
     });
   </script>
   
-  <!-- Spotlight Product Section -->
   <section class="py-5 main-content-container" style="background-color: #f9f7f5;">
     <h2 class="section-heading display-6 text-center">SPOTLIGHT PRODUCT</h2>
     <p class="section-subtext mt-2 text-center">Discover our latest standout piece</p>
@@ -1314,7 +1304,6 @@
     </script>
   </section>
 
-  <!-- New Collection Banner -->
   <section class="text-center py-5" style="background-color: #f9f7f5;">
     <h2 class="section-heading display-6">NEW COLLECTION</h2>
     <p class="section-subtext mt-2">Discover our curated selection of iconic pieces</p>
@@ -1431,10 +1420,8 @@
     </script>
   </section>
 
-  <!-- SELECT YOUR SPARKLE Banner -->
   <div class="sparkle-banner text-center py-3 fs-4">SELECT YOUR SPARKLE</div>
 
-  <!-- Product Categories -->
   <section class="category-grid-section py-5 main-content-container">
     <% if (category && category.length > 0) { %>
       <div class="category-grid">
@@ -1463,7 +1450,6 @@
     <% } %>
   </section>
 
-  <!-- Footer -->
   <%-include("../partials/user/fooret.ejs")%>
 
   <!-- Bootstrap JS and dependencies -->
