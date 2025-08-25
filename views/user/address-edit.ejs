@@ -376,11 +376,25 @@
                                 <input type="text" id="pincode" class="input-field" placeholder="Pincode" value="<%= address.pincode %>" required>
                                 <span id="pincodeError" class="error-message"></span>
                             </div>
-                            <div class="form-group">
-                                <label for="state">State</label>
-                                <input type="text" id="state" class="input-field" placeholder="State" value="<%= address.state %>" required>
-                                <span id="stateError" class="error-message"></span>
-                            </div>
+<div class="form-group">
+  <label for="state">State</label>
+  <select id="state" name="state" class="input-field" required>
+    <% const states = [
+      "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
+      "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand",
+      "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur",
+      "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan",
+      "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh",
+      "Uttarakhand", "West Bengal"
+    ]; %>
+
+    <% states.forEach(st => { %>
+      <option value="<%= st %>" <%= address.state === st ? "selected" : "" %>><%= st %></option>
+    <% }) %>
+  </select>
+  <span id="stateError" class="error-message"></span>
+</div>
+
                             <div class="form-group">
                                 <label for="city">City</label>
                                 <input type="text" id="city" class="input-field" placeholder="City" value="<%= address.city %>" required>
